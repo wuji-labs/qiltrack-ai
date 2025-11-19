@@ -1,0 +1,79 @@
+import { NextRequest, NextResponse } from "next/server";
+
+const FINNHUB_BASE = "https://finnhub.io/api/v1";
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const q = searchParams.get("q")?.trim();
+
+  if (!q) {
+    return NextResponse.json(
+      { error: "Missing q query parameter" },
+      { status: 400 }
+    );
+  }
+
+  const apiKey = process.env.FINNHUB_API_KEY;
+
+  if (!apiKey) {
+    console.error("Missing FINNHUB_API_KEY");
+    return NextResponse.json(
+      { error: "Server configuration error: missing FINNHUB_API_KEY" },
+      { status: 500 }
+    );
+  }
+
+  try {
+    const url = `${FINNHUB_BASE}/search?q=${encodeURIComponent(
+      q
+    )}&token=${apiKey}`;
+
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("Finnhub search error:", res.status, text);
+      return NextResponse.json(
+        { error: "Failed to search symbol from Finnhub" },
+        { status: 502 }
+      );
+    }
+
+    const data = await res.json();
+
+    type FinnhubSearchItem = {
+      description: string;
+      symbol: string;
+      displaySymbol?: string;
+      type?: string;
+    };
+
+    const rawResults = Array.isArray(data.result)
+      ? (data.result as FinnhubSearchItem[])
+      : [];
+
+    // 只取前 10 个有用结果
+    const results = rawResults
+      .filter((item): item is FinnhubSearchItem =>
+        Boolean(item.symbol && item.description)
+      )
+      .slice(0, 10)
+      .map((item) => ({
+        symbol: String(item.symbol),
+        description: String(item.description),
+        displaySymbol: item.displaySymbol ? String(item.displaySymbol) : undefined,
+        type: item.type ? String(item.type) : undefined,
+      }));
+
+    return NextResponse.json({
+      query: q,
+      results,
+    });
+  } catch (err) {
+    console.error("Unexpected error in /api/search:", err);
+    return NextResponse.json(
+      { error: "Unexpected server error" },
+      { status: 500 }
+    );
+  }
+}

@@ -1,0 +1,148 @@
+"use client";
+
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { useState, type FormEvent } from "react";
+
+import { useLanguage } from "@/lib/i18n";
+
+const providerButtons = [
+	{ id: "google", icon: "☉", labelKey: "auth.provider.google" },
+	{ id: "apple", icon: "", labelKey: "auth.provider.apple" },
+	{ id: "azure-ad", icon: "◆", labelKey: "auth.provider.microsoft" },
+] as const;
+
+export default function LoginPage() {
+	const { t } = useLanguage();
+	const searchParams = useSearchParams();
+	const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+	const requestError = searchParams.get("error");
+
+	const [pendingProvider, setPendingProvider] = useState<string | null>(null);
+	const [email, setEmail] = useState("");
+	const [emailStatus, setEmailStatus] = useState<"idle" | "loading" | "sent" | "error">("idle");
+
+	const errorMessage = requestError ? t("auth.error.generic") : null;
+	const successMessage = emailStatus === "sent" ? t("auth.success.magicLink") : null;
+
+	const handleProvider = async (provider: string) => {
+		try {
+			setPendingProvider(provider);
+			await signIn(provider, { callbackUrl });
+		} finally {
+			setPendingProvider(null);
+		}
+	};
+
+	const handleEmailSubmit = async (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		if (!email) return;
+		setEmailStatus("loading");
+		try {
+			const result = await signIn("email", {
+				email,
+				callbackUrl,
+				redirect: false,
+			});
+			if (result?.error) {
+				setEmailStatus("error");
+				return;
+			}
+			setEmailStatus("sent");
+		} catch (err) {
+			console.error("Email sign-in failed", err);
+			setEmailStatus("error");
+		}
+	};
+
+	const disabled = emailStatus === "loading";
+
+	return (
+		<div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-4 py-10">
+			<div className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900/80 backdrop-blur-xl shadow-[0_20px_80px_rgba(0,0,0,0.6)] p-8 space-y-6">
+				<div className="flex flex-col items-center gap-2 text-center">
+					<div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-300 to-sky-400 flex items-center justify-center font-black tracking-[0.2em] text-slate-950">
+						IA
+					</div>
+					<h1 className="text-2xl font-semibold">{t("auth.page.title")}</h1>
+					<p className="text-sm text-slate-400">{t("auth.page.subtitle")}</p>
+				</div>
+
+				{errorMessage && (
+					<div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+						{errorMessage}
+					</div>
+				)}
+
+				{successMessage && (
+					<div className="rounded-2xl border border-emerald-400/40 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
+						{successMessage}
+					</div>
+				)}
+
+				<div className="space-y-3">
+					{providerButtons.map((provider) => {
+						const loading = pendingProvider === provider.id;
+						return (
+							<button
+								key={provider.id}
+								type="button"
+								onClick={() => handleProvider(provider.id)}
+								disabled={loading}
+								className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-800 px-4 py-3 text-sm font-medium transition-colors ${
+									loading
+										? "opacity-60 cursor-not-allowed"
+										: "hover:border-emerald-400 hover:bg-slate-900"
+								}`}
+							>
+								<span>{provider.icon}</span>
+								<span>{t(provider.labelKey)}</span>
+							</button>
+						);
+					})}
+				</div>
+
+				<div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.3em] text-slate-600">
+					<span className="flex-1 h-px bg-slate-800" />
+					{t("auth.modal.or")}
+					<span className="flex-1 h-px bg-slate-800" />
+				</div>
+
+				<form onSubmit={handleEmailSubmit} className="space-y-3">
+					<label className="text-xs text-slate-400 block">
+						{t("auth.form.email")}
+						<input
+							type="email"
+							value={email}
+							onChange={(event) => setEmail(event.target.value)}
+							placeholder={t("auth.form.placeholder")}
+							className="mt-1 w-full rounded-2xl border border-slate-800 bg-transparent px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+						/>
+					</label>
+					<button
+						type="submit"
+						disabled={disabled}
+						className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-400 text-slate-950 py-3 text-sm font-semibold transition-opacity ${
+							disabled ? "opacity-60 cursor-not-allowed" : "hover:opacity-90"
+						}`}
+					>
+						{disabled ? t("auth.form.loading") : t("auth.email.button")}
+					</button>
+					<p className="text-[11px] text-slate-500">{t("auth.modal.emailHint")}</p>
+				</form>
+
+				<p className="text-[11px] text-slate-500 text-center">
+					{t("auth.footer.prefix")}{" "}
+					<Link href="/legal/terms" className="text-emerald-300 hover:underline">
+						{t("auth.footer.terms")}
+					</Link>{" "}
+					{t("auth.footer.connector")}{" "}
+					<Link href="/legal/privacy" className="text-emerald-300 hover:underline">
+						{t("auth.footer.privacy")}
+					</Link>
+				</p>
+			</div>
+		</div>
+	);
+}
