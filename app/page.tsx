@@ -746,24 +746,11 @@ const workflowStatusText = loading
 	const mainBg = isDark
 		? "bg-slate-950 text-slate-100"
 		: "bg-slate-50 text-slate-900";
-	const cardPrimary = isDark
-		? "bg-slate-900/85 border-slate-800"
-		: "bg-white border-slate-200";
 	const cardSecondary = isDark
 		? "bg-slate-900/80 border-slate-800"
 		: "bg-white border-slate-200";
 	const subtleText = isDark ? "text-slate-400" : "text-slate-500";
 	const strongSubtleText = isDark ? "text-slate-300" : "text-slate-600";
-	const tagBg = isDark
-		? "bg-emerald-400/10 border-emerald-500/40 text-emerald-200"
-		: "bg-emerald-50 border-emerald-300 text-emerald-700";
-	const inputBg = isDark
-		? "bg-slate-950 border-slate-700 text-slate-100"
-		: "bg-white border-slate-300 text-slate-900";
-	const dropdownBg = isDark
-		? "bg-slate-950/98 border-slate-800 divide-slate-800"
-		: "bg-white border-slate-200 divide-slate-100";
-	const skeletonBg = isDark ? "bg-slate-800" : "bg-slate-200";
 	const selectedToneInfo =
 		toneOptions.find((option) => option.id === selectedTone) || toneOptions[0];
 	const lastToneInfo =
@@ -937,265 +924,294 @@ const markdownComponents: Components = {
 				className={`min-h-screen ${mainBg} flex flex-col`}
 				style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont" }}
 			>
-			<nav className="border-b border-slate-800/60 px-4 sm:px-8 py-3 flex items-center justify-between sticky top-0 z-30 backdrop-blur bg-slate-950/80">
-				<div className="flex items-center gap-2">
-					<div className="h-7 w-7 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-300 to-sky-400 shadow-md shadow-emerald-500/40 flex items-center justify-center text-[11px] font-black tracking-[0.2em] text-slate-950">
+			<nav className="sticky top-0 z-40 flex flex-wrap items-center gap-4 border border-[var(--stroke-soft)]/70 bg-[var(--bg-frosted)]/80 px-4 sm:px-8 py-3 backdrop-blur-xl shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
+				<div className="flex items-center gap-3 min-w-[200px]">
+					<div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-[var(--accent-blue)] via-[var(--accent-purple)] to-[var(--accent-emerald)] flex items-center justify-center text-[11px] font-black tracking-[0.3em] text-slate-950 shadow-[0_10px_30px_rgba(165,138,255,0.35)]">
 						IA
 					</div>
 					<div className="flex flex-col leading-tight">
-						<span className="text-sm font-semibold tracking-wide">
+						<span className="text-sm font-semibold tracking-[0.12em] uppercase text-dim">
 							{t("brand.title")}
 						</span>
-						<span className="text-[11px] text-slate-400">
+						<span className="text-[11px] text-subtle tracking-[0.2em] uppercase">
 							{t("brand.subtitle")}
 						</span>
 					</div>
 				</div>
 
-				<div className="hidden md:flex items-center gap-5 text-[12px] text-slate-300">
+				<div className="hidden md:flex flex-1 items-center justify-center gap-6 text-[11px] uppercase tracking-[0.3em] text-subtle">
 					{navItems.map((item) => (
 						<a
 							key={item.href}
 							href={item.href}
-							className="uppercase tracking-wide hover:text-emerald-300 transition-colors"
+							className="transition text-subtle hover:text-[var(--accent-blue)]"
 						>
 							{t(item.labelKey)}
 						</a>
 					))}
 				</div>
 
-				<div className="flex items-center gap-3 flex-wrap justify-end">
-					<div
-						ref={languageMenuRef}
-						className="relative text-[12px]"
-					>
-				<button
-					type="button"
-					onClick={() => setLanguageMenuOpen((open) => !open)}
-					className="inline-flex items-center gap-1 rounded-full border border-slate-800 px-3 py-1 text-slate-200 hover:border-emerald-400"
-					aria-haspopup="listbox"
-					aria-expanded={languageMenuOpen}
-				>
-					<span>{LANGUAGE_LABEL[language]}</span>
-					<span className="text-[10px] text-slate-500">▾</span>
-				</button>
-				{languageMenuOpen && (
-					<div className="absolute right-0 mt-2 w-40 rounded-xl border border-slate-800 bg-slate-950/95 shadow-2xl shadow-slate-900/50">
-						<ul role="listbox" className="py-1">
-							{LANGUAGE_ORDER.map((lang) => (
-								<li key={lang}>
-									<button
-										type="button"
-										onClick={() => {
-											setLanguage(lang);
-											setLanguageMenuOpen(false);
-										}}
-										className={`w-full text-left px-4 py-2 text-[12px] transition-colors ${
-											lang === language
-												? "text-emerald-300"
-												: "text-slate-300 hover:text-emerald-200"
-											}`}
-									>
-										{LANGUAGE_LABEL[lang]}
-									</button>
-								</li>
-							))}
-						</ul>
+				<div className="flex flex-1 md:flex-none items-center justify-end gap-2 flex-wrap text-[12px]">
+					<div ref={languageMenuRef} className="relative">
+						<button
+							type="button"
+							onClick={() => setLanguageMenuOpen((open) => !open)}
+							className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3 py-1.5 text-dim transition hover:border-[var(--stroke-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40"
+							aria-haspopup="listbox"
+							aria-expanded={languageMenuOpen}
+						>
+							<span>{LANGUAGE_LABEL[language]}</span>
+							<span className="text-[10px] text-subtle">▾</span>
+						</button>
+						{languageMenuOpen && (
+							<div className="absolute right-0 mt-2 w-44 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/95 p-1 shadow-[0_20px_80px_rgba(0,0,0,0.65)] backdrop-blur-xl">
+								<ul role="listbox" className="space-y-1">
+									{LANGUAGE_ORDER.map((lang) => (
+										<li key={lang}>
+											<button
+												type="button"
+												onClick={() => {
+													setLanguage(lang);
+													setLanguageMenuOpen(false);
+												}}
+												className={`w-full text-left rounded-xl px-4 py-2 text-[12px] tracking-wide transition ${
+													lang === language
+														? "bg-[var(--bg-layer)] text-[var(--accent-blue)]"
+														: "text-dim hover:text-[var(--accent-blue)]"
+												}`}
+											>
+												{LANGUAGE_LABEL[lang]}
+											</button>
+										</li>
+									))}
+								</ul>
+							</div>
+						)}
 					</div>
-				)}
-			</div>
-			{session ? (
-				<>
-					<div className="text-xs px-3 py-1.5 rounded-full border border-emerald-400/40 text-slate-200 bg-slate-900/40">
-						<span>{sessionUserEmail ?? t("auth.session.fallback")}</span>
-						<span className="ml-2 text-emerald-300">
-							{t("auth.cta.remaining", { count: remainingFreeQuota.toString() })}
-						</span>
-					</div>
+					{session ? (
+						<div className="flex items-center gap-2 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3 py-2 text-[11px] leading-tight">
+							<div className="flex flex-col text-subtle">
+								<span className="font-medium text-dim">
+									{sessionUserEmail ?? t("auth.session.fallback")}
+								</span>
+								<span className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent-emerald)]">
+									{t("auth.cta.remaining", { count: remainingFreeQuota.toString() })}
+								</span>
+							</div>
+							<button
+								type="button"
+								onClick={() => signOut()}
+								className="btn-ghost px-3 py-1 text-[11px]"
+							>
+								{t("auth.account.signout")}
+							</button>
+						</div>
+					) : (
+						<Link
+							href="/login"
+							className="btn-ghost px-4 py-1.5 text-[11px]"
+						>
+							{t("auth.cta.button")}
+						</Link>
+					)}
 					<button
 						type="button"
-						onClick={() => signOut()}
-						className="text-xs px-3 py-1.5 rounded-full border border-slate-700 text-slate-200 hover:bg-slate-900 transition-colors"
+						onClick={handlePrimaryCta}
+						className="btn-gradient px-4 py-1.5 text-[11px]"
 					>
-						{t("auth.account.signout")}
+						{t("cta.preview")}
+						<span className="text-[9px] font-normal text-slate-900/70 normal-case tracking-normal">
+							{t("cta.preview.note")}
+						</span>
 					</button>
-				</>
-			) : (
-				<Link
-					href="/login"
-					className="text-xs px-4 py-1.5 rounded-full border border-slate-700 text-slate-200 hover:bg-slate-900 transition-colors"
-				>
-					{t("auth.cta.button")}
-				</Link>
-			)}
-									<button
-										type="button"
-										onClick={handlePrimaryCta}
-										className="inline-flex items-center gap-1 text-xs font-semibold px-4 py-1.5 rounded-full bg-emerald-400 text-slate-900 hover:bg-emerald-300 transition-colors"
-									>
-										{t("cta.preview")}
-					<span className="text-[10px] font-normal text-slate-900/70">
-						{t("cta.preview.note")}
-					</span>
-									</button>
 				</div>
 			</nav>
 
-			<div className="md:hidden px-4 py-2 border-b border-slate-900/60 bg-slate-950/60 backdrop-blur-sm overflow-x-auto flex gap-4 text-[11px] uppercase tracking-wide text-slate-400">
-				{navItems.map((item) => (
-					<a key={item.href} href={item.href} className="whitespace-nowrap hover:text-emerald-300">
-						{t(item.labelKey)}
-					</a>
-				))}
-			</div>
+				<div className="md:hidden px-4 py-2 border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 backdrop-blur-xl overflow-x-auto flex gap-4 text-[11px] uppercase tracking-[0.3em] text-subtle">
+					{navItems.map((item) => (
+						<a key={item.href} href={item.href} className="whitespace-nowrap hover:text-[var(--accent-blue)]">
+							{t(item.labelKey)}
+						</a>
+					))}
+				</div>
 
-			{/* 主体区域：单列大布局 */}
-			<div className="flex-1 flex justify-center px-4 sm:px-6 lg:px-10 py-8">
-				<div className="w-full max-w-5xl space-y-10">
-					{/* 标题介绍 */}
-					<section id="overview" className="space-y-4">
-						<div
-							className={`inline-flex items-center gap-2 rounded-full px-3 py-1 border text-xs ${tagBg}`}
+				{/* 主体区域：单列大布局 */}
+				<div className="flex-1 flex justify-center px-4 sm:px-6 lg:px-10 py-8">
+					<div className="w-full max-w-5xl space-y-10">
+						{/* 标题介绍 */}
+						<section
+							id="overview"
+							className="relative overflow-hidden rounded-[40px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-5 py-6 sm:px-8 sm:py-10 shadow-[0_40px_120px_rgba(0,0,0,0.55)]"
 						>
-							<span className="inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-							<span>{t("hero.tagline")}</span>
-						</div>
+							<div className="pointer-events-none absolute inset-0 opacity-60">
+								<div className="absolute -top-10 -right-16 h-64 w-64 rounded-full bg-gradient-to-br from-[var(--accent-blue)] via-[var(--accent-purple)] to-transparent blur-[160px]" />
+								<div className="absolute bottom-0 left-10 h-48 w-48 rounded-full bg-gradient-to-br from-[var(--accent-emerald)]/50 to-transparent blur-[140px]" />
+							</div>
+							<div className="relative space-y-6">
+								<div className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-glow)]/50 bg-[var(--bg-layer)] px-4 py-2 text-[11px] uppercase tracking-[0.4em] text-[var(--accent-blue)]">
+									<span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-emerald)] animate-pulse" />
+									<span>{t("hero.tagline")}</span>
+								</div>
 
-						<h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-300 via-teal-200 to-sky-300 bg-clip-text text-transparent">
-							{t("hero.title")}
-						</h1>
+								<div className="space-y-4">
+									<h1 className="text-[2.5rem] sm:text-[3rem] leading-[1.05] font-semibold text-white">
+										{t("hero.title")}
+									</h1>
+									<p className="max-w-3xl text-base sm:text-lg text-dim leading-relaxed">
+										{t("hero.description")}
+									</p>
+									<p className="text-sm uppercase tracking-[0.3em] text-subtle">
+										{t("hero.positioning")}
+									</p>
+									<p className="text-base font-medium text-[var(--accent-emerald)]">
+										{t("hero.brandline")}
+									</p>
+								</div>
 
-				<p
-					className={`text-sm sm:text-base max-w-3xl leading-relaxed text-slate-200`}
-				>
-					{t("hero.description")}
-				</p>
-				<p className={`text-xs sm:text-sm max-w-3xl leading-relaxed text-emerald-200/80`}>
-					{t("hero.positioning")}
-				</p>
-				<p className="text-sm text-emerald-300 mt-4 font-semibold">
-					{t("hero.brandline")}
-				</p>
-
-						<div className="grid lg:grid-cols-[1.4fr_1fr] gap-4">
-				<div className="rounded-3xl border border-slate-800/60 bg-gradient-to-br from-slate-950/90 via-slate-900/70 to-slate-900/40 p-5 space-y-4">
-								<p className="text-xs uppercase tracking-[0.3em] text-emerald-300">
-									{t("nav.product")}
-								</p>
-					<p className="text-base text-slate-100 leading-relaxed">
-						{t("hero.story")}
-					</p>
-					<div className="flex flex-wrap gap-2">
+								<div className="flex flex-wrap items-center gap-3">
 									<button
 										type="button"
 										onClick={handlePrimaryCta}
-										className="inline-flex items-center gap-1 rounded-full bg-emerald-400 px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-emerald-500/30 hover:bg-emerald-300"
+										className="btn-gradient px-6 py-2 text-sm"
 									>
 										{t("hero.cta.primary")}
 									</button>
-						<a
-							href="#templates"
-							className="inline-flex items-center gap-2 rounded-full border border-slate-800 px-4 py-2 text-sm text-slate-200 hover:border-emerald-400"
-						>
-							{t("hero.cta.secondary")}
-						</a>
-					</div>
-				</div>
-				<div className="rounded-3xl border border-emerald-500/40 bg-slate-950/50 p-5 space-y-2">
-					<p className="text-xs uppercase tracking-[0.3em] text-emerald-200">
-						{t("hero.quota")}
-					</p>
-					<p className="text-2xl font-semibold text-emerald-300 mt-2">
-						{session
-							? t("quota.status.heading", { count: displayRemainingQuota.toString() })
-							: t("quota.banner.title")}
-					</p>
-					<p className={`text-sm mt-1 ${strongSubtleText}`}>
-						{session && sessionUserEmail
-							? t("quota.status.session", {
-									email: sessionUserEmail,
-									plan: sessionPlanDisplay,
-							  })
-							: t("quota.banner.description")}
-					</p>
-								<div className="mt-3 inline-flex items-center gap-1 rounded-full bg-emerald-400/15 px-3 py-1 text-[11px] text-emerald-200">
-									<span className="h-2 w-2 rounded-full bg-emerald-300 animate-pulse" />
-										<span>
+									<a
+										href="#templates"
+										className="btn-ghost px-5 py-2 text-sm"
+									>
+										<span>{t("hero.cta.secondary")}</span>
+										<span className="text-[10px] text-subtle">↗</span>
+									</a>
+								</div>
+
+								<div className="grid gap-4 lg:grid-cols-[1.35fr_1fr]">
+									<div className="glass-card p-5 sm:p-6 space-y-4">
+										<p className="text-[11px] uppercase tracking-[0.3em] text-subtle">
+											{t("nav.product")}
+										</p>
+										<p className="text-base text-dim leading-relaxed">
+											{t("hero.story")}
+										</p>
+										<div className="grid gap-3 text-sm text-subtle sm:grid-cols-2">
+											<div className="rounded-2xl border border-[var(--stroke-soft)] px-4 py-3">
+												<p className="text-[11px] uppercase tracking-[0.3em] text-subtle">
+													{t("hero.highlight1.title")}
+												</p>
+												<p className="mt-1 text-dim">
+													{t("hero.highlight1.description")}
+												</p>
+											</div>
+											<div className="rounded-2xl border border-[var(--stroke-soft)] px-4 py-3">
+												<p className="text-[11px] uppercase tracking-[0.3em] text-subtle">
+													{t("hero.highlight2.title")}
+												</p>
+												<p className="mt-1 text-dim">
+													{t("hero.highlight2.description")}
+												</p>
+											</div>
+										</div>
+									</div>
+									<div className="glass-card p-5 sm:p-6 space-y-4 border border-[var(--stroke-glow)]/40">
+										<p className="text-[11px] uppercase tracking-[0.3em] text-[var(--accent-blue)]">
+											{t("hero.quota")}
+										</p>
+										<p className="text-3xl font-semibold text-white">
 											{session
-												? t("quota.banner.hint.refresh")
-												: t("quota.banner.hint.register")}
-										</span>
+												? t("quota.status.heading", { count: displayRemainingQuota.toString() })
+												: t("quota.banner.title")}
+										</p>
+										<p className="text-sm text-dim leading-relaxed">
+											{session && sessionUserEmail
+												? t("quota.status.session", {
+														email: sessionUserEmail,
+														plan: sessionPlanDisplay,
+												  })
+												: t("quota.banner.description")}
+										</p>
+										<div className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-glow)]/40 px-3 py-1 text-[11px] uppercase tracking-[0.3em] text-[var(--accent-emerald)]">
+											<span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-emerald)] animate-ping" />
+											<span>
+												{session
+													? t("quota.banner.hint.refresh")
+													: t("quota.banner.hint.register")}
+											</span>
+										</div>
+									</div>
+								</div>
+
+								<div className="grid gap-3 sm:grid-cols-3 text-sm">
+									{heroHighlightList.map((item) => (
+										<div
+											key={item.title}
+											className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-4 py-5 text-dim"
+										>
+											<p className="text-[12px] uppercase tracking-[0.3em] text-subtle">
+												{item.title}
+											</p>
+											<p className="mt-2 leading-relaxed text-dim">{item.description}</p>
+										</div>
+									))}
 								</div>
 							</div>
-						</div>
-
-				<div className="grid sm:grid-cols-3 gap-3 text-xs text-slate-300">
-					{heroHighlightList.map((item) => (
-						<div
-							key={item.title}
-							className="rounded-2xl border border-slate-800/60 bg-slate-950/70 p-4 space-y-1.5"
-						>
-							<p className="text-sm font-semibold text-slate-50">
-								{item.title}
-							</p>
-							<p className="leading-relaxed">{item.description}</p>
-						</div>
-					))}
-			</div>
-			</section>
+						</section>
 
 			<section
 				id="generator"
-				className={`rounded-3xl border shadow-[0_18px_60px_rgba(0,0,0,0.45)] p-5 sm:p-6 space-y-4 ${cardPrimary}`}
+				className="glass-card rounded-[36px] border border-[var(--stroke-soft)] shadow-[0_40px_120px_rgba(0,0,0,0.55)] p-5 sm:p-7 space-y-5"
 			>
 				{(progress > 0 || loading) && (
-					<div className="space-y-2 mb-1">
-						<div className="flex items-center justify-between text-xs text-emerald-200">
+					<div className="space-y-3 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-4">
+						<div className="flex items-center justify-between text-[11px] uppercase tracking-[0.3em] text-[var(--accent-emerald)]">
 							<span>{progressText || t("generator.progress.preparing")}</span>
 							<span>{Math.round(progress)}%</span>
 						</div>
-						<div className="h-2 rounded-full bg-slate-800/70 overflow-hidden">
-							<div
-								className="h-full bg-gradient-to-r from-emerald-400 via-teal-300 to-sky-300 transition-all duration-700"
-								style={{ width: `${progress}%` }}
-							/>
+						<div className="progress-track">
+							<div className="progress-fill" style={{ width: `${progress}%` }} />
 						</div>
 
-						<div className="mt-2 text-[11px] space-y-1.5">
-							<div className={`flex items-center gap-2 ${currentStep === 1 ? "text-emerald-300" : subtleText}`}>
-								<span className={`h-4 w-4 rounded-full border flex items-center justify-center text-[9px] ${currentStep === 1 ? "border-emerald-400 bg-emerald-400/20" : "border-slate-600"}`}>
-									1
-								</span>
-								<span>{t("generator.progress.fetching")}</span>
-							</div>
-							<div className={`flex items-center gap-2 ${currentStep === 2 ? "text-emerald-300" : subtleText}`}>
-								<span className={`h-4 w-4 rounded-full border flex items-center justify-center text-[9px] ${currentStep === 2 ? "border-emerald-400 bg-emerald-400/20" : "border-slate-600"}`}>
-									2
-								</span>
-								<span>{t("generator.progress.shaping")}</span>
-							</div>
-							<div className={`flex items-center gap-2 ${currentStep === 3 ? "text-emerald-300" : subtleText}`}>
-								<span className={`h-4 w-4 rounded-full border flex items-center justify-center text-[9px] ${currentStep === 3 ? "border-emerald-400 bg-emerald-400/20" : "border-slate-600"}`}>
-									3
-								</span>
-								<span>{t("generator.progress.llm")}</span>
-							</div>
-							<div className={`flex items-center gap-2 ${currentStep === 4 ? "text-emerald-300" : subtleText}`}>
-								<span className={`h-4 w-4 rounded-full border flex items-center justify-center text-[9px] ${currentStep === 4 ? "border-emerald-400 bg-emerald-400/20" : "border-slate-600"}`}>
-									4
-								</span>
-								<span>{t("generator.progress.ready")}</span>
-							</div>
+						<div className="grid gap-2 text-[11px] text-subtle sm:grid-cols-2">
+							{[
+								{ step: 1, label: t("generator.progress.fetching") },
+								{ step: 2, label: t("generator.progress.shaping") },
+								{ step: 3, label: t("generator.progress.llm") },
+								{ step: 4, label: t("generator.progress.ready") },
+							].map((item) => {
+								const active = currentStep === item.step;
+								return (
+									<div
+										key={item.step}
+										className={`flex items-center gap-2 rounded-xl border px-3 py-2 ${
+											active
+												? "border-[var(--stroke-glow)]/70 text-[var(--accent-blue)]"
+												: "border-[var(--stroke-soft)]"
+										}`}
+									>
+										<span
+											className={`h-5 w-5 rounded-full text-[10px] flex items-center justify-center ${
+												active
+													? "bg-[var(--accent-blue)]/15 text-[var(--accent-blue)]"
+													: "bg-[var(--bg-layer)] text-subtle"
+											}`}
+										>
+											{item.step}
+										</span>
+										<span>{item.label}</span>
+									</div>
+								);
+							})}
 						</div>
 					</div>
 				)}
-				<div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
-					<span>{t("generator.sectionTitle")}</span>
-					<span className="text-emerald-300 flex items-center gap-1">
+				<div className="flex flex-wrap items-center justify-between gap-3 text-[11px] text-subtle">
+					<span className="uppercase tracking-[0.3em]">{t("generator.sectionTitle")}</span>
+					<span className="flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3 py-1.5 text-[var(--accent-blue)]">
 						<span>{selectedToneInfo.emoji}</span>
-						<span>
-							{selectedToneTitle}
-							<span className="ml-1 text-[10px] text-emerald-200">{selectedToneBadge}</span>
+						<span className="flex flex-col leading-tight">
+							<span className="text-[11px] font-semibold">{selectedToneTitle}</span>
+							<span className="text-[10px] uppercase tracking-[0.3em] text-subtle">
+								{selectedToneBadge}
+							</span>
 						</span>
 					</span>
 				</div>
@@ -1210,47 +1226,47 @@ const markdownComponents: Components = {
 								key={option.id}
 								type="button"
 								onClick={() => setSelectedTone(option.id)}
-								className={`text-left rounded-2xl border px-3 py-3 text-xs transition-all ${
+								className={`text-left rounded-2xl border px-4 py-4 text-xs transition-all ${
 									active
-										? "border-emerald-400/70 bg-emerald-400/10 shadow-[0_0_25px_rgba(16,185,129,0.2)]"
-										: "border-slate-800/70 bg-slate-950/40 hover:border-slate-600"
+										? "border-[var(--stroke-glow)] bg-[var(--bg-layer)] shadow-[0_10px_35px_rgba(95,143,255,0.25)]"
+										: "border-[var(--stroke-soft)] hover:border-[var(--stroke-glow)]/60"
 								}`}
 							>
-								<div className="flex items-center justify-between mb-1">
-									<span className="text-base">{option.emoji}</span>
+								<div className="flex items-center justify-between mb-2">
+									<span className="text-lg">{option.emoji}</span>
 									{active && (
-										<span className="text-[10px] uppercase tracking-[0.2em] text-emerald-300">
+										<span className="text-[10px] uppercase tracking-[0.3em] text-[var(--accent-blue)]">
 											{t("persona.selector")}
 										</span>
 									)}
 								</div>
-								<p className="text-[11px] font-semibold text-slate-100">
+								<p className="text-[12px] font-semibold text-dim">
 									{optionTitle}
 								</p>
-								<p className="text-[10px] uppercase tracking-[0.15em] text-slate-500">
+								<p className="text-[10px] uppercase tracking-[0.3em] text-subtle">
 									{optionBadge}
 								</p>
-								<p className="mt-1 text-[11px] leading-relaxed text-slate-400">
+								<p className="mt-2 text-[11px] leading-relaxed text-subtle">
 									{optionDescription}
 								</p>
 							</button>
 						);
 					})}
 				</div>
-				<p className={`text-[11px] ${subtleText}`}>
+				<p className="text-[11px] text-subtle">
 					{personaSentence}
 				</p>
 
 				{/* ====== 输入模块 ====== */}
-				<form onSubmit={handleSubmit} className="space-y-3 relative">
-					<div className="flex flex-col sm:flex-row gap-3">
+				<form onSubmit={handleSubmit} className="space-y-4 relative">
+					<div className="flex flex-col sm:flex-row gap-4">
 						<div className="flex-1">
-							<label className="block text-xs text-slate-400 mb-1">
+							<label className="block text-[11px] uppercase tracking-[0.3em] text-subtle mb-2">
 								{t("generator.input.label")}
 							</label>
-							<div className="relative">
+							<div className="relative rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/50 px-3 py-1 focus-within:border-[var(--stroke-glow)] focus-within:shadow-[var(--shadow-focus)] transition">
 								{/* 搜索图标 */}
-								<span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">
+								<span className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-subtle text-sm">
 									🔎
 								</span>
 								<input
@@ -1259,30 +1275,30 @@ const markdownComponents: Components = {
 									value={inputValue}
 									onChange={(event) => setInputValue(event.target.value)}
 									placeholder={t("generator.input.placeholder")}
-									className={`w-full rounded-2xl border px-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/70 ${inputBg}`}
+									className="w-full bg-transparent px-10 py-3 text-sm text-dim placeholder:text-subtle focus:outline-none"
 								/>
 							</div>
 						</div>
-						<div className="sm:w-48 space-y-1 relative">
-							<label className="block text-xs text-slate-400">
+						<div className="sm:w-56 space-y-2 relative">
+							<label className="block text-[11px] uppercase tracking-[0.3em] text-subtle">
 								{t("generator.style.label")}
 							</label>
 							<button
 								type="button"
-								className="w-full rounded-2xl border border-slate-800/70 bg-slate-950/40 px-3 py-2 text-left text-xs text-slate-300 hover:border-emerald-400 transition-colors"
+								className="w-full rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-4 py-3 text-left text-xs text-dim transition hover:border-[var(--stroke-glow)] focus:outline-none focus:ring-2 focus:ring-[var(--stroke-glow)]/40"
 								onClick={() => setToneMenuOpen((open) => !open)}
 							>
 								<div className="flex items-center justify-between">
 									<span>
 										{selectedToneInfo.emoji} {selectedToneTitle}
 									</span>
-									<span className="text-[10px] text-slate-500">▾</span>
+									<span className="text-[10px] text-subtle">▾</span>
 								</div>
-								<p className="text-[10px] text-slate-500">{selectedToneInfo.subtitle}</p>
+								<p className="text-[10px] text-subtle">{selectedToneInfo.subtitle}</p>
 							</button>
 							{toneMenuOpen && (
-								<div className="absolute z-20 mt-1 w-60 rounded-2xl border border-slate-800 bg-slate-950/95 shadow-2xl shadow-slate-900/60">
-									<div className="max-h-64 overflow-auto p-2 text-xs text-slate-200">
+								<div className="absolute z-20 mt-2 w-64 rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/95 shadow-[0_25px_80px_rgba(0,0,0,0.65)] backdrop-blur-xl">
+									<div className="max-h-64 overflow-auto p-3 text-xs text-dim space-y-1">
 										{toneOptions.map((option) => {
 											const active = option.id === selectedTone;
 											const optionTitle = t(option.titleKey);
@@ -1296,22 +1312,22 @@ const markdownComponents: Components = {
 														setSelectedTone(option.id);
 														setToneMenuOpen(false);
 													}}
-													className={`w-full text-left rounded-xl px-3 py-2 mb-1 border ${
+													className={`w-full text-left rounded-2xl border px-4 py-3 ${
 														active
-															? "border-emerald-400/60 bg-emerald-400/10"
-															: "border-transparent hover:border-slate-700 hover:bg-slate-900"
+															? "border-[var(--stroke-glow)] bg-[var(--bg-layer)]"
+															: "border-transparent hover:border-[var(--stroke-soft)]/70"
 													}`}
 												>
 													<div className="flex items-center justify-between mb-1">
 														<span className="text-base">{option.emoji}</span>
-														<span className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
+														<span className="text-[10px] uppercase tracking-[0.3em] text-subtle">
 															{optionBadge}
 														</span>
 													</div>
-													<p className="text-[11px] font-semibold text-slate-100">
+													<p className="text-[11px] font-semibold text-dim">
 														{optionTitle}
 													</p>
-													<p className="text-[11px] text-slate-400">{optionDescription}</p>
+													<p className="text-[11px] text-subtle">{optionDescription}</p>
 												</button>
 											);
 										})}
@@ -1322,7 +1338,7 @@ const markdownComponents: Components = {
 					</div>
 
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-						<div className="text-[11px] text-slate-400">
+						<div className="text-[11px] text-subtle">
 							{session
 								? t("generator.account.status", {
 										count: displayRemainingQuota.toString(),
@@ -1331,19 +1347,19 @@ const markdownComponents: Components = {
 						</div>
 						<button
 							type="submit"
-							className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-300 to-sky-300 px-5 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-emerald-500/30 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+							className="btn-gradient px-6 py-3 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
 							disabled={loading}
 						>
 							{loading ? t("generator.loading") : t("generator.submit")}
 							{loading && (
-								<span className="h-4 w-4 border-2 border-slate-900/20 border-t-slate-900 rounded-full animate-spin" />
+								<span className="h-4 w-4 border-2 border-slate-900/30 border-t-slate-900 rounded-full animate-spin" />
 							)}
 						</button>
 					</div>
 				</form>
 
 				{error && (
-					<div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-[12px] text-amber-200 flex items-center gap-2">
+					<div className="rounded-2xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-[12px] text-amber-100 flex items-center gap-2 shadow-[0_10px_35px_rgba(251,191,36,0.18)]">
 						<span>⚠️</span>
 						<span>{error}</span>
 					</div>
@@ -1351,34 +1367,36 @@ const markdownComponents: Components = {
 
 				{loading && (
 					<div className="space-y-3">
-						<p className="text-xs text-slate-500">{t("generator.searching")}</p>
-						<div className="rounded-2xl border border-slate-800/60 bg-slate-950/50 p-4 space-y-3">
-							<div className="flex items-center justify-between text-[11px] text-slate-400">
+						<p className="text-[11px] text-subtle uppercase tracking-[0.3em]">
+							{t("generator.searching")}
+						</p>
+						<div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-4 space-y-3">
+							<div className="flex items-center justify-between text-[11px] text-subtle">
 								<span>{t("generator.progress.fetching")}</span>
-								<span className="text-emerald-300">{selectedToneTitle}</span>
+								<span className="text-[var(--accent-blue)]">{selectedToneTitle}</span>
 							</div>
 							<div className="space-y-2">
-								<div className={`h-3 w-full rounded ${skeletonBg}`} />
-								<div className={`h-3 w-5/6 rounded ${skeletonBg}`} />
-								<div className={`h-3 w-4/6 rounded ${skeletonBg}`} />
-								<div className={`h-3 w-3/5 rounded ${skeletonBg}`} />
+								<div className="h-3 w-full rounded bg-[var(--bg-base)]/50 animate-pulse" />
+								<div className="h-3 w-5/6 rounded bg-[var(--bg-base)]/50 animate-pulse" />
+								<div className="h-3 w-4/6 rounded bg-[var(--bg-base)]/50 animate-pulse" />
+								<div className="h-3 w-3/5 rounded bg-[var(--bg-base)]/50 animate-pulse" />
 							</div>
 						</div>
 					</div>
 				)}
 
 				{reportData && (
-					<div className="space-y-3">
-						<p className="text-[11px] text-slate-500">
+					<div className="space-y-3 rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 p-4 sm:p-5">
+						<p className="text-[11px] uppercase tracking-[0.3em] text-subtle">
 							{t("report.meta", { symbol: reportData.symbol })}
 						</p>
 
 						<div
 							ref={reportContentRef}
-							className="text-sm sm:text-[14px] leading-relaxed"
+							className="text-sm sm:text-[14px] leading-relaxed text-dim"
 						>
-							<div className="space-y-2">
-								<div className="text-[12px] text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3">
+							<div className="space-y-3">
+								<div className="text-[12px] text-amber-200 bg-amber-500/10 border border-amber-400/30 rounded-2xl p-4">
 									{t("report.disclaimerNotice")}
 								</div>
 								<ReactMarkdown components={markdownComponents}>
@@ -1387,11 +1405,11 @@ const markdownComponents: Components = {
 							</div>
 						</div>
 
-						<details className="mt-4">
-							<summary className="text-xs text-slate-500 cursor-pointer select-none">
+						<details className="mt-4 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/50 p-3">
+							<summary className="text-xs text-subtle cursor-pointer select-none">
 								{t("report.debug")}
 							</summary>
-							<pre className="mt-2 text-[10px] text-slate-400 max-h-64 overflow-auto bg-slate-950/60 rounded-xl p-3 border border-slate-800">
+							<pre className="mt-2 text-[10px] text-subtle max-h-64 overflow-auto bg-[var(--bg-layer)] rounded-xl p-3 border border-[var(--stroke-soft)]/60">
 								{JSON.stringify(reportData.companyData, null, 2)}
 							</pre>
 						</details>

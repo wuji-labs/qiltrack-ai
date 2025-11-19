@@ -11,6 +11,37 @@
 2. **page.tsx**：拆分 Hero/流程/FAQ，并保留现有报告生成功能。
 3. **体验检查**：跑 `npm run dev` 手动验证导航跳转、滚动锚点、移动端菜单。
 
+### Phase 1.5 — 旗舰级品牌视觉系统重建 (Day 2-3)
+
+**愿景**：打造 Apple/Linear/Notion/Bloomberg 级别的金融科技审美，让用户第一秒就感知到“稳定、可靠、安静、高智商”，并确信它值得付费。
+
+1. **品牌气质**  
+   - 关键词：Silent Confidence / Premium Minimalism / High-Intelligence Density / Financial Neutrality / Crisp Precision。  
+   - 禁忌：过度渐变、情绪插画、花哨玻璃拟态、夸张动效、多色彩。越贵越克制。
+
+2. **Design Tokens（Tailwind `@theme`）**  
+   - 颜色：`--bg-base #0A0A0C`、`--bg-layer rgba(255,255,255,.03)`、`--bg-frosted rgba(255,255,255,.07)`、`--stroke-soft rgba(255,255,255,.08)`、`--stroke-glow rgba(255,255,255,.18)`、`--accent-blue #5F8FFF`、`--accent-purple #A58AFF`。所有组件必须引用 token，不得裸写色值。  
+   - 字体：Inter + SF Pro Display；Headline/Body 样式依照 36–48 / 28–32 / 18 / 16 / 14 的层级及对应字重行高。  
+   - 半径/间距/阴影：r-xs 6、r-sm 10、r-md 16、r-lg 24；Spacing 使用 4/8/12/16/24/32；阴影/发光用 `shadow-soft`, `shadow-focus`, `shadow-depth`，营造冷静折射光感。  
+   - 模糊：blur-sm 8px、blur-md 12px，Frosted 层统一 `rgba(255,255,255,.06)` 背景 + 0.5px 边 + 内发光。
+
+3. **核心模块重构**  
+   - 导航：半透明 Apple 风玻璃、极简内容结构、200ms fade+blur 动效，桌面/移动统一气质。  
+   - Hero：固定结构（主标题/副标题/主次 CTA/轻量光效背景），信息密度高但秩序感强。  
+   - 生成器：类似 Apple 设置页的沉稳界面；输入/按钮/提示全部采用单色+内描边风格，CTA hover 仅调亮度。
+
+4. **动效系统**  
+   - 哲学：Less Movement, More Feeling。统一 200–240ms，属性限制在 opacity / brightness / blur，位移 ≤4px，scale ≤1.02。悬浮层使用 blur 8→12 + opacity 0→1 + 内描边亮起。
+
+5. **组件库**  
+   - 需统一 Button/Badge/Input/TextArea/Card/Modal/Sheet/Dropdown/Progress/Toast 等十类组件的视觉语法与状态机（默认/hover/press/disabled/focus）。
+
+6. **验收标准**  
+   - 首页开屏即给人“99 美元/月”级产品质感；任何页面摆脱 Indie Hacker 风；导航/Hero/生成器风格一致；所有 UI 引用 tokens；动效克制统一；布局遵循 8/16/24 网格；深色背景呈现 Apple × Bloomberg 气质。
+
+7. **交付物**  
+   - tokens 文档、首页/生成器前后对比截图、动效录屏、导航/Hero/生成器代码重构、components/ 目录与 `tailwind.config.js` 更新。
+
 ## Phase 2 - 登录/注册闭环 (Day 3-4)
 1. **鉴权选型**：NextAuth Email OTP；数据库暂用 SQLite + Prisma。
 2. **API 路由**：`/api/auth/[...nextauth]`，配置邮件发送或 Magic Link。
