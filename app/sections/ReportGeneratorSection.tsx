@@ -441,7 +441,7 @@ export function ReportGeneratorSection({
 					</span>
 				</div>
 
-				<div className="relative flex flex-col gap-4">
+				<div className="relative flex flex-col gap-5 sm:gap-6">
 					<div className="flex-1">
 						<div className="group relative overflow-hidden rounded-[24px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/90 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
 							<div className="pointer-events-none absolute inset-0">
@@ -524,7 +524,7 @@ export function ReportGeneratorSection({
 					<div className="flex justify-center">
 						<button
 							type="submit"
-							className="relative overflow-hidden rounded-full bg-gradient-to-r from-[var(--accent-emerald)] via-emerald-300 to-cyan-300 px-7 sm:px-10 py-3.5 text-base font-semibold text-slate-950 shadow-[0_18px_44px_rgba(91,224,176,0.35)] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)]/60 disabled:opacity-40 disabled:cursor-not-allowed"
+							className="relative overflow-hidden rounded-full bg-gradient-to-r from-[var(--accent-emerald)] via-emerald-300 to-cyan-300 px-8 sm:px-12 py-4 text-base sm:text-lg font-semibold text-slate-950 shadow-[0_22px_50px_rgba(91,224,176,0.35)] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)]/60 disabled:opacity-40 disabled:cursor-not-allowed"
 							disabled={loading}
 						>
 							<span className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.35),rgba(255,255,255,0))] opacity-70" aria-hidden />
