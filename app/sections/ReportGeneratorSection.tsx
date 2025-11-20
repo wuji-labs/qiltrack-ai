@@ -426,12 +426,13 @@ export function ReportGeneratorSection({
 					<div className="absolute right-0 bottom-0 h-52 w-52 rounded-full bg-[var(--accent-blue)]/10 blur-[140px]" aria-hidden />
 				</div>
 
-				<div className="relative flex flex-wrap items-center justify-between gap-3 text-sm uppercase tracking-[0.2em] text-subtle">
-					<div className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3.5 py-1.5 text-[var(--accent-emerald)] shadow-[0_12px_30px_rgba(0,0,0,0.24)]">
+					<div className="relative flex flex-wrap items-center justify-between gap-3 text-sm uppercase tracking-[0.2em] text-subtle">
+					<div className="relative inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3.5 py-1.5 text-[var(--accent-emerald)] shadow-[0_12px_30px_rgba(0,0,0,0.24)]">
 						<span className="rounded-full bg-[var(--accent-emerald)]/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-200">
 							Step 2
 						</span>
 						<span>{t("generator.input.label")}</span>
+						<div className="pointer-events-none absolute inset-0 rounded-full border border-[var(--stroke-soft)]/70" aria-hidden />
 					</div>
 					<span className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)]/70 bg-[var(--bg-layer)]/85 px-3.5 py-1.5 text-sm text-[var(--color-foreground)] whitespace-nowrap">
 						<span className="h-2 w-2 rounded-full bg-[var(--accent-emerald)] animate-pulse" aria-hidden />
@@ -650,6 +651,7 @@ export function ReportGeneratorSection({
 					<div className="relative inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3.5 py-1.5 text-sm uppercase tracking-[0.22em] text-[var(--accent-emerald)] shadow-[0_12px_30px_rgba(0,0,0,0.24)]">
 						<span className="text-[10px] font-semibold text-emerald-200">Step 3</span>
 						<span className="whitespace-nowrap">{t("report.tip.title")}</span>
+						<div className="pointer-events-none absolute inset-0 rounded-full border border-[var(--stroke-soft)]/70" aria-hidden />
 					</div>
 					<div className="relative grid gap-3 md:grid-cols-[1.2fr_0.8fr] items-start">
 						<div className="space-y-3">

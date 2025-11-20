@@ -27,11 +27,12 @@ export function ModesSection({ options, selected, onSelect, personaSentence, hea
 			</div>
 
 			<div className="relative flex flex-wrap items-center justify-between gap-3">
-				<div className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3.5 py-1.5 text-sm uppercase tracking-[0.22em] text-[var(--accent-emerald)] shadow-[0_12px_30px_rgba(0,0,0,0.24)]">
+				<div className="relative inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3.5 py-1.5 text-sm uppercase tracking-[0.22em] text-[var(--accent-emerald)] shadow-[0_12px_30px_rgba(0,0,0,0.24)]">
 					<span className="rounded-full bg-[var(--accent-emerald)]/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-200">
 						Step 1
 					</span>
 					<span className="whitespace-nowrap">{heading}</span>
+					<div className="pointer-events-none absolute inset-0 rounded-full border border-[var(--stroke-soft)]/70" aria-hidden />
 				</div>
 				<div className="inline-flex items-center gap-2 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/90 px-4 py-2 text-sm text-dim shadow-[0_10px_32px_rgba(0,0,0,0.18)]">
 					<span className="h-2.5 w-2.5 rounded-full bg-[var(--accent-emerald)] animate-pulse" aria-hidden />
