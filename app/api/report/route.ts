@@ -10,6 +10,7 @@ const FINNHUB_BASE = "https://finnhub.io/api/v1";
 
 const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "openai/gpt-5.1";
 
 const toneDirectives = {
     baseline: "以 Investor AI 标准流程输出，保持证据优先与结构化描述，不加入夸张语气。",
@@ -387,7 +388,7 @@ ${JSON.stringify(companyData, null, 2)}
                     "X-Title": process.env.OPENROUTER_APP_NAME || "investor-ai",
                 },
                 body: JSON.stringify({
-                    model: "openai/gpt-5.1",
+                    model: OPENROUTER_MODEL,
                     messages: [
                         { role: "system", content: sysPrompt },
                         { role: "user", content: userPrompt },

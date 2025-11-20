@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
 
 import { useLanguage } from "@/lib/i18n";
 
@@ -14,6 +14,20 @@ const providerButtons = [
 ] as const;
 
 export default function LoginPage() {
+	return (
+		<Suspense
+			fallback={
+				<div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-4 py-10">
+					<div className="text-base text-slate-400">{`Loading sign-in...`}</div>
+				</div>
+			}
+		>
+			<LoginContent />
+		</Suspense>
+	);
+}
+
+function LoginContent() {
 	const { t } = useLanguage();
 	const searchParams = useSearchParams();
 	const callbackUrl = searchParams.get("callbackUrl") ?? "/";
@@ -66,17 +80,17 @@ export default function LoginPage() {
 						IA
 					</div>
 					<h1 className="text-2xl font-semibold">{t("auth.page.title")}</h1>
-					<p className="text-sm text-slate-400">{t("auth.page.subtitle")}</p>
+					<p className="text-base text-slate-400">{t("auth.page.subtitle")}</p>
 				</div>
 
 				{errorMessage && (
-					<div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+					<div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-base text-amber-200">
 						{errorMessage}
 					</div>
 				)}
 
 				{successMessage && (
-					<div className="rounded-2xl border border-emerald-400/40 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
+					<div className="rounded-2xl border border-emerald-400/40 bg-emerald-400/10 px-4 py-3 text-base text-emerald-200">
 						{successMessage}
 					</div>
 				)}
@@ -90,7 +104,7 @@ export default function LoginPage() {
 								type="button"
 								onClick={() => handleProvider(provider.id)}
 								disabled={loading}
-								className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-800 px-4 py-3 text-sm font-medium transition-colors ${
+								className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-800 px-4 py-3 text-base font-medium transition-colors ${
 									loading
 										? "opacity-60 cursor-not-allowed"
 										: "hover:border-emerald-400 hover:bg-slate-900"
@@ -103,36 +117,36 @@ export default function LoginPage() {
 					})}
 				</div>
 
-				<div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.3em] text-slate-600">
+				<div className="flex items-center gap-3 text-sm uppercase tracking-[0.22em] text-slate-600">
 					<span className="flex-1 h-px bg-slate-800" />
 					{t("auth.modal.or")}
 					<span className="flex-1 h-px bg-slate-800" />
 				</div>
 
 				<form onSubmit={handleEmailSubmit} className="space-y-3">
-					<label className="text-xs text-slate-400 block">
+					<label className="text-sm text-slate-400 block">
 						{t("auth.form.email")}
 						<input
 							type="email"
 							value={email}
 							onChange={(event) => setEmail(event.target.value)}
 							placeholder={t("auth.form.placeholder")}
-							className="mt-1 w-full rounded-2xl border border-slate-800 bg-transparent px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+							className="mt-1 w-full rounded-2xl border border-slate-800 bg-transparent px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
 						/>
 					</label>
 					<button
 						type="submit"
 						disabled={disabled}
-						className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-400 text-slate-950 py-3 text-sm font-semibold transition-opacity ${
+						className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-400 text-slate-950 py-3 text-base font-semibold transition-opacity ${
 							disabled ? "opacity-60 cursor-not-allowed" : "hover:opacity-90"
 						}`}
 					>
 						{disabled ? t("auth.form.loading") : t("auth.email.button")}
 					</button>
-					<p className="text-[11px] text-slate-500">{t("auth.modal.emailHint")}</p>
+					<p className="text-sm text-slate-500">{t("auth.modal.emailHint")}</p>
 				</form>
 
-				<p className="text-[11px] text-slate-500 text-center">
+				<p className="text-sm text-slate-500 text-center">
 					{t("auth.footer.prefix")}{" "}
 					<Link href="/legal/terms" className="text-emerald-300 hover:underline">
 						{t("auth.footer.terms")}

@@ -5,9 +5,9 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 ### 核心能力
 - **模糊搜索**：输入英文公司名或股票代码，自动补全来自 `/api/search`。
 - **一键生成报告**：`/api/report` 汇总 Finnhub 数据并调度 OpenRouter，产出结构化分析。
-- **仅首份免费**：完成注册后可生成 1 份免费报告，后续额度通过订阅解锁；UI 已给出提示。
+- **额度管控**：NextAuth 登录后默认配额 1 份，后端按用户表的 `quota` / `reportsUsed` 校验，401/429 会在前端提示。
 - **导出/复制**：富文本复制 + DOCX 导出，方便把报告当作正式投研底稿。
-- **扩展空间**：导航、FAQ、定价等锚点已搭好，后续可快速接入登录、支付、历史报告等功能。
+- **扩展空间**：导航、FAQ、定价等锚点已搭好，后续可快速接入支付、历史报告等功能。
 
 ### 产品定位与合规声明
 - CodeX / Investor AI 仅提供“结构化信息整理”能力，帮助用户理解企业；**不提供投资建议、买卖指令或个性化判断**。
@@ -34,6 +34,11 @@ OPENROUTER_MODEL=openrouter/anthropic/claude-3.5-sonnet
 STRIPE_SECRET_KEY=Stripe 私钥
 STRIPE_WEBHOOK_SECRET=Webhook Secret
 NEXT_PUBLIC_FEATURE_PAYWALL=false
+DATABASE_URL="file:./prisma/dev.db"
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=replace-with-random-string
+EMAIL_SERVER=smtp://user:pass@mailtrap.io:2525
+EMAIL_FROM="Investor AI <no-reply@investor.ai>"
 ```
 
 ## 目录结构
@@ -42,11 +47,10 @@ NEXT_PUBLIC_FEATURE_PAYWALL=false
 - `public/`：静态资源。
 - `test-api.js`：用于单独验证 OpenAI/OpenRouter SDK。
 
-## 注册 / 额度逻辑（MVP）
-- 访客点击右上角「登录 / 注册」，输入邮箱即可在前端 localStorage 中创建临时账号（`investor-ai-user`）。
-- 注册成功后自动获得 1 份免费报告额度，并在导航/生成器区域展示剩余额度。
-- 调用「生成 AI 投研报告」前会校验：未注册则阻断并弹出注册窗，额度用尽则提示订阅。
-- 生成成功后会在本地递增 `reportsUsed`，确保“注册后首份免费”体验可被验证；后续将替换为 NextAuth + 服务器侧额度校验。
+## 注册 / 额度逻辑（当前实现）
+- NextAuth（Email / Google / Apple / Azure AD）登录，Prisma SQLite 存储用户信息与会话。
+- `User.quota` 默认为 1，`reportsUsed` 每次生成成功后递增，后端 `/api/report` 直接校验并返回 401/429。
+- 前端拿到 401 会引导去登录，429 会提示额度耗尽；成功生成后自动刷新 session 的剩余额度。
 
 ## 手动验证脚本
 1. `npm run dev` 启动服务。

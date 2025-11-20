@@ -91,12 +91,12 @@ const translations: Record<string, TranslationEntry> = {
 		zh: "Investor AI",
 	}),
 	"brand.subtitle": withChineseVariants({
-		en: "Research naturally",
-		ja: "企業を理解し、呼吸するようにリサーチ",
-		ko: "기업을 이해하고 숨 쉬듯 리서치",
+		en: "",
+		ja: "",
+		ko: "",
 		zh: {
-			hant: "智能投研",
-			hans: "智能投研",
+			hant: "",
+			hans: "",
 		},
 	}),
 	"hero.tagline": withChineseVariants({

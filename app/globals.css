@@ -7,8 +7,8 @@
   --color-foreground: #f4f4f7;
   --stroke-soft: rgba(255, 255, 255, 0.08);
   --stroke-glow: rgba(255, 255, 255, 0.18);
-  --accent-blue: #5f8fff;
-  --accent-purple: #a58aff;
+  --accent-blue: #23e6a1;
+  --accent-purple: #7cf8c8;
   --accent-emerald: #6ef6cf;
   --text-dim: rgba(244, 244, 247, 0.68);
   --text-subtle: rgba(244, 244, 247, 0.48);
@@ -88,7 +88,7 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.3em;
-  box-shadow: 0 20px 60px rgba(95, 143, 255, 0.4);
+  box-shadow: 0 20px 60px rgba(35, 230, 161, 0.35);
   transition: filter 0.2s ease;
 }
 
@@ -112,7 +112,7 @@ body {
 
 .btn-ghost:hover {
   border-color: var(--stroke-glow);
-  color: var(--accent-blue);
+  color: var(--accent-emerald);
 }
 
 .badge-pill {
