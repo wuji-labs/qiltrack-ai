@@ -272,30 +272,32 @@ export default function Home() {
 					<div className="flex flex-col flex-1">
 						<div className="flex-1 flex justify-center py-10 sm:py-12">
 							<div className="w-full max-w-6xl px-4 sm:px-6 lg:px-10 space-y-6 md:space-y-10">
-								<ModesSection
-									heading={t("generator.sectionTitle")}
-									options={toneOptionsLabeled}
-									selected={selectedTone}
-									onSelect={setSelectedTone}
-									personaSentence={personaSentence}
-								/>
+								<section className={`rounded-[32px] border p-4 sm:p-5 md:p-6 space-y-6 md:space-y-8 bg-[var(--bg-layer)]/70 border-[var(--stroke-soft)] shadow-[0_18px_60px_rgba(0,0,0,0.28)]`}>
+									<ModesSection
+										heading={t("generator.sectionTitle")}
+										options={toneOptionsLabeled}
+										selected={selectedTone}
+										onSelect={setSelectedTone}
+										personaSentence={personaSentence}
+									/>
 
-								<ReportGeneratorSection
-									selectedTone={selectedTone}
-									toneOptions={toneOptionsLabeled}
-									language={language as Language}
-									highlightFallback={highlightFallback}
-									heroHighlights={heroHighlightList}
-									auth={{
-										isAuthenticated: auth.isAuthenticated,
-										remainingQuota: auth.remainingQuota,
-										planLabel,
-										userEmail: auth.userEmail,
-										refreshSession: auth.refreshSession,
-									}}
-									onRequireLogin={() => router.push("/login")}
-									t={t}
-								/>
+									<ReportGeneratorSection
+										selectedTone={selectedTone}
+										toneOptions={toneOptionsLabeled}
+										language={language as Language}
+										highlightFallback={highlightFallback}
+										heroHighlights={heroHighlightList}
+										auth={{
+											isAuthenticated: auth.isAuthenticated,
+											remainingQuota: auth.remainingQuota,
+											planLabel,
+											userEmail: auth.userEmail,
+											refreshSession: auth.refreshSession,
+										}}
+										onRequireLogin={() => router.push("/login")}
+										t={t}
+									/>
+								</section>
 
 								<section id="workflow" className={`relative overflow-hidden rounded-3xl border p-5 sm:p-7 space-y-6 ${cardSecondary}`}>
 									<div className="pointer-events-none absolute inset-0 opacity-80">
