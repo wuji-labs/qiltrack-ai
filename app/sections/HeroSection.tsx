@@ -251,7 +251,11 @@ export function HeroSection({
 						</div>
 
 						<div className="flex flex-wrap items-center justify-center gap-3 mt-6">
-							<button type="button" onClick={onPrimaryCta} className="btn-gradient px-6 py-2 text-base">
+							<button
+								type="button"
+								onClick={onPrimaryCta}
+								className="rounded-full border border-[var(--accent-emerald)]/70 bg-[var(--accent-emerald)]/12 px-6 py-2 text-base font-semibold text-[var(--accent-emerald)] shadow-[0_10px_24px_rgba(91,224,176,0.18)] transition hover:bg-[var(--accent-emerald)]/20"
+							>
 								{t("hero.cta.primary")}
 							</button>
 							<a href="#generator" className="btn-ghost px-5 py-2 text-base">
