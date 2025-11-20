@@ -443,30 +443,54 @@ export function ReportGeneratorSection({
 
 				<div className="relative flex flex-col gap-3 sm:flex-row sm:items-center">
 					<div className="flex-1">
-						<div className="group relative rounded-[22px] p-[1.5px] bg-[radial-gradient(circle_at_12%_20%,rgba(91,224,176,0.24),transparent_42%),radial-gradient(circle_at_90%_18%,rgba(56,189,248,0.16),transparent_44%)]">
-							<div className="absolute inset-0 rounded-[22px] blur-3xl bg-gradient-to-r from-[var(--accent-emerald)]/16 via-transparent to-[var(--accent-blue)]/18 pointer-events-none" aria-hidden />
-							<div className="relative overflow-hidden rounded-[20px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/88 px-4 py-2 text-[var(--color-foreground)] backdrop-blur-xl transition shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_10px_26px_rgba(0,0,0,0.26),0_16px_42px_rgba(0,0,0,0.24)] group-focus-within:border-[var(--accent-emerald)]/70 group-focus-within:shadow-[inset_0_1px_0_rgba(255,255,255,0.09),inset_0_12px_30px_rgba(0,0,0,0.26),0_0_0_2px_rgba(91,224,176,0.45)]">
-								<div className="pointer-events-none absolute inset-0 rounded-[20px] bg-[linear-gradient(160deg,rgba(255,255,255,0.08),rgba(255,255,255,0)),radial-gradient(circle_at_26%_0%,rgba(91,224,176,0.12),transparent_34%)]" aria-hidden />
-								<span className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-subtle text-base">
-									🔍
-								</span>
-								<input
-									id="report-query-input"
-									type="text"
-									autoFocus
-									value={inputValue}
-									onChange={(event) => setInputValue(event.target.value)}
-									placeholder={t("generator.input.placeholder")}
-									className="w-full bg-transparent px-10 py-3 text-base text-[var(--color-foreground)] placeholder:text-subtle focus:outline-none"
-								/>
-								<div className="pointer-events-none absolute right-4 top-2 flex items-center gap-2 text-[11px] text-subtle">
-									<span className="rounded-full border border-[var(--accent-emerald)]/40 bg-[var(--accent-emerald)]/12 px-2 py-0.5 tracking-[0.18em] text-[var(--accent-emerald)]">
-										LIVE
+						<div className="group relative overflow-hidden rounded-[24px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/90 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
+							<div className="pointer-events-none absolute inset-0">
+								<div className="absolute -left-6 top-2 h-24 w-24 rounded-full bg-[var(--accent-emerald)]/20 blur-[90px]" aria-hidden />
+								<div className="absolute right-0 bottom-0 h-28 w-28 rounded-full bg-[var(--accent-blue)]/16 blur-[110px]" aria-hidden />
+								<div className="absolute inset-0 rounded-[24px] bg-[linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0)),radial-gradient(circle_at_16%_12%,rgba(91,224,176,0.14),transparent_34%)]" aria-hidden />
+							</div>
+
+							<div className="relative flex items-center justify-between px-4 py-2 text-[11px] uppercase tracking-[0.24em] text-subtle">
+								<div className="flex items-center gap-2">
+									<span className="inline-flex items-center gap-1 rounded-full border border-[var(--accent-emerald)]/40 bg-[var(--accent-emerald)]/10 px-2 py-1 text-[var(--accent-emerald)]">
+										<span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-emerald)] animate-ping" aria-hidden />
+										Live
 									</span>
-									<span className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 px-2 py-0.5 tracking-[0.18em]">
+									<span className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 px-2 py-1">
 										US
 									</span>
+									<span className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 px-2 py-1">
+										Beta
+									</span>
 								</div>
+								<span className="hidden sm:inline text-[10px] text-dim">三步完成：选模式 → 输入代码 → 生成</span>
+							</div>
+
+							<div className="relative px-4 pb-4">
+								<div className="relative rounded-[18px] border border-[var(--stroke-soft)] bg-[var(--bg-base)]/65 px-4 py-3 backdrop-blur-xl transition group-focus-within:border-[var(--accent-emerald)]/70 group-focus-within:shadow-[0_0_0_2px_rgba(91,224,176,0.45)]">
+									<span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-base text-[var(--accent-emerald)]">
+										🔎
+									</span>
+									<input
+										id="report-query-input"
+										type="text"
+										autoFocus
+										value={inputValue}
+										onChange={(event) => setInputValue(event.target.value)}
+										placeholder={t("generator.input.placeholder")}
+										className="w-full bg-transparent pl-10 pr-28 py-2.5 text-base text-[var(--color-foreground)] placeholder:text-subtle focus:outline-none"
+										aria-label={t("generator.input.label")}
+									/>
+									<div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-[11px] text-subtle">
+										<span className="rounded-full border border-[var(--accent-emerald)]/40 bg-[var(--accent-emerald)]/10 px-2 py-0.5">
+											Ticker / Name
+										</span>
+										<span className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 px-2 py-0.5">
+											回车生成
+										</span>
+									</div>
+								</div>
+
 								{(searchResults.length > 0 || searching) && (
 									<div className="absolute left-0 right-0 top-full z-10 mt-2 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/95 shadow-[0_18px_45px_rgba(0,0,0,0.32)] backdrop-blur">
 										{searching && (
