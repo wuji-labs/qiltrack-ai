@@ -71,8 +71,8 @@ export function HeroSection({
 	return (
 		<section className="w-full">
 			<div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4 sm:px-6 lg:px-10">
-				<nav className="flex flex-wrap items-center gap-3 sm:gap-4 rounded-2xl border border-[var(--stroke-soft)]/80 bg-[var(--bg-frosted)]/85 px-5 sm:px-10 py-4 sm:py-5 min-h-[72px] backdrop-blur-xl shadow-[0_14px_38px_rgba(0,0,0,0.35)] transition-all duration-300">
-					<div className="flex items-center gap-3 min-w-[200px] shrink-0 mr-auto">
+				<nav className="flex flex-wrap xl:flex-nowrap justify-between items-center gap-3 sm:gap-4 rounded-2xl border border-[var(--stroke-soft)]/80 bg-[var(--bg-frosted)]/85 px-5 sm:px-10 py-4 sm:py-5 min-h-[72px] backdrop-blur-xl shadow-[0_14px_38px_rgba(0,0,0,0.35)] transition-all duration-300">
+					<div className="flex items-center gap-3 min-w-[200px] shrink-0 mr-4">
 						<div className="h-11 w-11 rounded-2xl bg-[var(--accent-emerald)] flex items-center justify-center text-[12px] font-black tracking-[0.28em] text-slate-950 shadow-[0_10px_28px_rgba(91,224,176,0.35)]">
 							IA
 						</div>
@@ -231,7 +231,7 @@ export function HeroSection({
 					className="relative overflow-hidden rounded-[36px] border border-[var(--stroke-soft)]/80 bg-[var(--bg-layer)]/85 px-5 py-6 sm:px-8 sm:py-9 shadow-[0_16px_60px_rgba(0,0,0,0.32)]"
 				>
 					<div className="pointer-events-none absolute inset-0 hero-mesh" aria-hidden />
-					<div className="relative space-y-7">
+					<div className="relative space-y-7 text-center">
 					{tagline ? (
 						<div className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)]/90 bg-[var(--bg-layer)]/90 px-4 py-2 text-sm uppercase tracking-[0.24em] text-[var(--accent-emerald)]">
 							<span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-emerald)]" />
@@ -239,18 +239,18 @@ export function HeroSection({
 						</div>
 					) : null}
 
-						<div className="space-y-4">
+						<div className="space-y-4 text-center">
 							<h1 className="text-[2.5rem] sm:text-[3rem] leading-[1.05] font-semibold text-emerald-200">
 								{t("hero.title")}
 							</h1>
-							<p className="max-w-3xl text-lg sm:text-xl text-dim leading-relaxed">
+							<p className="mx-auto max-w-3xl text-lg sm:text-xl text-dim leading-relaxed">
 								{t("hero.description")}
 							</p>
 							<p className="text-base uppercase tracking-[0.24em] text-emerald-200/70">{t("hero.positioning")}</p>
 							<p className="text-lg font-medium text-[var(--accent-emerald)]">{t("hero.brandline")}</p>
 						</div>
 
-						<div className="flex flex-wrap items-center gap-3 mt-6">
+						<div className="flex flex-wrap items-center justify-center gap-3 mt-6">
 							<button type="button" onClick={onPrimaryCta} className="btn-gradient px-6 py-2 text-base">
 								{t("hero.cta.primary")}
 							</button>
