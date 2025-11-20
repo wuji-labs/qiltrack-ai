@@ -115,7 +115,7 @@ const translations: Record<string, TranslationEntry> = {
 		},
 	}),
 	"hero.description": withChineseVariants({
-		en: "Investor AI simplifies complex data into clear analysis.",
+		en: "Transforms complex data, reports, and jargon into clear, accessible company analysis.",
 		ja: "Investor AI は散在するデータや専門用語、複雑な構造を織り合わせ、誰でも理解できる企業分析へと整えます。",
 		ko: "Investor AI는 흩어진 데이터와 전문 용어, 복잡한 구조를 엮어 누구나 이해할 수 있는 기업 분석으로 정리해 줍니다.",
 		zh: {
