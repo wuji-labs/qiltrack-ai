@@ -297,53 +297,6 @@ export default function Home() {
 									t={t}
 								/>
 
-								<section id="templates" className={`rounded-3xl border p-5 sm:p-7 space-y-5 ${cardSecondary}`}>
-									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-										<div>
-											<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">{t("nav.templates")}</p>
-											<h2 className="text-2xl sm:text-3xl font-semibold">{t("gallery.inspired")}</h2>
-											<p className={`text-base mt-1 ${subtleText}`}>{t("persona.galleryCaption", { tones: toneLabelList })}</p>
-										</div>
-										<div className="text-sm text-right text-subtle">
-											<p>{t("gallery.subtitle")}</p>
-											<p>{t("gallery.description")}</p>
-										</div>
-									</div>
-
-									<div className="grid md:grid-cols-3 gap-3">
-										{caseStudyList.map((study) => (
-											<div key={study.company} className="rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-4 flex flex-col gap-3">
-												<div className="flex items-center justify-between">
-													<div>
-														<p className="text-sm uppercase tracking-[0.3em] text-subtle">{study.industry}</p>
-														<h3 className="text-xl font-semibold text-[var(--color-foreground)]">{study.company}</h3>
-													</div>
-													<span className="text-sm rounded-full border border-emerald-400/50 text-emerald-200 px-2 py-0.5">{study.tonality}</span>
-												</div>
-												<p className={`text-base leading-relaxed ${strongSubtleText}`}>{study.snippet}</p>
-												<div className="flex flex-wrap gap-1 text-sm text-subtle">
-													{study.tags.map((tag) => (
-														<span key={`${study.company}-${tag}`} className="rounded-full border border-[var(--stroke-soft)] px-2 py-0.5">
-															#{tag}
-														</span>
-													))}
-												</div>
-												<div className="text-sm text-emerald-300">{study.metric}</div>
-											</div>
-										))}
-									</div>
-
-									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border border-dashed border-[var(--stroke-soft)] p-4">
-										<p className={`text-base ${subtleText}`}>{t("gallery.footer")}</p>
-										<Link
-											href="/reports"
-											className="self-start rounded-full border border-emerald-400 px-4 py-2 text-base text-emerald-300 hover:bg-emerald-400/10"
-										>
-											{t("gallery.cta")}
-										</Link>
-									</div>
-								</section>
-
 								<section id="workflow" className={`relative overflow-hidden rounded-3xl border p-5 sm:p-7 space-y-6 ${cardSecondary}`}>
 									<div className="pointer-events-none absolute inset-0 opacity-80">
 										<div className="absolute -left-16 top-10 h-44 w-44 rounded-full bg-emerald-400/15 blur-[120px]" aria-hidden />
@@ -397,6 +350,53 @@ export default function Home() {
 												</div>
 											))}
 										</div>
+									</div>
+								</section>
+
+								<section id="templates" className={`rounded-3xl border p-5 sm:p-7 space-y-5 ${cardSecondary}`}>
+									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+										<div>
+											<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">{t("nav.templates")}</p>
+											<h2 className="text-2xl sm:text-3xl font-semibold">{t("gallery.inspired")}</h2>
+											<p className={`text-base mt-1 ${subtleText}`}>{t("persona.galleryCaption", { tones: toneLabelList })}</p>
+										</div>
+										<div className="text-sm text-right text-subtle">
+											<p>{t("gallery.subtitle")}</p>
+											<p>{t("gallery.description")}</p>
+										</div>
+									</div>
+
+									<div className="grid md:grid-cols-3 gap-3">
+										{caseStudyList.map((study) => (
+											<div key={study.company} className="rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-4 flex flex-col gap-3">
+												<div className="flex items-center justify-between">
+													<div>
+														<p className="text-sm uppercase tracking-[0.3em] text-subtle">{study.industry}</p>
+														<h3 className="text-xl font-semibold text-[var(--color-foreground)]">{study.company}</h3>
+													</div>
+													<span className="text-sm rounded-full border border-emerald-400/50 text-emerald-200 px-2 py-0.5">{study.tonality}</span>
+												</div>
+												<p className={`text-base leading-relaxed ${strongSubtleText}`}>{study.snippet}</p>
+												<div className="flex flex-wrap gap-1 text-sm text-subtle">
+													{study.tags.map((tag) => (
+														<span key={`${study.company}-${tag}`} className="rounded-full border border-[var(--stroke-soft)] px-2 py-0.5">
+															#{tag}
+														</span>
+													))}
+												</div>
+												<div className="text-sm text-emerald-300">{study.metric}</div>
+											</div>
+										))}
+									</div>
+
+									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border border-dashed border-[var(--stroke-soft)] p-4">
+										<p className={`text-base ${subtleText}`}>{t("gallery.footer")}</p>
+										<Link
+											href="/reports"
+											className="self-start rounded-full border border-emerald-400 px-4 py-2 text-base text-emerald-300 hover:bg-emerald-400/10"
+										>
+											{t("gallery.cta")}
+										</Link>
 									</div>
 								</section>
 
