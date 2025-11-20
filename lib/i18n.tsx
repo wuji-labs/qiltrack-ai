@@ -100,9 +100,9 @@ const translations: Record<string, TranslationEntry> = {
 		},
 	}),
 	"hero.tagline": withChineseVariants({
-		en: "MVP Live · Powered by Finnhub + OpenRouter",
-		ja: "MVP 版 · Finnhub + OpenRouter 連携",
-		ko: "MVP 버전 · Finnhub + OpenRouter 연동",
+		en: "",
+		ja: "",
+		ko: "",
 		zh: "",
 	}),
 	"hero.title": withChineseVariants({
@@ -130,13 +130,10 @@ const translations: Record<string, TranslationEntry> = {
 		zh: "理解，是投資的起點。",
 	}),
 	"hero.positioning": withChineseVariants({
-		en: "CodeX is a structured information assistant to help you understand companies; it never offers investment advice or trading guidance.",
-		ja: "CodeX は企業理解のための情報整理ツールであり、投資助言や売買指示は行いません。",
-		ko: "CodeX는 회사를 이해하기 위한 구조화 정보 도구이며, 투자 조언이나 매매 지침을 제공하지 않습니다.",
-		zh: {
-			hant: "CodeX 是協助理解公司的結構化資訊工具，不提供投資建議或交易指引。",
-			hans: "",
-		},
+		en: "",
+		ja: "",
+		ko: "",
+		zh: "",
 	}),
 	"hero.story": withChineseVariants({
 		en: "We built a unified understanding engine: multi-source ingestion, knowledge frameworks, and structured templates work together to turn chaos into clarity.",
