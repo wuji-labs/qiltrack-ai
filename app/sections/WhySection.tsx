@@ -27,7 +27,7 @@ export function WhySection({
 	labels,
 }: WhySectionProps) {
 	return (
-		<section className="relative overflow-hidden rounded-3xl border bg-[var(--bg-layer)]/88 p-5 sm:p-7 shadow-[0_20px_70px_rgba(0,0,0,0.32)]">
+		<section className="relative overflow-hidden rounded-3xl bg-[var(--bg-layer)]/88 p-5 sm:p-7 shadow-[0_20px_70px_rgba(0,0,0,0.32)]">
 			<div className="pointer-events-none absolute inset-0">
 				<div className="absolute -left-10 top-8 h-48 w-48 rounded-full bg-[var(--accent-emerald)]/16 blur-[120px]" aria-hidden />
 				<div className="absolute right-0 bottom-0 h-64 w-64 rounded-full bg-[var(--accent-blue)]/14 blur-[140px]" aria-hidden />
