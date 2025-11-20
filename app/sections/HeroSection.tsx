@@ -246,7 +246,9 @@ export function HeroSection({
 							<p className="mx-auto max-w-3xl text-lg sm:text-xl text-dim leading-relaxed">
 								{t("hero.description")}
 							</p>
-							<p className="text-base uppercase tracking-[0.24em] text-emerald-200/70">{t("hero.positioning")}</p>
+							{t("hero.positioning") ? (
+								<p className="text-base uppercase tracking-[0.24em] text-emerald-200/70">{t("hero.positioning")}</p>
+							) : null}
 							<p className="text-lg font-medium text-[var(--accent-emerald)]">{t("hero.brandline")}</p>
 						</div>
 
