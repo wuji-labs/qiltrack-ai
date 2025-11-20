@@ -52,6 +52,11 @@ EMAIL_FROM="Investor AI <no-reply@investor.ai>"
 - `User.quota` 默认为 1，`reportsUsed` 每次生成成功后递增，后端 `/api/report` 直接校验并返回 401/429。
 - 前端拿到 401 会引导去登录，429 会提示额度耗尽；成功生成后自动刷新 session 的剩余额度。
 
+## Reports Blog（新的文章体验）
+
+- `/reports` 保持与主站一致的暗色玻璃主题，顶部展示结构化 Hero、分类 Pills，以及多列文章卡片；数据集中管理于 `app/reports/data.ts`，便于 Archive 与 Detail 同步。
+- 点击任一卡片会导航到 `/reports/[slug]`，该路由展示大图、标签/作者、阅读时长和段落正文，打造正式博客体验。
+
 ## 手动验证脚本
 1. `npm run dev` 启动服务。
 2. 打开首页，测试导航锚点（产品介绍 / 生成器 / 工作流程 / 定价 / FAQ）。

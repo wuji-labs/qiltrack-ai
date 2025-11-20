@@ -7,11 +7,11 @@
   --color-foreground: #f4f4f7;
   --stroke-soft: rgba(255, 255, 255, 0.08);
   --stroke-glow: rgba(255, 255, 255, 0.18);
-  --accent-blue: #23e6a1;
-  --accent-purple: #7cf8c8;
-  --accent-emerald: #6ef6cf;
-  --text-dim: rgba(244, 244, 247, 0.68);
-  --text-subtle: rgba(244, 244, 247, 0.48);
+  --accent-blue: #4dd0a6;
+  --accent-purple: #4dd0a6;
+  --accent-emerald: #5be0b0;
+  --text-dim: rgba(244, 244, 247, 0.76);
+  --text-subtle: rgba(244, 244, 247, 0.54);
   --radius-xs: 6px;
   --radius-sm: 10px;
   --radius-md: 16px;
@@ -77,23 +77,18 @@ body {
   justify-content: center;
   gap: 0.5rem;
   border-radius: 999px;
-  border: 1px solid transparent;
-  background: linear-gradient(
-    120deg,
-    var(--accent-blue),
-    var(--accent-purple),
-    var(--accent-emerald)
-  );
-  color: #050505;
-  font-weight: 600;
+  border: 1px solid var(--stroke-soft);
+  background: var(--accent-emerald);
+  color: #04110c;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.3em;
-  box-shadow: 0 20px 60px rgba(35, 230, 161, 0.35);
+  letter-spacing: 0.18em;
+  box-shadow: 0 14px 42px rgba(91, 224, 176, 0.28);
   transition: filter 0.2s ease;
 }
 
 .btn-gradient:hover {
-  filter: brightness(1.1);
+  filter: brightness(1.05);
 }
 
 .btn-ghost {
@@ -106,12 +101,12 @@ body {
   background: transparent;
   color: var(--text-dim);
   text-transform: uppercase;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.22em;
   transition: border-color 0.2s ease, color 0.2s ease;
 }
 
 .btn-ghost:hover {
-  border-color: var(--stroke-glow);
+  border-color: var(--accent-emerald);
   color: var(--accent-emerald);
 }
 
@@ -126,6 +121,69 @@ body {
   padding: 0.25rem 0.75rem;
 }
 
+.hero-mesh {
+  background-image:
+    radial-gradient(120px 120px at 18% 20%, rgba(91, 224, 176, 0.12), transparent 55%),
+    radial-gradient(160px 160px at 82% 12%, rgba(91, 224, 176, 0.16), transparent 60%),
+    radial-gradient(200px 200px at 30% 82%, rgba(91, 224, 176, 0.13), transparent 65%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size:
+    auto,
+    auto,
+    auto,
+    100% 100%,
+    32px 32px,
+    32px 32px;
+  background-position: center;
+  mix-blend-mode: screen;
+  opacity: 0.9;
+}
+
+.feature-mesh {
+  background-image:
+    radial-gradient(140px 140px at 12% 30%, rgba(91, 224, 176, 0.12), transparent 58%),
+    radial-gradient(140px 140px at 88% 70%, rgba(91, 224, 176, 0.1), transparent 60%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size:
+    auto,
+    auto,
+    100% 100%,
+    36px 36px,
+    36px 36px;
+  background-position:
+    12% 30%,
+    88% 70%,
+    center,
+    0 0,
+    0 0;
+  mix-blend-mode: screen;
+  opacity: 0.75;
+}
+
+.generator-mesh {
+  background-image:
+    radial-gradient(200px 200px at 8% 18%, rgba(91, 224, 176, 0.12), transparent 60%),
+    radial-gradient(220px 220px at 88% 28%, rgba(91, 224, 176, 0.1), transparent 62%),
+    radial-gradient(260px 260px at 18% 82%, rgba(91, 224, 176, 0.1), transparent 65%),
+    radial-gradient(320px 320px at 84% 78%, rgba(63, 157, 255, 0.08), transparent 68%);
+  background-size:
+    auto,
+    auto,
+    auto,
+    auto;
+  background-position:
+    8% 18%,
+    88% 28%,
+    18% 82%,
+    84% 78%;
+  mix-blend-mode: screen;
+  opacity: 0.5;
+}
+
 .progress-track {
   height: 8px;
   width: 100%;
@@ -137,11 +195,6 @@ body {
 .progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    var(--accent-blue),
-    var(--accent-purple),
-    var(--accent-emerald)
-  );
+  background: var(--accent-emerald);
   transition: width 0.7s ease;
 }

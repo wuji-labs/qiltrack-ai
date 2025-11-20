@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { HeroSection } from "@/app/sections/HeroSection";
@@ -18,7 +19,7 @@ type TranslationKey = string;
 const navItems = [
 	{ labelKey: "nav.product", href: "#overview" },
 	{ labelKey: "nav.generator", href: "#generator" },
-	{ labelKey: "nav.templates", href: "#templates" },
+	{ labelKey: "nav.templates", href: "/reports" },
 	{ labelKey: "nav.pricing", href: "#pricing" },
 	{ labelKey: "nav.faq", href: "#faq" },
 ] as const;
@@ -86,6 +87,11 @@ const faqItems: { question: TranslationKey; answer: TranslationKey }[] = [
 	{ question: "faq.q1.question", answer: "faq.q1.answer" },
 	{ question: "faq.q2.question", answer: "faq.q2.answer" },
 	{ question: "faq.q3.question", answer: "faq.q3.answer" },
+	{ question: "faq.q4.question", answer: "faq.q4.answer" },
+	{ question: "faq.q5.question", answer: "faq.q5.answer" },
+	{ question: "faq.q6.question", answer: "faq.q6.answer" },
+	{ question: "faq.q7.question", answer: "faq.q7.answer" },
+	{ question: "faq.q8.question", answer: "faq.q8.answer" },
 ];
 
 type ToneOption = {
@@ -193,20 +199,20 @@ export default function Home() {
 		}
 	}, [t]);
 
-	const module5Items = useMemo(() => {
-		try {
-			return JSON.parse(t("landing.module5.items")) as string[];
-		} catch (err) {
-			console.warn("Failed to parse module5 items", err);
-			return [];
-		}
-	}, [t]);
-
 	const module6Items = useMemo(() => {
 		try {
 			return JSON.parse(t("landing.module6.items")) as string[];
 		} catch (err) {
 			console.warn("Failed to parse module6 items", err);
+			return [];
+		}
+	}, [t]);
+
+	const combinedItems = useMemo(() => {
+		try {
+			return JSON.parse(t("landing.moduleCombined.items")) as { title: string; body: string }[];
+		} catch (err) {
+			console.warn("Failed to parse moduleCombined items", err);
 			return [];
 		}
 	}, [t]);
@@ -243,18 +249,21 @@ export default function Home() {
 		document.querySelector("#generator")?.scrollIntoView({ behavior: "smooth", block: "start" });
 	};
 
+	const quotaHintPrimary = auth.isAuthenticated ? t("quota.banner.hint.refresh") : t("quota.banner.hint.register");
+	const quotaHintSecondary = t("quota.banner.description");
+
 	return (
 		<>
 			<main className={`min-h-screen ${mainBg}`} style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont" }}>
 				<div className="grid min-h-screen grid-rows-[auto,1fr]">
 					<HeroSection
 						navItems={navLinks}
-						highlights={heroHighlightList}
 						language={language as Language}
 						setLanguage={setLanguage}
 						remainingQuota={auth.remainingQuota}
 						planLabel={planLabel}
 						userEmail={auth.userEmail}
+						userImage={auth.userImage}
 						isAuthenticated={auth.isAuthenticated}
 						onPrimaryCta={handlePrimaryCta}
 						onSignOut={() => auth.signOut()}
@@ -262,7 +271,7 @@ export default function Home() {
 					/>
 					<div className="flex flex-col flex-1">
 						<div className="flex-1 flex justify-center py-10 sm:py-12">
-							<div className="w-full max-w-6xl px-4 sm:px-6 lg:px-10 space-y-12 md:space-y-16">
+							<div className="w-full max-w-6xl px-4 sm:px-6 lg:px-10 space-y-6 md:space-y-10">
 								<ModesSection
 									heading={t("generator.sectionTitle")}
 									options={toneOptionsLabeled}
@@ -276,6 +285,7 @@ export default function Home() {
 									toneOptions={toneOptionsLabeled}
 									language={language as Language}
 									highlightFallback={highlightFallback}
+									heroHighlights={heroHighlightList}
 									auth={{
 										isAuthenticated: auth.isAuthenticated,
 										remainingQuota: auth.remainingQuota,
@@ -288,19 +298,15 @@ export default function Home() {
 								/>
 
 								<WhySection
-									module2Items={module2Items}
-									module3Items={module3Items}
-									module4Items={module4Items}
-									module5Items={module5Items}
+									combinedItems={combinedItems}
 									module6Items={module6Items}
 									subtleTextClass={subtleText}
-									title={t("landing.module6.title")}
-									caption={t("landing.module3.description")}
+									combinedTitle={t("landing.moduleCombined.title")}
+									combinedCaption={t("landing.moduleCombined.caption")}
+									valueTitle={t("landing.module6.title")}
+									valueCaption={t("landing.module6.caption")}
 									labels={{
-										module2: t("landing.module2.title"),
-										module3: t("landing.module3.title"),
-										module4: t("landing.module4.title"),
-										module5: t("landing.module5.title"),
+										combined: t("landing.moduleCombined.title"),
 										module6: t("landing.module6.title"),
 									}}
 								/>
@@ -343,47 +349,68 @@ export default function Home() {
 
 									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border border-dashed border-[var(--stroke-soft)] p-4">
 										<p className={`text-base ${subtleText}`}>{t("gallery.footer")}</p>
-										<button
-											type="button"
-											onClick={handlePrimaryCta}
+										<Link
+											href="/reports"
 											className="self-start rounded-full border border-emerald-400 px-4 py-2 text-base text-emerald-300 hover:bg-emerald-400/10"
 										>
 											{t("gallery.cta")}
-										</button>
+										</Link>
 									</div>
 								</section>
 
-								<section id="workflow" className={`rounded-3xl border p-5 sm:p-7 space-y-5 ${cardSecondary}`}>
-									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-										<div>
+								<section id="workflow" className={`relative overflow-hidden rounded-3xl border p-5 sm:p-7 space-y-6 ${cardSecondary}`}>
+									<div className="pointer-events-none absolute inset-0 opacity-80">
+										<div className="absolute -left-16 top-10 h-44 w-44 rounded-full bg-emerald-400/15 blur-[120px]" aria-hidden />
+										<div className="absolute right-0 bottom-0 h-56 w-56 rounded-full bg-cyan-500/10 blur-[120px]" aria-hidden />
+										<div className="absolute inset-4 rounded-[28px] border border-white/5" aria-hidden />
+									</div>
+
+									<div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+										<div className="space-y-2 max-w-2xl">
 											<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">{t("workflow.sectionLabel")}</p>
 											<h2 className="text-2xl sm:text-3xl font-semibold">{t("workflow.title")}</h2>
-											<p className={`text-base mt-1 ${subtleText}`}>{t("workflow.caption")}</p>
+											<p className={`text-base ${subtleText}`}>{t("workflow.caption")}</p>
 										</div>
-										<div className="text-sm text-right text-emerald-200">
-											<span className="block font-semibold">{t("workflow.status.step", { step: "01" })}</span>
-											<span className="text-subtle">{t("workflow.status.idle")}</span>
+										<div className="relative rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 px-4 py-3 text-sm text-right text-emerald-100 shadow-[0_14px_40px_rgba(0,0,0,0.3)]">
+											<p className="font-semibold tracking-[0.16em] uppercase">{t("workflow.status.step", { step: "01" })}</p>
+											<p className="text-subtle">{t("workflow.status.idle")}</p>
+											<div className="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-emerald-400/10 blur-3xl" aria-hidden />
 										</div>
 									</div>
 
-									<div className="grid md:grid-cols-2 gap-4">
-										{workflowList.map((step, index) => (
-											<div
-												key={step.title}
-												className={`relative rounded-2xl border p-4 transition-all ${"border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80"}`}
-											>
-												<div className="flex items-center justify-between mb-3">
-													<div className="flex items-center gap-2 text-sm uppercase tracking-[0.22em]">
-														<span className="h-7 w-7 rounded-full flex items-center justify-center font-semibold bg-[var(--bg-layer)] text-dim">
+									<div className="relative rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 p-4 sm:p-5 shadow-[0_12px_40px_rgba(0,0,0,0.28)]">
+										<div className="absolute left-4 top-8 bottom-8 hidden lg:block w-px bg-gradient-to-b from-[var(--accent-emerald)] via-[var(--stroke-soft)] to-transparent" aria-hidden />
+										<div className="grid gap-4">
+											{workflowList.map((step, index) => (
+												<div key={step.title} className="relative pl-12 lg:pl-16">
+													<div className="absolute left-0 lg:left-1 top-1">
+														<div className="relative h-10 w-10 rounded-2xl bg-[var(--accent-emerald)]/20 border border-[var(--accent-emerald)]/50 flex items-center justify-center text-sm font-semibold text-[var(--accent-emerald)] shadow-[0_10px_30px_rgba(16,185,129,0.25)]">
 															{(index + 1).toString().padStart(2, "0")}
-														</span>
-														<span className="text-emerald-200">{step.badge}</span>
+															<span className="absolute inset-0 rounded-2xl border border-white/5" aria-hidden />
+														</div>
+													</div>
+													<div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-4 space-y-2 transition hover:border-[var(--stroke-glow)]/70 hover:shadow-[0_16px_46px_rgba(0,0,0,0.35)]">
+														<div className="flex items-center justify-between gap-3">
+															<span className="text-xs uppercase tracking-[0.22em] text-emerald-200">{step.badge}</span>
+															<span className="hidden sm:inline-flex items-center gap-2 text-xs text-subtle">
+																<span className="h-2 w-2 rounded-full bg-[var(--accent-emerald)]" />
+																{t("workflow.status.step", { step: (index + 1).toString().padStart(2, "0") })}
+															</span>
+														</div>
+														<h3 className="text-lg font-semibold text-[var(--color-foreground)]">{step.title}</h3>
+														<p className={`text-base leading-relaxed ${strongSubtleText}`}>{step.detail}</p>
+														<div className="flex flex-wrap gap-2 text-xs text-subtle">
+															<span className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 px-3 py-1">
+																{t("workflow.status.syncing")}
+															</span>
+															<span className="rounded-full border border-[var(--accent-emerald)]/50 bg-[var(--accent-emerald)]/10 px-3 py-1 text-[var(--accent-emerald)]">
+																{t("workflow.status.ready")}
+															</span>
+														</div>
 													</div>
 												</div>
-												<h3 className="text-lg font-semibold text-[var(--color-foreground)]">{step.title}</h3>
-												<p className={`text-base leading-relaxed mt-1 ${strongSubtleText}`}>{step.detail}</p>
-											</div>
-										))}
+											))}
+										</div>
 									</div>
 								</section>
 

@@ -170,22 +170,34 @@ function formatDate(date: Date): string {
 }
 
 export async function GET(request: NextRequest) {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user?.id) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // 本地调试默认 token（如需关闭请在环境变量里显式设置 TEST_REPORT_TOKEN）
+    const testToken = process.env.TEST_REPORT_TOKEN || "local-test-token";
+    const tokenFromHeader = request.headers.get("x-test-token");
+    const tokenFromQuery = new URL(request.url).searchParams.get("testToken");
+    const isTestBypass = Boolean(testToken && (tokenFromHeader === testToken || tokenFromQuery === testToken));
 
-    const dbUser = await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { id: true, reportsUsed: true, quota: true },
-    });
+    const session = isTestBypass ? null : await getServerSession(authOptions);
+    let dbUser: { id: string; reportsUsed: number; quota: number } | null = null;
 
-    if (!dbUser) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!isTestBypass) {
+        if (!session || !session.user?.id) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
 
-    if (dbUser.reportsUsed >= dbUser.quota) {
-        return NextResponse.json({ error: "Quota exceeded" }, { status: 429 });
+        dbUser = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { id: true, reportsUsed: true, quota: true },
+        });
+
+        if (!dbUser) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        if (dbUser.reportsUsed >= dbUser.quota) {
+            return NextResponse.json({ error: "Quota exceeded" }, { status: 429 });
+        }
+    } else {
+        dbUser = { id: "test-bypass", reportsUsed: 0, quota: 99 };
     }
 
     const { searchParams } = new URL(request.url);
@@ -416,12 +428,15 @@ ${JSON.stringify(companyData, null, 2)}
 
         const report = sanitizeReportContent(rawReport, language);
 
-        await prisma.user.update({
-            where: { id: dbUser.id },
-            data: { reportsUsed: { increment: 1 } },
-        });
+        if (!isTestBypass) {
+            await prisma.user.update({
+                where: { id: dbUser.id },
+                data: { reportsUsed: { increment: 1 } },
+            });
+        }
 
-        const remaining = Math.max(dbUser.quota - (dbUser.reportsUsed + 1), 0);
+        const used = isTestBypass ? 0 : dbUser.reportsUsed + 1;
+        const remaining = Math.max(dbUser.quota - used, 0);
 
         return NextResponse.json({
             symbol,

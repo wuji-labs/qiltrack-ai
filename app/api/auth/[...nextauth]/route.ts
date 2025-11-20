@@ -3,6 +3,7 @@ import EmailProvider from "next-auth/providers/email";
 import GoogleProvider from "next-auth/providers/google";
 import AppleProvider from "next-auth/providers/apple";
 import AzureADProvider from "next-auth/providers/azure-ad";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
@@ -14,6 +15,7 @@ const appleClientId = process.env.APPLE_CLIENT_ID;
 const appleClientSecret = process.env.APPLE_CLIENT_SECRET;
 const microsoftClientId = process.env.AZURE_AD_CLIENT_ID;
 const microsoftClientSecret = process.env.AZURE_AD_CLIENT_SECRET;
+const enableDevLogin = process.env.ENABLE_DEV_LOGIN === "true";
 
 if (!emailServer || !emailFrom) {
   console.warn(
@@ -66,6 +68,40 @@ const providers = [
         AzureADProvider({
           clientId: microsoftClientId,
           clientSecret: microsoftClientSecret,
+        }),
+      ]
+    : []),
+  ...(enableDevLogin
+    ? [
+        CredentialsProvider({
+          name: "Dev Email",
+          credentials: {
+            email: { label: "Email", type: "text" },
+          },
+          async authorize(credentials) {
+            const email = credentials?.email?.toLowerCase().trim();
+            if (!email) return null;
+
+            const user = await prisma.user.upsert({
+              where: { email },
+              update: {},
+              create: {
+                email,
+                name: email,
+                plan: "free",
+                quota: 1,
+                reportsUsed: 0,
+              },
+            });
+
+            return {
+              id: user.id,
+              email: user.email,
+              plan: user.plan,
+              quota: user.quota,
+              reportsUsed: user.reportsUsed,
+            };
+          },
         }),
       ]
     : []),
