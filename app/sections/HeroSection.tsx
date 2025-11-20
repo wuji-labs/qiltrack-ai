@@ -54,7 +54,7 @@ export function HeroSection({
 	return (
 		<section className="w-full">
 			<div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4 sm:px-6 lg:px-10">
-				<nav className="flex flex-wrap items-center gap-3 sm:gap-4 rounded-2xl border border-[var(--stroke-soft)]/70 bg-[var(--bg-frosted)]/90 px-5 sm:px-10 py-4 sm:py-5 min-h-[72px] backdrop-blur-2xl shadow-[0_22px_70px_rgba(0,0,0,0.52)] transition-all duration-300">
+				<nav className="flex flex-wrap items-center gap-3 sm:gap-4 rounded-2xl border border-[var(--stroke-soft)]/70 bg-[var(--bg-frosted)]/80 px-5 sm:px-10 py-4 sm:py-5 min-h-[72px] backdrop-blur-xl shadow-[0_22px_70px_rgba(0,0,0,0.52)] transition-all duration-300">
 					<div className="flex items-center gap-3 min-w-[200px] shrink-0 mr-auto">
 						<div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-[var(--accent-blue)] via-[var(--accent-purple)] to-[var(--accent-emerald)] flex items-center justify-center text-[12px] font-black tracking-[0.28em] text-slate-950 shadow-[0_12px_32px_rgba(35,230,161,0.35)]">
 							IA
