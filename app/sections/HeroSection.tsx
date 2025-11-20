@@ -152,7 +152,7 @@ export function HeroSection({
 					</div>
 				</nav>
 			</div>
-			<div className="h-[82px] sm:h-[90px]" />
+			<div className="h-[96px] sm:h-[112px]" />
 
 			<div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10">
 				<div className="lg:hidden px-4 py-2 border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 backdrop-blur-xl overflow-x-auto flex gap-4 text-sm uppercase tracking-[0.2em] text-subtle rounded-2xl mb-4">
