@@ -441,7 +441,7 @@ export function ReportGeneratorSection({
 					</span>
 				</div>
 
-				<div className="relative flex flex-col gap-4 sm:flex-row sm:items-center">
+				<div className="relative flex flex-col gap-3 sm:flex-row sm:items-center">
 					<div className="flex-1">
 						<div className="group relative overflow-hidden rounded-[24px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/90 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
 							<div className="pointer-events-none absolute inset-0">
@@ -521,21 +521,19 @@ export function ReportGeneratorSection({
 							</div>
 						</div>
 					</div>
-					<div className="flex justify-center sm:justify-end">
-						<button
-							type="submit"
-							className="relative overflow-hidden rounded-full bg-gradient-to-r from-[var(--accent-emerald)] via-emerald-300 to-cyan-300 px-7 sm:px-10 py-3.5 text-base font-semibold text-slate-950 shadow-[0_18px_44px_rgba(91,224,176,0.35)] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)]/60 disabled:opacity-40 disabled:cursor-not-allowed"
-							disabled={loading}
-						>
-							<span className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.35),rgba(255,255,255,0))] opacity-70" aria-hidden />
-							<span className="relative inline-flex items-center gap-2">
-								{loading ? t("generator.loading") : t("generator.submit")}
-								{loading && (
-									<span className="inline-block h-4 w-4 align-middle border-2 border-emerald-200/40 border-t-[var(--accent-emerald)] rounded-full animate-spin" />
-								)}
-							</span>
-						</button>
-					</div>
+					<button
+						type="submit"
+						className="relative overflow-hidden rounded-full bg-gradient-to-r from-[var(--accent-emerald)] via-emerald-300 to-cyan-300 px-6 sm:px-9 py-3 text-base font-semibold text-slate-950 shadow-[0_18px_44px_rgba(91,224,176,0.35)] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)]/60 disabled:opacity-40 disabled:cursor-not-allowed"
+						disabled={loading}
+					>
+						<span className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.35),rgba(255,255,255,0))] opacity-70" aria-hidden />
+						<span className="relative inline-flex items-center gap-2">
+							{loading ? t("generator.loading") : t("generator.submit")}
+							{loading && (
+								<span className="inline-block h-4 w-4 align-middle border-2 border-emerald-200/40 border-t-[var(--accent-emerald)] rounded-full animate-spin" />
+							)}
+						</span>
+					</button>
 				</div>
 			</form>
 
