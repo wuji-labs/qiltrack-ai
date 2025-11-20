@@ -60,10 +60,10 @@ export function HeroSection({
 							IA
 						</div>
 						<div className="flex flex-col leading-tight">
-							<span className="text-base font-semibold tracking-[0.12em] uppercase text-dim">{t("brand.title")}</span>
-							<span className="text-sm text-subtle tracking-[0.16em] uppercase">
-								{t("brand.subtitle")}
-							</span>
+							<span className="text-lg sm:text-xl font-semibold tracking-[0.1em] uppercase text-dim">{t("brand.title")}</span>
+							{t("brand.subtitle") ? (
+								<span className="text-sm text-subtle tracking-[0.12em] uppercase">{t("brand.subtitle")}</span>
+							) : null}
 						</div>
 					</div>
 
