@@ -40,48 +40,48 @@ function withChineseVariants(
 
 const translations: Record<string, TranslationEntry> = {
 	"nav.product": withChineseVariants({
-		en: "Product",
-		ja: "プロダクト",
-		ko: "제품",
+		en: "Solution",
+		ja: "ソリューション",
+		ko: "솔루션",
 		zh: {
-			hant: "產品亮點",
-			hans: "产品亮点",
+			hant: "解決方案",
+			hans: "解决方案",
 		},
 	}),
 	"nav.generator": withChineseVariants({
-		en: "Generate report",
-		ja: "生成レポート",
-		ko: "보고서 생성",
+		en: "Build report",
+		ja: "レポート作成",
+		ko: "리포트 작성",
 		zh: {
 			hant: "生成報告",
 			hans: "生成报告",
 		},
 	}),
 	"nav.templates": withChineseVariants({
-		en: "Research library",
-		ja: "リサーチライブラリ",
-		ko: "리서치 라이브러리",
+		en: "Report Hub",
+		ja: "レポートハブ",
+		ko: "리포트 허브",
 		zh: {
-			hant: "投研報告庫",
-			hans: "投研报告库",
+			hant: "報告中心",
+			hans: "报告中心",
 		},
 	}),
 	"nav.pricing": withChineseVariants({
-		en: "Pricing",
-		ja: "料金",
-		ko: "가격",
+		en: "Rates",
+		ja: "料金プラン",
+		ko: "요금",
 		zh: {
 			hant: "定價",
 			hans: "定价",
 		},
 	}),
 	"nav.faq": withChineseVariants({
-		en: "FAQ",
-		ja: "FAQ",
-		ko: "FAQ",
+		en: "Help",
+		ja: "ヘルプ",
+		ko: "도움말",
 		zh: {
-			hant: "常見問題",
-			hans: "常见问题",
+			hant: "幫助",
+			hans: "帮助",
 		},
 	}),
 	"brand.title": withChineseVariants({
