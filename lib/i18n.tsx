@@ -116,10 +116,10 @@ const translations: Record<string, TranslationEntry> = {
 	}),
 	"hero.description": withChineseVariants({
 		en: "Transforms complex data, reports, and jargon into clear company analysis.",
-		ja: "Investor AI は散在するデータや専門用語、複雑な構造を織り合わせ、誰でも理解できる企業分析へと整えます。",
-		ko: "Investor AI는 흩어진 데이터와 전문 용어, 복잡한 구조를 엮어 누구나 이해할 수 있는 기업 분석으로 정리해 줍니다.",
+		ja: "散在するデータや専門用語、複雑な構造を織り合わせ、誰でも理解できる企業分析へと整えます。",
+		ko: "흩어진 데이터와 전문 용어, 복잡한 구조를 엮어 누구나 이해할 수 있는 기업 분석으로 정리해 줍니다.",
 		zh: {
-			hant: "Investor AI 把分散的資訊、專業術語與複雜結構，整理成一份普通人也能看懂的公司分析。",
+			hant: "把分散的資訊、專業術語與複雜結構，整理成一份普通人也能看懂的公司分析。",
 			hans: "将纷繁复杂的资讯、财报与专业术语，整理成一份人人能懂的公司分析。",
 		},
 	}),
