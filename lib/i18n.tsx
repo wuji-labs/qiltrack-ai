@@ -106,7 +106,7 @@ const translations: Record<string, TranslationEntry> = {
 		zh: "",
 	}),
 	"hero.title": withChineseVariants({
-		en: "Understand a listed company in three minutes.",
+		en: "Understand a company in 3 minutes",
 		ja: "3 分で上場企業を把握。",
 		ko: "3분 만에 상장사를 이해하세요.",
 		zh: {
@@ -115,7 +115,7 @@ const translations: Record<string, TranslationEntry> = {
 		},
 	}),
 	"hero.description": withChineseVariants({
-		en: "Investor AI weaves scattered data, jargon, and complex structures into a company analysis that anyone can truly understand.",
+		en: "Investor AI simplifies complex data into clear analysis.",
 		ja: "Investor AI は散在するデータや専門用語、複雑な構造を織り合わせ、誰でも理解できる企業分析へと整えます。",
 		ko: "Investor AI는 흩어진 데이터와 전문 용어, 복잡한 구조를 엮어 누구나 이해할 수 있는 기업 분석으로 정리해 줍니다.",
 		zh: {
@@ -124,7 +124,7 @@ const translations: Record<string, TranslationEntry> = {
 		},
 	}),
 	"hero.brandline": withChineseVariants({
-		en: "Understanding is the starting point of investing.",
+		en: "Understanding is the foundation of investing.",
 		ja: "理解こそが投資の起点。",
 		ko: "이해가 투자 시작의 모든 것입니다.",
 		zh: "理解，是投資的起點。",

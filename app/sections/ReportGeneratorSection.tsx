@@ -432,7 +432,6 @@ export function ReportGeneratorSection({
 							Step 2
 						</span>
 						<span>{t("generator.input.label")}</span>
-						<div className="pointer-events-none absolute inset-0 rounded-full border border-[var(--stroke-soft)]/70" aria-hidden />
 					</div>
 					<span className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)]/70 bg-[var(--bg-layer)]/85 px-3.5 py-1.5 text-sm text-[var(--color-foreground)] whitespace-nowrap">
 						<span className="h-2 w-2 rounded-full bg-[var(--accent-emerald)] animate-pulse" aria-hidden />
