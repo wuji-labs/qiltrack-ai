@@ -91,12 +91,12 @@ const translations: Record<string, TranslationEntry> = {
 		zh: "Investor AI",
 	}),
 	"brand.subtitle": withChineseVariants({
-		en: "Understand companies · Research like breathing",
+		en: "Research naturally",
 		ja: "企業を理解し、呼吸するようにリサーチ",
 		ko: "기업을 이해하고 숨 쉬듯 리서치",
 		zh: {
-			hant: "理解公司 · 投研像呼吸一樣自然",
-			hans: "理解公司 · 投研如呼吸",
+			hant: "智能投研",
+			hans: "智能投研",
 		},
 	}),
 	"hero.tagline": withChineseVariants({
@@ -1167,11 +1167,11 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hans": "EN",
 	},
 	"cta.preview": {
-		"en": "Try now",
-		"ja": "今すぐ試す",
-		"ko": "지금 체험하기",
-		"zh-Hant": "立即試用",
-		"zh-Hans": "立即试用",
+		"en": "Login",
+		"ja": "ログイン",
+		"ko": "로그인",
+		"zh-Hant": "登入",
+		"zh-Hans": "登录",
 	},
 	"cta.workflow": {
 		"en": "Workflow",
@@ -1363,11 +1363,11 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hans": "继续",
 	},
 	"cta.preview.note": {
-		"en": "Free first report",
-		"ja": "初回レポート無料",
-		"ko": "첫 리포트 무료",
-		"zh-Hant": "首份報告免費",
-		"zh-Hans": "注册后首份免费",
+		"en": "",
+		"ja": "",
+		"ko": "",
+		"zh-Hant": "",
+		"zh-Hans": "",
 	},
 	"auth.modal.title": {
 		"en": "Sign up to unlock the first report",
@@ -1669,6 +1669,27 @@ const translations: Record<string, TranslationEntry> = {
 		"ko": "{{symbol}} 종목을 위한 리포트입니다 (교육용, 투자 조언 아님).",
 		"zh-Hant": "本報告基於代碼 {{symbol}} 生成（僅作教育用途，不構成投資建議）。",
 		"zh-Hans": "报告基于代码：{{symbol}} 生成（仅教育用途，不构成投资建议）。",
+	},
+	"report.tip.title": {
+		"en": "Report tip",
+		"ja": "レポートのヒント",
+		"ko": "리포트 팁",
+		"zh-Hant": "報告提示",
+		"zh-Hans": "报告提示",
+	},
+	"report.tip.body": {
+		"en": "Enter a ticker, pick a persona, and click generate so the AI can craft the report; this card explains that flow and will swap with the output once ready.",
+		"ja": "ティッカーを入力し、テンプレートを選んで生成を押すとAIレポートが出来上がります。このカードがその手順を案内し、完了後は出力とコピー／エクスポート操作に切り替わります。",
+		"ko": "티커를 입력하고 페르소나를 고른 다음 생성을 누르면 AI 리포트가 만들어집니다. 이 카드가 그 흐름을 안내하며 완료되면 리포트와 복사/내보내기 기능으로 교체됩니다。",
+		"zh-Hant": "輸入代碼、選擇模板，點擊「生成」讓 AI 整理出報告。這個提示會說明步驟，報告一生成即替換成輸出與複製/匯出操作。",
+		"zh-Hans": "选择模板、输入代码，点击“生成 AI 投研报告”。完成后即可复制/导出Word。",
+	},
+	"report.tip.action": {
+		"en": "Follow the steps above to start the generation; after the report finishes, this same card will host the copy/export buttons.",
+		"ja": "上の手順で生成を開始すると、レポート完成後はこのカード内にコピーとエクスポートのボタンが収まります。",
+		"ko": "위 과정을 따라 생성시키면 리포트 완성 후 이 카드에서 복사와 내보내기 버튼을 사용할 수 있습니다。",
+		"zh-Hant": "照著上述步驟觸發生成後，報告完成時這裡會出現複製與匯出按鈕。",
+		"zh-Hans": "按照上述步骤触发生成后，报告完成时此处会出现复制与导出按钮。",
 	},
 	"report.debug": {
 		"en": "View raw data used for generation (debug)",
