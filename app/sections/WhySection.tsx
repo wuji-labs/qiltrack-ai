@@ -31,7 +31,6 @@ export function WhySection({
 			<div className="pointer-events-none absolute inset-0">
 				<div className="absolute -left-10 top-8 h-48 w-48 rounded-full bg-[var(--accent-emerald)]/16 blur-[120px]" aria-hidden />
 				<div className="absolute right-0 bottom-0 h-64 w-64 rounded-full bg-[var(--accent-blue)]/14 blur-[140px]" aria-hidden />
-				<div className="absolute inset-4 rounded-[28px] border border-white/5" aria-hidden />
 			</div>
 
 			<div className="relative grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
