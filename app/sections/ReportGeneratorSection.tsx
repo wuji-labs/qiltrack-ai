@@ -647,7 +647,7 @@ export function ReportGeneratorSection({
 						<div className="absolute -left-10 top-0 h-32 w-32 rounded-full bg-[var(--accent-emerald)]/14 blur-[100px]" aria-hidden />
 						<div className="absolute right-0 bottom-0 h-44 w-44 rounded-full bg-[var(--accent-blue)]/12 blur-[120px]" aria-hidden />
 					</div>
-					<div className="relative inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)]/90 bg-[var(--bg-layer)] px-3.5 py-1.5 text-sm uppercase tracking-[0.22em] text-[var(--accent-emerald)] shadow-[0_12px_30px_rgba(0,0,0,0.24)]">
+					<div className="relative inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3.5 py-1.5 text-sm uppercase tracking-[0.22em] text-[var(--accent-emerald)] shadow-[0_12px_30px_rgba(0,0,0,0.24)]">
 						<span className="text-[10px] font-semibold text-emerald-200">Step 3</span>
 						<span className="whitespace-nowrap">{t("report.tip.title")}</span>
 					</div>
