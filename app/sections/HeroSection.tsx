@@ -67,7 +67,7 @@ export function HeroSection({
 						</div>
 					</div>
 
-					<div className="hidden lg:flex flex-1 items-center justify-center gap-5 xl:gap-7 text-xs md:text-sm font-semibold uppercase tracking-[0.14em] text-dim">
+					<div className="hidden xl:flex flex-1 items-center justify-center gap-5 xl:gap-7 text-xs md:text-sm font-semibold uppercase tracking-[0.14em] text-dim">
 						{navItems.map((item) => (
 							<a
 								key={item.href}
@@ -152,7 +152,7 @@ export function HeroSection({
 					</div>
 				</nav>
 
-				<div className="md:hidden px-4 py-2 border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 backdrop-blur-xl overflow-x-auto flex gap-4 text-sm uppercase tracking-[0.2em] text-subtle rounded-2xl mb-4">
+				<div className="lg:hidden px-4 py-2 border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 backdrop-blur-xl overflow-x-auto flex gap-4 text-sm uppercase tracking-[0.2em] text-subtle rounded-2xl mb-4">
 					{navItems.map((item) => (
 						<a key={item.href} href={item.href} className="whitespace-nowrap hover:text-[var(--accent-blue)]">
 							{item.label}
