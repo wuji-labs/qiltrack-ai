@@ -35,7 +35,8 @@ export async function searchSymbols(query: string): Promise<SearchResult[]> {
 	if (!query.trim()) return [];
 	const searchParams = new URLSearchParams({ q: query.trim() });
 	const testToken = process.env.NEXT_PUBLIC_TEST_REPORT_TOKEN;
-	if (testToken) {
+	const enableTestSearch = process.env.NEXT_PUBLIC_ENABLE_TEST_SEARCH === "true";
+	if (testToken && enableTestSearch) {
 		searchParams.set("testToken", testToken);
 	}
 	const res = await fetch(`/api/search?${searchParams.toString()}`);

@@ -51,6 +51,7 @@ export function ReportGeneratorSection({
 	const [inputValue, setInputValue] = useState("");
 	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 	const [searching, setSearching] = useState(false);
+	const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [reportData, setReportData] = useState<ReportResponse | null>(null);
@@ -95,6 +96,7 @@ export function ReportGeneratorSection({
 
 	useEffect(() => {
 		const q = inputValue.trim();
+		setSelectedSymbol(null);
 		if (!q || q.length < 2) {
 			setSearchResults([]);
 			setSearching(false);
@@ -206,12 +208,14 @@ export function ReportGeneratorSection({
 			setError(t("error.submit.format"));
 			return;
 		}
-		if (searchResults.length > 0) {
-			const exists = searchResults.some((item) => item.symbol.toUpperCase() === raw);
-			if (!exists) {
-				setError(t("error.submit.notFound"));
-				return;
-			}
+		const validResults = searchResults.filter(
+			(item) => item.type !== "test" && item.type !== "fallback"
+		);
+		const matchedFromResults = validResults.some((item) => item.symbol.toUpperCase() === raw);
+		const matchedFromSelection = selectedSymbol ? selectedSymbol.toUpperCase() === raw : false;
+		if (!matchedFromResults && !matchedFromSelection) {
+			setError(t("error.submit.notFound"));
+			return;
 		}
 		setSearchResults([]);
 
@@ -506,6 +510,7 @@ export function ReportGeneratorSection({
 													key={`${item.symbol}-${item.displaySymbol ?? item.description}`}
 													onClick={() => {
 														setInputValue(item.symbol);
+														setSelectedSymbol(item.symbol);
 														setSearchResults([]);
 													}}
 													className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--bg-layer)] focus:outline-none focus-visible:bg-[var(--bg-layer)]"
