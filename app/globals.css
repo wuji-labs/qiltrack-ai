@@ -185,66 +185,65 @@ body {
 }
 
 .progress-track {
+  position: relative;
   height: 8px;
   width: 100%;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
   overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .progress-fill {
   height: 100%;
-  border-radius: 999px;
-  background: var(--accent-emerald);
-  transition: width 0.7s ease;
-}
-
-.progress-marquee {
   position: relative;
+  border-radius: 999px;
+  background: linear-gradient(120deg, rgba(81, 242, 191, 0.6), rgba(63, 157, 255, 0.55));
+  transition: width 0.28s cubic-bezier(0.22, 1, 0.36, 1);
   overflow: hidden;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: linear-gradient(120deg, rgba(81, 242, 191, 0.12), rgba(67, 139, 255, 0.08));
-  padding: 12px 16px;
-  min-height: 64px;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  animation: marquee-shell-drift 10s ease-in-out infinite;
-  transform-style: preserve-3d;
-  perspective: 600px;
+  isolation: isolate;
 }
 
-.progress-marquee-track {
+.progress-fill-glow {
+  position: absolute;
+  inset: -40% -10%;
+  background: radial-gradient(circle at 30% 50%, rgba(81, 242, 191, 0.45), transparent 45%),
+    radial-gradient(circle at 70% 50%, rgba(63, 157, 255, 0.35), transparent 50%);
+  filter: blur(22px);
+  opacity: 0.55;
+  animation: gradient-shift 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.progress-stack {
   display: flex;
-  width: 100%;
-  gap: 12px;
-  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform;
-  animation: marquee-float 9s ease-in-out infinite alternate;
-  transform-style: preserve-3d;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 6px;
 }
 
 .progress-chip {
   position: relative;
-  min-width: 100%;
-  display: inline-flex;
+  min-width: 220px;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
-  justify-content: center;
   gap: 12px;
   padding: 14px 16px;
   border-radius: 14px;
-  background: linear-gradient(130deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.08));
+  background: linear-gradient(120deg, rgba(16, 24, 38, 0.82), rgba(18, 28, 44, 0.78));
   border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(6px);
+  color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.02),
-    0 8px 24px rgba(0, 0, 0, 0.2);
-  white-space: nowrap;
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 12px 24px rgba(0, 0, 0, 0.28);
   overflow: hidden;
   text-overflow: ellipsis;
   transition:
-    transform 0.6s ease,
+    transform 0.45s ease,
     color 0.5s ease,
     box-shadow 0.5s ease,
     border-color 0.5s ease;
@@ -262,49 +261,65 @@ body {
   font-size: 12px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(135deg, rgba(81, 242, 191, 0.12), rgba(63, 157, 255, 0.1));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .progress-chip-label {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.4;
   flex: 1;
   text-align: center;
+  font-weight: 600;
+}
+
+.progress-chip-ring {
+  position: absolute;
+  inset: -45%;
+  background: radial-gradient(circle at 50% 50%, rgba(81, 242, 191, 0.18), transparent 52%),
+    radial-gradient(circle at 60% 40%, rgba(63, 157, 255, 0.12), transparent 55%);
+  filter: blur(26px);
+  opacity: 0.4;
+  transform: scale(0.9);
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .progress-chip-spark {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 10% 50%, rgba(81, 242, 191, 0.35), rgba(81, 242, 191, 0) 28%);
+  background: linear-gradient(120deg, rgba(81, 242, 191, 0) 0%, rgba(81, 242, 191, 0.28) 45%, rgba(63, 157, 255, 0) 100%);
   mix-blend-mode: screen;
-  transform: translateX(-30%);
-  animation: spark-move 2.8s ease-in-out infinite;
-  opacity: 0.4;
+  transform: translateX(-40%);
+  animation: spark-move 1.9s ease-in-out infinite;
+  opacity: 0.35;
 }
 
 .progress-chip-glow {
   position: absolute;
-  inset: -40%;
-  background: radial-gradient(circle at 35% 50%, rgba(81, 242, 191, 0.14), transparent 50%),
-    radial-gradient(circle at 70% 50%, rgba(82, 163, 255, 0.12), transparent 55%);
-  filter: blur(30px);
+  inset: -30%;
+  background: radial-gradient(circle at 35% 50%, rgba(81, 242, 191, 0.18), transparent 52%),
+    radial-gradient(circle at 70% 50%, rgba(82, 163, 255, 0.18), transparent 58%);
+  filter: blur(32px);
   opacity: 0;
   transition: opacity 0.6s ease;
   pointer-events: none;
 }
 
 .progress-chip.is-active {
-  color: #e9fbff;
-  transform: translateY(-1px);
-  border-color: rgba(81, 242, 191, 0.45);
+  color: #f1fbff;
+  transform: translateY(-4px);
+  border-color: rgba(81, 242, 191, 0.6);
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(81, 242, 191, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  animation:
-    chip-pop 0.8s ease,
-    chip-tilt 8s ease-in-out infinite alternate;
+    0 14px 32px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(81, 242, 191, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  animation: stack-bounce 1.05s ease-in-out infinite;
+}
+
+.progress-chip.is-active .progress-chip-ring {
+  opacity: 0.8;
+  transform: scale(1);
 }
 
 .progress-chip.is-active .progress-chip-glow {
@@ -340,43 +355,40 @@ body {
 
 @keyframes spark-move {
   0% {
-    transform: translateX(-30%);
-    opacity: 0.35;
+    transform: translateX(-40%);
+    opacity: 0.45;
   }
   50% {
     transform: translateX(35%);
-    opacity: 0.7;
+    opacity: 0.85;
   }
   100% {
-    transform: translateX(-30%);
-    opacity: 0.35;
+    transform: translateX(-40%);
+    opacity: 0.45;
   }
 }
 
-@keyframes chip-pop {
+@keyframes stack-bounce {
   0% {
-    transform: translateY(4px) scale(0.99);
-    box-shadow:
-      0 4px 16px rgba(0, 0, 0, 0.2),
-      0 0 0 1px rgba(81, 242, 191, 0.12);
+    transform: translateY(-2px);
   }
-  40% {
-    transform: translateY(-2px) scale(1.01);
+  45% {
+    transform: translateY(-6px);
   }
   100% {
-    transform: translateY(-1px) scale(1);
+    transform: translateY(-2px);
   }
 }
 
-@keyframes chip-tilt {
+@keyframes gradient-shift {
   0% {
-    transform: translateY(-1px) rotateX(0deg) rotateY(0deg);
+    transform: translateX(0);
   }
   50% {
-    transform: translateY(-1px) rotateX(2deg) rotateY(-3deg);
+    transform: translateX(5%);
   }
   100% {
-    transform: translateY(-1px) rotateX(-2deg) rotateY(3deg);
+    transform: translateX(0);
   }
 }
 
@@ -388,10 +400,8 @@ body {
   .progress-chip.is-active {
     animation: none;
   }
-  .progress-marquee-track {
-    animation: none;
-  }
-  .progress-marquee {
+
+  .progress-fill-glow {
     animation: none;
   }
 }
