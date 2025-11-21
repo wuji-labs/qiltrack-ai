@@ -17,7 +17,8 @@ type ProgressBarProps = {
 
 export function ProgressBar({ percent, label, steps, activeStep, extra }: ProgressBarProps) {
 	const computedIndex = steps.findIndex((item) => item.step === activeStep);
-	const activeIndex = computedIndex === -1 ? 0 : computedIndex;
+	const fallbackIndex = Math.min(steps.length - 1, Math.floor((percent / 100) * (steps.length - 1)));
+	const activeIndex = computedIndex === -1 ? fallbackIndex : computedIndex;
 	const translateX = `calc(-${activeIndex * 100}% - ${activeIndex * 12}px)`;
 
 	return (
@@ -39,6 +40,7 @@ export function ProgressBar({ percent, label, steps, activeStep, extra }: Progre
 						const active = activeStep === item.step;
 						return (
 							<div key={item.step} className={`progress-chip ${active ? "is-active" : ""}`}>
+								<span className="progress-chip-spark" aria-hidden />
 								<div className="progress-chip-index">0{item.step}</div>
 								<div className="progress-chip-label">{item.label}</div>
 								<div className="progress-chip-glow" aria-hidden />
