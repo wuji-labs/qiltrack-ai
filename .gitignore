@@ -43,3 +43,6 @@ next-env.d.ts
 
 # local chrome downloads (debugging)
 /chrome/
+
+# Claude Code configuration
+.claude/
