@@ -20,6 +20,11 @@ export function ProgressBar({ percent, label, steps, activeStep, extra }: Progre
 	const fallbackIndex = Math.min(steps.length - 1, Math.floor((percent / 100) * (steps.length - 1)));
 	const activeIndex = computedIndex === -1 ? fallbackIndex : computedIndex;
 
+	const pipPositions = steps.map((_, idx) => {
+		if (steps.length === 1) return 100;
+		return (idx / (steps.length - 1)) * 100;
+	});
+
 	return (
 		<div className="space-y-3 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-4">
 			<div className="flex items-center justify-between text-sm uppercase tracking-[0.24em] text-[var(--accent-emerald)]">
@@ -27,7 +32,21 @@ export function ProgressBar({ percent, label, steps, activeStep, extra }: Progre
 				<span>{Math.round(percent)}%</span>
 			</div>
 			<div className="progress-track">
+				<div className="progress-track-backdrop" aria-hidden />
+				<div className="progress-pips" aria-hidden>
+					{pipPositions.map((left, idx) => {
+						const passed = percent >= left;
+						return (
+							<span
+								key={idx}
+								className={`progress-pip ${passed ? "is-passed" : ""} ${idx === activeIndex ? "is-current" : ""}`}
+								style={{ left: `${left}%` }}
+							/>
+						);
+					})}
+				</div>
 				<div className="progress-fill" style={{ width: `${percent}%` }}>
+					<span className="progress-fill-sheen" aria-hidden />
 					<span className="progress-fill-glow" aria-hidden />
 				</div>
 			</div>

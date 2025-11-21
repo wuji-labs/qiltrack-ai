@@ -69,6 +69,7 @@ export function ReportGeneratorSection({
 	const lastToneInfo =
 		toneOptions.find((option) => option.id === lastReportTone) || toneOptions[0];
 	const selectedToneTitle = selectedToneInfo.title;
+	const keyInsightsSubtitle = t("report.keyInsights.subtitle");
 
 	const keyInsights = useMemo(() => {
 		if (!reportData?.report) return highlightFallback.slice(0, 3);
@@ -599,16 +600,13 @@ export function ReportGeneratorSection({
 							{t("report.disclaimerNotice")}
 						</div>
 
-						<div className="space-y-4 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/60 p-4 text-dim">
-							<div className="flex flex-wrap items-center justify-between gap-4">
-								<div>
-									<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">
-										{t("report.keyInsights.subtitle")}
-									</p>
-									<p className="text-lg font-semibold text-[var(--color-foreground)] leading-relaxed">
-										{t("report.keyInsights.title")}
-									</p>
-								</div>
+							<div className="space-y-4 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/60 p-4 text-dim">
+								<div className="flex flex-wrap items-center justify-between gap-4">
+									<div>
+										<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">
+											{keyInsightsSubtitle}
+										</p>
+									</div>
 								<div className="text-sm uppercase tracking-[0.26em] text-subtle">
 									<span className="inline-flex items-center gap-1">
 										<span>{lastToneInfo.emoji}</span>

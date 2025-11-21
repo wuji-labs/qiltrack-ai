@@ -2148,8 +2148,8 @@ const translations: Record<string, TranslationEntry> = {
 		"en": "Key Insights",
 		"ja": "主要インサイト",
 		"ko": "핵심 인사이트",
-		"zh-Hant": "關鍵洞察",
-		"zh-Hans": "关键洞察",
+		"zh-Hant": "Investor AI 快速摘要",
+		"zh-Hans": "Investor AI 快速摘要",
 	},
 	"report.keyInsights.subtitle": {
 		"en": "Investor AI Highlights",
