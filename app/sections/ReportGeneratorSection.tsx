@@ -409,10 +409,14 @@ export function ReportGeneratorSection({
 	};
 
 	const workflowList = [
-		{ step: 1, label: t("generator.progress.fetching") },
-		{ step: 2, label: t("generator.progress.shaping") },
-		{ step: 3, label: t("generator.progress.llm") },
-		{ step: 4, label: t("generator.progress.ready") },
+		{ step: 1, label: t("generator.progress.stage1") },
+		{ step: 2, label: t("generator.progress.stage2") },
+		{ step: 3, label: t("generator.progress.stage3") },
+		{ step: 4, label: t("generator.progress.stage4") },
+		{ step: 5, label: t("generator.progress.stage5") },
+		{ step: 6, label: t("generator.progress.stage6") },
+		{ step: 7, label: t("generator.progress.stage7") },
+		{ step: 8, label: t("generator.progress.stage8") },
 	];
 
 	const maxVisibleResults = 3;
@@ -640,12 +644,6 @@ export function ReportGeneratorSection({
 								>
 									{exportingDocx ? t("report.action.exporting") : t("report.action.export")}
 								</button>
-							</div>
-
-							<div className="space-y-1 text-sm text-subtle">
-								<p className="font-semibold text-[var(--color-foreground)]">{t("report.template.title")}</p>
-								<p className="text-base leading-relaxed">{t("report.template.description")}</p>
-								<p className="text-sm text-subtle">{t("report.loginReminder")}</p>
 							</div>
 						</div>
 					</div>

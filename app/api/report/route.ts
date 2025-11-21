@@ -22,62 +22,26 @@ const toneDirectives = {
 const LANGUAGE_CONFIG: Record<Language, {
     languageInstruction: string;
     disclaimer: string;
-    checklist: string;
 }> = {
     en: {
         languageInstruction: "Language: English",
         disclaimer: `This report is auto-generated from public data and common analytical frameworks. The content is for general information only and never constitutes investment advice, trading guidance, or personalized judgment. Market conditions may change and information may lag. Consult licensed professionals before making investment decisions.`,
-        checklist: `"Analysis checklist · for user self assessment"
-
-□ Identify potential risk factors
-□ Check whether financial fundamentals remain stable
-□ Review changes in industry structure
-□ Confirm if the growth logic still holds
-□ Consider possible black swan events`,
     },
     ja: {
         languageInstruction: "言語: 日本語で出力してください",
         disclaimer: `本レポートは公開データと一般的な分析手法をもとに自動生成された一般参考情報であり、投資助言や売買指示ではありません。市場環境は変化し得るため、情報には遅延や偏りが含まれる可能性があります。投資判断が必要な場合は、必ず有資格の専門家に相談してください。`,
-        checklist: `「分析チェックリスト（利用者自身の判断用）」
-
-□ リスク要因が把握されているか
-□ 財務の基礎体力が維持されているか
-□ 業界構造の変化がないか
-□ 成長ストーリーが継続しているか
-□ 潜在的なブラックスワンがないか`,
     },
     ko: {
         languageInstruction: "언어: 한국어로 작성해 주세요",
         disclaimer: `이 리포트는 공개 데이터와 일반적인 분석 방법을 기반으로 자동 생성된 일반 참고 정보이며, 투자 자문이나 매매 지침이 아닙니다. 시장 상황은 언제든 변할 수 있고 정보에는 지연이나 편차가 있을 수 있습니다. 투자 결정을 내리기 전에 반드시 자격을 갖춘 전문가와 상담하세요.`,
-        checklist: `"분석 체크리스트 · 사용자가 직접 판단"
-
-□ 식별 가능한 위험 요인이 있는가
-□ 재무 기초가 안정적으로 유지되고 있는가
-□ 산업 구조에 변화가 있는가
-□ 성장 논리가 여전히 유효한가
-□ 잠재적 블랙스완 이벤트가 없는가`,
     },
     "zh-Hant": {
         languageInstruction: "語言：請用繁體中文輸出",
         disclaimer: `本報告內容由系統基於公開數據與通用分析方法自動生成，僅供一般資訊參考，不構成任何投資建議、買賣意見或個人化判斷。市場情勢可能變動，資訊亦可能存在延遲或偏差。如需投資建議，請諮詢具備合法資質的專業機構。`,
-        checklist: `「分析檢核清單 · 供使用者自行判斷」
-
-□ 是否存在可辨識的風險點
-□ 財務基本面是否保持穩定
-□ 產業結構是否發生變化
-□ 成長邏輯是否仍然成立
-□ 是否存在潛在黑天鵝事件`,
     },
     "zh-Hans": {
         languageInstruction: "语言：请使用简体中文输出",
         disclaimer: `本报告内容由系统基于公开数据和通用分析方法自动生成，仅供一般信息参考，不构成任何投资建议、买卖意见或个性化判断。市场状况可能变化，信息可能存在延迟或偏差。如需投资建议，请咨询取得合法资质的专业机构。`,
-        checklist: `「分析检核清单 · 供用户自行判断」
-
-□ 是否存在可识别的风险点
-□ 财务基本面是否保持稳定
-□ 行业结构是否发生变化
-□ 增长逻辑是否仍在成立
-□ 是否存在潜在黑天鹅事件`,
     },
 };
 
@@ -120,10 +84,8 @@ function sanitizeReportContent(content: string, language: Language) {
     const langConfig = LANGUAGE_CONFIG[language] ?? LANGUAGE_CONFIG.en;
     const paragraphs = content.split(/\n{2,}/);
     const safeParagraphs: string[] = [];
-    let removed = false;
     for (const paragraph of paragraphs) {
         if (PARAGRAPH_REMOVAL_KEYWORDS.some((kw) => paragraph.includes(kw))) {
-            removed = true;
             continue;
         }
         safeParagraphs.push(paragraph);
@@ -132,10 +94,6 @@ function sanitizeReportContent(content: string, language: Language) {
     let sanitized = safeParagraphs.join("\n\n");
     for (const { pattern, replacement } of WORD_REPLACEMENTS) {
         sanitized = sanitized.replace(pattern, replacement);
-    }
-
-    if (removed) {
-        sanitized = `${sanitized}\n\n${langConfig.checklist}`.trim();
     }
 
     return `${langConfig.disclaimer}\n\n${sanitized}`.trim();

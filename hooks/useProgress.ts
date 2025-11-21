@@ -16,6 +16,8 @@ export type ProgressState = {
 	currentStep: number;
 };
 
+const STEP_THRESHOLDS = [0, 10, 22, 35, 50, 65, 80, 92];
+
 export function useProgress() {
 	const [progress, setProgress] = useState(0);
 	const [status, setStatus] = useState<ProgressStatus>("idle");
@@ -82,10 +84,12 @@ export function useProgress() {
 	useEffect(() => reset, [reset]);
 
 	const currentStep = (() => {
-		if (status === "done") return 4;
-		if (progress >= 60) return 3;
-		if (progress >= 30) return 2;
-		if (progress > 0) return 1;
+		if (status === "done") return STEP_THRESHOLDS.length;
+		for (let index = STEP_THRESHOLDS.length - 1; index >= 0; index -= 1) {
+			if (progress >= STEP_THRESHOLDS[index]) {
+				return index + 1;
+			}
+		}
 		return 1;
 	})();
 
