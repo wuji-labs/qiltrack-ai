@@ -52,6 +52,7 @@ export function ReportGeneratorSection({
 	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 	const [searching, setSearching] = useState(false);
 	const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
+	const [suppressNextSearch, setSuppressNextSearch] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [reportData, setReportData] = useState<ReportResponse | null>(null);
@@ -95,6 +96,11 @@ export function ReportGeneratorSection({
 	);
 
 	useEffect(() => {
+		if (suppressNextSearch) {
+			setSuppressNextSearch(false);
+			return;
+		}
+
 		const q = inputValue.trim();
 		setSelectedSymbol(null);
 		if (!q || q.length < 2) {
@@ -486,6 +492,10 @@ export function ReportGeneratorSection({
 										value={inputValue}
 										onChange={(event) => setInputValue(event.target.value)}
 										placeholder={t("generator.input.placeholder")}
+										autoComplete="off"
+										spellCheck={false}
+										autoCorrect="off"
+										autoCapitalize="none"
 										className="w-full bg-transparent pl-10 pr-28 py-2.5 text-base text-[var(--color-foreground)] placeholder:text-subtle focus:outline-none"
 										aria-label={t("generator.input.label")}
 									/>
@@ -516,6 +526,7 @@ export function ReportGeneratorSection({
 														setInputValue(item.symbol);
 														setSelectedSymbol(item.symbol);
 														setSearchResults([]);
+														setSuppressNextSearch(true);
 													}}
 													className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--bg-layer)] focus:outline-none focus-visible:bg-[var(--bg-layer)]"
 												>
