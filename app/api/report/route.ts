@@ -24,23 +24,23 @@ const LANGUAGE_CONFIG: Record<Language, {
     disclaimer: string;
 }> = {
     en: {
-        languageInstruction: "Language: English",
+        languageInstruction: "Language: English only. Do not use any other language.",
         disclaimer: `This report is auto-generated from public data and common analytical frameworks. The content is for general information only and never constitutes investment advice, trading guidance, or personalized judgment. Market conditions may change and information may lag. Consult licensed professionals before making investment decisions.`,
     },
     ja: {
-        languageInstruction: "言語: 日本語で出力してください",
+        languageInstruction: "言語: 必ず日本語のみで出力してください。他の言語は使わないでください。",
         disclaimer: `本レポートは公開データと一般的な分析手法をもとに自動生成された一般参考情報であり、投資助言や売買指示ではありません。市場環境は変化し得るため、情報には遅延や偏りが含まれる可能性があります。投資判断が必要な場合は、必ず有資格の専門家に相談してください。`,
     },
     ko: {
-        languageInstruction: "언어: 한국어로 작성해 주세요",
+        languageInstruction: "언어: 보고서 전체를 한국어로만 작성하세요. 중국어/영어 등 다른 언어는 절대 사용하지 마세요.",
         disclaimer: `이 리포트는 공개 데이터와 일반적인 분석 방법을 기반으로 자동 생성된 일반 참고 정보이며, 투자 자문이나 매매 지침이 아닙니다. 시장 상황은 언제든 변할 수 있고 정보에는 지연이나 편차가 있을 수 있습니다. 투자 결정을 내리기 전에 반드시 자격을 갖춘 전문가와 상담하세요.`,
     },
     "zh-Hant": {
-        languageInstruction: "語言：請用繁體中文輸出",
+        languageInstruction: "語言：請全程使用繁體中文輸出，不要混用其他語言。",
         disclaimer: `本報告內容由系統基於公開數據與通用分析方法自動生成，僅供一般資訊參考，不構成任何投資建議、買賣意見或個人化判斷。市場情勢可能變動，資訊亦可能存在延遲或偏差。如需投資建議，請諮詢具備合法資質的專業機構。`,
     },
     "zh-Hans": {
-        languageInstruction: "语言：请使用简体中文输出",
+        languageInstruction: "语言：请全程使用简体中文输出，不要混用其他语言。",
         disclaimer: `本报告内容由系统基于公开数据和通用分析方法自动生成，仅供一般信息参考，不构成任何投资建议、买卖意见或个性化判断。市场状况可能变化，信息可能存在延迟或偏差。如需投资建议，请咨询取得合法资质的专业机构。`,
     },
 };

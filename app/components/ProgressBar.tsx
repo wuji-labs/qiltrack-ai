@@ -33,18 +33,6 @@ export function ProgressBar({ percent, label, steps, activeStep, extra }: Progre
 			</div>
 			<div className="progress-track">
 				<div className="progress-track-backdrop" aria-hidden />
-				<div className="progress-pips" aria-hidden>
-					{pipPositions.map((left, idx) => {
-						const passed = percent >= left;
-						return (
-							<span
-								key={idx}
-								className={`progress-pip ${passed ? "is-passed" : ""} ${idx === activeIndex ? "is-current" : ""}`}
-								style={{ left: `${left}%` }}
-							/>
-						);
-					})}
-				</div>
 				<div className="progress-fill" style={{ width: `${percent}%` }}>
 					<span className="progress-fill-sheen" aria-hidden />
 					<span className="progress-fill-glow" aria-hidden />

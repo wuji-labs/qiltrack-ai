@@ -855,7 +855,7 @@ const translations: Record<string, TranslationEntry> = {
 	},
 	"tone.baseline.title": {
 		"en": "Baseline Mode",
-		"ja": "ベースライン",
+		"ja": "ベースライン・モード",
 		"ko": "베이스라인 모드",
 		"zh-Hant": "標準模式",
 		"zh-Hans": "标准模式",
@@ -876,7 +876,7 @@ const translations: Record<string, TranslationEntry> = {
 	},
 	"tone.buffett.title": {
 		"en": "Buffett Mode",
-		"ja": "バフェット",
+		"ja": "バフェット・モード",
 		"ko": "버핏 모드",
 		"zh-Hant": "巴菲特模式",
 		"zh-Hans": "巴菲特模式",
@@ -897,7 +897,7 @@ const translations: Record<string, TranslationEntry> = {
 	},
 	"tone.musk.title": {
 		"en": "Musk Mode",
-		"ja": "マスク",
+		"ja": "マスク・モード",
 		"ko": "머스크 모드",
 		"zh-Hant": "馬斯克模式",
 		"zh-Hans": "马斯克模式",
@@ -918,8 +918,8 @@ const translations: Record<string, TranslationEntry> = {
 	},
 	"tone.muddy.title": {
 		"en": "Muddy Waters Mode",
-		"ja": "マディーウォーターズ",
-		"ko": "머디워터스 모드",
+		"ja": "マディ・ウォーターズ・モード",
+		"ko": "머디 워터스 모드",
 		"zh-Hant": "渾水模式",
 		"zh-Hans": "浑水模式",
 	},

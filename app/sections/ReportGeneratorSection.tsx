@@ -245,8 +245,8 @@ export function ReportGeneratorSection({
 
 		try {
 			const data = await generateReport({ symbol: raw, lang: language, tone: selectedTone });
+			await progress.complete(t("generator.progress.done"));
 			setReportData(data);
-			progress.complete(t("generator.progress.done"));
 			await auth.refreshSession();
 		} catch (err) {
 			console.error("调用接口异常：", err);
