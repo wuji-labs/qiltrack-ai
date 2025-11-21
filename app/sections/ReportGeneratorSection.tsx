@@ -249,7 +249,7 @@ export function ReportGeneratorSection({
 			setReportData(data);
 			await auth.refreshSession();
 		} catch (err) {
-			console.error("调用接口异常：", err);
+			console.error("调用接口异常:", err);
 			const message = err instanceof Error ? err.message : t("error.submit.generic");
 			setError(message);
 			progress.fail(message);
@@ -662,10 +662,16 @@ export function ReportGeneratorSection({
 					<div className="pointer-events-none absolute inset-0">
 						<div className="absolute -left-10 top-0 h-32 w-32 rounded-full bg-[var(--accent-emerald)]/14 blur-[100px]" aria-hidden />
 						<div className="absolute right-0 bottom-0 h-44 w-44 rounded-full bg-[var(--accent-blue)]/12 blur-[120px]" aria-hidden />
+						<div
+							className="absolute left-4 bottom-4 h-20 w-28 rounded-2xl border border-[var(--stroke-soft)]/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0)),radial-gradient(circle_at_18%_16%,rgba(91,224,176,0.18),transparent_42%)] shadow-[0_14px_38px_rgba(0,0,0,0.28)]"
+							aria-hidden
+						/>
 					</div>
 					<div className="relative flex flex-wrap items-center justify-between gap-3 text-sm uppercase tracking-[0.22em] text-subtle">
 						<div className="relative inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3.5 py-1.5 text-sm text-[var(--accent-emerald)] shadow-[0_12px_30px_rgba(0,0,0,0.24)]">
-							<span className="text-[10px] font-semibold text-emerald-200">Step 3</span>
+							<span className="rounded-full bg-[var(--accent-emerald)]/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-200">
+								Step 3
+							</span>
 							<span className="whitespace-nowrap">{t("report.tip.title")}</span>
 							<div className="pointer-events-none absolute inset-0 rounded-full border border-[var(--stroke-soft)]/70" aria-hidden />
 						</div>

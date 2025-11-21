@@ -98,31 +98,31 @@ export function useProgress() {
 		}, STEP_FOUR_INTERVAL);
 	}, [clearTimers]);
 
- const complete = useCallback(
-  (label?: string) =>
-    new Promise<void>((resolve) => {
-      clearTimers();
-      setStatus("running");
-      setText(label ?? null);
-      setProgress((value) => Math.max(value, STEP_FOUR_TARGET));
-      finishRef.current = setInterval(() => {
-        setProgress((value) => {
-          if (value >= 100) {
-            if (finishRef.current) clearInterval(finishRef.current);
-            setStatus("done");
-            resetTimerRef.current = setTimeout(() => {
-              reset();
-              resolve();
-            }, FINISH_HOLD);
-            return 100;
-          }
-          const delta = Math.max(1, Math.round((100 - value) / 4));
-          return Math.min(100, value + delta);
-        });
-      }, FINISH_INTERVAL);
-    }),
-  [clearTimers, reset]
-);
+	const complete = useCallback(
+		(label?: string) =>
+			new Promise<void>((resolve) => {
+				clearTimers();
+				setStatus("running");
+				setText(label ?? null);
+				setProgress((value) => Math.max(value, STEP_FOUR_TARGET));
+				finishRef.current = setInterval(() => {
+					setProgress((value) => {
+						if (value >= 100) {
+							if (finishRef.current) clearInterval(finishRef.current);
+							setStatus("done");
+							resetTimerRef.current = setTimeout(() => {
+								reset();
+								resolve();
+							}, FINISH_HOLD);
+							return 100;
+						}
+						const delta = Math.max(1, Math.round((100 - value) / 4));
+						return Math.min(100, value + delta);
+					});
+				}, FINISH_INTERVAL);
+			}),
+		[clearTimers, reset]
+	);
 
 	const forceComplete = useCallback(() => {
 		clearTimers();

@@ -7,13 +7,20 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest --environment jsdom --pool=forks"
+    "test": "vitest --environment jsdom --pool=forks",
+    "dev:chrome": "powershell -ExecutionPolicy Bypass -File scripts/devtools-mcp.ps1 start",
+    "dev:chrome:endpoint": "powershell -ExecutionPolicy Bypass -File scripts/devtools-mcp.ps1 endpoint",
+    "dev:chrome:stop": "powershell -ExecutionPolicy Bypass -File scripts/devtools-mcp.ps1 stop",
+    "mcp:start": "bash scripts/devtools-mcp.sh start",
+    "mcp:endpoint": "bash scripts/devtools-mcp.sh endpoint",
+    "mcp:stop": "bash scripts/devtools-mcp.sh stop"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
-    "@next/swc-linux-x64-gnu": "^16.0.3",
     "@prisma/client": "^6.19.0",
+    "chrome-devtools-mcp": "^0.10.2",
     "docx": "^9.5.1",
+    "esbuild": "^0.27.0",
     "file-saver": "^2.0.5",
     "jspdf": "^3.0.3",
     "next": "16.0.3",
@@ -27,17 +34,18 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
+    "jsdom": "^26.0.0",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "@testing-library/react": "^16.1.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "jsdom": "^26.0.0",
     "vitest": "^2.1.8"
   }
 }

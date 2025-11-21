@@ -20,9 +20,14 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 | 命令 | 说明 |
 | --- | --- |
 | `npm run dev` | 启动开发服务器，默认 http://localhost:3000 |
+| `npm run dev:chrome` | Windows PowerShell 启动调试 Chrome（调用 `scripts/devtools-mcp.ps1 start`） |
 | `npm run build` | 生成 `.next` 生产构建 |
 | `npm start` | 运行生产构建 |
 | `npm run lint` | ESLint（core-web-vitals） |
+| `npm run test` | Vitest（jsdom），覆盖 API service 与进度条 hook |
+| `npm run mcp:start` | 可选：启动 headless Chrome (`scripts/devtools-mcp.sh start`) |
+| `npm run mcp:endpoint` | 可选：查看 headless Chrome WebSocket endpoint |
+| `npm run mcp:stop` | 可选：停止 headless Chrome 进程 |
 
 > 运行前请复制 `.env.local.example` 为 `.env.local` 并补齐密钥。
 
@@ -56,6 +61,11 @@ EMAIL_FROM="Investor AI <no-reply@investor.ai>"
 
 - `/reports` 保持与主站一致的暗色玻璃主题，顶部展示结构化 Hero、分类 Pills，以及多列文章卡片；数据集中管理于 `app/reports/data.ts`，便于 Archive 与 Detail 同步。
 - 点击任一卡片会导航到 `/reports/[slug]`，该路由展示大图、标签/作者、阅读时长和段落正文，打造正式博客体验。
+
+## 调试辅助（Windows 优先）
+- Windows VS Code + PowerShell：运行 `pwsh scripts/devtools-mcp.ps1 start`（或 `npm run dev:chrome`）启动调试专用 Chrome，`endpoint`/`stop` 子命令用于查看 WebSocket URL 或关闭实例，再通过 `chrome-devtools-mcp --wsEndpoint <url>` 与本地 `npm run dev` 页面联调。
+- 若需要 headless/无人值守场景，可选用 Bash 版脚本：`npm run mcp:start`（默认监听 9223），再用 `npm run mcp:endpoint` 拿到 WebSocket Endpoint，最后 `npm run mcp:stop` 退出。该脚本可在 Windows 上配合 Git Bash/Cygwin 运行，不再依赖 WSL。
+- 早期的跨主机方案（WSL 获取 `WIN_IP`、访问 `/mnt/c/...` 等）仅在特殊环境参考；默认工作流以 Windows 为主，请同步参阅 `AGENTS.md` 的更新。
 
 ## 手动验证脚本
 1. `npm run dev` 启动服务。

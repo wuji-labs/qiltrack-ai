@@ -14,7 +14,9 @@ describe("useProgress", () => {
 
 	it("advances progress and completes", () => {
 		const { result } = renderHook(() => useProgress());
-		act(() => result.current.start("init"));
+		act(() => {
+			result.current.start("init");
+		});
 		expect(result.current.progress).toBeGreaterThan(0);
 
 		act(() => {
@@ -22,7 +24,12 @@ describe("useProgress", () => {
 		});
 		expect(result.current.progress).toBeGreaterThanOrEqual(7);
 
-		act(() => result.current.complete("done"));
+		act(() => {
+			result.current.complete("done");
+		});
+		act(() => {
+			vi.advanceTimersByTime(200);
+		});
 		expect(result.current.status).toBe("done");
 		expect(result.current.progress).toBe(100);
 
@@ -35,8 +42,12 @@ describe("useProgress", () => {
 
 	it("fail stops timers without completing", () => {
 		const { result } = renderHook(() => useProgress());
-		act(() => result.current.start());
-		act(() => result.current.fail("error"));
+		act(() => {
+			result.current.start();
+		});
+		act(() => {
+			result.current.fail("error");
+		});
 		expect(result.current.status).toBe("idle");
 		expect(result.current.text).toBe("error");
 	});
