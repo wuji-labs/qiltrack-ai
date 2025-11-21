@@ -38,18 +38,15 @@ export default function ReportsPage() {
 	return (
 		<main className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)]">
 			<div className="mx-auto max-w-6xl space-y-10 px-4 py-12 sm:px-6 lg:px-10">
-				<section className="relative overflow-hidden rounded-[32px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-6 shadow-[0_26px_90px_rgba(0,0,0,0.45)]">
-					<div className="pointer-events-none absolute inset-0 opacity-60">
-						<div className="absolute -top-12 left-8 h-36 w-36 rounded-full bg-[var(--accent-emerald)]/20 blur-[140px]" />
-						<div className="absolute bottom-[-20px] right-10 h-40 w-40 rounded-full bg-[var(--accent-blue)]/18 blur-[150px]" />
-					</div>
-					<div className="relative space-y-4">
+				<section className="relative overflow-hidden rounded-[32px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-6 shadow-[0_26px_90px_rgba(0,0,0,0.45)] text-center">
+					<div className="pointer-events-none absolute inset-0 hero-mesh" aria-hidden />
+					<div className="relative mx-auto max-w-3xl space-y-4">
 						<p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)]">
 							{t("reports.page.hero.kicker")}
 						</p>
 						<h1 className="text-3xl sm:text-4xl font-semibold leading-tight">{t("reports.page.hero.title")}</h1>
 						<p className="text-base text-dim">{t("reports.page.hero.description")}</p>
-						<div className="flex flex-wrap gap-3">
+						<div className="flex flex-wrap items-center justify-center gap-3">
 							<Link href="#archive" className="btn-gradient px-5 py-2 text-sm font-semibold">
 								{t("reports.page.hero.cta")}
 							</Link>

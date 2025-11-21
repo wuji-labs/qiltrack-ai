@@ -693,11 +693,11 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hans": "正在调度大模型生成分析结论与排版…",
 	},
 	"generator.progress.ready": {
-		"en": "Report ready—copy or export.",
-		"ja": "レポートが完成しました。コピーまたはエクスポートできます。",
-		"ko": "리포트가 준비되었습니다. 복사하거나 내보내세요.",
-		"zh-Hant": "報告已完成，可立即複製或匯出。",
-		"zh-Hans": "报告生成完成，可复制/导出与分享结果。",
+		"en": "Report finished—now copy/export/share.",
+		"ja": "レポート生成後に、コピー・エクスポートや共有ができます。",
+		"ko": "리포트가 생성된 후 복사·내보내기와 공유가 가능합니다.",
+		"zh-Hant": "報告生成後，可進行複製、匯出與分享。",
+		"zh-Hans": "报告生成后，可复制/导出与分享结果。",
 	},
 	"generator.progress.stage1": {
 		"en": "Ingesting live global market data and financial metrics",

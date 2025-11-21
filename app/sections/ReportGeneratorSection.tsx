@@ -662,10 +662,6 @@ export function ReportGeneratorSection({
 					<div className="pointer-events-none absolute inset-0">
 						<div className="absolute -left-10 top-0 h-32 w-32 rounded-full bg-[var(--accent-emerald)]/14 blur-[100px]" aria-hidden />
 						<div className="absolute right-0 bottom-0 h-44 w-44 rounded-full bg-[var(--accent-blue)]/12 blur-[120px]" aria-hidden />
-						<div
-							className="absolute left-4 bottom-4 h-20 w-28 rounded-2xl border border-[var(--stroke-soft)]/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0)),radial-gradient(circle_at_18%_16%,rgba(91,224,176,0.18),transparent_42%)] shadow-[0_14px_38px_rgba(0,0,0,0.28)]"
-							aria-hidden
-						/>
 					</div>
 					<div className="relative flex flex-wrap items-center justify-between gap-3 text-sm uppercase tracking-[0.22em] text-subtle">
 						<div className="relative inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3.5 py-1.5 text-sm text-[var(--accent-emerald)] shadow-[0_12px_30px_rgba(0,0,0,0.24)]">
@@ -680,27 +676,10 @@ export function ReportGeneratorSection({
 							{t("generator.progress.ready")}
 						</span>
 					</div>
-					<div className="relative grid gap-3 md:grid-cols-[1.2fr_0.8fr] items-start">
+					<div className="relative grid gap-3 md:grid-cols-[1.2fr] items-start">
 						<div className="space-y-3">
 							<p className="text-base text-dim leading-relaxed">{t("report.tip.body")}</p>
 							<p className="text-sm text-subtle">{t("report.tip.action")}</p>
-							<div className="flex flex-wrap gap-2 text-xs text-subtle">
-								<span className="rounded-full border border-[var(--accent-emerald)]/50 bg-[var(--accent-emerald)]/10 px-3 py-1 text-[var(--accent-emerald)]">
-									{t("generator.progress.fetching")}
-								</span>
-								<span className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 px-3 py-1">
-									{t("generator.progress.shaping")}
-								</span>
-								<span className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 px-3 py-1">
-									{t("generator.progress.llm")}
-								</span>
-							</div>
-						</div>
-						<div className="relative overflow-hidden rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 space-y-2">
-							<div className="absolute -right-4 -bottom-6 h-20 w-20 rounded-full bg-[var(--accent-emerald)]/12 blur-2xl" aria-hidden />
-							<p className="text-xs uppercase tracking-[0.22em] text-emerald-200">{t("workflow.sectionLabel")}</p>
-							<p className="text-base font-semibold text-[var(--color-foreground)]">{t("workflow.title")}</p>
-							<p className="text-sm text-subtle">{t("workflow.caption")}</p>
 						</div>
 					</div>
 				</div>
