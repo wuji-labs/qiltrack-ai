@@ -154,7 +154,7 @@ export default function Home() {
 	const [selectedTone, setSelectedTone] = useState<ReportTone>("baseline");
 
 	const isDark = true;
-	const mainBg = isDark ? "bg-[var(--bg-base)] text-[var(--color-foreground)]" : "bg-slate-50 text-slate-900";
+	const mainBg = isDark ? "bg-[var(--bg-base)] text-[var(--color-foreground)] pb-16" : "bg-slate-50 text-slate-900";
 	const cardSecondary = isDark ? "bg-[var(--bg-layer)]/85 border-[var(--stroke-soft)]" : "bg-white border-slate-200";
 	const subtleText = isDark ? "text-subtle" : "text-slate-500";
 	const strongSubtleText = isDark ? "text-dim" : "text-slate-600";

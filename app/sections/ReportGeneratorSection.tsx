@@ -409,6 +409,10 @@ export function ReportGeneratorSection({
 		{ step: 4, label: t("generator.progress.ready") },
 	];
 
+	const maxVisibleResults = 3;
+	const visibleResults = searchResults.slice(0, maxVisibleResults);
+	const hasDropdown = visibleResults.length > 0 || searching;
+
 	return (
 		<div className="space-y-6 md:space-y-8" id="generator">
 		<section className="space-y-5 md:space-y-6">
@@ -423,7 +427,7 @@ export function ReportGeneratorSection({
 
 			<form
 				onSubmit={handleSubmit}
-				className="relative overflow-hidden space-y-5 rounded-[28px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-4 sm:p-6 shadow-[0_20px_70px_rgba(0,0,0,0.34)]"
+				className="relative overflow-visible space-y-5 rounded-[28px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-4 sm:p-6 shadow-[0_20px_70px_rgba(0,0,0,0.34)]"
 			>
 				<div className="pointer-events-none absolute inset-0">
 					<div className="absolute -left-10 top-8 h-40 w-40 rounded-full bg-[var(--accent-emerald)]/12 blur-[110px]" aria-hidden />
@@ -495,16 +499,16 @@ export function ReportGeneratorSection({
 									</div>
 								</div>
 
-								{(searchResults.length > 0 || searching) && (
-									<div className="absolute left-0 right-0 top-full z-10 mt-2 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/95 shadow-[0_18px_45px_rgba(0,0,0,0.32)] backdrop-blur">
+								{hasDropdown && (
+									<div className="mt-2 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/95 shadow-[0_18px_45px_rgba(0,0,0,0.32)] backdrop-blur">
 										{searching && (
 											<div className="px-4 py-2 text-sm text-subtle">{t("generator.searching")}</div>
 										)}
-										{!searching && searchResults.length === 0 && (
+										{!searching && visibleResults.length === 0 && (
 											<div className="px-4 py-2 text-sm text-subtle">{t("generator.search.empty")}</div>
 										)}
 										{!searching &&
-											searchResults.map((item) => (
+											visibleResults.map((item) => (
 												<button
 													type="button"
 													key={`${item.symbol}-${item.displaySymbol ?? item.description}`}
