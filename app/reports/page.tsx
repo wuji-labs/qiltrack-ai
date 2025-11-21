@@ -145,7 +145,7 @@ export default function ReportsPage() {
 					</div>
 
 					<div className="flex items-center justify-between text-xs text-subtle">
-						<span>{t("reports.page.seoNote", { count: filteredReports.length })}</span>
+						<span>{t("reports.page.seoNote", { count: String(filteredReports.length) })}</span>
 						<div className="flex items-center gap-2">
 							<button
 								type="button"
