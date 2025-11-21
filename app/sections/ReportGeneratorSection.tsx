@@ -443,7 +443,7 @@ export function ReportGeneratorSection({
 
 				<div className="relative flex flex-col gap-5 sm:gap-6">
 					<div className="flex-1">
-						<div className="group relative overflow-hidden rounded-[24px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/90 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
+						<div className="group relative overflow-visible rounded-[24px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/90 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
 							<div className="pointer-events-none absolute inset-0">
 								<div className="absolute -left-6 top-2 h-24 w-24 rounded-full bg-[var(--accent-emerald)]/20 blur-[90px]" aria-hidden />
 								<div className="absolute right-0 bottom-0 h-28 w-28 rounded-full bg-[var(--accent-blue)]/16 blur-[110px]" aria-hidden />
