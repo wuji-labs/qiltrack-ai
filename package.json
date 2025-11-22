@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest --environment jsdom --pool=forks",
+    "test:ci": "cross-env CI=true vitest --environment jsdom --pool=forks run",
     "dev:chrome": "powershell -ExecutionPolicy Bypass -File scripts/devtools-mcp.ps1 start",
     "dev:chrome:endpoint": "powershell -ExecutionPolicy Bypass -File scripts/devtools-mcp.ps1 endpoint",
     "dev:chrome:stop": "powershell -ExecutionPolicy Bypass -File scripts/devtools-mcp.ps1 stop",

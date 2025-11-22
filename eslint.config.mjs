@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Local artifacts and utility scripts we don't lint:
+    ".claude/**",
+    "chrome/**",
+    "scripts/**",
+    "screenshot*.js",
   ]),
 ]);
 
