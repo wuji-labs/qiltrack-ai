@@ -85,15 +85,7 @@ function normalizeLanguage(value: string | null): Language {
 function sanitizeReportContent(content: string, language: Language) {
     const langConfig = LANGUAGE_CONFIG[language] ?? LANGUAGE_CONFIG.en;
     const paragraphs = content.split(/\n{2,}/);
-    const safeParagraphs: string[] = [];
-    for (const paragraph of paragraphs) {
-        if (PARAGRAPH_REMOVAL_KEYWORDS.some((kw) => paragraph.includes(kw))) {
-            continue;
-        }
-        safeParagraphs.push(paragraph);
-    }
-
-    let sanitized = safeParagraphs.join("\n\n");
+    let sanitized = paragraphs.join("\n\n");
     for (const { pattern, replacement } of WORD_REPLACEMENTS) {
         sanitized = sanitized.replace(pattern, replacement);
     }
@@ -301,9 +293,8 @@ export async function GET(request: NextRequest) {
 4. **新闻 · 政策 · 黑天鹅雷达**
 5. 个人投资决策参考框架 (非投资建议)
 6. 最强反对意见 (Bear Case)
-7. 在组合中的定位与仓位思路（非投资建议）
-8. 最终结论（一句话）
-9. 重要免责声明与数据来源说明
+7. 最终结论（一句话）
+8. 重要免责声明与数据来源说明
 
 ---
 **【关于第 4 章节的特殊指令】**
@@ -330,9 +321,9 @@ export async function GET(request: NextRequest) {
   “本章节分析主要基于 Finnhub 提供的近期新闻数据，再结合一般公开常识进行补充。”
 
 ---
-**【关于第 9 章节的强制要求：固定免责声明】** 模型，请严格注意：第 10 章节的内容**必须**是下面这段 Markdown 文本的**精确复制**，不得更改任何措辞、顺序或标点符号。这是强制性的免责声明，必须保持一致性。
+**【关于第 8 章节的强制要求：固定免责声明】** 模型，请严格注意：该章节的内容**必须**是下面这段 Markdown 文本的**精确复制**，不得更改任何措辞、顺序或标点符号。这是强制性的免责声明，必须保持一致性。
 
-## 9. 重要免责声明与数据来源说明
+## 8. 重要免责声明与数据来源说明
 
 * 本报告仅基于当日给定的结构化数据和一般公开常识进行分析，不构成任何形式的投资建议或买卖指引。
 * 股票价格会随时间和市场情绪而波动，公司基本面和政策环境也会发生变化，文中判断仅反映撰写时点的有限信息。
