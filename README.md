@@ -36,6 +36,8 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 FINNHUB_API_KEY=来自 Finnhub 的密钥
 OPENROUTER_API_KEY=OpenRouter API Key
 OPENROUTER_MODEL=openrouter/anthropic/claude-3.5-sonnet
+HELICONE_API_KEY=sk-helicone-your-key
+HELICONE_MODEL=gpt-4o-mini
 STRIPE_SECRET_KEY=Stripe 私钥
 STRIPE_WEBHOOK_SECRET=Webhook Secret
 NEXT_PUBLIC_FEATURE_PAYWALL=false
