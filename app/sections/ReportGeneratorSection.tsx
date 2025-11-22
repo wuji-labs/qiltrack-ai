@@ -423,6 +423,17 @@ export function ReportGeneratorSection({
 	const maxVisibleResults = 3;
 	const visibleResults = searchResults.slice(0, maxVisibleResults);
 	const hasDropdown = visibleResults.length > 0 || searching;
+	const currentStageIndex = Math.min(
+		workflowList.length - 1,
+		Math.max(0, progress.currentStep - 1)
+	);
+	const progressStageLabel =
+		workflowList[currentStageIndex]?.label ?? t("generator.progress.fetching");
+	const loadingSubtitle = t("generator.searching.wait");
+	const quotaPrimaryHint = auth.isAuthenticated
+		? t("quota.banner.hint.refresh")
+		: t("quota.banner.hint.register");
+	const quotaSecondaryHint = t("quota.banner.description");
 
 	return (
 		<div className="space-y-6 md:space-y-8" id="generator">
@@ -573,10 +584,10 @@ export function ReportGeneratorSection({
 
 			{loading && (
 				<div className="space-y-3">
-					<p className="text-sm text-subtle uppercase tracking-[0.26em]">{t("generator.searching")}</p>
+					<p className="text-sm text-subtle uppercase tracking-[0.26em]">{loadingSubtitle}</p>
 					<div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-4 space-y-3">
 						<div className="flex items-center justify-between text-sm text-subtle">
-							<span>{t("generator.progress.fetching")}</span>
+							<span>{progressStageLabel}</span>
 							<span className="text-[var(--accent-blue)]">{selectedToneTitle}</span>
 						</div>
 						<div className="space-y-2">
@@ -693,8 +704,8 @@ export function ReportGeneratorSection({
 						<div className="absolute -left-6 top-2 h-28 w-28 rounded-full bg-[var(--accent-emerald)]/18 blur-[90px]" aria-hidden />
 						<div className="absolute right-0 bottom-0 h-36 w-36 rounded-full bg-[var(--accent-blue)]/14 blur-[110px]" aria-hidden />
 					</div>
-					<div className="relative flex items-center justify-between gap-3">
-						<div className="space-y-1">
+					<div className="relative flex flex-wrap items-start justify-between gap-4">
+						<div className="space-y-2 max-w-xl">
 							<p className="text-xs uppercase tracking-[0.28em] text-emerald-300">{t("hero.quota")}</p>
 							<h3 className="text-xl font-semibold text-[var(--color-foreground)]">
 								{auth.isAuthenticated
@@ -710,22 +721,33 @@ export function ReportGeneratorSection({
 									: t("quota.banner.description")}
 							</p>
 						</div>
-						<div className="text-right">
-							<span className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 px-3 py-1 text-xs uppercase tracking-[0.22em] text-[var(--accent-emerald)]">
-								<span className="h-2 w-2 rounded-full bg-[var(--accent-emerald)] animate-pulse" aria-hidden />
-								{auth.planLabel}
-							</span>
+						<div className="text-right flex-shrink-0">
+							<div className="inline-flex flex-col items-end gap-2">
+								<span className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 px-3 py-1 text-xs uppercase tracking-[0.22em] text-[var(--accent-emerald)] whitespace-nowrap">
+									<span className="h-2 w-2 rounded-full bg-[var(--accent-emerald)] animate-pulse" aria-hidden />
+									{auth.planLabel}
+								</span>
+								<span className="rounded-full border border-[var(--stroke-soft)]/70 bg-[var(--bg-layer)]/70 px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-subtle">
+									{t("quota.status.badge")}
+								</span>
+							</div>
 						</div>
 					</div>
-					<div className="relative flex flex-wrap gap-2 text-xs text-subtle">
-						<span className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 px-3 py-1">
-							{auth.isAuthenticated ? t("quota.banner.hint.refresh") : t("quota.banner.hint.register")}
-						</span>
-						<span className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 px-3 py-1">
-							{t("quota.banner.description")}
-						</span>
+					<div className="relative grid gap-2 sm:grid-cols-2 text-xs text-subtle">
+						<div className="rounded-2xl border border-[var(--stroke-soft)]/70 bg-[var(--bg-layer)]/80 p-3 shadow-[0_12px_30px_rgba(0,0,0,0.18)]">
+							<p className="font-semibold text-[var(--color-foreground)]/90">{quotaPrimaryHint}</p>
+							<p className="mt-1 text-[11px] text-subtle/80">
+								{auth.isAuthenticated ? t("quota.banner.description") : t("quota.banner.title")}
+							</p>
+						</div>
+						{!auth.isAuthenticated && (
+							<div className="rounded-2xl border border-[var(--stroke-soft)]/70 bg-[var(--bg-layer)]/65 p-3 shadow-[0_12px_30px_rgba(0,0,0,0.15)]">
+								<p className="font-semibold text-[var(--color-foreground)]/85">{quotaSecondaryHint}</p>
+								<p className="mt-1 text-[11px] text-subtle/80">{t("quota.banner.hint.register")}</p>
+							</div>
+						)}
 					</div>
-					<div className="relative flex gap-2">
+					<div className="relative flex flex-wrap gap-3">
 						<button
 							type="button"
 							onClick={auth.isAuthenticated ? auth.refreshSession : onRequireLogin}

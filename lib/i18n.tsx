@@ -671,6 +671,13 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hant": "正在搜尋符合的公司…",
 		"zh-Hans": "正在搜索匹配的公司…",
 	},
+	"generator.searching.wait": {
+		"en": "Please wait about 3 minutes…",
+		"ja": "3 分ほどお待ちください…",
+		"ko": "약 3분 정도만 기다려 주세요…",
+		"zh-Hant": "請耐心等待約 3 分鐘…",
+		"zh-Hans": "请耐心等待约 3 分钟…",
+	},
 	"generator.progress.fetching": {
 		"en": "Syncing market and financial data …",
 		"ja": "最新の株価と財務データを同期中…",
@@ -1403,11 +1410,11 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hans": "注册领取首份免费报告",
 	},
 	"quota.banner.description": {
-		"en": "Sign up with email to save quota and receive the report in your inbox.",
-		"ja": "メール登録でクォータを保存し、レポートを受信箱にお届けします。",
-		"ko": "이메일로 가입하면 쿼터가 저장되고 리포트가 메일함으로 전송됩니다.",
-		"zh-Hant": "輸入 Email 註冊即可保留額度，報告也會寄到信箱。",
-		"zh-Hans": "邮箱注册即可保存额度，报告会同步发送到你的收件箱。",
+		"en": "Complete signup to reserve your quota and keep reports synced to your account.",
+		"ja": "登録を完了するとクォータが保持され、レポートもアカウント内で同期されます。",
+		"ko": "가입을 마치면 쿼터가 보존되고 리포트도 계정 안에서 동기화됩니다.",
+		"zh-Hant": "完成註冊即可保留額度，報告會同步存放在帳號中。",
+		"zh-Hans": "完成注册即可保留额度，报告会同步存放在账户里。",
 	},
 	"quota.banner.hint.register": {
 		"en": "Complete signup to unlock the first quota",
