@@ -1182,6 +1182,15 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hant": "Email 投遞與額度同步",
 		"zh-Hans": "Email 投递与额度同步",
 	},
+	"pricing.plan.free.feature5": withChineseVariants({
+		"en": "Registration preserves quota",
+		"ja": "登録で枠を保持",
+		"ko": "가입으로 쿼터 보존",
+		"zh": {
+			"hant": "註冊即保留額度",
+			"hans": "注册即保留额度",
+		},
+	}),
 	"pricing.plan.free.cta": {
 		"en": "Claim free report",
 		"ja": "無料レポートを受け取る",
@@ -1252,6 +1261,176 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hant": "加入候補名單",
 		"zh-Hans": "加入候补名单",
 	},
+	// Monthly plan keys
+	"pricing.plan.monthly.badge": withChineseVariants({
+		"en": "Most popular",
+		"ja": "最も人気",
+		"ko": "가장 인기",
+		"zh": "最受欢迎",
+	}),
+	"pricing.plan.monthly.name": withChineseVariants({
+		"en": "Pro · Monthly",
+		"ja": "プロ · 月額",
+		"ko": "프로 · 월구독",
+		"zh": {
+			"hant": "專業版 · 月付",
+			"hans": "专业版 · 月付",
+		},
+	}),
+	"pricing.plan.monthly.price": withChineseVariants({
+		"en": "$39 / seat / month",
+		"ja": "$39 / 席 / 月",
+		"ko": "$39 / 사용자 / 월",
+		"zh": {
+			"hant": "$39 / 席 / 月",
+			"hans": "$39 / 席 / 月",
+		},
+	}),
+	"pricing.plan.monthly.caption": withChineseVariants({
+		"en": "Unlimited reports + template marketplace",
+		"ja": "無制限レポート + テンプレート市場",
+		"ko": "무제한 리포트 + 템플릿 마켓플레이스",
+		"zh": {
+			"hant": "不限量報告 + 模板市集",
+			"hans": "不限量报告 + 模板市集",
+		},
+	}),
+	"pricing.plan.monthly.feature1": withChineseVariants({
+		"en": "Real-time market data, persona/template switching",
+		"ja": "リアルタイム市況、ペルソナ/テンプレート切替",
+		"ko": "실시간 시장 데이터, 페르소나/템플릿 전환",
+		"zh": {
+			"hant": "實時行情、人格/模板切換",
+			"hans": "实时行情、人格/模板切换",
+		},
+	}),
+	"pricing.plan.monthly.feature2": withChineseVariants({
+		"en": "Team workspaces & approval workflows",
+		"ja": "チームワークスペース & 承認ワークフロー",
+		"ko": "팀 워크스페이스 및 승인 워크플로우",
+		"zh": {
+			"hant": "團隊工作區與審批",
+			"hans": "团队工作区与审批",
+		},
+	}),
+	"pricing.plan.monthly.feature3": withChineseVariants({
+		"en": "Priority support + API add-on packages (coming soon)",
+		"ja": "優先サポート + APIアドオンパッケージ（近日公開）",
+		"ko": "우선 지원 + API 애드온 패키지 (곧 출시)",
+		"zh": {
+			"hant": "優先客服 + API 附加包（即將）",
+			"hans": "优先客服 + API 附加包（即将）",
+		},
+	}),
+	"pricing.plan.monthly.feature4": withChineseVariants({
+		"en": "Quota & report retention sync",
+		"ja": "クォータとレポート保持同期",
+		"ko": "쿼터 및 리포트 보존 동기화",
+		"zh": {
+			"hant": "額度與報告留存同步",
+			"hans": "额度与报告留存同步",
+		},
+	}),
+	"pricing.plan.monthly.cta": withChineseVariants({
+		"en": "Subscribe monthly",
+		"ja": "月額で契約",
+		"ko": "월구독 시작",
+		"zh": {
+			"hant": "立即訂閱 · 月付",
+			"hans": "立即订阅 · 月付",
+		},
+	}),
+	// Annual plan keys
+	"pricing.plan.annual.badge": withChineseVariants({
+		"en": "Best value",
+		"ja": "最もお得",
+		"ko": "최고 혜택",
+		"zh": {
+			"hant": "年度最省",
+			"hans": "年度最省",
+		},
+	}),
+	"pricing.plan.annual.name": withChineseVariants({
+		"en": "Pro · Annual",
+		"ja": "プロ · 年額",
+		"ko": "프로 · 연구독",
+		"zh": {
+			"hant": "專業版 · 年付",
+			"hans": "专业版 · 年付",
+		},
+	}),
+	"pricing.plan.annual.price": withChineseVariants({
+		"en": "$390 / seat / year",
+		"ja": "$390 / 席 / 年",
+		"ko": "$390 / 사용자 / 년",
+		"zh": {
+			"hant": "$390 / 席 / 年",
+			"hans": "$390 / 席 / 年",
+		},
+	}),
+	"pricing.plan.annual.caption": withChineseVariants({
+		"en": "Equivalent to $32.5 / month · Save 2 months",
+		"ja": "月額$32.5相当 · 2ヶ月分お得",
+		"ko": "월 $32.5 상당 · 2개월 절약",
+		"zh": {
+			"hant": "折合 $32.5 / 月 · 贈 2 個月",
+			"hans": "折合 $32.5 / 月 · 赠 2 个月",
+		},
+	}),
+	"pricing.plan.annual.feature1": withChineseVariants({
+		"en": "All monthly plan features included",
+		"ja": "月額プランのすべての機能が含まれます",
+		"ko": "월구독 플랜의 모든 기능 포함",
+		"zh": {
+			"hant": "含月付全部功能",
+			"hans": "含月付全部功能",
+		},
+	}),
+	"pricing.plan.annual.feature2": withChineseVariants({
+		"en": "Priority support direct line & API quota boost",
+		"ja": "優先サポート直通 & API制限向上",
+		"ko": "우선 지원 직통 라인 및 API 할당량 증가",
+		"zh": {
+			"hant": "優先客服直連 & API 限額提升",
+			"hans": "优先客服直连 & API 限额提升",
+		},
+	}),
+	"pricing.plan.annual.feature3": withChineseVariants({
+		"en": "Account quota priority refresh & governance controls",
+		"ja": "アカウントクォータ優先リフレッシュ & ガバナンス制御",
+		"ko": "계정 쿼터 우선 새로고침 및 거버넌스 제어",
+		"zh": {
+			"hant": "賬戶額度優先刷新、治理控制",
+			"hans": "账户额度优先刷新、治理控制",
+		},
+	}),
+	"pricing.plan.annual.feature4": withChineseVariants({
+		"en": "Quarterly reconciliation + invoice services",
+		"ja": "四半期調整 + 請求書サービス",
+		"ko": "분기별 정산 + 인보이스 서비스",
+		"zh": {
+			"hant": "季度對賬 + 發票服務",
+			"hans": "季度对账 + 发票服务",
+		},
+	}),
+	"pricing.plan.annual.cta": withChineseVariants({
+		"en": "Save 2 months with annual",
+		"ja": "年額で2ヶ月分節約",
+		"ko": "연구독으로 2개월 절약",
+		"zh": {
+			"hant": "以年付省 2 個月",
+			"hans": "以年付省 2 个月",
+		},
+	}),
+	"pricing.plan.annual.note": withChineseVariants({
+		"en": "Annual users enjoy additional quota guarantee and invoicing support",
+		"ja": "年額ユーザーは追加のクォータ保証と請求書サポートをお楽しみいただけます",
+		"ko": "연구독 사용자는 추가 쿼터 보장과 인보이싱 지원을 이용하실 수 있습니다",
+		"zh": {
+			"hant": "年付用戶享額外額度保障及開票支持",
+			"hans": "年付用户享额外额度保障及开票支持",
+		},
+	}),
 	"faq.title": {
 		"en": "FAQ & Safety Statement",
 		"ja": "FAQ と安全性声明",

@@ -44,6 +44,7 @@ const heroHighlightKeys: ReadonlyArray<{ title: TranslationKey; description: Tra
 ];
 
 type PricingPlanKey = {
+	tier: "free" | "monthly" | "annual";
 	name: TranslationKey;
 	badge: TranslationKey;
 	price: TranslationKey;
@@ -51,10 +52,12 @@ type PricingPlanKey = {
 	features: TranslationKey[];
 	cta: TranslationKey;
 	highlight?: boolean;
+	secondary?: boolean;
 };
 
 const pricingPlans: PricingPlanKey[] = [
 	{
+		tier: "free",
 		name: "pricing.plan.free.name",
 		badge: "pricing.plan.free.badge",
 		price: "pricing.plan.free.price",
@@ -64,22 +67,39 @@ const pricingPlans: PricingPlanKey[] = [
 			"pricing.plan.free.feature2",
 			"pricing.plan.free.feature3",
 			"pricing.plan.free.feature4",
+			"pricing.plan.free.feature5",
 		],
 		cta: "pricing.plan.free.cta",
+	},
+	{
+		tier: "monthly",
+		name: "pricing.plan.monthly.name",
+		badge: "pricing.plan.monthly.badge",
+		price: "pricing.plan.monthly.price",
+		tagline: "pricing.plan.monthly.caption",
+		features: [
+			"pricing.plan.monthly.feature1",
+			"pricing.plan.monthly.feature2",
+			"pricing.plan.monthly.feature3",
+			"pricing.plan.monthly.feature4",
+		],
+		cta: "pricing.plan.monthly.cta",
 		highlight: true,
 	},
 	{
-		name: "pricing.plan.pro.name",
-		badge: "pricing.plan.pro.badge",
-		price: "pricing.plan.pro.price",
-		tagline: "pricing.plan.pro.tagline",
+		tier: "annual",
+		name: "pricing.plan.annual.name",
+		badge: "pricing.plan.annual.badge",
+		price: "pricing.plan.annual.price",
+		tagline: "pricing.plan.annual.caption",
 		features: [
-			"pricing.plan.pro.feature1",
-			"pricing.plan.pro.feature2",
-			"pricing.plan.pro.feature3",
-			"pricing.plan.pro.feature4",
+			"pricing.plan.annual.feature1",
+			"pricing.plan.annual.feature2",
+			"pricing.plan.annual.feature3",
+			"pricing.plan.annual.feature4",
 		],
-		cta: "pricing.plan.pro.cta",
+		cta: "pricing.plan.annual.cta",
+		secondary: true,
 	},
 ];
 
@@ -228,6 +248,7 @@ export default function Home() {
 
 	const workflowList = workflowSteps.map((step) => ({ badge: t(step.badge), title: t(step.title), detail: t(step.detail) }));
 	const pricingList = pricingPlans.map((plan) => ({
+		tier: plan.tier,
 		name: t(plan.name),
 		badge: t(plan.badge),
 		price: t(plan.price),
@@ -235,6 +256,7 @@ export default function Home() {
 		features: plan.features.map((key) => t(key)),
 		cta: t(plan.cta),
 		highlight: plan.highlight,
+		secondary: plan.secondary,
 	}));
 	const faqList = faqItems.map((item) => ({ question: t(item.question), answer: t(item.answer) }));
 	const highlightFallback = highlightFallbackKeys.map((key) => t(key));
@@ -247,6 +269,21 @@ export default function Home() {
 			return;
 		}
 		document.querySelector("#generator")?.scrollIntoView({ behavior: "smooth", block: "start" });
+	};
+
+	// TODO: Implement subscription handlers when checkout functions are ready
+	const handleSubscribeMonthly = () => {
+		// Placeholder for monthly subscription logic
+		console.log("Monthly subscription requested");
+		// Fallback to primary CTA for now
+		handlePrimaryCta();
+	};
+
+	const handleSubscribeAnnual = () => {
+		// Placeholder for annual subscription logic
+		console.log("Annual subscription requested");
+		// Fallback to primary CTA for now
+		handlePrimaryCta();
 	};
 
 	const quotaHintPrimary = auth.isAuthenticated ? t("quota.banner.hint.refresh") : t("quota.banner.hint.register");
@@ -415,45 +452,92 @@ export default function Home() {
 										</div>
 									</div>
 
-									<div className="grid md:grid-cols-2 gap-4">
-										{pricingList.map((plan) => (
-											<div
-												key={plan.name}
-												className={`rounded-2xl border p-5 space-y-4 transition-all ${
-													plan.highlight
-														? "border-emerald-400/80 bg-emerald-400/10 shadow-[0_18px_40px_rgba(16,185,129,0.2)]"
-														: "border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80"
-												}`}
-												>
-												<div className="flex items-start justify-between gap-3">
-													<div>
-														<p className="text-sm uppercase tracking-[0.26em] text-emerald-200">{plan.badge}</p>
-														<h3 className="text-2xl sm:text-3xl font-semibold text-[var(--color-foreground)]">{plan.name}</h3>
-														<p className="text-3xl sm:text-4xl font-bold text-emerald-300 mt-2">{plan.price}</p>
-													</div>
-													<p className={`text-base text-right ${subtleText}`}>{plan.tagline}</p>
-												</div>
-												<ul className="space-y-1.5 text-base text-dim">
-													{plan.features.map((feature) => (
-														<li key={feature} className="flex items-start gap-2">
-															<span className="text-emerald-300">•</span>
-															<span>{feature}</span>
-														</li>
-													))}
-												</ul>
-												<button
-													type="button"
-													className={`w-full rounded-xl py-2.5 text-base font-semibold transition-colors ${
+									<div className="grid gap-4 lg:grid-cols-3">
+										{pricingList.map((plan) => {
+											const handleClick = () => {
+												if (plan.tier === "free") return handlePrimaryCta();
+												if (plan.tier === "monthly") return handleSubscribeMonthly();
+												if (plan.tier === "annual") return handleSubscribeAnnual();
+												return handlePrimaryCta();
+											};
+
+											return (
+												<article
+													key={plan.name}
+													className={`rounded-2xl border p-5 space-y-4 transition-all ${
 														plan.highlight
-															? "bg-emerald-400 text-slate-900 hover:bg-emerald-300"
-															: "border border-[var(--stroke-soft)] text-dim hover:bg-[var(--bg-layer)]"
+															? "scale-[1.02] border-emerald-400/80 bg-emerald-400/10 shadow-[0_24px_60px_rgba(16,185,129,0.35)]"
+															: "border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80"
 													}`}
-													onClick={handlePrimaryCta}
 												>
-													{plan.cta}
-												</button>
-											</div>
-										))}
+													{/* Badge for highlight or secondary */}
+													{(plan.highlight || plan.secondary) && (
+														<div className="relative">
+															<span
+																className={`inline-block text-xs uppercase tracking-[0.26em] px-3 py-1 rounded-full ${
+																	plan.highlight
+																		? "bg-emerald-400/20 text-emerald-200 border border-emerald-400/50"
+																		: "bg-blue-400/20 text-blue-200 border border-blue-400/50"
+																}`}
+															>
+																{plan.badge}
+															</span>
+														</div>
+													)}
+
+													<div className="flex items-start justify-between gap-3">
+														<div>
+															{!plan.highlight && !plan.secondary && (
+																<p className="text-sm uppercase tracking-[0.26em] text-emerald-200">{plan.badge}</p>
+															)}
+															<h3 className="text-2xl sm:text-3xl font-semibold text-[var(--color-foreground)]">{plan.name}</h3>
+															<p className={`text-3xl sm:text-4xl font-bold mt-2 ${
+																plan.highlight
+																	? "text-[var(--accent-emerald)]"
+																	: plan.secondary
+																		? "text-[var(--accent-blue)]"
+																		: "text-emerald-300"
+															}`}>
+																{plan.price}
+															</p>
+														</div>
+														<div className="text-right">
+															<p className={`text-base ${subtleText}`}>{plan.tagline}</p>
+														</div>
+													</div>
+
+													<ul className="space-y-1.5 text-base text-dim">
+														{plan.features.map((feature) => (
+															<li key={feature} className="flex items-start gap-2">
+																<span className={plan.highlight ? "text-emerald-300" : plan.secondary ? "text-[var(--accent-blue)]" : "text-emerald-300"}>•</span>
+																<span>{feature}</span>
+															</li>
+														))}
+													</ul>
+
+													<button
+														type="button"
+														className={`w-full rounded-xl py-2.5 text-base font-semibold transition-colors ${
+															plan.highlight
+																? "bg-emerald-400 text-slate-900 hover:bg-emerald-300"
+																: plan.secondary
+																	? "border border-[var(--accent-blue)] text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/10"
+																	: "bg-emerald-400 text-slate-900 hover:bg-emerald-300"
+														}`}
+														onClick={handleClick}
+													>
+														{plan.cta}
+													</button>
+
+													{/* Annual plan note */}
+													{plan.tier === "annual" && (
+														<p className="text-sm text-subtle text-center">
+															{t("pricing.plan.annual.note")}
+														</p>
+													)}
+												</article>
+											);
+										})}
 									</div>
 								</section>
 
