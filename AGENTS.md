@@ -1,5 +1,21 @@
 # Repository Guidelines
 
+## Codex–Claude Collaboration Protocol
+**⚠️ 每次会话开始时，Codex 和 Claude 都必须先读取 `CODEX_CLAUDE_COLLAB.md` 以了解协作流程、职责边界和质量门槛。**
+
+### 对 Codex（架构师）的要求：
+- 发布新任务前先产出 Architecture Snapshot 存入 `docs/decisions/<date>-<topic>.md`
+- Snapshot 需包含：问题背景、设计目标、技术约束、文案 key、测试要求
+- 代码审查时关注架构完整性、测试覆盖、文档同步
+- 用中文与用户沟通，代码/命令保持英文
+
+### 对 Claude（实现工程师）的要求：
+- 收到 Snapshot 后先确认依赖和环境，列出实施清单
+- 所有交付物需遵循 CAVR 格式：**Context → Actions → Verification → Risks**
+- 完成后附上 `npm run lint` / `npm test` 结果
+- Scope 变动 >20% 时主动触发 mini design review
+- 用中文与用户沟通，代码/命令保持英文
+
 ## Project Structure & Module Organization
 - `app/`：Next.js App Router 入口，`layout.tsx` 管理全局字体与样式；`page.tsx` 组合多个 Section（Hero、Modes、ReportGenerator、Why、Templates/Pricing/FAQ、Footer）。  
 - `app/sections/`：页面拆分的可复用区块（HeroSection、ReportGeneratorSection、ModesSection、WhySection、FooterSection 等）。  
