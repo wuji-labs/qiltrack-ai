@@ -1,10 +1,11 @@
 #Requires -Version 5.1
-Set-StrictMode -Version Latest
-
 param(
     [ValidateSet("start", "endpoint", "stop")]
     [string]$Command = "start"
 )
+
+$PSDefaultParameterValues['*:ErrorAction'] = 'Stop'
+Set-StrictMode -Version Latest
 
 $port = if ($env:PORT) { [int]$env:PORT } else { 9222 }
 $userDir = if ($env:USER_DIR) { $env:USER_DIR } else { "C:\tmp\chrome-debug" }
@@ -47,10 +48,11 @@ function Start-DevtoolsChrome {
 
     $arguments = @(
         "--remote-debugging-port=$RemotePort",
-        "--remote-debugging-address=0.0.0.0",
+        "--remote-debugging-address=127.0.0.1",
         "--user-data-dir=$UserDataDir",
         "--remote-allow-origins=*",
-        "--disable-first-run-ui"
+        "--disable-first-run-ui",
+        "--no-first-run"
     )
 
     $startInfo = @{
@@ -62,6 +64,39 @@ function Start-DevtoolsChrome {
 
     $proc = Start-Process @startInfo
     Write-Output "Chrome started on port $RemotePort (PID $($proc.Id))."
+
+    Write-Verbose "Waiting for DevTools endpoint to be ready..."
+    Start-Sleep -Seconds 3
+    $endpoint = Get-DevtoolsEndpoint -PortFilePath (Join-Path $UserDataDir "DevToolsActivePort") -RemotePort $RemotePort
+
+    if ($endpoint -and $endpoint -notmatch "not ready") {
+        Write-Output "WebSocket endpoint: $endpoint"
+    } else {
+        Write-Output "DevTools not ready yet. Run 'endpoint' command to check status."
+    }
+}
+
+function Wait-DevtoolsEndpoint {
+    param(
+        [int]$RemotePort,
+        [int]$TimeoutSeconds = 15
+    )
+
+    $startTime = Get-Date
+    $maxWait = $startTime.AddSeconds($TimeoutSeconds)
+
+    while ((Get-Date) -lt $maxWait) {
+        try {
+            $response = Invoke-WebRequest -Uri "http://127.0.0.1:$RemotePort/json/version" -UseBasicParsing -TimeoutSec 2 -ErrorAction Stop
+            $json = $response.Content | ConvertFrom-Json
+            Write-Verbose "[$(Get-Date -Format 'HH:mm:ss')] DevTools endpoint ready"
+            return $json.webSocketDebuggerUrl
+        } catch {
+            Write-Verbose "[$(Get-Date -Format 'HH:mm:ss')] Waiting for DevTools... ($_)"
+            Start-Sleep -Milliseconds 500
+        }
+    }
+    return $null
 }
 
 function Get-DevtoolsEndpoint {
@@ -79,12 +114,13 @@ function Get-DevtoolsEndpoint {
         }
     }
 
-    try {
-        $response = Invoke-WebRequest -Uri "http://127.0.0.1:$RemotePort/json/version" -UseBasicParsing -TimeoutSec 3
-        $json = $response.Content | ConvertFrom-Json
-        return $json.webSocketDebuggerUrl
-    } catch {
-        return "(not running)"
+    Write-Verbose "Polling DevTools endpoint (max 15s)..."
+    $endpoint = Wait-DevtoolsEndpoint -RemotePort $RemotePort -TimeoutSeconds 15
+
+    if ($endpoint) {
+        return $endpoint
+    } else {
+        return "(endpoint not ready - Chrome may still be initializing)"
     }
 }
 

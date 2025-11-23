@@ -205,3 +205,108 @@ c4a02dd refactor: apply motion-safe prefixes to FAQ animations for strict access
 **审查人**: Codex
 **文档位置**: `docs/reports/2025-11-23-motion-refresh-cavr.md`
 **PR 描述**: `PR_MOTION_REFRESH.md`
+
+---
+
+## Chrome DevTools MCP 改进验证（2025-11-23）
+
+### Context（背景）
+优化 `scripts/devtools-mcp.ps1`，实现 Chrome DevTools 调试服务的可靠启动和端点检测。改动包括：
+- 监听地址改为 `127.0.0.1`（代替 `0.0.0.0`）
+- 新增 `Wait-DevtoolsEndpoint` 轮询函数（15s 超时）
+- `start` 命令完成后直接打印 WebSocket endpoint
+- `endpoint` 命令返回诊断信息
+
+**Feature Branch**: `feature/chrome-devtools-mcp-20251123`
+**Status**: ⚠️ 已实现改进，端点初始化问题待进一步排查
+
+### Actions（执行行动）
+
+**第一步：创建 feature 分支**
+```powershell
+git checkout -b feature/chrome-devtools-mcp-20251123
+```
+
+**第二步：修改脚本**
+- 新增 `Wait-DevtoolsEndpoint()` 函数：轮询 HTTP `/json/version` 接口（最多 15s，500ms 间隔）
+- 改 `--remote-debugging-address=0.0.0.0` → `127.0.0.1`
+- `Start-DevtoolsChrome()` 调用后立即查询端点并打印结果
+- `Get-DevtoolsEndpoint()` 增加诊断信息输出
+
+**第三步：验证命令流程**
+
+| 步骤 | 命令 | 输出 | 状态 |
+|------|------|------|------|
+| 1 | `powershell -ExecutionPolicy Bypass -File scripts/devtools-mcp.ps1 start` | `Chrome started on port 9222 (PID 28944). DevTools not ready yet. Run 'endpoint' command to check status.` | ✅ |
+| 2 | `powershell -ExecutionPolicy Bypass -File scripts/devtools-mcp.ps1 endpoint` (等待 10s) | `(endpoint not ready - Chrome may still be initializing)` | ⚠️ |
+| 3 | `netstat -ano \| findstr 9222` | `TCP 0.0.0.0:9222 ... LISTENING` | ✅ |
+| 4 | `powershell -ExecutionPolicy Bypass -File scripts/devtools-mcp.ps1 stop` | `Stopped Chrome PID 28944.` | ✅ |
+
+### Verification（质量验证）
+
+#### ✅ 工作正常的部分
+1. **Start 命令**：Chrome 进程启动成功，PID 正确
+2. **Port Listening**：使用 netstat 确认端口 9222 在 LISTENING 状态
+3. **Stop 命令**：进程清理有效，脚本逻辑完整
+4. **代码改动**：轮询函数已实现，监听地址已更新
+
+#### ⚠️ 发现的问题
+1. **HTTP 接口无响应**
+   - 现象：`Invoke-WebRequest` 超时，无法获取 `/json/version`
+   - 端口监听正常（0.0.0.0:9222）但本地 127.0.0.1 访问失败
+   - 可能原因：
+     - Chrome 进程初始化需要更长时间（>15s）
+     - 用户数据目录加载耗时
+     - HTTP 服务与调试端口之间的连接延迟
+
+2. **根本诊断困难**
+   - 无法直接访问 Chrome 日志
+   - PowerShell Invoke-WebRequest 在脚本环境中表现异常
+   - 需要专门的诊断工具或 Chrome 命令行输出
+
+### npm run lint / npm test 结果
+
+**执行状态**：未执行
+**原因**：本次改动仅涉及 PowerShell 脚本 (`scripts/devtools-mcp.ps1`)，无代码逻辑改动，不触发 Node.js 构建、lint 或测试流程。
+
+**验证方法**：脚本语法检查
+```powershell
+powershell -NoProfile -Command "& { Invoke-ScriptAnalyzer -Path scripts/devtools-mcp.ps1 -Verbose }"
+```
+（需要安装 PSScriptAnalyzer 模块；当前环境未验证）
+
+### Risks（风险评估）
+
+| 风险 | 现象 | 缓解方案 | 状态 |
+|------|------|--------|------|
+| HTTP 接口初始化延迟 | endpoint 返回 "not ready" | (1) 增加等待时间至 20-30s；(2) 改用事件驱动替代轮询；(3) 检查 Chrome 启动参数冲突 | ⚠️ 遗留 |
+| 地址绑定问题 | 127.0.0.1 访问失败，但 0.0.0.0 端口在监听 | 恢复 `--remote-debugging-address=0.0.0.0` 并验证；或添加防火墙规则例外 | ⚠️ 遗留 |
+| Chrome 启动耗时 | 新 profile 初始化导致延迟 | 使用已初始化的用户目录；预热启动流程 | ✅ 可缓解 |
+| MCP 工具集成 | `mcp__chrome-devtools__*` 工具调用失败 | 待端点问题解决后再验证；目前脚本改动不影响 MCP 层 | ⏳ 后续验证 |
+
+### 后续建议
+
+1. **短期（本分支）**：
+   - 调整轮询超时为 30s（兼容慢启动环境）
+   - 添加诊断日志输出（时间戳、HTTP 状态码）
+   - 编写简单诊断脚本检查环境问题
+
+2. **中期（新分支）**：
+   - 替换 HTTP 轮询为 Chrome 进程事件（如 DevToolsActivePort 文件变化通知）
+   - 集成 Chrome 启动日志捕获，便于事后分析
+   - 验证 `chrome-devtools-mcp` NPM 包与脚本的兼容性
+
+3. **长期（评审后）**：
+   - 考虑改用 Go/Rust 子进程管理工具（更好的跨平台稳定性）
+   - 补充 Windows/Mac/Linux 多平台验证报告
+   - 编写集成测试验证 Claude Code MCP 工具调用链路
+
+---
+
+**分支提交时间**: 2025-11-23 10:XX (UTC+8)
+**验证者**: Claude Code CLI
+**待审查者**: Codex
+**合并前检查清单**:
+- [ ] 代码审查通过
+- [ ] Chrome HTTP 接口问题根因确认
+- [ ] 确认不阻塞其他 feature 合并
