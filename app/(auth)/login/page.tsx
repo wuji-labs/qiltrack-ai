@@ -157,67 +157,6 @@ function LoginContent() {
 					</Link>
 				</p>
 
-				{enableDevLogin && (
-					<div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 space-y-3">
-						<div className="text-sm uppercase tracking-[0.22em] text-emerald-300">测试登录</div>
-						<p className="text-sm text-slate-400">输入任意邮箱，无需验证，直接登录用于本地调试（配额 1）。</p>
-						<form
-							onSubmit={async (event) => {
-								event.preventDefault();
-								const value = devEmail.trim();
-								if (!value) {
-									setDevError("请填写邮箱");
-									return;
-								}
-								setDevError(null);
-								setDevLoading(true);
-								const result = await signIn("credentials", {
-									redirect: false,
-									email: value,
-									callbackUrl,
-								});
-								if (result?.error) {
-									setDevError(result.error);
-									setDevLoading(false);
-									return;
-								}
-								// 成功后手动跳转，这会触发 session 刷新
-								try {
-									window.localStorage.setItem("dev-login-email", value);
-								} catch {
-									// ignore
-								}
-								window.location.href = callbackUrl;
-							}}
-							className="space-y-3"
-						>
-							<label className="text-sm text-slate-400 block">
-								邮箱
-								<input
-									type="email"
-									value={devEmail}
-									onChange={(event) => setDevEmail(event.target.value)}
-									placeholder="test@example.com"
-									className="mt-1 w-full rounded-2xl border border-slate-800 bg-transparent px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
-								/>
-							</label>
-							<button
-								type="submit"
-								disabled={devLoading}
-								className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-emerald-400/50 bg-emerald-400/10 text-emerald-100 py-3 text-base font-semibold transition-colors ${
-									devLoading ? "opacity-60 cursor-not-allowed" : "hover:bg-emerald-400/20"
-								}`}
-							>
-								{devLoading ? "登录中..." : "一键登录（测试）"}
-							</button>
-							{devError && (
-								<div className="rounded-xl border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
-									{devError}
-								</div>
-							)}
-						</form>
-					</div>
-				)}
 			</div>
 		</div>
 	);
