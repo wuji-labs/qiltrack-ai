@@ -1,83 +1,77 @@
-# Codex–Claude Collaboration Guide
+# Codex–Claude 协作手册
 
-This playbook explains how the Codex architect agent and the Claude implementation agent coordinate on the investor-ai project. It defines responsibilities, shared rituals, and the artifacts needed to keep work aligned with the repository guidelines in `AGENTS.md`.
+本手册说明架构师（Codex）与实现工程师（Claude）在 investor-ai 项目的协作方式、职责分工与交付规范。命令/路径保持英文，其余叙述统一中文。
 
-## 1. Purpose & Scope
-- Guarantee every feature/change starts with an explicit architecture intent (Codex) and ends with reviewed, tested code (Claude).
-- Maintain end-to-end traceability from product goals → design notes → PRs → release notes.
-- Keep turnaround fast by operating asynchronously yet predictably.
+## 1. 目的与范围
+- 确保每个需求从清晰的架构意图出发，最终以经过审查与测试的代码交付。
+- 保持产品目标 → 设计笔记 → PR → 发布说明的全链路可追踪。
+- 异步高效协作，减少往返。
 
-## 2. Roles & Responsibilities
-### Codex (Architect + Reviewer)
-- Intake product/user asks, restate requirements, and highlight constraints (.env, API limits, tailwind themes, etc.).
-- Produce lightweight architecture notes, interface contracts, test expectations, and sequencing of tasks.
-- During implementation, answer design questions, unblock Claude, and adjust scope as repo context evolves.
-- Perform code reviews focused on correctness, architectural integrity, and adherence to lint/test strategy; call out missing tests or risk areas.
+## 2. 角色职责
+### Codex（架构师 + 评审）
+- 整理需求，强调约束（环境变量、API 限额、样式主题等）。
+- 产出 Architecture Snapshot：接口/组件约定、测试预期、任务拆解。
+- 实施阶段解答设计问题、调整范围。
+- 做代码评审，关注正确性、架构一致性、lint/test 策略，指出风险与缺测。
+- 交付 snapshot 或反馈时，必须提醒 Claude 使用 feature 分支 + PR（禁止直推 main），并附可复制的 `@Claude ...` fenced block。
 
-### Claude (Programmer + Executor)
-- Break Codex's plan into actionable subtasks, estimating effort and dependencies.
-- Implement features/tests following repo standards (Next.js App Router, Tailwind v4, Vitest coverage) and keep worktree changes scoped.
-- Surface uncertainties early (API assumptions, schema ambiguity, env gaps) with proposed resolutions.
-- Provide rich status updates: what changed, verification (lint/test/manual), and outstanding risks to feed back into Codex's review cycle.
+### Claude（实现工程师）
+- 把方案拆成可执行子任务，列出依赖和测试。
+- 按仓库规范实现（Next App Router、Tailwind v4、Vitest），控制改动范围。
+- 早暴露不确定性（API 假设、schema/环境缺口），给出建议解法。
+- 提供 CAVR 更新（Context/Actions/Verification/Risks），附 lint/test 结果。
 
-## 3. Shared Principles
-- **Single source of truth**: requirements live in Codex-authored notes and are mirrored in README/PLAN updates when scope shifts.
-- **Incremental delivery**: prefer vertical slices per section (Hero/Modes/etc.) with feature flags/mock data when APIs are unstable.
-- **Test-first mindset**: Codex defines success metrics; Claude encodes them in Vitest or integration harnesses.
-- **Traceable communication**: decisions captured in `docs/` or issue comments; avoid relying on transient chat logs.
+## 3. 共同原则
+- 单一事实源：需求以 Codex 笔记为准，范围变化同步 README/PLAN。
+- 增量交付：按区块垂直切片，API 不稳时用 mock/feature flag。
+- 测试优先：Codex 定验收，Claude 编码成测试或脚本。
+- 可追溯：决策写入 `docs/` 或 issue 记录，避免口头漂移。
 
-## 4. Collaboration Workflow
-1. **Context Sync**
-   - Codex: consolidate latest repo state, AGENTS rules, and user brief → publish "Architecture Snapshot" (why, scope, constraints, risks).
-   - Claude: acknowledge snapshot, list clarifying questions, and confirm dependencies (env vars, mock data, API fixtures).
-2. **Design & Task Breakdown**
-   - Codex: provide component tree, data-flow diagrams, API contracts, and testing matrix; identify reusable hooks/services.
-   - Claude: create implementation checklist (files to touch, new components/hooks, test files) referencing Codex's numbering for easy review.
-3. **Implementation Loop**
-   - Claude develops in short branches, running `npm run lint`/`npm test`. Each chunk ends with a change note (summary, files, verification, follow-ups).
-   - Codex is on-call for feedback, approves design adjustments, and ensures global architecture docs stay current.
-4. **Review & Validation**
-   - Codex reviews diffs for behavior, resilience, and style; flags blocking issues, high-risk decisions, and doc/test gaps.
-   - Claude addresses feedback, tags tests/manual checks performed, and records any residual debt.
-5. **Knowledge Capture**
-   - Codex updates strategy/plan docs with final architecture patterns.
-   - Claude updates README snippets, env instructions, or adds regression tests per review outcomes.
+## 4. 协作流程
+1) **Context Sync**：Codex 汇总上下文 + 发布 Architecture Snapshot；Claude 确认依赖/提疑问。  
+2) **Design & Breakdown**：Codex 给组件/数据流/测试矩阵；Claude 输出实施清单。  
+3) **Implementation Loop**：Claude 在短分支开发，跑 `npm run lint` / `npm test`，每段产出变更说明；Codex 随时答疑。  
+   - 分支策略：Claude 必须用独立 feature 分支，禁止直接改/推 main；通过 PR 合并，lint/test 必过。  
+4) **Review & Validation**：Codex 按行为/韧性/风格审查，指出缺陷与风险；Claude 修复并补充验证。  
+5) **Knowledge Capture**：Codex 更新策略/方案文档；Claude 补 README/env/回归测试。  
+6) **Closeout Checklist（双方）**：  
+   - 状态：说明任务/分支完成或丢弃，当前分支，工作区是否干净。  
+   - 指令：如有后续动作，附可复制 fenced block（中文叙述、英文路径/命令）。  
+   - 验证：列出已跑的 lint/test/截图，或未执行原因。  
+   - 风险：标注遗留风险、待补测试或待决策事项。
 
-## 5. Communication Protocols
-- **Status Updates (Claude → Codex)**: `Context → Actions → Verification → Risks/Needs` (CAVR). Keep logs in PR descriptions or `PLAN.md` blocks.
-- **Design Decisions (Codex → Claude)**: `Decision → Rationale → Alternatives → Impact`. Store in `docs/decisions/<date>-<topic>.md`.
-- **Question Handling**: Claude batches clarifications unless blocking; Codex responds with either authoritative answer or directs to experiment/test.
-- **Urgent Escalations**: Use #blocking label (literal text) in messages so Codex prioritizes response.
-- **Language Constraint**: All Codex → Claude updates delivered to the user must be written in Chinese; when referencing code/commands keep them in English but surround narrative with 中文说明。
-- **Handoff Prompt**: 每当 Codex 发布 Architecture Snapshot 后，用户可直接复制粘贴指令给 Claude，替换文件路径即可，确保交接流程短且固定。`@Claude 请按照 docs/decisions/<date>-<topic>.md 中 Architecture Snapshot 执行，完成后以 CAVR（Context / Actions / Verification / Risks）汇报，并附上 npm run lint / npm test 结果。若 scope 变动 >20%，请触发 mini design review。`
+## 5. 沟通规范
+- **状态更新（Claude → Codex）**：CAVR（Context/Actions/Verification/Risks），记录在 PR 或 PLAN。  
+- **设计决策（Codex → Claude）**：Decision/Rationale/Alternatives/Impact，存 `docs/decisions/<date>-<topic>.md`。  
+- **提问**：非阻塞批量提；阻塞标记 #blocking。  
+- **语言**：对用户的 Codex/Claude 更新用中文；代码/命令用英文。  
+- **交接模板**：每次 Codex 发布 Snapshot 或需求回复时，末尾附一键复制 fenced block（含 `@Claude ...` 指令，路径/命令写好）。
 
-## 6. Required Artifacts per Work Item
-| Stage | Owner | Artifact | Notes |
+## 6. 交付物清单
+| 阶段 | 责任人 | 产物 | 说明 |
 | --- | --- | --- | --- |
-| Kickoff | Codex | Architecture Snapshot | Problem, scope, acceptance tests, dependencies |
-| Planning | Claude | Implementation Checklist | File list, ordered subtasks, env/test needs |
-| Dev | Claude | Change Notes | After each chunk; include lint/test output summary |
-| Review | Codex | Review Log | Findings ordered by severity, referencing file paths |
-| Closeout | Both | Knowledge Capture | Updates to README/PLAN/tests + TODO debt list |
+| Kickoff | Codex | Architecture Snapshot | 背景、范围、验收、依赖 |
+| Planning | Claude | Implementation Checklist | 文件/子任务/测试需求 |
+| Dev | Claude | Change Notes | 每段变更 + lint/test 摘要 |
+| Review | Codex | Review Log | 按严重度列问题，含文件路径 |
+| Closeout | Both | Knowledge Capture | 更新 README/PLAN/测试，列 TODO |
 
-## 7. Quality Gates & Checklists
-- Lint + tests green locally before Codex review.
-- Tailwind tokens updated via `@theme inline` when adding new colors/spacings; document defaults.
-- API interactions mocked under `lib/services/api` tests when possible; real-call scripts live in `test-api.js`.
-- Accessibility: run through keyboard nav + minimum color contrast for any UI-affecting change.
-- Deployment readiness: confirm `.env.local.example` updates whenever new env vars appear.
+## 7. 质量门槛
+- 本地 lint + test 必须通过再提审。
+- 新增样式用 `@theme inline` 维护 token，记录默认值。
+- API 交互尽量在 `lib/services/api` 做 mock，真实连通用 `test-api.js`。
+- UI 改动做可访问性检查（键盘导航、对比度）。
+- 新增 env 时同步 `.env.local.example`。
 
-## 8. Escalation & Decision Logging
-- If implementation diverges from plan (>20% scope change), Claude pings Codex for a "mini design review". No deviation proceeds without recorded approval.
-- Critical bugs or production regressions trigger an incident note (timestamp, impact, fix plan) maintained by Codex; Claude attaches remediation tasks.
-- Disagreements resolved via ADR (architecture decision record) stored alongside docs; Codex owns final call but documents rationale.
+## 8. 升级与决策记录
+- 超出方案 >20% 必触发 mini design review（Claude 发起）。  
+- 生产回归/重大缺陷：Codex 记 incident（时间/影响/修复），Claude 附整改任务。  
+- 分歧用 ADR，Codex 最终定夺并记录。
 
-## 9. Quick-Start Checklist
-1. Codex posts latest snapshot before handing new work to Claude.
-2. Claude replies with checklist + clarification questions.
-3. Both confirm tooling/commands (`npm run dev`, `npm run lint`, `npm test`) run locally.
-4. Claude builds feature in slices, logging CAVR updates.
-5. Codex reviews with severity-ranked findings; iterate until clean.
-6. Update docs/tests/env samples; archive decision log entry.
-
-By following this guide, Codex and Claude can operate as a tight architect–engineer duo, keeping architecture intent and shipped code perfectly aligned across the investor-ai codebase.
+## 9. 快速开始
+1. Codex 先发最新 Snapshot。  
+2. Claude 回复清单 + 疑问。  
+3. 双方确认工具可用：`npm run dev` / `npm run lint` / `npm test`。  
+4. Claude 按切片开发，持续输出 CAVR。  
+5. Codex 审查，直到通过。  
+6. 更新文档/测试/env 示例，归档决策。
