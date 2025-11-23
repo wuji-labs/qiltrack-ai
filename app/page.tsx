@@ -441,18 +441,18 @@ export default function Home() {
 
 								<section id="pricing" className={`rounded-3xl border p-5 sm:p-7 space-y-6 ${cardSecondary}`}>
 									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-										<div>
+										<div className="space-y-1.5">
 											<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">Pricing</p>
 											<h2 className="text-2xl sm:text-3xl font-semibold">{t("pricing.title")}</h2>
-											<p className={`text-base mt-1 ${subtleText}`}>{t("pricing.caption")}</p>
+											<p className={`text-base ${subtleText}`}>{t("pricing.caption")}</p>
 										</div>
-										<div className="text-sm text-right text-subtle">
+										<div className="flex gap-2 text-sm text-subtle">
 											<p>{t("pricing.note1")}</p>
 											<p>{t("pricing.note2")}</p>
 										</div>
 									</div>
 
-									<div className="grid gap-4 lg:grid-cols-3">
+									<div className="grid gap-5 grid-cols-1 lg:grid-cols-3 lg:items-stretch">
 										{pricingList.map((plan) => {
 											const handleClick = () => {
 												if (plan.tier === "free") return handlePrimaryCta();
@@ -464,20 +464,20 @@ export default function Home() {
 											return (
 												<article
 													key={plan.name}
-													className={`rounded-2xl border p-5 space-y-4 transition-all ${
+													className={`rounded-3xl border p-6 sm:p-7 space-y-5 transition-all flex flex-col h-full ${
 														plan.highlight
-															? "scale-[1.02] border-emerald-400/80 bg-emerald-400/10 shadow-[0_24px_60px_rgba(16,185,129,0.35)]"
-															: "border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80"
+															? "border-[var(--accent-emerald)]/50 bg-[var(--bg-layer)]/85 bg-gradient-to-br from-emerald-500/8 via-emerald-400/4 to-cyan-400/6 shadow-[0_20px_50px_rgba(16,185,129,0.25)] hover:shadow-[0_20px_50px_rgba(16,185,129,0.32)] hover:-translate-y-1"
+															: "border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 hover:border-[var(--stroke-glow)]/50 hover:-translate-y-1"
 													}`}
 												>
-													{/* Badge for highlight or secondary */}
+													{/* Unified badge style */}
 													{(plan.highlight || plan.secondary) && (
-														<div className="relative">
+														<div>
 															<span
-																className={`inline-block text-xs uppercase tracking-[0.26em] px-3 py-1 rounded-full ${
+																className={`inline-block text-xs uppercase tracking-[0.24em] px-3 py-1 rounded-full ${
 																	plan.highlight
-																		? "bg-emerald-400/20 text-emerald-200 border border-emerald-400/50"
-																		: "bg-blue-400/20 text-blue-200 border border-blue-400/50"
+																		? "bg-emerald-400/20 text-emerald-200 border border-emerald-400/40"
+																		: "bg-blue-400/20 text-blue-200 border border-blue-400/40"
 																}`}
 															>
 																{plan.badge}
@@ -485,31 +485,36 @@ export default function Home() {
 														</div>
 													)}
 
-													<div className="flex items-start justify-between gap-3">
-														<div>
-															{!plan.highlight && !plan.secondary && (
-																<p className="text-sm uppercase tracking-[0.26em] text-emerald-200">{plan.badge}</p>
-															)}
-															<h3 className="text-2xl sm:text-3xl font-semibold text-[var(--color-foreground)]">{plan.name}</h3>
-															<p className={`text-3xl sm:text-4xl font-bold mt-2 ${
-																plan.highlight
-																	? "text-[var(--accent-emerald)]"
-																	: plan.secondary
-																		? "text-[var(--accent-blue)]"
-																		: "text-emerald-300"
-															}`}>
-																{plan.price}
-															</p>
-														</div>
-														<div className="text-right">
-															<p className={`text-base ${subtleText}`}>{plan.tagline}</p>
-														</div>
+													{/* Free plan badge text-only */}
+													{!plan.highlight && !plan.secondary && (
+														<p className="text-xs uppercase tracking-[0.24em] text-emerald-200">{plan.badge}</p>
+													)}
+
+													<div>
+														<h3 className="text-xl sm:text-2xl font-semibold text-[var(--color-foreground)] mb-2">{plan.name}</h3>
+														<p className={`text-3xl sm:text-4xl font-bold ${
+															plan.highlight
+																? "text-[var(--accent-emerald)]"
+																: plan.secondary
+																	? "text-[var(--accent-blue)]"
+																	: "text-emerald-300"
+														}`}>
+															{plan.price}
+														</p>
 													</div>
 
-													<ul className="space-y-1.5 text-base text-dim">
+													<p className={`text-sm leading-relaxed ${subtleText}`}>{plan.tagline}</p>
+
+													<ul className="space-y-2 text-sm leading-relaxed text-dim flex-1">
 														{plan.features.map((feature) => (
 															<li key={feature} className="flex items-start gap-2">
-																<span className={plan.highlight ? "text-emerald-300" : plan.secondary ? "text-[var(--accent-blue)]" : "text-emerald-300"}>•</span>
+																<span className={`flex-shrink-0 mt-0.5 ${
+																	plan.highlight
+																		? "text-emerald-300"
+																		: plan.secondary
+																			? "text-[var(--accent-blue)]"
+																			: "text-emerald-300"
+																}`} style={{ fontSize: "0.6em" }}>●</span>
 																<span>{feature}</span>
 															</li>
 														))}
@@ -517,7 +522,7 @@ export default function Home() {
 
 													<button
 														type="button"
-														className={`w-full rounded-xl py-2.5 text-base font-semibold transition-colors ${
+														className={`mt-auto w-full rounded-full py-3 text-sm font-semibold transition-all ${
 															plan.highlight
 																? "bg-emerald-400 text-slate-900 hover:bg-emerald-300"
 																: plan.secondary
@@ -531,7 +536,7 @@ export default function Home() {
 
 													{/* Annual plan note */}
 													{plan.tier === "annual" && (
-														<p className="text-sm text-subtle text-center">
+														<p className="text-xs text-center text-subtle">
 															{t("pricing.plan.annual.note")}
 														</p>
 													)}
