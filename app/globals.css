@@ -505,6 +505,32 @@ body {
   animation: fade-in-up 0.2s ease-out;
 }
 
+.motion-safe\:transition-all {
+  @media (prefers-reduced-motion: no-preference) {
+    transition: all 0.2s ease-out;
+  }
+}
+
+.motion-safe\:hover\:-translate-y-1:hover {
+  @media (prefers-reduced-motion: no-preference) {
+    transform: translateY(-0.25rem);
+  }
+}
+
+/* 加载旋转动画 */
+@keyframes spinner-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spinner {
+  animation: spinner-rotate 0.8s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

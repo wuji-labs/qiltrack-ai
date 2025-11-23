@@ -89,9 +89,10 @@ export function HeroSection({
 							<a
 								key={item.href}
 								href={item.href}
-								className="rounded-full px-3 py-2 transition text-subtle hover:text-[var(--accent-blue)] hover:bg-[var(--bg-layer)]/70"
+								className="rounded-full px-3 py-2 transition-all duration-200 ease-out relative text-subtle hover:text-[var(--accent-blue)] hover:-translate-y-0.5 hover:bg-[var(--bg-layer)]/70 group"
 							>
 								{item.label}
+								<span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[var(--accent-blue)] to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-out origin-left" />
 							</a>
 						))}
 					</div>
@@ -200,7 +201,7 @@ export function HeroSection({
 							<button
 								type="button"
 								onClick={onPrimaryCta}
-								className="btn-gradient px-[18px] py-2 text-sm font-semibold shadow-[0_10px_30px_rgba(16,185,129,0.35)]"
+								className="btn-gradient px-[18px] py-2 text-sm font-semibold shadow-[0_10px_30px_rgba(16,185,129,0.35)] transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_14px_40px_rgba(16,185,129,0.45)] active:translate-y-0.5"
 							>
 								{t("cta.preview")}
 								{previewNote && (
@@ -256,11 +257,11 @@ export function HeroSection({
 							<button
 								type="button"
 								onClick={onPrimaryCta}
-								className="rounded-full border border-[var(--accent-emerald)]/70 bg-[var(--accent-emerald)]/12 px-6 py-2 text-base font-semibold text-[var(--accent-emerald)] shadow-[0_10px_24px_rgba(91,224,176,0.18)] transition hover:bg-[var(--accent-emerald)]/20"
+								className="rounded-full border border-[var(--accent-emerald)]/70 bg-[var(--accent-emerald)]/12 px-6 py-2 text-base font-semibold text-[var(--accent-emerald)] shadow-[0_10px_24px_rgba(91,224,176,0.18)] transition-all duration-200 ease-out hover:bg-[var(--accent-emerald)]/20 hover:-translate-y-1 hover:shadow-[0_14px_32px_rgba(91,224,176,0.28)] active:translate-y-0.5"
 							>
 								{t("hero.cta.primary")}
 							</button>
-							<a href="#generator" className="btn-ghost px-5 py-2 text-base">
+							<a href="#generator" className="btn-ghost px-5 py-2 text-base transition-all duration-200 ease-out hover:-translate-y-0.5">
 								<span>{t("hero.cta.secondary")}</span>
 								<span className="text-xs text-subtle">↗</span>
 							</a>

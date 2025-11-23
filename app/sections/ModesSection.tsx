@@ -48,10 +48,10 @@ export function ModesSection({ options, selected, onSelect, personaSentence, hea
 							key={option.id}
 							type="button"
 							onClick={() => onSelect(option.id)}
-							className={`relative overflow-hidden text-left rounded-2xl border px-4 py-4 text-sm transition-all backdrop-blur ${
+							className={`relative overflow-hidden text-left rounded-2xl border px-4 py-4 text-sm transition-all duration-200 ease-out backdrop-blur ${
 								active
-									? "border-[var(--accent-emerald)]/70 bg-[var(--bg-layer)]/90 shadow-[0_18px_42px_rgba(91,224,176,0.18)]"
-									: "border-[var(--stroke-soft)] bg-[var(--bg-base)]/45 hover:border-[var(--accent-emerald)]/60 hover:shadow-[0_12px_30px_rgba(0,0,0,0.24)]"
+									? "border-[var(--accent-emerald)]/70 bg-[var(--bg-layer)]/90 shadow-[0_18px_42px_rgba(91,224,176,0.18)] -translate-y-1"
+									: "border-[var(--stroke-soft)] bg-[var(--bg-base)]/45 hover:border-[var(--accent-emerald)]/60 hover:shadow-[0_12px_30px_rgba(0,0,0,0.24)] hover:-translate-y-1"
 							}`}
 						>
 							<div className="pointer-events-none absolute -left-6 top-2 h-16 w-16 rounded-full bg-[var(--accent-emerald)]/12 blur-3xl" aria-hidden />
