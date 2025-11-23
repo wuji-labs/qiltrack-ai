@@ -174,11 +174,10 @@ chrome-devtools-mcp --browserUrl http://localhost:9223
 npm run dev:chrome:stop
 ```
 
-### Q: 可以在 WSL 中使用吗？
-A: 可以，但需要：
-1. 在 Windows 侧启动 Chrome（因为 WSL 没有 GUI）
-2. 使用 WSL IP 访问（`WIN_IP:9222`）
-3. 详见 `AGENTS.md` 中的跨主机配置
+### Q: 推荐的调试环境是什么？
+A: **Windows PowerShell（默认）**。所有命令都已为 Windows 原生优化，见 README.md 的"调试辅助"章节。
+
+**Legacy：WSL 支持**（仅在特殊环境）：若需在 WSL 中使用，详见 `AGENTS.md` 附录"Legacy：WSL 调试"。
 
 ## 总结
 

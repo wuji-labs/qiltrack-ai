@@ -48,16 +48,60 @@
 - PR 内容需包含：变更摘要、相关 Issue/需求链接、手动验证说明（含命令和截图，如报告生成流程）、若动到 API Key 配置需标注安全影响。  
 - 代码评审前请确认依赖安装、`npm run lint` 结果、环境变量说明已更新到 README/部署脚本。
 
-## WSL 使用 Windows Chrome 远程调试
-- 在 Windows PowerShell 启动独立调试实例（64 位路径；不存在则改用 `Program Files (x86)`）：  
+## Windows 原生调试设置
+
+### PowerShell 启动 Chrome 调试实例
+```powershell
+# 方式 1：npm 命令（推荐）
+npm run dev:chrome        # 启动 Chrome headless
+npm run mcp:endpoint      # 获取 WebSocket endpoint
+npm run mcp:stop          # 停止 Chrome
+
+# 方式 2：直接 PowerShell 脚本
+pwsh scripts/devtools-mcp.ps1 start
+pwsh scripts/devtools-mcp.ps1 endpoint
+pwsh scripts/devtools-mcp.ps1 stop
+```
+
+### 获取 WebSocket Endpoint
+```powershell
+# 使用 npm 命令
+npm run mcp:endpoint
+
+# 或者直接用 PowerShell 脚本
+$endpoint = pwsh scripts/devtools-mcp.ps1 endpoint
+Write-Host $endpoint
+```
+
+### Chrome MCP 连接
+使用返回的 WebSocket endpoint：
+```powershell
+chrome-devtools-mcp --wsEndpoint "ws://127.0.0.1:9222/devtools/browser/<uuid>"
+```
+
+## MCP: chrome-devtools-mcp 快速指引
+- 全局安装（nvm 环境下跟 Node 版本绑定）：`npm install -g chrome-devtools-mcp`。切换 Node 版本后若命令不可用，需在对应版本下再装一次。
+- 连接已运行的调试端口：`chrome-devtools-mcp --browserUrl http://127.0.0.1:9222`，或用 WebSocket `--wsEndpoint ws://127.0.0.1:9222/devtools/browser/<id>`。
+- 默认使用 Windows 本地 Chrome；可通过 `$env:CHROME_BIN` 指定自定义路径。
+
+---
+
+## Legacy：WSL 调试方案（仅作参考）
+
+⚠️ **已弃用**：以下方案不再作为默认工作流，仅在特殊环境参考。
+
+### WSL 使用 Windows Chrome 远程调试
+- 在 Windows PowerShell 启动独立调试实例：
   `& "C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222 --remote-debugging-address=0.0.0.0 --user-data-dir="C:\tmp\chrome-debug"`
-- WSL 侧获取宿主机 IP 并验证端口：  
-  `WIN_IP=$(awk '/nameserver/ {print $2; exit}' /etc/resolv.conf)`  
+- WSL 侧获取宿主机 IP 并验证端口：
+  `WIN_IP=$(awk '/nameserver/ {print $2; exit}' /etc/resolv.conf)`
   `curl "http://$WIN_IP:9222/json/version"`
 - 使用返回的 `webSocketDebuggerUrl`，跨主机时把其中的 `127.0.0.1` 替换为 `$WIN_IP`，如 `ws://$WIN_IP:9222/devtools/browser/...`。
 - 若无法连接，检查 Windows 防火墙是否允许 9222 入站或换端口后重启上述 Chrome 命令。
 
-## MCP: chrome-devtools-mcp 快速指引
-- 全局安装（nvm 环境下跟 Node 版本绑定）：`npm install -g chrome-devtools-mcp`。切换 Node 版本后若命令不可用，需在对应版本下再装一次。
-- 连接已运行的调试端口：`chrome-devtools-mcp --browserUrl http://$WIN_IP:9222`，或用 WebSocket `--wsEndpoint ws://$WIN_IP:9222/devtools/browser/<id>`；`$WIN_IP` 为 `awk '/nameserver/ {print $2; exit}' /etc/resolv.conf`。
-- 如果想在 WSL 本地跑 headless Chromium，需先安装 Chrome/Chromium，然后：`chromium-browser --headless --remote-debugging-port=9223 --remote-debugging-address=0.0.0.0 --user-data-dir=/tmp/chrome-headless --no-sandbox`，再用 MCP 连接 `--browserUrl http://localhost:9223`。
+### WSL 本地 Chromium
+若需在 WSL 中运行 headless Chromium：
+```bash
+chromium-browser --headless --remote-debugging-port=9223 --remote-debugging-address=0.0.0.0 --user-data-dir=/tmp/chrome-headless --no-sandbox
+```
+再用 MCP 连接 `--browserUrl http://localhost:9223`。

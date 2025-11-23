@@ -25,9 +25,12 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 | `npm start` | 运行生产构建 |
 | `npm run lint` | ESLint（core-web-vitals） |
 | `npm run test` | Vitest（jsdom），覆盖 API service 与进度条 hook |
-| `npm run mcp:start` | 可选：启动 headless Chrome (`scripts/devtools-mcp.sh start`) |
+| `npm run mcp:start` | 可选：启动 headless Chrome （Windows PowerShell，调用 `scripts/devtools-mcp.ps1 start`） |
 | `npm run mcp:endpoint` | 可选：查看 headless Chrome WebSocket endpoint |
 | `npm run mcp:stop` | 可选：停止 headless Chrome 进程 |
+| `npm run mcp:start:bash` | Legacy：Bash 版本（需 Git Bash/GNU 工具） |
+| `npm run mcp:endpoint:bash` | Legacy：Bash 版本 |
+| `npm run mcp:stop:bash` | Legacy：Bash 版本 |
 
 > 运行前请复制 `.env.local.example` 为 `.env.local` 并补齐密钥。
 
@@ -64,10 +67,47 @@ EMAIL_FROM="Investor AI <no-reply@investor.ai>"
 - `/reports` 保持与主站一致的暗色玻璃主题，顶部展示结构化 Hero、分类 Pills，以及多列文章卡片；数据集中管理于 `app/reports/data.ts`，便于 Archive 与 Detail 同步。
 - 点击任一卡片会导航到 `/reports/[slug]`，该路由展示大图、标签/作者、阅读时长和段落正文，打造正式博客体验。
 
-## 调试辅助（Windows 优先）
-- Windows VS Code + PowerShell：运行 `pwsh scripts/devtools-mcp.ps1 start`（或 `npm run dev:chrome`）启动调试专用 Chrome，`endpoint`/`stop` 子命令用于查看 WebSocket URL 或关闭实例，再通过 `chrome-devtools-mcp --wsEndpoint <url>` 与本地 `npm run dev` 页面联调。
-- 若需要 headless/无人值守场景，可选用 Bash 版脚本：`npm run mcp:start`（默认监听 9223），再用 `npm run mcp:endpoint` 拿到 WebSocket Endpoint，最后 `npm run mcp:stop` 退出。该脚本可在 Windows 上配合 Git Bash/Cygwin 运行，不再依赖 WSL。
-- 早期的跨主机方案（WSL 获取 `WIN_IP`、访问 `/mnt/c/...` 等）仅在特殊环境参考；默认工作流以 Windows 为主，请同步参阅 `AGENTS.md` 的更新。
+## 调试辅助（Windows 原生）
+
+### Windows PowerShell 流程（默认推荐）
+```powershell
+# 方式 1：使用 npm 命令
+npm run dev:chrome        # 启动 Chrome headless（监听 9222）
+npm run mcp:endpoint      # 获取 WebSocket endpoint
+npm run mcp:stop          # 停止 Chrome
+
+# 方式 2：直接调用 PowerShell 脚本
+pwsh scripts/devtools-mcp.ps1 start      # 启动
+pwsh scripts/devtools-mcp.ps1 endpoint   # 获取 endpoint
+pwsh scripts/devtools-mcp.ps1 stop       # 停止
+```
+
+#### 环境变量配置（可选）
+```powershell
+$env:PORT=9222                   # Chrome 调试端口（默认 9222）
+$env:CHROME_BIN="C:\...\chrome.exe"  # Chrome 路径（默认查找系统 Chrome）
+$env:USER_DIR="C:\tmp\chrome-debug"  # Chrome 用户数据目录
+```
+
+#### Chrome 已运行或端口被占用的提示
+- 如果 Chrome 已在监听该端口，脚本会自动提示并返回 endpoint，无需重启。
+- 若需强制关闭，使用 `npm run mcp:stop`。
+
+### Git Bash 流程（Legacy，需 GNU 工具）
+如果安装了 Git Bash 并配置了 GNU 工具链，也可使用 Bash 版本：
+```bash
+npm run mcp:start:bash      # 启动（Bash 版本）
+npm run mcp:endpoint:bash   # 获取 endpoint
+npm run mcp:stop:bash       # 停止
+```
+
+---
+
+## Legacy：WSL 调试（仅在特殊环境参考）
+
+⚠️ **已弃用**：以下方案仅作为参考，不再作为默认工作流。
+
+早期的跨主机方案（WSL 获取 `WIN_IP`、访问 `/mnt/c/...` 等）仅在特定场景使用。若需在 WSL 中使用本项目，请参考 [`AGENTS.md`](./AGENTS.md) 附录部分。
 
 ## 手动验证脚本
 1. `npm run dev` 启动服务。
