@@ -16,8 +16,8 @@
 - ❌ 性能优化和缓存策略（第二轮）
 
 ## Steps（依阶段推进）
-- [ ] **Schema 基座**：Supabase CLI 安装、版本记录、`supabase init`、schema/migration/sql、`supabase gen types` 输出 `types/database.ts`
-- [ ] **Auth 替换**：`hooks/useAuth`、登录/Account 页面与 `createServerClient` 对接，移除 NextAuth 残留
+- [x] **Schema 基座**：Supabase CLI 安装、版本记录、`supabase init`、schema/migration/sql、`supabase gen types` 输出 `types/database.ts`
+- [x] **Auth 替换**：`hooks/useAuth`、登录/Account 页面与 `createServerClient` 对接，移除 NextAuth 残留
 - [ ] **Report & RPC**：`/api/report`、历史查询与 `fn_consume_report_credit` / `fn_record_report_run`、Storage 写入
 - [ ] **内容模块**：`report_templates`、FAQ / Pricing / Hero copy 改为 Supabase 读数，并更新 UI 数据访问
 - [ ] **支付 & 审计**：Stripe webhook、`report_credit_events`、`billing_subscriptions`、审计视图/脚本

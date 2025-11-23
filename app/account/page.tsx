@@ -15,6 +15,7 @@ type Preferences = {
 };
 
 export default function AccountPage() {
+	const router = useRouter();
 	const { isAuthenticated, loading, user, getReportCredits, signOut } = useSupabaseAuth();
 	const { language, setLanguage, t } = useLanguage();
 	const [prefs, setPrefs] = useState<Preferences>({

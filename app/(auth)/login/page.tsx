@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useState, type FormEvent } from "react";
 
 import { useLanguage } from "@/lib/i18n";
@@ -29,7 +29,6 @@ export default function LoginPage() {
 
 function LoginContent() {
 	const { t } = useLanguage();
-	const router = useRouter();
 	const searchParams = useSearchParams();
 	const callbackUrl = searchParams.get("callbackUrl") ?? "/";
 	const requestError = searchParams.get("error");
@@ -37,10 +36,6 @@ function LoginContent() {
 	const [pendingProvider, setPendingProvider] = useState<string | null>(null);
 	const [email, setEmail] = useState("");
 	const [emailStatus, setEmailStatus] = useState<"idle" | "loading" | "sent" | "error">("idle");
-	const enableDevLogin = process.env.NEXT_PUBLIC_ENABLE_DEV_LOGIN === "true";
-	const [devEmail, setDevEmail] = useState("");
-	const [devError, setDevError] = useState<string | null>(null);
-	const [devLoading, setDevLoading] = useState(false);
 	const { signInWithProvider, signInWithEmail } = useSupabaseAuth();
 
 	const errorMessage = requestError ? t("auth.error.generic") : null;
