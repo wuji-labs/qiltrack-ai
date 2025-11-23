@@ -446,7 +446,7 @@ export default function Home() {
 											<h2 className="text-2xl sm:text-3xl font-semibold">{t("pricing.title")}</h2>
 											<p className={`text-base ${subtleText}`}>{t("pricing.caption")}</p>
 										</div>
-										<div className="flex gap-2 text-sm text-subtle">
+										<div className="flex flex-col gap-1 text-sm text-subtle sm:text-right">
 											<p>{t("pricing.note1")}</p>
 											<p>{t("pricing.note2")}</p>
 										</div>
@@ -505,7 +505,7 @@ export default function Home() {
 
 													<p className={`text-sm leading-relaxed ${subtleText}`}>{plan.tagline}</p>
 
-													<ul className="space-y-2 text-sm leading-relaxed text-dim flex-1">
+													<ul className="space-y-2 text-base leading-relaxed text-dim flex-1">
 														{plan.features.map((feature) => (
 															<li key={feature} className="flex items-start gap-2">
 																<span className={`flex-shrink-0 mt-0.5 ${
@@ -522,7 +522,7 @@ export default function Home() {
 
 													<button
 														type="button"
-														className={`mt-auto w-full rounded-full py-3 text-sm font-semibold transition-all ${
+														className={`mt-auto w-full rounded-full py-3 text-base font-semibold transition-all ${
 															plan.highlight
 																? "bg-emerald-400 text-slate-900 hover:bg-emerald-300"
 																: plan.secondary
@@ -536,7 +536,7 @@ export default function Home() {
 
 													{/* Annual plan note */}
 													{plan.tier === "annual" && (
-														<p className="text-xs text-center text-subtle">
+														<p className="text-sm text-center text-subtle">
 															{t("pricing.plan.annual.note")}
 														</p>
 													)}
