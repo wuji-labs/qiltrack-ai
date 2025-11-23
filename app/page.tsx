@@ -336,7 +336,7 @@ export default function Home() {
 									/>
 								</section>
 
-								<section id="workflow" className={`relative overflow-hidden rounded-3xl border p-5 sm:p-7 space-y-6 ${cardSecondary}`}>
+								<section id="workflow" className={`relative overflow-hidden rounded-3xl border p-5 sm:p-7 space-y-6 transition-all duration-200 ease-out ${cardSecondary}`}>
 									<div className="pointer-events-none absolute inset-0 opacity-80">
 										<div className="absolute -left-16 top-10 h-44 w-44 rounded-full bg-emerald-400/15 blur-[120px]" aria-hidden />
 										<div className="absolute right-0 bottom-0 h-56 w-56 rounded-full bg-cyan-500/10 blur-[120px]" aria-hidden />
@@ -392,7 +392,7 @@ export default function Home() {
 									</div>
 								</section>
 
-								<section id="templates" className={`rounded-3xl border p-5 sm:p-7 space-y-5 ${cardSecondary}`}>
+								<section id="templates" className={`rounded-3xl border p-5 sm:p-7 space-y-5 transition-all duration-200 ease-out ${cardSecondary}`}>
 									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 										<div>
 											<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">{t("nav.templates")}</p>
@@ -439,7 +439,7 @@ export default function Home() {
 									</div>
 								</section>
 
-								<section id="pricing" className={`rounded-3xl border p-5 sm:p-7 space-y-6 ${cardSecondary}`}>
+								<section id="pricing" className={`rounded-3xl border p-5 sm:p-7 space-y-6 transition-all duration-200 ease-out ${cardSecondary}`}>
 									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 										<div className="space-y-1.5">
 											<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">Pricing</p>
@@ -464,10 +464,10 @@ export default function Home() {
 											return (
 												<article
 													key={plan.name}
-													className={`rounded-3xl border p-6 sm:p-7 space-y-5 transition-all flex flex-col h-full ${
+													className={`rounded-3xl border p-6 sm:p-7 space-y-5 transition-all duration-200 ease-out flex flex-col h-full ${
 														plan.highlight
 															? "border-[var(--accent-emerald)]/50 bg-[var(--bg-layer)]/85 bg-gradient-to-br from-emerald-500/8 via-emerald-400/4 to-cyan-400/6 shadow-[0_20px_50px_rgba(16,185,129,0.25)] hover:shadow-[0_20px_50px_rgba(16,185,129,0.32)] hover:-translate-y-1"
-															: "border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 hover:border-[var(--stroke-glow)]/50 hover:-translate-y-1"
+															: "border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 hover:border-[var(--stroke-glow)]/50 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.25)]"
 													}`}
 												>
 													{/* Unified badge style */}
@@ -522,12 +522,12 @@ export default function Home() {
 
 													<button
 														type="button"
-														className={`mt-auto w-full rounded-full py-3 text-base font-semibold transition-all ${
+														className={`mt-auto w-full rounded-full py-3 text-base font-semibold transition-all duration-200 ease-out ${
 															plan.highlight
-																? "bg-emerald-400 text-slate-900 hover:bg-emerald-300"
+																? "bg-emerald-400 text-slate-900 hover:bg-emerald-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.3)] active:translate-y-0.5"
 																: plan.secondary
-																	? "border border-[var(--accent-blue)] text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/10"
-																	: "bg-emerald-400 text-slate-900 hover:bg-emerald-300"
+																	? "border border-[var(--accent-blue)] text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/10 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.3)] active:translate-y-0.5"
+																	: "bg-emerald-400 text-slate-900 hover:bg-emerald-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.3)] active:translate-y-0.5"
 														}`}
 														onClick={handleClick}
 													>
@@ -560,7 +560,7 @@ export default function Home() {
 									}}
 								/>
 
-								<section id="faq" className={`rounded-3xl border p-5 sm:p-7 space-y-5 ${cardSecondary}`}>
+								<section id="faq" className={`rounded-3xl border p-5 sm:p-7 space-y-5 transition-all duration-200 ease-out ${cardSecondary}`}>
 									<div className="space-y-2">
 										<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">FAQ</p>
 										<h2 className="text-2xl sm:text-3xl font-semibold">{t("faq.title")}</h2>
@@ -568,11 +568,11 @@ export default function Home() {
 									</div>
 									<div className="space-y-3">
 										{faqList.map((item) => (
-											<details key={item.question} className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-4">
-												<summary className="cursor-pointer text-base font-semibold text-[var(--color-foreground)]">
+											<details key={item.question} className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-4 transition-all duration-200 ease-out group open:border-[var(--stroke-glow)]/50">
+												<summary className="cursor-pointer text-base font-semibold text-[var(--color-foreground)] transition-all duration-200 ease-out hover:-translate-y-0.5">
 													{item.question}
 												</summary>
-												<p className={`mt-2 text-base leading-relaxed ${strongSubtleText}`}>{item.answer}</p>
+												<p className={`mt-2 text-base leading-relaxed ${strongSubtleText} transition-all duration-200 ease-out animate-fadeInUp`}>{item.answer}</p>
 											</details>
 										))}
 									</div>
