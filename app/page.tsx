@@ -169,7 +169,7 @@ const highlightFallbackKeys: TranslationKey[] = ["highlight.default.1", "highlig
 
 export default function Home() {
 	const { language, setLanguage, t } = useLanguage();
-	const { isAuthenticated, user, signOut } = useSupabaseAuth();
+	const { isAuthenticated, user, signOut, refreshSession } = useSupabaseAuth();
 	const router = useRouter();
 	const [selectedTone, setSelectedTone] = useState<ReportTone>("baseline");
 
