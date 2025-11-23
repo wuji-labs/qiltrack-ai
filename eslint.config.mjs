@@ -17,6 +17,8 @@ const eslintConfig = defineConfig([
     "chrome/**",
     "scripts/**",
     "screenshot*.js",
+    "test-api.js",
+    "helicone_test.js",
   ]),
 ]);
 
