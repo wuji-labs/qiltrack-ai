@@ -407,7 +407,7 @@ export default function Home() {
 
 									<div className="grid md:grid-cols-3 gap-3">
 										{caseStudyList.map((study) => (
-											<div key={study.company} className="rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-4 flex flex-col gap-3">
+											<div key={study.company} className="rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-4 flex flex-col gap-3 transition-all duration-200 ease-out hover:border-[var(--stroke-glow)]/70 hover:shadow-[0_12px_32px_rgba(0,0,0,0.28)] hover:-translate-y-1">
 												<div className="flex items-center justify-between">
 													<div>
 														<p className="text-sm uppercase tracking-[0.3em] text-subtle">{study.industry}</p>
