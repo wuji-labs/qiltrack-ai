@@ -12,7 +12,9 @@
     "helicone:sync-models": "node scripts/update-helicone-models.js"
   },
   "dependencies": {
-    
+    "@supabase/auth-helpers-nextjs": "^0.10.8",
+    "@supabase/ssr": "^0.2.6",
+    "@supabase/supabase-js": "^2.46.0",
     "@prisma/client": "^6.19.0",
     "axios": "^1.13.2",
     "docx": "^9.5.1",
@@ -20,7 +22,6 @@
     "file-saver": "^2.0.5",
     "jspdf": "^3.0.3",
     "next": "16.0.3",
-    
     "nodemailer": "^7.0.10",
     "openai": "^6.9.0",
     "prisma": "^6.19.0",

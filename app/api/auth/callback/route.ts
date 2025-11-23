@@ -1,4 +1,4 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import type { Database } from "@/types/database";
@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const cookieStore = await cookies();
-    const supabase = createServerComponentClient<Database>({
+    const supabase = createRouteHandlerClient<Database>({
       cookies: () => cookieStore,
     });
 
@@ -17,45 +17,33 @@ export async function GET(request: NextRequest) {
       const { error } = await supabase.auth.exchangeCodeForSession(code);
 
       if (error) {
-        console.error("交换 code 失败:", error);
+        console.error("Code exchange failed:", error);
         return NextResponse.redirect(
           new URL("/login?error=auth_code_exchange_failed", requestUrl.origin)
         );
       }
 
-      // 获取当前用户
+      // Get current authenticated user
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (user) {
-        // 检查或创建用户 profile
-        const { data: existingProfile } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("id", user.id)
-          .single();
+      if (user && user.email) {
+        // Call RPC to initialize profile and credits atomically
+        const { error: rpcError } = await supabase.rpc("fn_initialize_profile", {
+          p_user_id: user.id,
+          p_email: user.email,
+        });
 
-        if (!existingProfile) {
-          await supabase.from("profiles").insert({
-            id: user.id,
-            email: user.email || "",
-            full_name: user.user_metadata?.full_name || null,
-            avatar_url: user.user_metadata?.avatar_url || null,
-          });
-
-          // 初始化报告积分
-          await supabase.from("report_credits").insert({
-            user_id: user.id,
-            credits_available: 5, // 初始积分
-            credits_used: 0,
-          });
+        if (rpcError) {
+          console.error("Failed to initialize profile:", rpcError);
+          // Don't fail the login, just log the error
         }
       }
 
       return NextResponse.redirect(new URL("/", requestUrl.origin));
     } catch (error) {
-      console.error("会话交换异常:", error);
+      console.error("Session exchange error:", error);
       return NextResponse.redirect(
         new URL("/login?error=session_exchange_error", requestUrl.origin)
       );
