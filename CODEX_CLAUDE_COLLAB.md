@@ -45,7 +45,9 @@
 - **设计决策（Codex → Claude）**：Decision/Rationale/Alternatives/Impact，存 `docs/decisions/<date>-<topic>.md`。  
 - **提问**：非阻塞批量提；阻塞标记 #blocking。  
 - **语言**：对用户的 Codex/Claude 更新用中文；代码/命令用英文。  
-- **交接模板**：每次 Codex 发布 Snapshot 或需求回复时，末尾附一键复制 fenced block（含 `@Claude ...` 指令，路径/命令写好）。
+- **交接模板**：每次 Codex 发布 Snapshot 或需求回复时，末尾附一键复制 fenced block（含 `@Claude ...` 指令，路径/命令写好）。  
+- **报告落地**：Claude 的 CAVR/验证/测试输出需写入 PR 描述或仓库文档（如 `docs/reports/<date>-<topic>.md`），终端只给简短摘要与文件路径，便于直接查看复制。  
+- **终端输出限长**：终端回复仅允许 3–5 行摘要 + 文档/PR 路径，不得粘贴长报告；详细内容必须在文档或 PR 描述中查看。
 
 ## 6. 交付物清单
 | 阶段 | 责任人 | 产物 | 说明 |
