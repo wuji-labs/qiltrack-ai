@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useLanguage } from "@/lib/i18n";
 import { LANGUAGE_OPTIONS } from "@/lib/i18n-config";
 
@@ -14,10 +14,8 @@ type Preferences = {
 	saveHistory: boolean;
 };
 
-const PREF_KEY = "ia-account-preferences";
 export default function AccountPage() {
-	const router = useRouter();
-	const auth = useAuth();
+	const { isAuthenticated, loading, user, getReportCredits, signOut } = useSupabaseAuth();
 	const { language, setLanguage, t } = useLanguage();
 	const [prefs, setPrefs] = useState<Preferences>({
 		language,
@@ -26,6 +24,9 @@ export default function AccountPage() {
 		saveHistory: true,
 	});
 	const [loaded, setLoaded] = useState(false);
+	const [reportCredits, setReportCredits] = useState<{ credits_available: number; credits_used: number } | null>(null);
+
+	const PREF_KEY = "ia-account-preferences";
 
 	useEffect(() => {
 		try {
@@ -50,7 +51,7 @@ export default function AccountPage() {
 		window.localStorage.setItem(PREF_KEY, JSON.stringify(prefs));
 	}, [prefs, loaded]);
 
-	if (!auth.isAuthenticated) {
+	if (!isAuthenticated) {
 		return (
 			<div className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)] flex items-center justify-center px-4">
 				<div className="w-full max-w-md space-y-4 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-6 text-center shadow-xl">
@@ -75,7 +76,7 @@ export default function AccountPage() {
 		);
 	}
 
-	const avatarInitial = auth.userEmail ? auth.userEmail.charAt(0).toUpperCase() : "A";
+	const avatarInitial = user?.email ? user.email.charAt(0).toUpperCase() : "A";
 
 	return (
 		<div className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)]">
@@ -91,22 +92,22 @@ export default function AccountPage() {
 				<div className="rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-6 shadow-[0_18px_60px_rgba(0,0,0,0.35)] space-y-6">
 					<div className="flex items-center gap-4">
 						<span className="h-12 w-12 rounded-full bg-[var(--accent-emerald)]/20 border border-[var(--stroke-soft)] overflow-hidden flex items-center justify-center text-base font-semibold text-[var(--accent-emerald)]">
-							{auth.userImage ? (
-								// eslint-disable-next-line @next/next/no-img-element
-								<img src={auth.userImage} alt="avatar" className="h-full w-full object-cover" />
-							) : (
-								avatarInitial
-							)}
+							{avatarInitial}
 						</span>
 						<div className="flex-1">
-							<p className="text-lg font-semibold">{auth.userEmail ?? t("auth.session.fallback")}</p>
+							<p className="text-lg font-semibold">{user?.email ?? t("auth.session.fallback")}</p>
 							<p className="text-sm text-subtle">
-								{t("account.page.planLabel")}: {auth.plan ?? "free"}
+								{t("account.page.planLabel")}: free
 							</p>
 						</div>
 						<button
 							type="button"
-							onClick={() => auth.refreshSession()}
+							onClick={async () => {
+								const credits = await getReportCredits();
+								if (credits) {
+									setReportCredits(credits);
+								}
+							}}
 							className="rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)]"
 						>
 							{t("account.page.refreshQuota")}
@@ -116,13 +117,13 @@ export default function AccountPage() {
 					<div className="grid gap-4 sm:grid-cols-2">
 						<div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 space-y-2">
 							<p className="text-sm text-subtle">{t("account.page.remainingTitle")}</p>
-							<p className="text-3xl font-bold text-[var(--accent-emerald)]">{auth.remainingQuota}</p>
+							<p className="text-3xl font-bold text-[var(--accent-emerald)]">{reportCredits?.credits_available ?? 5}</p>
 							<p className="text-sm text-dim">{t("account.page.remainingNote")}</p>
 						</div>
 						<div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 space-y-2">
 							<p className="text-sm text-subtle">{t("account.page.planSectionTitle")}</p>
 							<p className="text-base text-[var(--color-foreground)]">
-								{t("account.page.planStatus", { plan: auth.plan ?? "free" })}
+								{t("account.page.planStatus", { plan: "free" })}
 							</p>
 							<p className="text-sm text-dim">{t("account.page.planNote")}</p>
 						</div>
@@ -193,7 +194,12 @@ export default function AccountPage() {
 							<div className="flex flex-wrap gap-2">
 						<button
 							type="button"
-							onClick={() => auth.refreshSession()}
+							onClick={async () => {
+								const credits = await getReportCredits();
+								if (credits) {
+									setReportCredits(credits);
+								}
+							}}
 							className="rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)]"
 						>
 							{t("account.page.refreshQuota")}
@@ -224,7 +230,7 @@ export default function AccountPage() {
 						</Link>
 						<button
 							type="button"
-							onClick={() => auth.signOut()}
+							onClick={() => signOut()}
 							className="inline-flex items-center gap-2 rounded-full bg-[var(--accent-emerald)] px-4 py-2 text-sm font-semibold text-slate-950 shadow-[0_12px_28px_rgba(91,224,176,0.28)] hover:brightness-105"
 						>
 							{t("auth.account.signout")}

@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense, useState, type FormEvent } from "react";
 
 import { useLanguage } from "@/lib/i18n";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 const providerButtons = [
 	{ id: "google", icon: "☉", labelKey: "auth.provider.google" },
@@ -29,6 +29,7 @@ export default function LoginPage() {
 
 function LoginContent() {
 	const { t } = useLanguage();
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const callbackUrl = searchParams.get("callbackUrl") ?? "/";
 	const requestError = searchParams.get("error");
@@ -40,14 +41,18 @@ function LoginContent() {
 	const [devEmail, setDevEmail] = useState("");
 	const [devError, setDevError] = useState<string | null>(null);
 	const [devLoading, setDevLoading] = useState(false);
+	const { signInWithProvider, signInWithEmail } = useSupabaseAuth();
 
 	const errorMessage = requestError ? t("auth.error.generic") : null;
 	const successMessage = emailStatus === "sent" ? t("auth.success.magicLink") : null;
 
-	const handleProvider = async (provider: string) => {
+	const handleProvider = async (provider: "google" | "github" | "microsoft") => {
 		try {
 			setPendingProvider(provider);
-			await signIn(provider, { callbackUrl });
+			const result = await signInWithProvider(provider);
+			if (!result.success) {
+				console.error("Provider sign-in error:", result.error);
+			}
 		} finally {
 			setPendingProvider(null);
 		}
@@ -58,12 +63,8 @@ function LoginContent() {
 		if (!email) return;
 		setEmailStatus("loading");
 		try {
-			const result = await signIn("email", {
-				email,
-				callbackUrl,
-				redirect: false,
-			});
-			if (result?.error) {
+			const result = await signInWithEmail(email);
+			if (!result.success) {
 				setEmailStatus("error");
 				return;
 			}
