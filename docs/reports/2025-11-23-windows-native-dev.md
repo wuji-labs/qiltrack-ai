@@ -122,8 +122,12 @@ Chrome started on port 9222 (PID 19028).
 - 命令格式检查：✅ powershell/bash 代码块标记准确
 
 **npm run test**：
-- 状态：正在进行（前置运行中）
-- 预期：通过（本次改动为文档与脚本路由，不涉及代码逻辑改变）
+- 结果：✅ **5 测试全部通过**
+- 执行时间：1.03s（transform 74ms, setup 0ms, collect 159ms, tests 18ms, environment 618ms, prepare 481ms）
+- 测试覆盖：
+  - `__tests__/api.test.ts`：3 个测试 ✅
+  - `__tests__/useProgress.test.tsx`：2 个测试 ✅
+- 备注：本次改动为文档与脚本路由，不涉及代码逻辑改变，所有现有测试通过
 
 ### 文件修改清单
 
@@ -181,11 +185,19 @@ Chrome started on port 9222 (PID 19028).
 
 ## 总结
 
-✅ **完成状态**：所有任务按 Snapshot 范围完成，Windows-first 工作流已建立。
+✅ **完成状态**：所有任务按 Snapshot 范围完成，Windows-first 工作流已建立，测试全部通过。
 
-- 5 个文件改动，0 个新文件（除 CAVR 报告）
-- 10+ 处文档更新，全部强调 Windows PowerShell 默认
-- 命令路由统一：PowerShell 为主，Bash 标记为 Legacy
-- 验证完毕：Chrome 启动、命令执行、文档一致性通过
+**验证清单**：
+- ✅ npm run mcp:start：Chrome 于 port 9222 启动成功（PID 19028）
+- ✅ npm run mcp:endpoint|stop：PowerShell 脚本正常执行
+- ✅ npm run lint：0 新错误（预存警告与改动无关）
+- ✅ npm run test：5 个测试全部通过（1.03s，api 3 个 + useProgress 2 个）
+- ✅ 文档一致性：README/AGENTS/DEVTOOLS_DEMO 全部更新，Windows-first 强调一致
+- ✅ 命令路由统一：PowerShell 为主，Bash 标记为 Legacy（mcp:*:bash）
+
+**交付物清单**：
+- 5 个文件改动（package.json、README.md、AGENTS.md、DEVTOOLS_DEMO.md、CAVR 报告）
+- 0 个新功能代码（仅涉及脚本路由和文档重构）
+- 10+ 处文档更新，全部强调 Windows PowerShell 默认推荐
 
 **准备就绪**：可提交 PR 用于 Codex 评审。
