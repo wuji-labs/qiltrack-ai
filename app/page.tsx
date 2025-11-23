@@ -568,11 +568,11 @@ export default function Home() {
 									</div>
 									<div className="space-y-3">
 										{faqList.map((item) => (
-											<details key={item.question} className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-4 transition-all duration-200 ease-out group open:border-[var(--stroke-glow)]/50">
-												<summary className="cursor-pointer text-base font-semibold text-[var(--color-foreground)] transition-all duration-200 ease-out hover:-translate-y-0.5">
+											<details key={item.question} className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-4 motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out group open:border-[var(--stroke-glow)]/50">
+												<summary className="cursor-pointer text-base font-semibold text-[var(--color-foreground)] motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out motion-safe:hover:-translate-y-0.5">
 													{item.question}
 												</summary>
-												<p className={`mt-2 text-base leading-relaxed ${strongSubtleText} transition-all duration-200 ease-out animate-fadeInUp`}>{item.answer}</p>
+												<p className={`mt-2 text-base leading-relaxed ${strongSubtleText} motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out motion-safe:animate-fadeInUp`}>{item.answer}</p>
 											</details>
 										))}
 									</div>
