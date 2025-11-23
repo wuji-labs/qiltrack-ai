@@ -508,7 +508,7 @@ export function ReportGeneratorSection({
 										spellCheck={false}
 										autoCorrect="off"
 										autoCapitalize="none"
-										className="w-full bg-transparent pl-10 pr-28 py-2.5 text-base text-[var(--color-foreground)] placeholder:text-subtle focus:outline-none focus-visible:shadow-[0_0_0_3px_rgba(91,224,176,0.25)] transition-shadow duration-200 ease-out"
+										className="w-full bg-transparent pl-10 pr-28 py-2.5 text-base text-[var(--color-foreground)] placeholder:text-subtle focus:outline-none transition-shadow duration-200 ease-out"
 										aria-label={t("generator.input.label")}
 									/>
 									<div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-[11px] text-subtle">
