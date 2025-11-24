@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { prisma } from "@/lib/prisma";
-
+import { createServerClient, createServiceRoleClient, uploadToStorage } from "@/lib/supabase/server";
+import { consumeReportCredit, writeReportAudit } from "@/lib/services/quota";
 import { DEFAULT_LANGUAGE, type Language } from "@/lib/i18n-config";
 
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
@@ -46,17 +43,6 @@ const LANGUAGE_CONFIG: Record<Language, {
         disclaimer: `本报告内容由系统基于公开数据和通用分析方法自动生成，仅供一般信息参考，不构成任何投资建议、买卖意见或个性化判断。市场状况可能变化，信息可能存在延迟或偏差。如需投资建议，请咨询取得合法资质的专业机构。`,
     },
 };
-
-const PARAGRAPH_REMOVAL_KEYWORDS = [
-    "买入",
-    "卖出",
-    "建仓",
-    "加仓",
-    "减仓",
-    "清仓",
-    "仓位",
-    "调仓",
-];
 
 const WORD_REPLACEMENTS: Array<{ pattern: RegExp; replacement: string }> = [
     { pattern: /买入/gi, replacement: "分析视角" },
@@ -126,34 +112,49 @@ function formatDate(date: Date): string {
 }
 
 export async function GET(request: NextRequest) {
-    // 本地调试默认 token（如需关闭请在环境变量里显式设置 TEST_REPORT_TOKEN）
+    // Check for test bypass
     const testToken = process.env.TEST_REPORT_TOKEN || "local-test-token";
     const tokenFromHeader = request.headers.get("x-test-token");
     const tokenFromQuery = new URL(request.url).searchParams.get("testToken");
     const isTestBypass = Boolean(testToken && (tokenFromHeader === testToken || tokenFromQuery === testToken));
 
-    const session = isTestBypass ? null : await getServerSession(authOptions);
-    let dbUser: { id: string; reportsUsed: number; quota: number } | null = null;
+    // Get Supabase server client
+    const supabase = createServerClient({
+      get: (name: string) => {
+        const cookieValue = request.cookies.get(name)?.value;
+        return cookieValue ? { value: cookieValue } : undefined;
+      },
+    });
 
+    let userId: string | null = null;
     if (!isTestBypass) {
-        if (!session || !session.user?.id) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+      // Get session from Supabase auth
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
 
-        dbUser = await prisma.user.findUnique({
-            where: { id: session.user.id },
-            select: { id: true, reportsUsed: true, quota: true },
-        });
+      if (sessionError || !session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
 
-        if (!dbUser) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+      userId = session.user.id;
 
-        if (dbUser.reportsUsed >= dbUser.quota) {
-            return NextResponse.json({ error: "Quota exceeded" }, { status: 429 });
-        }
+      // Check quota before attempting to generate
+      const { data: quotaData, error: quotaError } = await supabase
+        .from("v_user_quota")
+        .select("remaining_credits")
+        .eq("user_id", userId)
+        .single();
+
+      if (quotaError || !quotaData || quotaData.remaining_credits <= 0) {
+        return NextResponse.json(
+          { error: "Quota exceeded" },
+          { status: 429 }
+        );
+      }
     } else {
-        dbUser = { id: "test-bypass", reportsUsed: 0, quota: 99 };
+      userId = "test-bypass";
     }
 
     const { searchParams } = new URL(request.url);
@@ -430,21 +431,95 @@ ${JSON.stringify(companyData, null, 2)}
 
         const report = sanitizeReportContent(rawReport, language);
 
-        if (!isTestBypass) {
-            await prisma.user.update({
-                where: { id: dbUser.id },
-                data: { reportsUsed: { increment: 1 } },
+        // Consume quota and write to Supabase
+        let remainingCredits = 0;
+        let reportRunId: string | null = null;
+
+        if (isTestBypass) {
+          // Test mode: write audit log but don't deduct credits
+          await writeReportAudit(userId, symbol, "test", "success");
+          remainingCredits = 999; // Mock remaining
+        } else {
+          try {
+            // Consume credit atomically
+            const consumeResult = await consumeReportCredit(userId);
+            if (!consumeResult.success) {
+              return NextResponse.json(
+                { error: consumeResult.error || "Failed to consume credit" },
+                { status: 500 }
+              );
+            }
+            remainingCredits = consumeResult.remainingCredits || 0;
+
+            // Record report run
+            const { data: runData, error: runError } = await supabase
+              .from("report_runs")
+              .insert({
+                user_id: userId,
+                symbol,
+                status: "completed",
+                mode: "production",
+              })
+              .select("id")
+              .single();
+
+            if (runError || !runData) {
+              throw new Error(`Failed to create report run: ${runError?.message}`);
+            }
+
+            reportRunId = runData.id;
+
+            // Upload Markdown to Storage
+            const bucketName = process.env.SUPABASE_STORAGE_REPORT_BUCKET || "report-assets";
+            const markdownPath = `${userId}/${reportRunId}.md`;
+
+            try {
+              const serviceRoleClient = createServiceRoleClient();
+              await uploadToStorage(
+                serviceRoleClient,
+                bucketName,
+                markdownPath,
+                report
+              );
+              // Note: DOCX generation would happen here in production
+              // For MVP, we only store Markdown
+            } catch (storageError) {
+              // Rollback: delete the report run to avoid incorrect state
+              await supabase
+                .from("report_runs")
+                .delete()
+                .eq("id", reportRunId);
+
+              return NextResponse.json(
+                { error: `Storage upload failed: ${storageError instanceof Error ? storageError.message : "Unknown error"}` },
+                { status: 500 }
+              );
+            }
+
+            // Save document reference in database
+            await supabase.from("report_documents").insert({
+              report_run_id: reportRunId,
+              document_type: "markdown",
+              storage_path: markdownPath,
             });
+
+            await writeReportAudit(userId, symbol, "production", "success");
+          } catch (err) {
+            await writeReportAudit(userId, symbol, "production", "failed");
+            console.error("Supabase report error:", err);
+            return NextResponse.json(
+              { error: `Report generation error: ${err instanceof Error ? err.message : "Unknown error"}` },
+              { status: 500 }
+            );
+          }
         }
 
-        const used = isTestBypass ? 0 : dbUser.reportsUsed + 1;
-        const remaining = Math.max(dbUser.quota - used, 0);
-
         return NextResponse.json({
-            symbol,
-            report,
-            companyData,
-            remainingQuota: remaining,
+          symbol,
+          report,
+          companyData,
+          remainingQuota: remainingCredits,
+          reportRunId,
         });
     } catch (err) {
         console.error("Error generating report:", err);
