@@ -80,16 +80,16 @@ describe("lib/services/quota", () => {
 
   describe("getRemainingCredits", () => {
     it("should return remaining credits", async () => {
-      const mockFrom = vi.fn(() => ({
-        select: vi.fn(() => ({
-          eq: vi.fn(() =>
-            Promise.resolve({
-              data: { remaining_credits: 10 },
-              error: null,
-            })
-          ),
-        })),
-      }));
+      const mockChain = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: { remaining_credits: 10 },
+          error: null,
+        }),
+      };
+
+      const mockFrom = vi.fn(() => mockChain);
 
       vi.mocked(createServiceRoleClient).mockReturnValue({
         from: mockFrom,
@@ -101,16 +101,16 @@ describe("lib/services/quota", () => {
     });
 
     it("should return 0 on query error", async () => {
-      const mockFrom = vi.fn(() => ({
-        select: vi.fn(() => ({
-          eq: vi.fn(() =>
-            Promise.resolve({
-              data: null,
-              error: { message: "Not found" },
-            })
-          ),
-        })),
-      }));
+      const mockChain = {
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({
+          data: null,
+          error: { message: "Not found" },
+        }),
+      };
+
+      const mockFrom = vi.fn(() => mockChain);
 
       vi.mocked(createServiceRoleClient).mockReturnValue({
         from: mockFrom,

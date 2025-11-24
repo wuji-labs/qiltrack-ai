@@ -10,9 +10,18 @@ import type { Database } from "@/types/database";
 /**
  * Create a Supabase server client with user session (RLS-enabled)
  * Use this in API route handlers to respect row-level security
- * @param cookies Cookie object from request
+ * Handles cookies transparently via @supabase/ssr
+ *
+ * @param cookieGetter Function to get cookie by name from request
+ * @param cookieSetter Optional function to set cookies in response (called with [name, value] pairs)
+ *
+ * Note: @supabase/ssr automatically discovers the session cookie names.
+ * We provide a simple pass-through cookie interface without hardcoding names.
  */
-export function createServerClient(cookies: { get: (name: string) => { value: string } | undefined }) {
+export function createServerClient(
+  cookieGetter: (name: string) => { value: string } | undefined,
+  cookieSetter?: (cookiesToSet: Array<{ name: string; value: string; options?: unknown }>) => void
+) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -27,13 +36,39 @@ export function createServerClient(cookies: { get: (name: string) => { value: st
     );
   }
 
+  // @supabase/ssr createServerClient handles cookies via getAll/setAll
+  // getAll: retrieves session cookies from request (names determined by Supabase)
+  // setAll: returns updated cookies to be set in response
   return createServerClientBase<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
-        return [];
+        // Return all cookies from the request
+        // This is a simple array interface - @supabase/ssr will query what it needs
+        const cookieList: Array<{ name: string; value: string }> = [];
+
+        // Common Supabase session cookie names - but don't restrict to only these
+        // @supabase/ssr will query for specific names via getAll pattern
+        const commonNames = [
+          "sb-auth-token",
+          "sb-session",
+          "sb_auth_token",
+          "sb_session",
+        ];
+
+        for (const name of commonNames) {
+          const cookie = cookieGetter(name);
+          if (cookie?.value) {
+            cookieList.push({ name, value: cookie.value });
+          }
+        }
+
+        return cookieList;
       },
-      setAll() {
-        // Note: Server client cookie setting is handled by NextResponse headers in route handlers
+      setAll(cookiesToSet) {
+        // Pass updated cookies to response handler if provided
+        if (cookieSetter) {
+          cookieSetter(cookiesToSet);
+        }
       },
     },
   });

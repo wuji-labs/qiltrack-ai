@@ -59,6 +59,7 @@ const WORD_REPLACEMENTS: Array<{ pattern: RegExp; replacement: string }> = [
     { pattern: /调仓/gi, replacement: "风险敞口调整讨论" },
 ];
 
+
 function normalizeLanguage(value: string | null): Language {
     const key = (value || "").trim().toLowerCase();
     if (key === "ja" || key === "ja-jp") return "ja";
@@ -118,15 +119,22 @@ export async function GET(request: NextRequest) {
     const tokenFromQuery = new URL(request.url).searchParams.get("testToken");
     const isTestBypass = Boolean(testToken && (tokenFromHeader === testToken || tokenFromQuery === testToken));
 
-    // Get Supabase server client
-    const supabase = createServerClient({
-      get: (name: string) => {
+    // Collect response cookies from Supabase
+    const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
+
+    // Get Supabase server client with cookie handling
+    const supabase = createServerClient(
+      (name: string) => {
         const cookieValue = request.cookies.get(name)?.value;
         return cookieValue ? { value: cookieValue } : undefined;
       },
-    });
+      (cookies) => {
+        responseCookies.push(...cookies);
+      }
+    );
 
     let userId: string | null = null;
+
     if (!isTestBypass) {
       // Get session from Supabase auth
       const {
@@ -135,7 +143,11 @@ export async function GET(request: NextRequest) {
       } = await supabase.auth.getSession();
 
       if (sessionError || !session?.user?.id) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        const response = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        responseCookies.forEach(({ name, value }) => {
+          response.headers.append("Set-Cookie", `${name}=${value}`);
+        });
+        return response;
       }
 
       userId = session.user.id;
@@ -148,13 +160,19 @@ export async function GET(request: NextRequest) {
         .single();
 
       if (quotaError || !quotaData || quotaData.remaining_credits <= 0) {
-        return NextResponse.json(
+        const response = NextResponse.json(
           { error: "Quota exceeded" },
           { status: 429 }
         );
+        responseCookies.forEach(({ name, value }) => {
+          response.headers.append("Set-Cookie", `${name}=${value}`);
+        });
+        return response;
       }
     } else {
-      userId = "test-bypass";
+      // Generate a test user ID (valid UUID format for test mode)
+      // Using a deterministic UUID for test mode so audit logs can be traced
+      userId = "00000000-0000-0000-0000-000000000001";
     }
 
     const { searchParams } = new URL(request.url);
@@ -167,15 +185,19 @@ export async function GET(request: NextRequest) {
         toneDirectives[toneKeyRaw as keyof typeof toneDirectives] || toneDirectives.baseline;
 
     if (!symbol) {
-        return NextResponse.json(
+        const response = NextResponse.json(
             { error: "Missing symbol param" },
             { status: 400 }
         );
+        responseCookies.forEach(({ name, value }) => {
+          response.headers.append("Set-Cookie", `${name}=${value}`);
+        });
+        return response;
     }
 
     const missingLlmProvider = !OPENROUTER_API_KEY && !HELICONE_API_KEY;
     if (!FINNHUB_API_KEY || missingLlmProvider) {
-        return NextResponse.json(
+        const response = NextResponse.json(
             {
                 error: missingLlmProvider
                     ? "No LLM provider configured"
@@ -183,6 +205,10 @@ export async function GET(request: NextRequest) {
             },
             { status: 500 }
         );
+        responseCookies.forEach(({ name, value }) => {
+          response.headers.append("Set-Cookie", `${name}=${value}`);
+        });
+        return response;
     }
 
     try {
@@ -419,10 +445,14 @@ ${JSON.stringify(companyData, null, 2)}
             null;
 
         if (!data) {
-            return NextResponse.json(
+            const response = NextResponse.json(
                 { error: "Failed to generate report via Helicone/OpenRouter" },
                 { status: 500 }
             );
+            responseCookies.forEach(({ name, value }) => {
+              response.headers.append("Set-Cookie", `${name}=${value}`);
+            });
+            return response;
         }
 
         const rawReport =
@@ -436,7 +466,51 @@ ${JSON.stringify(companyData, null, 2)}
         let reportRunId: string | null = null;
 
         if (isTestBypass) {
-          // Test mode: write audit log but don't deduct credits
+          // Test mode: write audit log and create report run (but use test marker)
+          // Try to create report run in test mode
+          try {
+            const { data: runData, error: runError } = await supabase
+              .from("report_runs")
+              .insert({
+                user_id: userId, // Use actual test-bypass ID, but mark mode='test'
+                symbol,
+                status: "completed",
+                mode: "test",
+              })
+              .select("id")
+              .single();
+
+            if (!runError && runData) {
+              reportRunId = runData.id;
+
+              // Upload Markdown to Storage in test mode
+              const bucketName = process.env.SUPABASE_STORAGE_REPORT_BUCKET || "report-assets";
+              const markdownPath = `${userId}/${reportRunId}.md`;
+
+              try {
+                const serviceRoleClient = createServiceRoleClient();
+                await uploadToStorage(
+                  serviceRoleClient,
+                  bucketName,
+                  markdownPath,
+                  report
+                );
+              } catch (storageError) {
+                // Log but don't fail test run if storage fails
+                console.warn("Test mode storage upload failed:", storageError);
+              }
+
+              // Save document reference in database
+              await supabase.from("report_documents").insert({
+                report_run_id: reportRunId,
+                document_type: "markdown",
+                storage_path: markdownPath,
+              });
+            }
+          } catch (err) {
+            console.warn("Test mode report run creation failed:", err);
+          }
+
           await writeReportAudit(userId, symbol, "test", "success");
           remainingCredits = 999; // Mock remaining
         } else {
@@ -444,10 +518,14 @@ ${JSON.stringify(companyData, null, 2)}
             // Consume credit atomically
             const consumeResult = await consumeReportCredit(userId);
             if (!consumeResult.success) {
-              return NextResponse.json(
+              const response = NextResponse.json(
                 { error: consumeResult.error || "Failed to consume credit" },
                 { status: 500 }
               );
+              responseCookies.forEach(({ name, value }) => {
+                response.headers.append("Set-Cookie", `${name}=${value}`);
+              });
+              return response;
             }
             remainingCredits = consumeResult.remainingCredits || 0;
 
@@ -490,10 +568,14 @@ ${JSON.stringify(companyData, null, 2)}
                 .delete()
                 .eq("id", reportRunId);
 
-              return NextResponse.json(
+              const response = NextResponse.json(
                 { error: `Storage upload failed: ${storageError instanceof Error ? storageError.message : "Unknown error"}` },
                 { status: 500 }
               );
+              responseCookies.forEach(({ name, value }) => {
+                response.headers.append("Set-Cookie", `${name}=${value}`);
+              });
+              return response;
             }
 
             // Save document reference in database
@@ -507,25 +589,43 @@ ${JSON.stringify(companyData, null, 2)}
           } catch (err) {
             await writeReportAudit(userId, symbol, "production", "failed");
             console.error("Supabase report error:", err);
-            return NextResponse.json(
+            const response = NextResponse.json(
               { error: `Report generation error: ${err instanceof Error ? err.message : "Unknown error"}` },
               { status: 500 }
             );
+            responseCookies.forEach(({ name, value }) => {
+              response.headers.append("Set-Cookie", `${name}=${value}`);
+            });
+            return response;
           }
         }
 
-        return NextResponse.json({
+        const response = NextResponse.json({
           symbol,
           report,
           companyData,
           remainingQuota: remainingCredits,
           reportRunId,
         });
+
+        // Apply collected cookies to response
+        responseCookies.forEach(({ name, value }) => {
+          response.headers.append("Set-Cookie", `${name}=${value}`);
+        });
+
+        return response;
     } catch (err) {
         console.error("Error generating report:", err);
-        return NextResponse.json(
+        const response = NextResponse.json(
             { error: `Failed to generate report: ${err instanceof Error ? err.message : 'Unknown error'}` },
             { status: 500 }
         );
+
+        // Apply collected cookies to error response
+        responseCookies.forEach(({ name, value }) => {
+          response.headers.append("Set-Cookie", `${name}=${value}`);
+        });
+
+        return response;
     }
 }

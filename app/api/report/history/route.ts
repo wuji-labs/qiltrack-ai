@@ -3,13 +3,19 @@ import { createServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
   try {
-    // Get Supabase server client
-    const supabase = createServerClient({
-      get: (name: string) => {
+    // Initialize response headers for cookie writeback
+    const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
+
+    // Get Supabase server client with cookie handling
+    const supabase = createServerClient(
+      (name: string) => {
         const cookieValue = request.cookies.get(name)?.value;
         return cookieValue ? { value: cookieValue } : undefined;
       },
-    });
+      (cookies) => {
+        responseCookies.push(...cookies);
+      }
+    );
 
     // Get user session
     const {
@@ -18,7 +24,11 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getSession();
 
     if (sessionError || !session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      const response = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      responseCookies.forEach(({ name, value }) => {
+        response.headers.append("Set-Cookie", `${name}=${value}`);
+      });
+      return response;
     }
 
     const userId = session.user.id;
@@ -39,13 +49,17 @@ export async function GET(request: NextRequest) {
 
     if (queryError) {
       console.error("Failed to fetch report history:", queryError);
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: "Failed to fetch report history" },
         { status: 500 }
       );
+      responseCookies.forEach(({ name, value }) => {
+        response.headers.append("Set-Cookie", `${name}=${value}`);
+      });
+      return response;
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       reports: reports || [],
       pagination: {
         page,
@@ -54,6 +68,12 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil((count || 0) / pageSize),
       },
     });
+
+    responseCookies.forEach(({ name, value }) => {
+      response.headers.append("Set-Cookie", `${name}=${value}`);
+    });
+
+    return response;
   } catch (err) {
     console.error("Report history error:", err);
     return NextResponse.json(
