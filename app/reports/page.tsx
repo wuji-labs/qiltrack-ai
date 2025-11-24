@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useLanguage } from "@/lib/i18n";
-import { reports, type ReportCard } from "./data";
+import { reports } from "./data";
 
 const categories = ["All", ...Array.from(new Set(reports.map((item) => item.theme)))];
 
@@ -25,8 +25,6 @@ export default function ReportsPage() {
 		const start = (pageIndex - 1) * pageSize;
 		return filteredReports.slice(start, start + pageSize);
 	}, [filteredReports, pageIndex]);
-
-	const featuredReport = reports[0];
 
 	const formatDate = (dateStr: string) =>
 		new Date(dateStr).toLocaleDateString(language === "en" ? "en-US" : "zh-CN", {

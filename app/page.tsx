@@ -192,32 +192,6 @@ export default function Home() {
 	const toneLabelList = useMemo(() => toneOptionsLabeled.map((option) => option.title).join(" / "), [toneOptionsLabeled]);
 	const personaSentence = t("persona.caption", { tones: toneLabelList });
 
-	const module2Items = useMemo(() => {
-		try {
-			return JSON.parse(t("landing.module2.items")) as { q: string; a: string }[];
-		} catch (err) {
-			console.warn("Failed to parse module2 items", err);
-			return [];
-		}
-	}, [t]);
-
-	const module3Items = useMemo(() => {
-		try {
-			return JSON.parse(t("landing.module3.items")) as { title: string; body: string }[];
-		} catch (err) {
-			console.warn("Failed to parse module3 items", err);
-			return [];
-		}
-	}, [t]);
-
-	const module4Items = useMemo(() => {
-		try {
-			return JSON.parse(t("landing.module4.items")) as string[];
-		} catch (err) {
-			console.warn("Failed to parse module4 items", err);
-			return [];
-		}
-	}, [t]);
 
 	const module6Items = useMemo(() => {
 		try {
@@ -286,9 +260,6 @@ export default function Home() {
 		handlePrimaryCta();
 	};
 
-	const quotaHintPrimary = isAuthenticated ? t("quota.banner.hint.refresh") : t("quota.banner.hint.register");
-	const quotaHintSecondary = t("quota.banner.description");
-
 	return (
 		<>
 			<main className={`min-h-screen ${mainBg}`} style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont" }}>
@@ -297,7 +268,6 @@ export default function Home() {
 						navItems={navLinks}
 						language={language as Language}
 						setLanguage={setLanguage}
-						remainingQuota={1}
 						planLabel={planLabel}
 						userEmail={user?.email}
 						userImage={user?.user_metadata?.avatar_url}

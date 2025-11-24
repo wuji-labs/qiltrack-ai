@@ -129,7 +129,7 @@ export function ReportGeneratorSection({
 			clearTimeout(timer);
 			setSearching(false);
 		};
-	}, [inputValue]);
+	}, [inputValue, suppressNextSearch]);
 
 	useEffect(() => {
 		if (typeof window === "undefined") return;

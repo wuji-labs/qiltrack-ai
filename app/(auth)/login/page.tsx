@@ -30,7 +30,6 @@ export default function LoginPage() {
 function LoginContent() {
 	const { t } = useLanguage();
 	const searchParams = useSearchParams();
-	const callbackUrl = searchParams.get("callbackUrl") ?? "/";
 	const requestError = searchParams.get("error");
 
 	const [pendingProvider, setPendingProvider] = useState<string | null>(null);
