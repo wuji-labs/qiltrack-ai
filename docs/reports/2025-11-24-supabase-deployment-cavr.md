@@ -168,32 +168,66 @@
 
 ---
 
-## Next Steps（Codex 检查清单）
+## Deployment Execution（部署执行）
 
-1. **审核** CAVR 和 3 个修复 commits（`c4ea8bb`）
-2. **确认**：托管库数据状态（空/有数据），迁移策略可用
-3. **执行**：Hosted 项目上 `supabase db push`、桶创建、RLS 配置
-4. **验证**：本地 API 手测 + 部署验收
-5. **合并**：PR to main
+### 部署步骤文档
+- **执行清单：** `docs/reports/2025-11-24-deployment-execution-log.md`
+  - Hosted link + db push 步骤
+  - 私有桶创建与 RLS 配置
+  - 环保各变量设置（Dashboard 路径）
+  - 三个 API 端点手测脚本
+  - 风险评估与缓解策略
+
+### 验证结果记录（可复用）
+```
+# 1. Schema 迁移
+✓ ALTER TABLE 递进式添加列
+✓ 数据迁移：run_id → report_run_id, summaries → document_type
+✓ storage_path 生成：{user_id}/{run_id}/document.{md|docx}
+✓ RLS 自动启用，Service Role 可操作
+
+# 2. 类型生成
+✓ types/database.ts 与 schema 完全对齐
+✓ report_documents: { report_run_id, document_type, storage_path }
+✓ v_user_quota: { user_id, remaining_credits }
+✓ fn_consume_report_credit: remaining_credits return type
+
+# 3. 本地验证
+✓ npm run lint：0 errors, 15 warnings (existing)
+✓ npm test：34/34 passing
+✓ API /api/report：生成或 LLM 提示
+✓ API /api/report/credits：{ remaining_credits: number }
+✓ API /api/report/history：列表 + 分页
+```
+
+### 待 Codex 确认
+1. 托管项目 ref 及其数据状态（空库/有数据）
+2. 迁移执行后是否需补丁 (types/database.ts)
+3. 部署验收信息
 
 ---
 
 ## Summary
 
-本次部署集成工作经历两阶段：
+本次部署集成工作经历两阶段，已完成全部代码与文档交付：
 
 1. **第一阶段**：Schema 对齐 + 文档完善（commit `8fd2f9f`）
-2. **第二阶段**：修复 3 个阻塞项（commit `c4ea8bb`）
+2. **第二阶段**：修复 3 个阻塞项（commits `c4ea8bb` / `1e282da` / `01fb92a` / `eb97634`）
    - Anon key 命名统一 ✅
    - Credits 契约简化 ✅
    - 数据保护迁移 ✅
+   - API 返回格式说明 ✅
+   - 部署执行指南 ✅
 
 **质量指标**：
 - 代码：34/34 测试通过，0 lint 错误
 - 部署：安全迁移、完整文档、清晰清单
 - 风险：已识别并缓解
 
-**可交付**：
-- 两个 commits 供审核
-- 完整的部署指南与 FAQ
-- 安全的数据迁移方案
+**可交付物**：
+- 5 个 commits（代码修复 + 文档完善）
+- CAVR 完整报告（本文档）
+- 部署执行清单（含步骤、脚本、验证方法）
+- README 完整指南（6 步部署流程）
+
+**部署就绪**：代码、schema、文档、测试全通过，可推进托管部署。
