@@ -22,10 +22,10 @@
 - 创建 Storage upload（best-effort，fail gracefully）
 - 调用 `writeReportAudit` 标记审计
 
-### 3. ✅ API 测试重写 (完整覆盖)
-- `__tests__/api/report.supabase.test.ts`: 4 核心场景
+### 3. ✅ API 测试全部通过
+- `__tests__/api/report.supabase.test.ts`: 4 核心场景全通过
   - ✅ 无 session 返回 401
-  - ⏭️ test bypass 成功生成报告 (skipped due to module loading timing)
+  - ✅ test bypass 成功生成报告
   - ✅ 缺失 symbol 返回 400
   - ✅ 超限返回 429
 
@@ -34,10 +34,9 @@
 
 ### 4. ✅ 测试修复完成
 - `lib/services/quota.test.ts` - 修复 mock 链式调用
-  - ✅ 9 tests passed (之前 1 failed)
-- `__tests__/api/report.supabase.test.ts` - 环境变量优化
-  - ⏭️ 1 test skipped (env loading timing - documented in code)
-  - ✅ 其他 3 tests passed
+  - ✅ 9 tests passed
+- `__tests__/api/report.supabase.test.ts` - 环境变量运行时读取
+  - ✅ 4 tests passed（全通过，无 skip）
 
 ### 5. ✅ Lint 通过
 - 0 errors（Stage 2 所有改动）
@@ -157,17 +156,6 @@ const mockChain = {
    - ✅ 读取请求 cookies
    - ✅ 写回响应 headers
    - ✅ Session 刷新支持
-
----
-
-## 已知限制
-
-### ✅ 已解决（2025-11-24 更新）
-
-之前的 test bypass 模块加载时序问题已解决：
-- ✅ `__tests__/api/report.supabase.test.ts` 现在完整通过所有 4 个测试
-- ✅ 环境变量从运行时读取而非模块加载时缓存
-- ✅ Test bypass 验证已集成到自动化测试中
 
 ---
 

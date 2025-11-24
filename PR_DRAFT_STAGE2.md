@@ -11,10 +11,10 @@ feat: Complete Stage 2 Supabase report workflow - tests and documentation
 Completes Stage 2 of Supabase integration for the report generation workflow. All tests passing with comprehensive documentation and verification guides.
 
 **Status:** ✅ Ready for review
-- ✅ 33 tests passed, 1 skipped (0 failures)
+- ✅ 34 tests passed, 0 skipped (0 failures)
 - ✅ 0 lint errors from Stage 2 changes
 - ✅ Full TypeScript type safety
-- ✅ Complete CAVR documentation with manual testing scenarios
+- ✅ Comprehensive documentation with Hosted Supabase as default deployment strategy
 
 ---
 
@@ -25,11 +25,10 @@ Completes Stage 2 of Supabase integration for the report generation workflow. Al
    - Changed mock implementation to use `.mockReturnThis()` for proper chaining
    - All 9 quota service tests now passing
 
-2. **`__tests__/api/report.supabase.test.ts`** - Fixed test environment
-   - Optimized environment variable handling
-   - 1 test marked as `it.skip()` due to Vitest module loading timing limitation
-   - Documented the limitation with clear comment and workaround
-   - Other 3 tests passing
+2. **`__tests__/api/report.supabase.test.ts`** - Environment variable runtime loading
+   - Env variables now read at runtime instead of module load time
+   - All 4 tests passing (0 skips, 100% pass rate)
+   - Full test bypass verification integrated
 
 3. **`lib/supabase/server.ts`** - No changes (verified correct from Stage 1)
 
@@ -40,29 +39,24 @@ Completes Stage 2 of Supabase integration for the report generation workflow. Al
 ### Documentation (New)
 
 #### 1. CAVR Guide (`docs/guides/supabase-report-stage2-cavr.md`)
-**700+ lines** of comprehensive testing and setup documentation:
-- **Environment Variables** - Complete configuration guide
-- **Local Supabase Setup** - Step-by-step with troubleshooting
-- **Test Results** - Current status: 33 passed, 1 skipped
-- **Manual Testing** - 4 detailed scenarios:
-  - Test Bypass Mode (no auth required)
-  - Authenticated Report Generation
-  - Storage & Downloads
-  - Error Cases
-- **Browser Dev Tools Checklist** - Network, Application, Console tabs
-- **Verification Checklist** - Code quality, API endpoints, Supabase, Security
+**700+ lines** with Hosted Supabase as primary strategy:
+- **Environment Setup** - Production, Hosted Dev (Recommended), and Local Dev (Optional)
+- **Hosted Supabase Setup** (Default) - For production and primary development
+- **Local Supabase Stack** (Alternative) - Advanced setup requiring Docker
+- **Test Results** - 34 passed, 0 skipped
+- **Manual Testing** - 4 comprehensive scenarios with step-by-step instructions
+- **Browser Dev Tools Checklist** - Network, Application, Console verification
+- **Verification Checklist** - Code quality, API, Supabase, Security checks
 - **Troubleshooting** - Common issues and solutions
+- **Deployment Guide** - Vercel, Railway, and other platforms
 
 #### 2. Final Report (`docs/reports/2025-11-24-stage2-final.md`)
 **Updated** with final results:
 - ✅ Implementation Complete status
-- Test results by file (6 files, 33+1 tests)
-- Technical architecture details
-- Code quality metrics
-- Integration verification
-- Known limitations with solutions
-- Performance characteristics
-- Regression testing results
+- Test results: 34 passed, 0 skipped (100% pass rate)
+- Complete technical architecture and metrics
+- Code quality verification
+- Integration validation
 
 ---
 
@@ -71,7 +65,7 @@ Completes Stage 2 of Supabase integration for the report generation workflow. Al
 ### Final Status
 ```
 Test Files: 6 passed (6)
-Tests:      33 passed | 1 skipped (34)
+Tests:      34 passed | 0 skipped (34)
 Lint:       0 errors (Stage 2 changes)
 ```
 
@@ -81,9 +75,9 @@ Lint:       0 errors (Stage 2 changes)
 |-----------|--------|-------|
 | `lib/supabase/server.test.ts` | ✅ 9/9 | Cookie handling, client creation |
 | `__tests__/api.test.ts` | ✅ 3/3 | Basic routing |
-| `lib/services/quota.test.ts` | ✅ 9/9 | **FIXED** - Mock chain calls |
+| `lib/services/quota.test.ts` | ✅ 9/9 | Mock chain calls (fixed) |
 | `__tests__/api/report.history.test.ts` | ✅ 7/7 | RLS filtering, pagination |
-| `__tests__/api/report.supabase.test.ts` | ✅ 3/4, ⏭️ 1 | **FIXED** - 1 skipped (documented) |
+| `__tests__/api/report.supabase.test.ts` | ✅ 4/4 | All passing (no skips) |
 | `__tests__/useProgress.test.tsx` | ✅ 2/2 | UI hooks |
 
 ### Lint Verification
@@ -129,7 +123,7 @@ npm run lint
 
 | Metric | Value | Status |
 |--------|-------|--------|
-| Test Coverage | 33 tests | ✅ Comprehensive |
+| Test Coverage | 34 tests | ✅ Comprehensive (0 skips) |
 | Type Safety | 100% | ✅ No `any` types |
 | Lint Errors | 0 | ✅ Clean |
 | Module Size | ~630 lines | ✅ Maintainable |
@@ -149,29 +143,6 @@ npm run lint
 | `app/api/report/history/route.ts` | Modified | No changes (verified correct) | ✅ |
 | `docs/guides/supabase-report-stage2-cavr.md` | New | 700+ line guide | ✅ |
 | `docs/reports/2025-11-24-stage2-final.md` | New | Final report | ✅ |
-
----
-
-## Known Limitations
-
-### 1. Module Loading Timing (Test Only)
-**Issue:** One test in `__tests__/api/report.supabase.test.ts` skipped
-
-**Root Cause:**
-- Route handler caches env variables at module load time
-- Vitest stubEnv executes after module load
-- Cannot modify `FINNHUB_API_KEY` / `HELICONE_API_KEY` in test
-
-**Impact:** Test only (code is verified through manual testing)
-
-**Mitigation:**
-- Documented in code comment
-- Manual testing scenario provided in CAVR
-- Can be verified with `npm run dev` + proper `.env.local`
-
-**Future Solution:**
-- Move env variable reading to runtime
-- Use conditional imports to avoid caching
 
 ---
 
@@ -204,7 +175,7 @@ npm run lint
 1. **Run Tests**
    ```bash
    npm test
-   # Expected: 33 passed, 1 skipped
+   # Expected: 34 passed, 0 skipped
    ```
 
 2. **Check Lint**
@@ -243,12 +214,13 @@ See CAVR document sections:
 ## Reviewers Checklist
 
 - [ ] Code changes reviewed
-- [ ] Tests verified (33 passed, 1 skip acceptable)
+- [ ] Tests verified (34 passed, 0 skipped)
 - [ ] Lint passed
-- [ ] Documentation reviewed
+- [ ] Documentation reviewed (CAVR + Final Report)
 - [ ] CAVR scenarios understood
 - [ ] No security concerns
 - [ ] Backwards compatibility confirmed
+- [ ] Deployment strategy understood (Hosted Supabase default)
 
 ---
 
@@ -287,8 +259,10 @@ For questions about this implementation, see:
 ---
 
 **Status:** ✅ Ready for Code Review
-**Created:** 2025-11-24
+**Updated:** 2025-11-24 14:50 UTC
 **Branch:** `feat/supabase-integration`
-**Commits:** 1 (14cfa36)
+**Tests:** 34 passed | 0 skipped (100% pass rate)
+**Deployment:** Hosted Supabase (default) + Local stack (optional)
+**Latest Commit:** a39a2ea
 
 🤖 Generated with Claude Code
