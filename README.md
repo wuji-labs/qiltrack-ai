@@ -150,10 +150,10 @@ npm run dev    # 启动开发服务器
 # 测试报告生成（需 LLM 配置）
 curl "http://localhost:3000/api/report?symbol=AAPL&testToken=test-token-12345"
 
-# 查询额度（需登录 Session）
+# 查询额度（需登录 Session，返回 { userId, credits: { remaining_credits: number } }）
 curl -H "Cookie: ..." "http://localhost:3000/api/report/credits"
 
-# 查询历史报告
+# 查询历史报告（返回报告列表与分页信息）
 curl -H "Cookie: ..." "http://localhost:3000/api/report/history"
 
 # 验证 401（未授权） / 429（额度耗尽） / 200（成功）
