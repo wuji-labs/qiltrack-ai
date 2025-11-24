@@ -309,7 +309,7 @@ export default function Home() {
 					<div className="flex flex-col flex-1">
 						<div className="flex-1 flex justify-center py-10 sm:py-12">
 							<div className="w-full max-w-6xl px-4 sm:px-6 lg:px-10 space-y-6 md:space-y-10">
-								<section className={`rounded-[32px] border p-4 sm:p-5 md:p-6 space-y-6 md:space-y-8 bg-[var(--bg-layer)]/70 border-[var(--stroke-soft)] shadow-[0_18px_60px_rgba(0,0,0,0.28)]`}>
+								<section id="generator" className={`rounded-[32px] border p-4 sm:p-5 md:p-6 space-y-6 md:space-y-8 bg-[var(--bg-layer)]/70 border-[var(--stroke-soft)] shadow-[0_18px_60px_rgba(0,0,0,0.28)] scroll-mt-32`}>
 									<ModesSection
 										heading={t("generator.sectionTitle")}
 										options={toneOptionsLabeled}
@@ -336,7 +336,7 @@ export default function Home() {
 									/>
 								</section>
 
-								<section id="workflow" className={`relative overflow-hidden rounded-3xl border p-5 sm:p-7 space-y-6 transition-all duration-200 ease-out ${cardSecondary}`}>
+								<section id="overview" className={`relative overflow-hidden rounded-3xl border p-5 sm:p-7 space-y-6 transition-all duration-200 ease-out scroll-mt-32 ${cardSecondary}`}>
 									<div className="pointer-events-none absolute inset-0 opacity-80">
 										<div className="absolute -left-16 top-10 h-44 w-44 rounded-full bg-emerald-400/15 blur-[120px]" aria-hidden />
 										<div className="absolute right-0 bottom-0 h-56 w-56 rounded-full bg-cyan-500/10 blur-[120px]" aria-hidden />
@@ -439,7 +439,7 @@ export default function Home() {
 									</div>
 								</section>
 
-								<section id="pricing" className={`rounded-3xl border p-5 sm:p-7 space-y-6 transition-all duration-200 ease-out ${cardSecondary}`}>
+								<section id="pricing" className={`rounded-3xl border p-5 sm:p-7 space-y-6 transition-all duration-200 ease-out scroll-mt-32 ${cardSecondary}`}>
 									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 										<div className="space-y-1.5">
 											<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">Pricing</p>
@@ -560,7 +560,7 @@ export default function Home() {
 									}}
 								/>
 
-								<section id="faq" className={`rounded-3xl border p-5 sm:p-7 space-y-5 transition-all duration-200 ease-out ${cardSecondary}`}>
+								<section id="faq" className={`rounded-3xl border p-5 sm:p-7 space-y-5 transition-all duration-200 ease-out scroll-mt-32 ${cardSecondary}`}>
 									<div className="space-y-2">
 										<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">FAQ</p>
 										<h2 className="text-2xl sm:text-3xl font-semibold">{t("faq.title")}</h2>
