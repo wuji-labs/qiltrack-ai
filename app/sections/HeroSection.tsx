@@ -234,34 +234,34 @@ export function HeroSection({
 					<div className="pointer-events-none absolute inset-0 hero-mesh" aria-hidden />
 					<div className="relative space-y-7 text-center">
 					{tagline ? (
-						<div className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)]/90 bg-[var(--bg-layer)]/90 px-4 py-2 text-sm uppercase tracking-[0.24em] text-[var(--accent-emerald)]">
+						<div className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)]/90 bg-[var(--bg-layer)]/90 px-4 py-2 text-sm uppercase tracking-[0.24em] text-[var(--accent-emerald)] motion-safe:animate-fadeInUp" style={{ animationDelay: '0.08s' }}>
 							<span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-emerald)]" />
 							<span>{tagline}</span>
 						</div>
 					) : null}
 
 						<div className="space-y-4 text-center">
-							<h1 className="text-[2.5rem] sm:text-[3rem] leading-[1.05] font-semibold text-emerald-200">
+							<h1 className="text-[2.5rem] sm:text-[3rem] leading-[1.05] font-semibold text-emerald-200 motion-safe:animate-fadeInUp" style={{ animationDelay: '0.16s' }}>
 								{t("hero.title")}
 							</h1>
-							<p className="mx-auto max-w-3xl text-lg sm:text-xl text-dim leading-relaxed">
+							<p className="mx-auto max-w-3xl text-lg sm:text-xl text-dim leading-relaxed motion-safe:animate-fadeInUp" style={{ animationDelay: '0.24s' }}>
 								{t("hero.description")}
 							</p>
 							{t("hero.positioning") ? (
-								<p className="text-base uppercase tracking-[0.24em] text-emerald-200/70">{t("hero.positioning")}</p>
+								<p className="text-base uppercase tracking-[0.24em] text-emerald-200/70 motion-safe:animate-fadeInUp" style={{ animationDelay: '0.32s' }}>{t("hero.positioning")}</p>
 							) : null}
-							<p className="text-lg font-medium text-[var(--accent-emerald)]">{t("hero.brandline")}</p>
+							<p className="text-lg font-medium text-[var(--accent-emerald)] motion-safe:animate-fadeInUp" style={{ animationDelay: '0.4s' }}>{t("hero.brandline")}</p>
 						</div>
 
 						<div className="flex flex-wrap items-center justify-center gap-3 mt-6">
 							<button
 								type="button"
 								onClick={onPrimaryCta}
-								className="rounded-full border border-[var(--accent-emerald)]/70 bg-[var(--accent-emerald)]/12 px-6 py-2 text-base font-semibold text-[var(--accent-emerald)] shadow-[0_10px_24px_rgba(91,224,176,0.18)] transition-all duration-200 ease-out hover:bg-[var(--accent-emerald)]/20 hover:-translate-y-1 hover:shadow-[0_14px_32px_rgba(91,224,176,0.28)] active:translate-y-0.5"
+								className="rounded-full border border-[var(--accent-emerald)]/70 bg-[var(--accent-emerald)]/12 px-6 py-2 text-base font-semibold text-[var(--accent-emerald)] shadow-[0_10px_24px_rgba(91,224,176,0.18)] transition-all duration-200 ease-out hover:bg-[var(--accent-emerald)]/20 hover:-translate-y-1 hover:shadow-[0_14px_32px_rgba(91,224,176,0.28)] active:translate-y-0.5 motion-safe:animate-fadeInUp" style={{ animationDelay: '0.48s' }}
 							>
 								{t("hero.cta.primary")}
 							</button>
-							<a href="#generator" className="btn-ghost px-5 py-2 text-base transition-all duration-200 ease-out hover:-translate-y-0.5">
+							<a href="#generator" className="btn-ghost px-5 py-2 text-base transition-all duration-200 ease-out hover:-translate-y-0.5 motion-safe:animate-fadeInUp" style={{ animationDelay: '0.56s' }}>
 								<span>{t("hero.cta.secondary")}</span>
 								<span className="text-xs text-subtle">↗</span>
 							</a>
