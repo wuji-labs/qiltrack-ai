@@ -1,7 +1,7 @@
 # 多组并行开发与合并策略 Snapshot（Codex–Claude，2025-11-24）
 ## 背景 / 问题
 - 两组并行（每组含架构师 Codex + 实现 Claude），希望同一分支内协同，又需降低互踩与合并成本。
-- Git worktree 对同一分支无法多实例；多目录协作会产生同步负担，需要“一组一分支一工作树”的准则与合并守则。
+- Git worktree 同一分支只能挂载一次，多目录协作会产生同步负担，需要“一组一分支一工作树”的准则与合并守则。
 
 ## 目标
 1) 保持主干可发布：主干受保护，所有改动经 PR + CI。
@@ -14,18 +14,22 @@
 
 ## 分支与工作树策略
 - 命名：`g<n>/<topic>`（例：`g1/report-ai`、`g2/report-ai`）。
-- 工作树：每组一个 worktree 绑定该分支（同一分支不得多 worktree）。示例：
+- 工作树：每组一个 worktree 绑定该分支（同一分支不得挂两份 worktree）。示例：
   ```
   git worktree add ../investor-ai-g1 -b g1/report-ai origin/main
   git worktree add ../investor-ai-g2 -b g2/report-ai origin/main
   ```
-- 使用：组内多人共享同一目录，可开多终端/多 VS Code 窗口；禁在同一分支上再新增第二个 worktree。
+- 使用：组内多人共享同一目录，可开多终端/多 VS Code 窗口；不要为同一分支再新增第二个 worktree。
 
 ## 协作与同步流
 1) 启动：Codex 发布 Snapshot；Claude 产出 Implementation Checklist。
 2) 日常同步：每日在组内分支执行 `git fetch origin` + `git rebase origin/main`；冲突及时解决并更新 mock/类型。
 3) 契约先行：公共类型与接口先落 `types/` + `lib/services/api` + mock，前后端据此并行。
 4) 提交：小步提交，保持 clean working tree。
+5) 分支可见性与通知：
+   - 本地新建分支后立即 `git push -u origin <branch>`，并在沟通渠道提示或开 draft PR，架构师/程序员即可看到。
+   - 对方获取：`git fetch --all`，用 `git branch -r` 或在 PR 页面查看；VS Code 原有的“自动同步”依赖远端分支或 PR。
+   - 同一分支只挂一个 worktree；新分支从各自 worktree 切出即可。
 
 ## 合并策略
 - 主干保护：开启 required checks（lint/test/build）+ PR 审核。
@@ -48,5 +52,6 @@
 - [ ] 为每组创建分支 + worktree：`git worktree add ../investor-ai-g{n} -b g{n}/<topic> origin/main`
 - [ ] 每日 rebase main，保持分支新鲜
 - [ ] 提前落公共契约与 mock，再动 UI/逻辑
-- [ ] 提 PR 前：`git status` 干净 → `npm run lint` → `npm run test` → 更新文档 → 填 PR 模板
+- [ ] PR 前：`git status` 干净 → `npm run lint` → `npm run test` → 更新文档 → 填 PR 模板
+- [ ] 新分支立即 push + draft PR 通知组内
 - [ ] 合并顺序：先 ready 先合，另一组即刻 rebase 跟进
