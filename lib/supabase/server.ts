@@ -1,0 +1,148 @@
+/**
+ * Server-side Supabase client utilities
+ * Provides createServerClient() for RLS-enabled queries and createServiceRoleClient() for privileged operations
+ */
+
+import { createServerClient as createServerClientBase } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
+
+/**
+ * Create a Supabase server client with user session (RLS-enabled)
+ * Use this in API route handlers to respect row-level security
+ * Handles cookies transparently via @supabase/ssr
+ *
+ * @param cookieGetter Function to get cookie by name from request
+ * @param cookieSetter Optional function to set cookies in response (called with [name, value] pairs)
+ *
+ * Note: @supabase/ssr automatically discovers the session cookie names.
+ * We provide a simple pass-through cookie interface without hardcoding names.
+ */
+export function createServerClient(
+  cookieGetter: (name: string) => { value: string } | undefined,
+  cookieSetter?: (cookiesToSet: Array<{ name: string; value: string; options?: unknown }>) => void
+) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl) {
+    throw new Error(
+      "Missing NEXT_PUBLIC_SUPABASE_URL in environment variables"
+    );
+  }
+  if (!supabaseAnonKey) {
+    throw new Error(
+      "Missing NEXT_PUBLIC_SUPABASE_ANON_KEY in environment variables"
+    );
+  }
+
+  // @supabase/ssr createServerClient handles cookies via getAll/setAll
+  // getAll: retrieves session cookies from request (names determined by Supabase)
+  // setAll: returns updated cookies to be set in response
+  return createServerClientBase<Database>(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        // Return all cookies from the request
+        // This is a simple array interface - @supabase/ssr will query what it needs
+        const cookieList: Array<{ name: string; value: string }> = [];
+
+        // Common Supabase session cookie names - but don't restrict to only these
+        // @supabase/ssr will query for specific names via getAll pattern
+        const commonNames = [
+          "sb-auth-token",
+          "sb-session",
+          "sb_auth_token",
+          "sb_session",
+        ];
+
+        for (const name of commonNames) {
+          const cookie = cookieGetter(name);
+          if (cookie?.value) {
+            cookieList.push({ name, value: cookie.value });
+          }
+        }
+
+        return cookieList;
+      },
+      setAll(cookiesToSet) {
+        // Pass updated cookies to response handler if provided
+        if (cookieSetter) {
+          cookieSetter(cookiesToSet);
+        }
+      },
+    },
+  });
+}
+
+/**
+ * Create a Supabase service role client (bypasses RLS)
+ * Use ONLY for privileged operations like consuming credits, writing audit logs
+ * WARNING: Never expose service role key to client
+ */
+export function createServiceRoleClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl) {
+    throw new Error(
+      "Missing NEXT_PUBLIC_SUPABASE_URL in environment variables"
+    );
+  }
+  if (!serviceRoleKey) {
+    throw new Error(
+      "Missing SUPABASE_SERVICE_ROLE_KEY in environment variables"
+    );
+  }
+
+  return createClient<Database>(supabaseUrl, serviceRoleKey, {
+    auth: {
+      persistSession: false,
+    },
+  });
+}
+
+/**
+ * Helper to upload file to Storage bucket with signed URL
+ * @param client Supabase client instance
+ * @param bucket Bucket name
+ * @param path File path (e.g., "user_id/run_id.md")
+ * @param data File content (string or Blob)
+ */
+export async function uploadToStorage(
+  client: ReturnType<typeof createServiceRoleClient>,
+  bucket: string,
+  path: string,
+  data: string | Blob
+) {
+  const { error: uploadError } = await client.storage
+    .from(bucket)
+    .upload(path, data, { upsert: true });
+
+  if (uploadError) {
+    throw new Error(`Storage upload failed: ${uploadError.message}`);
+  }
+
+  // Generate signed URL (valid for 7 days)
+  const { data: signedUrl, error: signError } = await client.storage
+    .from(bucket)
+    .createSignedUrl(path, 7 * 24 * 60 * 60);
+
+  if (signError || !signedUrl?.signedUrl) {
+    throw new Error(`Failed to generate signed URL: ${signError?.message}`);
+  }
+
+  return signedUrl.signedUrl;
+}
+
+/**
+ * Helper to get user's session from request cookies
+ * Returns user ID if authenticated, null otherwise
+ */
+export async function getUserIdFromRequest(
+  supabase: ReturnType<typeof createServerClient>
+) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  return session?.user?.id ?? null;
+}

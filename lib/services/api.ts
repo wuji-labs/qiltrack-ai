@@ -12,6 +12,28 @@ type QuoteResponse = {
 	quote: Record<string, unknown>;
 };
 
+type HistoryResponse = {
+	reports: Array<{
+		id: string;
+		symbol: string;
+		created_at: string;
+		status: string;
+	}>;
+	pagination: {
+		page: number;
+		pageSize: number;
+		total: number;
+		pages: number;
+	};
+};
+
+type CreditsResponse = {
+	userId: string;
+	credits: {
+		remaining_credits: number;
+	};
+};
+
 async function handleJson<T>(res: Response, defaultMessage: string): Promise<T> {
 	let body: unknown = null;
 	try {
@@ -68,4 +90,26 @@ export async function generateReport(params: FetchReportParams): Promise<ReportR
 export async function fetchQuote(symbol: string): Promise<QuoteResponse> {
 	const res = await fetch(`/api/quote?symbol=${encodeURIComponent(symbol)}`);
 	return handleJson<QuoteResponse>(res, "Failed to fetch quote");
+}
+
+/**
+ * Fetch report history for authenticated user
+ * @param page Page number (1-indexed)
+ * @param limit Items per page (max 50)
+ */
+export async function fetchReportHistory(
+	page: number = 1,
+	limit: number = 10
+): Promise<HistoryResponse> {
+	const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+	const res = await fetch(`/api/report/history?${params.toString()}`);
+	return handleJson<HistoryResponse>(res, "Failed to fetch report history");
+}
+
+/**
+ * Fetch current user's credit information
+ */
+export async function fetchCredits(): Promise<CreditsResponse> {
+	const res = await fetch("/api/report/credits");
+	return handleJson<CreditsResponse>(res, "Failed to fetch credits");
 }

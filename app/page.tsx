@@ -9,7 +9,7 @@ import { ModesSection } from "@/app/sections/ModesSection";
 import { ReportGeneratorSection } from "@/app/sections/ReportGeneratorSection";
 import { WhySection } from "@/app/sections/WhySection";
 import { FooterSection } from "@/app/sections/FooterSection";
-import { useAuth } from "@/hooks/useAuth";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useLanguage } from "@/lib/i18n";
 import { type Language } from "@/lib/i18n-config";
 import type { ReportTone } from "@/types/report";
@@ -169,7 +169,7 @@ const highlightFallbackKeys: TranslationKey[] = ["highlight.default.1", "highlig
 
 export default function Home() {
 	const { language, setLanguage, t } = useLanguage();
-	const auth = useAuth();
+	const { isAuthenticated, user, signOut, refreshSession } = useSupabaseAuth();
 	const router = useRouter();
 	const [selectedTone, setSelectedTone] = useState<ReportTone>("baseline");
 
@@ -261,10 +261,10 @@ export default function Home() {
 	const faqList = faqItems.map((item) => ({ question: t(item.question), answer: t(item.answer) }));
 	const highlightFallback = highlightFallbackKeys.map((key) => t(key));
 
-	const planLabel = auth.plan && auth.plan !== "free" ? auth.plan : t("quota.plan.free");
+	const planLabel = user?.user_metadata?.plan && user?.user_metadata?.plan !== "free" ? user?.user_metadata?.plan : t("quota.plan.free");
 
 	const handlePrimaryCta = () => {
-		if (!auth.isAuthenticated) {
+		if (!isAuthenticated) {
 			router.push("/login");
 			return;
 		}
@@ -286,7 +286,7 @@ export default function Home() {
 		handlePrimaryCta();
 	};
 
-	const quotaHintPrimary = auth.isAuthenticated ? t("quota.banner.hint.refresh") : t("quota.banner.hint.register");
+	const quotaHintPrimary = isAuthenticated ? t("quota.banner.hint.refresh") : t("quota.banner.hint.register");
 	const quotaHintSecondary = t("quota.banner.description");
 
 	return (
@@ -297,13 +297,13 @@ export default function Home() {
 						navItems={navLinks}
 						language={language as Language}
 						setLanguage={setLanguage}
-						remainingQuota={auth.remainingQuota}
+						remainingQuota={1}
 						planLabel={planLabel}
-						userEmail={auth.userEmail}
-						userImage={auth.userImage}
-						isAuthenticated={auth.isAuthenticated}
+						userEmail={user?.email}
+						userImage={user?.user_metadata?.avatar_url}
+						isAuthenticated={isAuthenticated}
 						onPrimaryCta={handlePrimaryCta}
-						onSignOut={() => auth.signOut()}
+						onSignOut={() => signOut()}
 						t={t}
 					/>
 					<div className="flex flex-col flex-1">
@@ -325,11 +325,11 @@ export default function Home() {
 										highlightFallback={highlightFallback}
 										heroHighlights={heroHighlightList}
 										auth={{
-											isAuthenticated: auth.isAuthenticated,
-											remainingQuota: auth.remainingQuota,
+											isAuthenticated: isAuthenticated,
+											remainingQuota: 1,
 											planLabel,
-											userEmail: auth.userEmail,
-											refreshSession: auth.refreshSession,
+											userEmail: user?.email,
+											refreshSession: refreshSession,
 										}}
 										onRequireLogin={() => router.push("/login")}
 										t={t}

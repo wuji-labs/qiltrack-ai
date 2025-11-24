@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { prisma } from "@/lib/prisma";
-
+import { createServerClient, createServiceRoleClient, uploadToStorage } from "@/lib/supabase/server";
+import { consumeReportCredit, writeReportAudit } from "@/lib/services/quota";
 import { DEFAULT_LANGUAGE, type Language } from "@/lib/i18n-config";
 
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
 
-const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "openai/gpt-5.1";
-const HELICONE_API_KEY = process.env.HELICONE_API_KEY;
-const HELICONE_MODEL = process.env.HELICONE_MODEL || "gpt-4o-mini";
+// Note: These are read at runtime to allow test env override
+const getEnvVars = () => ({
+  FINNHUB_API_KEY: process.env.FINNHUB_API_KEY,
+  OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+  OPENROUTER_MODEL: process.env.OPENROUTER_MODEL || "openai/gpt-5.1",
+  HELICONE_API_KEY: process.env.HELICONE_API_KEY,
+  HELICONE_MODEL: process.env.HELICONE_MODEL || "gpt-4o-mini",
+});
 
 const toneDirectives = {
     baseline: "以 Investor AI 标准流程输出，保持证据优先与结构化描述，不加入夸张语气。",
@@ -47,17 +47,6 @@ const LANGUAGE_CONFIG: Record<Language, {
     },
 };
 
-const PARAGRAPH_REMOVAL_KEYWORDS = [
-    "买入",
-    "卖出",
-    "建仓",
-    "加仓",
-    "减仓",
-    "清仓",
-    "仓位",
-    "调仓",
-];
-
 const WORD_REPLACEMENTS: Array<{ pattern: RegExp; replacement: string }> = [
     { pattern: /买入/gi, replacement: "分析视角" },
     { pattern: /卖出/gi, replacement: "分析视角" },
@@ -72,6 +61,7 @@ const WORD_REPLACEMENTS: Array<{ pattern: RegExp; replacement: string }> = [
     { pattern: /必买/gi, replacement: "主流观点讨论" },
     { pattern: /调仓/gi, replacement: "风险敞口调整讨论" },
 ];
+
 
 function normalizeLanguage(value: string | null): Language {
     const key = (value || "").trim().toLowerCase();
@@ -91,17 +81,6 @@ function sanitizeReportContent(content: string, language: Language) {
     }
 
     return `${langConfig.disclaimer}\n\n${sanitized}`.trim();
-}
-
-if (!FINNHUB_API_KEY) {
-    console.warn("⚠️ FINNHUB_API_KEY 未配置，请检查 .env.local");
-}
-if (!OPENROUTER_API_KEY && !HELICONE_API_KEY) {
-    console.warn("⚠️ 未配置可用的 LLM 提供方（Helicone 或 OpenRouter），报告生成功能将不可用");
-} else if (!OPENROUTER_API_KEY) {
-    console.warn("⚠️ OPENROUTER_API_KEY 未配置，Helicone 将作为唯一模型通道");
-} else if (!HELICONE_API_KEY) {
-    console.warn("ℹ️ HELICONE_API_KEY 未配置，全部请求将回退到 OpenRouter");
 }
 
 async function fetchJson(url: string) {
@@ -126,34 +105,69 @@ function formatDate(date: Date): string {
 }
 
 export async function GET(request: NextRequest) {
-    // 本地调试默认 token（如需关闭请在环境变量里显式设置 TEST_REPORT_TOKEN）
+    // Read env vars at runtime to allow test override
+    const env = getEnvVars();
+
+    // Check for test bypass
     const testToken = process.env.TEST_REPORT_TOKEN || "local-test-token";
     const tokenFromHeader = request.headers.get("x-test-token");
     const tokenFromQuery = new URL(request.url).searchParams.get("testToken");
     const isTestBypass = Boolean(testToken && (tokenFromHeader === testToken || tokenFromQuery === testToken));
 
-    const session = isTestBypass ? null : await getServerSession(authOptions);
-    let dbUser: { id: string; reportsUsed: number; quota: number } | null = null;
+    // Collect response cookies from Supabase
+    const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
+
+    // Get Supabase server client with cookie handling
+    const supabase = createServerClient(
+      (name: string) => {
+        const cookieValue = request.cookies.get(name)?.value;
+        return cookieValue ? { value: cookieValue } : undefined;
+      },
+      (cookies) => {
+        responseCookies.push(...cookies);
+      }
+    );
+
+    let userId: string | null = null;
 
     if (!isTestBypass) {
-        if (!session || !session.user?.id) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+      // Get session from Supabase auth
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
 
-        dbUser = await prisma.user.findUnique({
-            where: { id: session.user.id },
-            select: { id: true, reportsUsed: true, quota: true },
+      if (sessionError || !session?.user?.id) {
+        const response = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        responseCookies.forEach(({ name, value }) => {
+          response.headers.append("Set-Cookie", `${name}=${value}`);
         });
+        return response;
+      }
 
-        if (!dbUser) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+      userId = session.user.id;
 
-        if (dbUser.reportsUsed >= dbUser.quota) {
-            return NextResponse.json({ error: "Quota exceeded" }, { status: 429 });
-        }
+      // Check quota before attempting to generate
+      const { data: quotaData, error: quotaError } = await supabase
+        .from("v_user_quota")
+        .select("remaining_credits")
+        .eq("user_id", userId)
+        .single();
+
+      if (quotaError || !quotaData || quotaData.remaining_credits <= 0) {
+        const response = NextResponse.json(
+          { error: "Quota exceeded" },
+          { status: 429 }
+        );
+        responseCookies.forEach(({ name, value }) => {
+          response.headers.append("Set-Cookie", `${name}=${value}`);
+        });
+        return response;
+      }
     } else {
-        dbUser = { id: "test-bypass", reportsUsed: 0, quota: 99 };
+      // Generate a test user ID (valid UUID format for test mode)
+      // Using a deterministic UUID for test mode so audit logs can be traced
+      userId = "00000000-0000-0000-0000-000000000001";
     }
 
     const { searchParams } = new URL(request.url);
@@ -166,15 +180,19 @@ export async function GET(request: NextRequest) {
         toneDirectives[toneKeyRaw as keyof typeof toneDirectives] || toneDirectives.baseline;
 
     if (!symbol) {
-        return NextResponse.json(
+        const response = NextResponse.json(
             { error: "Missing symbol param" },
             { status: 400 }
         );
+        responseCookies.forEach(({ name, value }) => {
+          response.headers.append("Set-Cookie", `${name}=${value}`);
+        });
+        return response;
     }
 
-    const missingLlmProvider = !OPENROUTER_API_KEY && !HELICONE_API_KEY;
-    if (!FINNHUB_API_KEY || missingLlmProvider) {
-        return NextResponse.json(
+    const missingLlmProvider = !env.OPENROUTER_API_KEY && !env.HELICONE_API_KEY;
+    if (!env.FINNHUB_API_KEY || missingLlmProvider) {
+        const response = NextResponse.json(
             {
                 error: missingLlmProvider
                     ? "No LLM provider configured"
@@ -182,6 +200,10 @@ export async function GET(request: NextRequest) {
             },
             { status: 500 }
         );
+        responseCookies.forEach(({ name, value }) => {
+          response.headers.append("Set-Cookie", `${name}=${value}`);
+        });
+        return response;
     }
 
     try {
@@ -198,20 +220,20 @@ export async function GET(request: NextRequest) {
         // 1. 拉基础数据（使用 Finnhub 免费或基础数据接口）
         const profileUrl = `${FINNHUB_BASE}/stock/profile2?symbol=${encodeURIComponent(
             symbol
-        )}&token=${FINNHUB_API_KEY}`;
+        )}&token=${env.FINNHUB_API_KEY}`;
 
         const quoteUrl = `${FINNHUB_BASE}/quote?symbol=${encodeURIComponent(
             symbol
-        )}&token=${FINNHUB_API_KEY}`;
+        )}&token=${env.FINNHUB_API_KEY}`;
 
         const metricsUrl = `${FINNHUB_BASE}/stock/metric?symbol=${encodeURIComponent(
             symbol
-        )}&metric=all&token=${FINNHUB_API_KEY}`;
+        )}&metric=all&token=${env.FINNHUB_API_KEY}`;
 
         // 新增：Finnhub /company-news 接口 (免费层级通常支持近期)
         const newsUrl = `${FINNHUB_BASE}/company-news?symbol=${encodeURIComponent(
             symbol
-        )}&from=${fromDate}&to=${toDate}&token=${FINNHUB_API_KEY}`;
+        )}&from=${fromDate}&to=${toDate}&token=${env.FINNHUB_API_KEY}`;
 
 
         const [profile, quote, metricsRaw, recentNews] = await Promise.all([
@@ -349,7 +371,7 @@ ${JSON.stringify(companyData, null, 2)}
 
         // 3. 调用 Helicone (fallback to OpenRouter if needed)
         const heliPayload = {
-            model: HELICONE_MODEL,
+            model: env.HELICONE_MODEL,
             messages: [
                 { role: "system", content: sysPrompt },
                 { role: "user", content: userPrompt },
@@ -359,14 +381,14 @@ ${JSON.stringify(companyData, null, 2)}
         };
 
         async function callHelicone() {
-            if (!HELICONE_API_KEY) return null;
+            if (!env.HELICONE_API_KEY) return null;
             const res = await fetch(
                 "https://ai-gateway.helicone.ai/v1/chat/completions",
                 {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${HELICONE_API_KEY}`,
+                        Authorization: `Bearer ${env.HELICONE_API_KEY}`,
                     },
                     body: JSON.stringify(heliPayload),
                 }
@@ -380,20 +402,20 @@ ${JSON.stringify(companyData, null, 2)}
         }
 
         async function callOpenRouter() {
-            if (!OPENROUTER_API_KEY) return null;
+            if (!env.OPENROUTER_API_KEY) return null;
             const res = await fetch(
                 "https://openrouter.ai/api/v1/chat/completions",
                 {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+                        Authorization: `Bearer ${env.OPENROUTER_API_KEY}`,
                         "HTTP-Referer":
                             process.env.OPENROUTER_SITE_URL || "http://localhost:3000",
                         "X-Title": process.env.OPENROUTER_APP_NAME || "investor-ai",
                     },
                     body: JSON.stringify({
-                        model: OPENROUTER_MODEL,
+                        model: env.OPENROUTER_MODEL,
                         messages: [
                             { role: "system", content: sysPrompt },
                             { role: "user", content: userPrompt },
@@ -418,10 +440,14 @@ ${JSON.stringify(companyData, null, 2)}
             null;
 
         if (!data) {
-            return NextResponse.json(
+            const response = NextResponse.json(
                 { error: "Failed to generate report via Helicone/OpenRouter" },
                 { status: 500 }
             );
+            responseCookies.forEach(({ name, value }) => {
+              response.headers.append("Set-Cookie", `${name}=${value}`);
+            });
+            return response;
         }
 
         const rawReport =
@@ -430,27 +456,171 @@ ${JSON.stringify(companyData, null, 2)}
 
         const report = sanitizeReportContent(rawReport, language);
 
-        if (!isTestBypass) {
-            await prisma.user.update({
-                where: { id: dbUser.id },
-                data: { reportsUsed: { increment: 1 } },
+        // Consume quota and write to Supabase
+        let remainingCredits = 0;
+        let reportRunId: string | null = null;
+
+        if (isTestBypass) {
+          // Test mode: write audit log and create report run (but use test marker)
+          // Try to create report run in test mode
+          try {
+            const { data: runData, error: runError } = await supabase
+              .from("report_runs")
+              .insert({
+                user_id: userId, // Use actual test-bypass ID, but mark mode='test'
+                symbol,
+                status: "completed",
+                mode: "test",
+              })
+              .select("id")
+              .single();
+
+            if (!runError && runData) {
+              reportRunId = runData.id;
+
+              // Upload Markdown to Storage in test mode
+              const bucketName = process.env.SUPABASE_STORAGE_REPORT_BUCKET || "report-assets";
+              const markdownPath = `${userId}/${reportRunId}.md`;
+
+              try {
+                const serviceRoleClient = createServiceRoleClient();
+                await uploadToStorage(
+                  serviceRoleClient,
+                  bucketName,
+                  markdownPath,
+                  report
+                );
+              } catch (storageError) {
+                // Log but don't fail test run if storage fails
+                console.warn("Test mode storage upload failed:", storageError);
+              }
+
+              // Save document reference in database
+              await supabase.from("report_documents").insert({
+                report_run_id: reportRunId,
+                document_type: "markdown",
+                storage_path: markdownPath,
+              });
+            }
+          } catch (err) {
+            console.warn("Test mode report run creation failed:", err);
+          }
+
+          await writeReportAudit(userId, symbol, "test", "success");
+          remainingCredits = 999; // Mock remaining
+        } else {
+          try {
+            // Consume credit atomically
+            const consumeResult = await consumeReportCredit(userId);
+            if (!consumeResult.success) {
+              const response = NextResponse.json(
+                { error: consumeResult.error || "Failed to consume credit" },
+                { status: 500 }
+              );
+              responseCookies.forEach(({ name, value }) => {
+                response.headers.append("Set-Cookie", `${name}=${value}`);
+              });
+              return response;
+            }
+            remainingCredits = consumeResult.remainingCredits || 0;
+
+            // Record report run
+            const { data: runData, error: runError } = await supabase
+              .from("report_runs")
+              .insert({
+                user_id: userId,
+                symbol,
+                status: "completed",
+                mode: "production",
+              })
+              .select("id")
+              .single();
+
+            if (runError || !runData) {
+              throw new Error(`Failed to create report run: ${runError?.message}`);
+            }
+
+            reportRunId = runData.id;
+
+            // Upload Markdown to Storage
+            const bucketName = process.env.SUPABASE_STORAGE_REPORT_BUCKET || "report-assets";
+            const markdownPath = `${userId}/${reportRunId}.md`;
+
+            try {
+              const serviceRoleClient = createServiceRoleClient();
+              await uploadToStorage(
+                serviceRoleClient,
+                bucketName,
+                markdownPath,
+                report
+              );
+              // Note: DOCX generation would happen here in production
+              // For MVP, we only store Markdown
+            } catch (storageError) {
+              // Rollback: delete the report run to avoid incorrect state
+              await supabase
+                .from("report_runs")
+                .delete()
+                .eq("id", reportRunId);
+
+              const response = NextResponse.json(
+                { error: `Storage upload failed: ${storageError instanceof Error ? storageError.message : "Unknown error"}` },
+                { status: 500 }
+              );
+              responseCookies.forEach(({ name, value }) => {
+                response.headers.append("Set-Cookie", `${name}=${value}`);
+              });
+              return response;
+            }
+
+            // Save document reference in database
+            await supabase.from("report_documents").insert({
+              report_run_id: reportRunId,
+              document_type: "markdown",
+              storage_path: markdownPath,
             });
+
+            await writeReportAudit(userId, symbol, "production", "success");
+          } catch (err) {
+            await writeReportAudit(userId, symbol, "production", "failed");
+            console.error("Supabase report error:", err);
+            const response = NextResponse.json(
+              { error: `Report generation error: ${err instanceof Error ? err.message : "Unknown error"}` },
+              { status: 500 }
+            );
+            responseCookies.forEach(({ name, value }) => {
+              response.headers.append("Set-Cookie", `${name}=${value}`);
+            });
+            return response;
+          }
         }
 
-        const used = isTestBypass ? 0 : dbUser.reportsUsed + 1;
-        const remaining = Math.max(dbUser.quota - used, 0);
-
-        return NextResponse.json({
-            symbol,
-            report,
-            companyData,
-            remainingQuota: remaining,
+        const response = NextResponse.json({
+          symbol,
+          report,
+          companyData,
+          remainingQuota: remainingCredits,
+          reportRunId,
         });
+
+        // Apply collected cookies to response
+        responseCookies.forEach(({ name, value }) => {
+          response.headers.append("Set-Cookie", `${name}=${value}`);
+        });
+
+        return response;
     } catch (err) {
         console.error("Error generating report:", err);
-        return NextResponse.json(
+        const response = NextResponse.json(
             { error: `Failed to generate report: ${err instanceof Error ? err.message : 'Unknown error'}` },
             { status: 500 }
         );
+
+        // Apply collected cookies to error response
+        responseCookies.forEach(({ name, value }) => {
+          response.headers.append("Set-Cookie", `${name}=${value}`);
+        });
+
+        return response;
     }
 }
