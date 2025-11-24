@@ -5,11 +5,14 @@ import { DEFAULT_LANGUAGE, type Language } from "@/lib/i18n-config";
 
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
 
-const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY;
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "openai/gpt-5.1";
-const HELICONE_API_KEY = process.env.HELICONE_API_KEY;
-const HELICONE_MODEL = process.env.HELICONE_MODEL || "gpt-4o-mini";
+// Note: These are read at runtime to allow test env override
+const getEnvVars = () => ({
+  FINNHUB_API_KEY: process.env.FINNHUB_API_KEY,
+  OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+  OPENROUTER_MODEL: process.env.OPENROUTER_MODEL || "openai/gpt-5.1",
+  HELICONE_API_KEY: process.env.HELICONE_API_KEY,
+  HELICONE_MODEL: process.env.HELICONE_MODEL || "gpt-4o-mini",
+});
 
 const toneDirectives = {
     baseline: "以 Investor AI 标准流程输出，保持证据优先与结构化描述，不加入夸张语气。",
@@ -80,17 +83,6 @@ function sanitizeReportContent(content: string, language: Language) {
     return `${langConfig.disclaimer}\n\n${sanitized}`.trim();
 }
 
-if (!FINNHUB_API_KEY) {
-    console.warn("⚠️ FINNHUB_API_KEY 未配置，请检查 .env.local");
-}
-if (!OPENROUTER_API_KEY && !HELICONE_API_KEY) {
-    console.warn("⚠️ 未配置可用的 LLM 提供方（Helicone 或 OpenRouter），报告生成功能将不可用");
-} else if (!OPENROUTER_API_KEY) {
-    console.warn("⚠️ OPENROUTER_API_KEY 未配置，Helicone 将作为唯一模型通道");
-} else if (!HELICONE_API_KEY) {
-    console.warn("ℹ️ HELICONE_API_KEY 未配置，全部请求将回退到 OpenRouter");
-}
-
 async function fetchJson(url: string) {
     const res = await fetch(url);
     if (!res.ok) {
@@ -113,6 +105,9 @@ function formatDate(date: Date): string {
 }
 
 export async function GET(request: NextRequest) {
+    // Read env vars at runtime to allow test override
+    const env = getEnvVars();
+
     // Check for test bypass
     const testToken = process.env.TEST_REPORT_TOKEN || "local-test-token";
     const tokenFromHeader = request.headers.get("x-test-token");
@@ -195,8 +190,8 @@ export async function GET(request: NextRequest) {
         return response;
     }
 
-    const missingLlmProvider = !OPENROUTER_API_KEY && !HELICONE_API_KEY;
-    if (!FINNHUB_API_KEY || missingLlmProvider) {
+    const missingLlmProvider = !env.OPENROUTER_API_KEY && !env.HELICONE_API_KEY;
+    if (!env.FINNHUB_API_KEY || missingLlmProvider) {
         const response = NextResponse.json(
             {
                 error: missingLlmProvider
@@ -225,20 +220,20 @@ export async function GET(request: NextRequest) {
         // 1. 拉基础数据（使用 Finnhub 免费或基础数据接口）
         const profileUrl = `${FINNHUB_BASE}/stock/profile2?symbol=${encodeURIComponent(
             symbol
-        )}&token=${FINNHUB_API_KEY}`;
+        )}&token=${env.FINNHUB_API_KEY}`;
 
         const quoteUrl = `${FINNHUB_BASE}/quote?symbol=${encodeURIComponent(
             symbol
-        )}&token=${FINNHUB_API_KEY}`;
+        )}&token=${env.FINNHUB_API_KEY}`;
 
         const metricsUrl = `${FINNHUB_BASE}/stock/metric?symbol=${encodeURIComponent(
             symbol
-        )}&metric=all&token=${FINNHUB_API_KEY}`;
+        )}&metric=all&token=${env.FINNHUB_API_KEY}`;
 
         // 新增：Finnhub /company-news 接口 (免费层级通常支持近期)
         const newsUrl = `${FINNHUB_BASE}/company-news?symbol=${encodeURIComponent(
             symbol
-        )}&from=${fromDate}&to=${toDate}&token=${FINNHUB_API_KEY}`;
+        )}&from=${fromDate}&to=${toDate}&token=${env.FINNHUB_API_KEY}`;
 
 
         const [profile, quote, metricsRaw, recentNews] = await Promise.all([
@@ -376,7 +371,7 @@ ${JSON.stringify(companyData, null, 2)}
 
         // 3. 调用 Helicone (fallback to OpenRouter if needed)
         const heliPayload = {
-            model: HELICONE_MODEL,
+            model: env.HELICONE_MODEL,
             messages: [
                 { role: "system", content: sysPrompt },
                 { role: "user", content: userPrompt },
@@ -386,14 +381,14 @@ ${JSON.stringify(companyData, null, 2)}
         };
 
         async function callHelicone() {
-            if (!HELICONE_API_KEY) return null;
+            if (!env.HELICONE_API_KEY) return null;
             const res = await fetch(
                 "https://ai-gateway.helicone.ai/v1/chat/completions",
                 {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${HELICONE_API_KEY}`,
+                        Authorization: `Bearer ${env.HELICONE_API_KEY}`,
                     },
                     body: JSON.stringify(heliPayload),
                 }
@@ -407,20 +402,20 @@ ${JSON.stringify(companyData, null, 2)}
         }
 
         async function callOpenRouter() {
-            if (!OPENROUTER_API_KEY) return null;
+            if (!env.OPENROUTER_API_KEY) return null;
             const res = await fetch(
                 "https://openrouter.ai/api/v1/chat/completions",
                 {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+                        Authorization: `Bearer ${env.OPENROUTER_API_KEY}`,
                         "HTTP-Referer":
                             process.env.OPENROUTER_SITE_URL || "http://localhost:3000",
                         "X-Title": process.env.OPENROUTER_APP_NAME || "investor-ai",
                     },
                     body: JSON.stringify({
-                        model: OPENROUTER_MODEL,
+                        model: env.OPENROUTER_MODEL,
                         messages: [
                             { role: "system", content: sysPrompt },
                             { role: "user", content: userPrompt },

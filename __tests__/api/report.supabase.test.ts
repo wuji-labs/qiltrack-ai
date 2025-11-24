@@ -1,14 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 
-// Set env vars BEFORE importing route handler
-vi.stubEnv("TEST_REPORT_TOKEN", "test-token");
-vi.stubEnv("FINNHUB_API_KEY", "test-finnhub-key");
-vi.stubEnv("HELICONE_API_KEY", "test-helicone-key");
-vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "http://localhost:54321");
-vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "test-anon-key");
-vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "test-service-role-key");
-
 // Mock all Supabase and services
 vi.mock("@/lib/supabase/server", () => ({
   createServerClient: vi.fn(),
@@ -33,6 +25,13 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 describe("API: /api/report - Supabase Integration", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Set env vars for each test (runtime read now)
+    process.env.TEST_REPORT_TOKEN = "test-token";
+    process.env.FINNHUB_API_KEY = "test-finnhub-key";
+    process.env.HELICONE_API_KEY = "test-helicone-key";
+    process.env.NEXT_PUBLIC_SUPABASE_URL = "http://localhost:54321";
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "test-anon-key";
+    process.env.SUPABASE_SERVICE_ROLE_KEY = "test-service-role-key";
     mockFetch.mockClear();
   });
 
@@ -59,12 +58,7 @@ describe("API: /api/report - Supabase Integration", () => {
     expect(response.status).toBe(401);
   });
 
-  it.skip("should allow test bypass with token and skip auth", async () => {
-    // FIXME: This test fails due to Vitest module loading timing:
-    // The route handler caches env vars at module load time (lines 8-12 of route.ts),
-    // before Vitest can inject stubbed env vars. The test code and mocks are correct;
-    // this test passes in actual runtime with proper .env.local setup.
-    // To verify manually: npm run dev with TEST_REPORT_TOKEN, FINNHUB_API_KEY, HELICONE_API_KEY set
+  it("should allow test bypass with token and skip auth", async () => {
     // Mock fetch responses for Finnhub/LLM calls
     const mockFetchResponses = [
       // profile

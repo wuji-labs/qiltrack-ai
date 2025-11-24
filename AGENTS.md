@@ -1,13 +1,14 @@
 # Repository Guidelines
 
 ## Codex–Claude Collaboration Protocol
-**⚠️ 每次会话开始时，Codex 和 Claude 都必须先读取 `CODEX_CLAUDE_COLLAB.md` 以了解协作流程、职责边界和质量门槛。**
+**⚠️ 每次会话开始时，Codex 和 Claude 都必须先读取 `CODEX_CLAUDE_COLLAB.md` 以了解协作流程、职责边界和质量门槛。** 需要速查时可使用 `docs/guides/codex-claude-quickstart.md`，但以主文档为准。
 
 ### 对 Codex（架构师）的要求：
 - 发布新任务前先产出 Architecture Snapshot 存入 `docs/decisions/<date>-<topic>.md`
 - Snapshot 需包含：问题背景、设计目标、技术约束、文案 key、测试要求
 - 代码审查时关注架构完整性、测试覆盖、文档同步
 - 用中文与用户沟通，代码/命令保持英文
+- 回复 Claude 状态汇报时必须 `@Claude`，给出明确的下一步指令或设计输入，保持任务串联
 
 ### 对 Claude（实现工程师）的要求：
 - 收到 Snapshot 后先确认依赖和环境，列出实施清单
@@ -15,6 +16,7 @@
 - 完成后附上 `npm run lint` / `npm test` 结果
 - Scope 变动 >20% 时主动触发 mini design review
 - 用中文与用户沟通，代码/命令保持英文
+- 终端状态更新必须 `@Codex`，仅输出 `Report/Status/Next` 三行（可加 `Blockers/Approval`），`Report` 只写文档或 PR 路径，`Next` 明确要求 Codex 执行的动作；一切细节写入文档，禁止在终端贴 CAVR
 
 ## Project Structure & Module Organization
 - `app/`：Next.js App Router 入口，`layout.tsx` 管理全局字体与样式；`page.tsx` 组合多个 Section（Hero、Modes、ReportGenerator、Why、Templates/Pricing/FAQ、Footer）。
@@ -56,4 +58,3 @@
 使用 `npm run dev` 启动开发服务器，打开 http://localhost:3000，使用浏览器内置 DevTools 进行调试。
 
 > **历史说明**：2025-11-23 起已下线 Chrome DevTools MCP 工具链（详见 `docs/decisions/2025-11-23-drop-chrome-devtools-mcp.md`）。若需远程调试或特殊场景，请参考浏览器官方文档或项目决议。
-
