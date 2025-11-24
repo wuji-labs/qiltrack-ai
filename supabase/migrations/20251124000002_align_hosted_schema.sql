@@ -1,21 +1,47 @@
 -- Migration: Align schema with code expectations and Architecture Snapshot (Stage 2)
 -- Purpose: Fix field names and add missing columns to match API/test requirements for Hosted deployment
+-- Data Protection: Uses ALTER TABLE for safe migration; assumes empty or non-critical report_documents table
 
 -- 1. Add 'mode' column to report_runs if it doesn't exist
 ALTER TABLE public.report_runs
 ADD COLUMN IF NOT EXISTS mode TEXT DEFAULT 'production';
 
--- 2. Rename and restructure report_documents to match code expectations
--- Drop and recreate to align with current code: report_run_id, document_type, storage_path
-DROP TABLE IF EXISTS public.report_documents CASCADE;
+-- 2. Safe migration of report_documents: Add new columns first
+-- If existing data exists, this preserves it during transition
+ALTER TABLE public.report_documents
+ADD COLUMN IF NOT EXISTS report_run_id UUID REFERENCES public.report_runs(id) ON DELETE CASCADE,
+ADD COLUMN IF NOT EXISTS document_type TEXT DEFAULT 'markdown',
+ADD COLUMN IF NOT EXISTS storage_path TEXT;
 
-CREATE TABLE public.report_documents (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  report_run_id UUID NOT NULL REFERENCES public.report_runs(id) ON DELETE CASCADE,
-  document_type TEXT NOT NULL, -- 'markdown', 'docx', etc.
-  storage_path TEXT NOT NULL,  -- 'user_id/report_run_id.md' format
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+-- Migrate data from old columns to new columns (if data exists)
+UPDATE public.report_documents
+SET
+  report_run_id = COALESCE(report_run_id, run_id),
+  storage_path = COALESCE(storage_path,
+    CASE
+      WHEN markdown_summary IS NOT NULL THEN CONCAT(user_id, '/', run_id, '/document.md')
+      ELSE CONCAT(user_id, '/', run_id, '/document')
+    END
+  ),
+  document_type = CASE
+    WHEN markdown_summary IS NOT NULL THEN 'markdown'
+    WHEN docx_summary IS NOT NULL THEN 'docx'
+    ELSE 'markdown'
+  END
+WHERE report_run_id IS NULL OR storage_path IS NULL;
+
+-- Make new columns NOT NULL after migration
+ALTER TABLE public.report_documents
+ALTER COLUMN report_run_id SET NOT NULL,
+ALTER COLUMN document_type SET NOT NULL,
+ALTER COLUMN storage_path SET NOT NULL;
+
+-- Remove old columns (they have been migrated)
+ALTER TABLE public.report_documents
+DROP COLUMN IF EXISTS run_id,
+DROP COLUMN IF EXISTS user_id,
+DROP COLUMN IF EXISTS markdown_summary,
+DROP COLUMN IF EXISTS docx_summary;
 
 -- 3. Add metadata column to report_credit_events for audit data
 ALTER TABLE public.report_credit_events

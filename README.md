@@ -52,7 +52,7 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 | 环境变量 | 说明 | 获取位置 |
 |---------|------|--------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Hosted 项目 API URL | Supabase Dashboard → Settings → API |
-| `SUPABASE_ANON_KEY` | 公钥（客户端用） | Supabase Dashboard → Settings → API → Anon key |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 公钥（客户端用） | Supabase Dashboard → Settings → API → Anon key |
 | `SUPABASE_SERVICE_ROLE_KEY` | 服务密钥（服务端用） | Supabase Dashboard → Settings → API → Service role key |
 | `SUPABASE_STORAGE_REPORT_BUCKET` | 存储桶名 | 默认 `report-assets`（需先创建） |
 | `TEST_REPORT_TOKEN` | 测试报告 Token（开发/验证使用） | 任意字符串 |
@@ -114,7 +114,7 @@ npx supabase gen types typescript --linked --schema public > types/database.ts
 ```bash
 # Supabase（从 Dashboard → Settings → API 获取）
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 SUPABASE_STORAGE_REPORT_BUCKET=report-assets
 

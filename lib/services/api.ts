@@ -30,8 +30,6 @@ type HistoryResponse = {
 type CreditsResponse = {
 	userId: string;
 	credits: {
-		total_credits: number;
-		used_credits: number;
 		remaining_credits: number;
 	};
 };
