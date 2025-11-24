@@ -31,6 +31,50 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 
 > 运行前请复制 `.env.local.example` 为 `.env.local` 并补齐密钥。
 
+### SSH 配置（推送代码）
+
+本仓库使用 SSH 进行 Git 推送，请按以下步骤配置本地 SSH key：
+
+#### 1. 生成 SSH key（若未生成）
+```bash
+ssh-keygen -t ed25519 -C "your_email@example.com"
+# 提示时直接回车（使用默认路径 ~/.ssh/id_ed25519，不设密码短语）
+```
+
+#### 2. 启动 SSH agent 并添加密钥
+```bash
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+```
+
+#### 3. 获取并添加公钥到 GitHub
+```bash
+cat ~/.ssh/id_ed25519.pub
+# 复制输出的公钥
+```
+
+然后打开 [GitHub SSH Keys 设置](https://github.com/settings/keys)：
+- 点击 **New SSH key**
+- Title 填入 "Local Dev Machine"（或自定义名称）
+- Key type 选择 **Authentication Key**
+- 粘贴上面的公钥到 Key 字段
+- 点击 **Add SSH key**
+
+#### 4. 验证 SSH 连接
+```bash
+ssh -T git@github.com
+# 应返回：Hi <username>! You've successfully authenticated...
+```
+
+#### 5. 推送代码
+```bash
+# 首次推送需要设置上游分支
+git push --set-upstream origin <branch-name>
+
+# 之后可直接用
+git push
+```
+
 ## 环境变量
 
 ### 核心配置（必需）
