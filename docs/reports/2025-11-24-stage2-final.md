@@ -3,9 +3,9 @@
 ## 🎯 最终状态：✅ 完成并通过验证
 
 **代码实现：** 完成
-**测试：** 33 passed, 1 skipped (0 failures)
+**测试：** 34 passed, 0 skipped (0 failures)
 **Lint：** 0 errors
-**文档：** 完整 CAVR + 环境配置
+**文档：** 完整 CAVR + 环境配置（托管 Supabase 为默认）
 
 ---
 
@@ -49,7 +49,7 @@
 
 ```
 Test Files: 6 passed (6)
-Tests:      33 passed | 1 skipped (34)
+Tests:      34 passed | 0 skipped (34)
 Lint:       0 errors (Stage 2 changes)
 ```
 
@@ -61,7 +61,7 @@ Lint:       0 errors (Stage 2 changes)
 | `__tests__/api.test.ts` | ✅ 3/3 | 基础路由测试 |
 | `lib/services/quota.test.ts` | ✅ 9/9 | 额度消费、审计日志 |
 | `__tests__/api/report.history.test.ts` | ✅ 7/7 | 历史查询、RLS 过滤 |
-| `__tests__/api/report.supabase.test.ts` | ✅ 3/4, ⏭️ 1 | 报告 API（1 个 skip） |
+| `__tests__/api/report.supabase.test.ts` | ✅ 4/4 | 报告 API（全通过，无 skip） |
 | `__tests__/useProgress.test.tsx` | ✅ 2/2 | UI Hook 测试 |
 
 ---
@@ -162,24 +162,12 @@ const mockChain = {
 
 ## 已知限制
 
-### 1. Test Bypass 模块加载时序
+### ✅ 已解决（2025-11-24 更新）
 
-**问题：** `__tests__/api/report.supabase.test.ts` 中 test bypass 测试被 skip
-
-**原因：**
-- Route handler 在模块加载时缓存 env 变量（lines 8-12 of route.ts）
-- Vitest stub env 时序在模块加载之后
-- 无法在测试时修改已缓存的 `FINNHUB_API_KEY` 和 `HELICONE_API_KEY`
-
-**影响：** 无（仅测试端）
-
-**验证方式：**
-- 手工测试：`npm run dev` 配置 .env.local 后可验证
-- 或：查看 CAVR 文档中"Test Scenario 1"
-
-**解决方案（未来）：**
-- 将 env 变量读取改为运行时而非模块加载时
-- 或：使用条件导入避免缓存
+之前的 test bypass 模块加载时序问题已解决：
+- ✅ `__tests__/api/report.supabase.test.ts` 现在完整通过所有 4 个测试
+- ✅ 环境变量从运行时读取而非模块加载时缓存
+- ✅ Test bypass 验证已集成到自动化测试中
 
 ---
 
@@ -205,7 +193,7 @@ const mockChain = {
 
 | 指标 | 值 | 说明 |
 |------|-----|------|
-| Test Coverage | 33 tests | 核心功能和边界情况 |
+| Test Coverage | 34 tests | 核心功能和边界情况（无 skip） |
 | Type Safety | ✅ 全覆盖 | 无 `any` 或明确文档化 |
 | Lint Errors | 0 | Stage 2 改动 |
 | Module Size | < 650 lines | `app/api/report/route.ts` |
@@ -305,18 +293,19 @@ GET /api/report/credits
 
 Stage 2 完整实现了 Supabase 报告工作流的核心功能：
 
-✅ **代码质量**：33 tests passed, 0 lint errors, 完整的类型安全
+✅ **代码质量**：34 tests passed（无 skip），0 lint errors，完整的类型安全
 ✅ **功能完整**：Report API、History、Quota、Storage 集成
 ✅ **安全合规**：RLS、Session 验证、审计日志、Service Role 隔离
-✅ **文档齐全**：CAVR + 环境配置 + 故障排查指南
+✅ **文档齐全**：CAVR + 环境配置（托管 Supabase 为默认）+ 故障排查指南
 ✅ **向后兼容**：Stage 1 功能保留，现有 UI 兼容
+✅ **部署就绪**：支持托管 Supabase（Vercel、Railway 等）和本地开发栈
 
 **Ready for PR and Code Review.**
 
 ---
 
-**Status:** ✅ Implementation Complete
-**Generated:** 2025-11-24 13:40 UTC
+**Status:** ✅ Implementation Complete (Updated: 2025-11-24 14:30 UTC)
+**Generated:** 2025-11-24 | **Tests:** 34 passed / 0 skipped
 **Branch:** feat/supabase-integration
-**Commits:** Multiple (test fixes, doc updates)
+**Deployment:** Hosted Supabase (default) | Local stack (optional)
 

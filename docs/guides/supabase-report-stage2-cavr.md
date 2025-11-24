@@ -3,12 +3,13 @@
 **Date:** 2025-11-24
 **Branch:** feat/supabase-integration
 **Stage:** 2 (Report API + Quota Integration)
+**Deployment:** Hosted Supabase (default) | Local stack (optional)
 
 ---
 
 ## Executive Summary
 
-Stage 2 implements the complete Supabase integration for report generation workflow. All code is production-ready with comprehensive test coverage (33 tests passing). The implementation includes:
+Stage 2 implements the complete Supabase integration for report generation workflow. All code is production-ready with comprehensive test coverage (34 tests passing). The implementation includes:
 
 - ✅ Refactored `/api/report` to use Supabase RPC + Storage
 - ✅ New `/api/report/history` endpoint for report listings
@@ -21,10 +22,50 @@ Stage 2 implements the complete Supabase integration for report generation workf
 
 ## Environment Variables Required
 
-### For Development (`.env.local`)
+### For Production / Hosting (Vercel, Railway, etc.)
 
 ```bash
-# Supabase Configuration
+# Supabase Hosted Project (Required - create at https://supabase.com)
+NEXT_PUBLIC_SUPABASE_URL=<your-supabase-api-url>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key-from-supabase>
+SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
+
+# Report Generation
+FINNHUB_API_KEY=<your-finnhub-api-key>
+HELICONE_API_KEY=<your-helicone-api-key>
+# OR
+OPENROUTER_API_KEY=<your-openrouter-api-key>
+
+# Storage
+SUPABASE_STORAGE_REPORT_BUCKET=report-assets
+
+# Test Mode (Optional)
+TEST_REPORT_TOKEN=<optional-for-development>
+```
+
+### For Development (`.env.local`) - Option 1: Hosted Supabase (Recommended)
+
+```bash
+# Use your Supabase cloud project for development
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
+SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
+
+# Report Generation
+FINNHUB_API_KEY=<your-finnhub-api-key>
+HELICONE_API_KEY=<your-helicone-api-key>
+# OR
+OPENROUTER_API_KEY=<your-openrouter-api-key>
+
+# Test Mode
+TEST_REPORT_TOKEN=dev-test-token
+SUPABASE_STORAGE_REPORT_BUCKET=report-assets
+```
+
+### For Development (`.env.local`) - Option 2: Local Supabase Stack (Advanced)
+
+```bash
+# Local Supabase (requires Docker)
 NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key-from-supabase>
 SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
@@ -57,7 +98,32 @@ SUPABASE_STORAGE_REPORT_BUCKET=report-assets
 
 ---
 
-## Local Supabase Setup
+## Setup Options
+
+### Option A: Hosted Supabase (Recommended for Production)
+
+1. **Create a Supabase project:** https://supabase.com
+2. **Get credentials from project settings:**
+   - Copy API URL
+   - Copy anon key (public)
+   - Copy service_role key (secret)
+3. **Set env vars** as shown above in "Option 1: Hosted Supabase"
+4. **Run migrations:**
+   ```bash
+   npx supabase link --project-ref <your-project-ref>
+   npx supabase db push
+   ```
+5. **Create Storage bucket:**
+   - In Supabase console → Storage → New bucket
+   - Name: `report-assets` (private)
+6. **Start developing:**
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## Option B: Local Supabase Stack (Optional for Development)
 
 ### Prerequisites
 
@@ -152,15 +218,15 @@ npm test
 
 **Current Status:**
 - **Test Files:** 6 passed
-- **Tests:** 33 passed, 1 skipped (due to module loading timing in Vitest)
-- **Coverage:** Core report API, quota service, history API, server client
+- **Tests:** 34 passed, 0 failed
+- **Coverage:** Core report API, quota service, history API, server client, UI hooks
 
 ```
  ✓ lib/supabase/server.test.ts (9 tests)
  ✓ __tests__/api.test.ts (3 tests)
  ✓ lib/services/quota.test.ts (9 tests)
  ✓ __tests__/api/report.history.test.ts (7 tests)
- ✓ __tests__/api/report.supabase.test.ts (4 tests | 1 skipped)
+ ✓ __tests__/api/report.supabase.test.ts (4 tests)
  ✓ __tests__/useProgress.test.tsx (2 tests)
 ```
 
@@ -406,7 +472,7 @@ When manually testing, verify these in the browser:
 Complete these checks to verify Stage 2 implementation:
 
 ### Code Quality
-- [ ] `npm test` passes with 33 tests (1 skip allowed)
+- [ ] `npm test` passes with 34 tests (0 skipped, 0 failed)
 - [ ] `npm run lint` shows 0 errors from our changes
 - [ ] All modified files have proper TypeScript types
 - [ ] No `any` types without explicit `/* eslint-disable-next-line */`
@@ -531,4 +597,19 @@ For issues with this Stage 2 implementation:
 
 ---
 
-**Generated:** 2025-11-24 | **Branch:** feat/supabase-integration
+## Deployment Guide
+
+### Vercel Deployment
+1. Push changes to GitHub
+2. Connect repo to Vercel
+3. Add environment variables (all from your Supabase project)
+4. Deploy
+
+### Railway / Other Platforms
+1. Set environment variables from Supabase hosted project
+2. Run migrations: `npx supabase db push`
+3. Deploy Node.js application
+
+---
+
+**Updated:** 2025-11-24 | **Tests:** 34 passed | **Deployment:** Hosted Supabase (default) | **Branch:** feat/supabase-integration
