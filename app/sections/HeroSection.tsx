@@ -261,10 +261,10 @@ export function HeroSection({
 							>
 								{t("hero.cta.primary")}
 							</button>
-							<a href="#generator" className="btn-ghost px-5 py-2 text-base transition-all duration-200 ease-out hover:-translate-y-0.5">
+							<Link href="/reports" className="btn-ghost px-5 py-2 text-base transition-all duration-200 ease-out hover:-translate-y-0.5">
 								<span>{t("hero.cta.secondary")}</span>
 								<span className="text-xs text-subtle">↗</span>
-							</a>
+							</Link>
 						</div>
 
 						{belowCta}
