@@ -1,4 +1,4 @@
-# 多组并行开发与合并策略 Snapshot（Codex–Claude，2025-11-24）
+﻿# 多组并行开发与合并策略 Snapshot（Codex–Claude，2025-11-24）
 ## 背景 / 问题
 - 两组并行（每组含架构师 Codex + 实现 Claude），希望同一分支内协同，又需降低互踩与合并成本。
 - Git worktree 同一分支只能挂载一次，多目录协作会产生同步负担，需要“一组一分支一工作树”的准则与合并守则。
@@ -28,7 +28,7 @@
 4) 提交：小步提交，保持 clean working tree。
 5) 分支可见性与通知：
    - 本地新建分支后立即 `git push -u origin <branch>`，并在沟通渠道提示或开 draft PR，架构师/程序员即可看到。
-   - 对方获取：`git fetch --all`，用 `git branch -r` 或在 PR 页面查看；VS Code 原有的“自动同步”依赖远端分支或 PR。
+   - 对方获取：`git fetch --all`，用 `git branch -r` 或在 PR 页面查看；VS Code 的“自动同步”取决于远端分支或 PR。
    - 同一分支只挂一个 worktree；新分支从各自 worktree 切出即可。
 
 ## 合并策略
