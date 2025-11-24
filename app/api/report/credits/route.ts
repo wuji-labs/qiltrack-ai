@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     // Query quota view (RLS-protected)
     const { data: quotaData, error: quotaError } = await supabase
       .from("v_user_quota")
-      .select("total_credits, used_credits, remaining_credits")
+      .select("user_id, remaining_credits")
       .eq("user_id", userId)
       .single();
 
@@ -41,8 +41,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       userId,
       credits: quotaData || {
-        total_credits: 0,
-        used_credits: 0,
         remaining_credits: 0,
       },
     });

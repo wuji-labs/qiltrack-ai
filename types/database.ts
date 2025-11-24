@@ -56,6 +56,7 @@ export type Database = {
           symbol: string | null
           tone: string | null
           language: string
+          mode: string
           status: string
           model: string | null
           company_snapshot: Json | null
@@ -70,10 +71,9 @@ export type Database = {
       report_documents: {
         Row: {
           id: string
-          run_id: string
-          user_id: string
-          markdown_summary: string | null
-          docx_summary: string | null
+          report_run_id: string
+          document_type: string
+          storage_path: string
           created_at: string
         }
       }
@@ -170,7 +170,9 @@ export type Database = {
           user_id: string
           event_type: string
           credits_amount: number
+          delta: number | null
           reason: string | null
+          metadata: Json | null
           created_at: string
         }
       }
@@ -182,7 +184,7 @@ export type Database = {
       }
       fn_consume_report_credit: {
         Args: { p_user_id: string; p_symbol?: string; p_metadata?: Json }
-        Returns: Array<{ success: boolean; remaining: number }>
+        Returns: Array<{ success: boolean; remaining_credits: number }>
       }
       fn_record_report_run: {
         Args: { p_user_id: string; p_template_id: string; p_report_data: Json; p_storage_path: string }
@@ -192,12 +194,12 @@ export type Database = {
     Views: {
       v_user_quota: {
         Row: {
-          id: string
+          user_id: string
           email: string
           plan: string
           quota_limit: number
           reports_used: number
-          remaining_quota: number
+          remaining_credits: number
         }
       }
     }
