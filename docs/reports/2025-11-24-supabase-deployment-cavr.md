@@ -2,8 +2,9 @@
 
 **日期：** 2025-11-24
 **分支：** feat/supabase-deployment
-**状态：** 已修复 3 个阻塞项，准备审查
-**测试：** 34/34 通过，ESLint 0 错误
+**状态：** ✅ 完成迁移执行、类型同步、本地验证。待存储桶创建和 PR 合并。
+**测试：** ✅ 34/34 通过，ESLint 0 错误
+**部署阶段：** Stage 2 - Hosted 实例上线验证
 
 ---
 
@@ -200,34 +201,50 @@
 ✓ API /api/report/history：列表 + 分页
 ```
 
-### 待 Codex 确认
-1. 托管项目 ref 及其数据状态（空库/有数据）
-2. 迁移执行后是否需补丁 (types/database.ts)
-3. 部署验收信息
+### 执行完成情况 ✅
+1. ✅ 托管项目 ref: inmtounwqcjwsxkfnsfd（已确认）
+2. ✅ 迁移执行：Dashboard SQL Editor 完成（report_documents/report_credit_events/v_user_quota/fn_consume_report_credit）
+3. ✅ 类型同步：types/database.ts 已对齐，无需变更
+4. ✅ 本地验证：lint 0 errors, test 34/34 passing
+5. ⏳ 存储桶创建：`report-assets` 待 Codex 在 Dashboard 创建（Private + RLS）
+6. ⏳ 凭证已配置到 .env.local（不提交，已在 .gitignore）
 
 ---
 
 ## Summary
 
-本次部署集成工作经历两阶段，已完成全部代码与文档交付：
+本次 Hosted 部署工作已完成代码、迁移、验证的全部环节：
 
-1. **第一阶段**：Schema 对齐 + 文档完善（commit `8fd2f9f`）
-2. **第二阶段**：修复 3 个阻塞项（commits `c4ea8bb` / `1e282da` / `01fb92a` / `eb97634`）
-   - Anon key 命名统一 ✅
-   - Credits 契约简化 ✅
-   - 数据保护迁移 ✅
-   - API 返回格式说明 ✅
-   - 部署执行指南 ✅
+### 第一阶段：Schema 对齐 + 文档完善 ✅
+- Commit `8fd2f9f`: Schema 初期对齐与迁移策略
+
+### 第二阶段：修复 3 个阻塞项 ✅
+- Commit `c4ea8bb`: Anon key 命名、Credits 契约、数据保护
+- Commits `1e282da`/`01fb92a`/`eb97634`: 文档与 CAVR 更新
+
+### 第三阶段：部署执行与验证 ✅
+- Commit `5291ff5`: 手工迁移指南（Dashboard SQL Editor）
+- Commit `3a7c6ae`: Schema 修正完整指南与脚本
+- SQL 迁移：Codex 在 Dashboard 完成（report_documents/events/视图/函数）
+- 类型同步：types/database.ts 对齐，无需变更
+- 本地验证：ESLint 0 errors, Tests 34/34 passing
 
 **质量指标**：
-- 代码：34/34 测试通过，0 lint 错误
-- 部署：安全迁移、完整文档、清晰清单
-- 风险：已识别并缓解
+- ✅ 代码：34/34 测试通过，0 lint 错误
+- ✅ 迁移：安全 ALTER TABLE 策略，数据保护
+- ✅ 类型：完全对齐 Hosted schema
+- ✅ 文档：13 个 commits，8 份部署指南
+
+**部署状态**：
+- ✅ 代码交付完成
+- ✅ 迁移执行完成
+- ✅ 本地验证通过
+- ⏳ 存储桶待创建 (report-assets, Private + RLS)
 
 **可交付物**：
-- 5 个 commits（代码修复 + 文档完善）
+- 13 commits（含所有修复与文档）
 - CAVR 完整报告（本文档）
-- 部署执行清单（含步骤、脚本、验证方法）
-- README 完整指南（6 步部署流程）
+- 8 份部署指南与脚本
+- README 6-步部署流程
 
-**部署就绪**：代码、schema、文档、测试全通过，可推进托管部署。
+**部署就绪**：迁移完成、代码验证通过，仅需创建存储桶后可合并 PR。
