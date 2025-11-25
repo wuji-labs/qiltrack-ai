@@ -291,7 +291,7 @@ export default function Home() {
 
 	return (
 		<>
-			<main className={`min-h-screen ${mainBg}`} style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont" }}>
+			<main className={`min-h-screen overflow-x-hidden ${mainBg}`} style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont" }}>
 				<div className="grid min-h-screen grid-rows-[auto,1fr]">
 					<HeroSection
 						navItems={navLinks}
@@ -307,8 +307,8 @@ export default function Home() {
 						t={t}
 					/>
 					<div className="flex flex-col flex-1">
-						<div className="flex-1 flex justify-center py-10 sm:py-12">
-							<div className="w-full max-w-6xl px-4 sm:px-6 lg:px-10 space-y-6 md:space-y-10">
+						<div className="flex-1 flex justify-center py-6 sm:py-10 md:py-12">
+							<div className="w-full max-w-6xl px-4 sm:px-6 lg:px-10 space-y-4 sm:space-y-6 md:space-y-10 overflow-x-hidden min-w-0">
 								<section id="generator" className={`rounded-[32px] border p-4 sm:p-5 md:p-6 space-y-6 md:space-y-8 bg-[var(--bg-layer)]/70 border-[var(--stroke-soft)] shadow-[0_18px_60px_rgba(0,0,0,0.28)] scroll-mt-32`}>
 									<ModesSection
 										heading={t("generator.sectionTitle")}
@@ -336,52 +336,52 @@ export default function Home() {
 									/>
 								</section>
 
-								<section id="overview" className={`relative overflow-hidden rounded-3xl border p-5 sm:p-7 space-y-6 transition-all duration-200 ease-out scroll-mt-32 ${cardSecondary}`}>
+								<section id="overview" className={`relative overflow-hidden rounded-2xl sm:rounded-3xl border p-4 sm:p-5 md:p-7 space-y-4 sm:space-y-6 transition-all duration-200 ease-out scroll-mt-32 ${cardSecondary}`}>
 									<div className="pointer-events-none absolute inset-0 opacity-80">
 										<div className="absolute -left-16 top-10 h-44 w-44 rounded-full bg-emerald-400/15 blur-[120px]" aria-hidden />
 										<div className="absolute right-0 bottom-0 h-56 w-56 rounded-full bg-cyan-500/10 blur-[120px]" aria-hidden />
 										<div className="absolute inset-4 rounded-[28px] border border-white/5" aria-hidden />
 									</div>
 
-									<div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+									<div className="relative flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center sm:justify-between">
 										<div className="space-y-2 max-w-2xl">
-											<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">{t("workflow.sectionLabel")}</p>
-											<h2 className="text-2xl sm:text-3xl font-semibold">{t("workflow.title")}</h2>
-											<p className={`text-base ${subtleText}`}>{t("workflow.caption")}</p>
+											<p className="text-xs sm:text-sm uppercase tracking-[0.28em] text-emerald-300">{t("workflow.sectionLabel")}</p>
+											<h2 className="text-xl sm:text-2xl md:text-3xl font-semibold">{t("workflow.title")}</h2>
+											<p className={`text-sm sm:text-base ${subtleText}`}>{t("workflow.caption")}</p>
 										</div>
-										<div className="relative rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 px-4 py-3 text-sm text-right text-emerald-100 shadow-[0_14px_40px_rgba(0,0,0,0.3)]">
+										<div className="relative rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-right text-emerald-100 shadow-[0_14px_40px_rgba(0,0,0,0.3)] flex-shrink-0">
 											<p className="font-semibold tracking-[0.16em] uppercase">{t("workflow.status.step", { step: "01" })}</p>
-											<p className="text-subtle">{t("workflow.status.idle")}</p>
+											<p className="text-subtle text-[10px] sm:text-xs">{t("workflow.status.idle")}</p>
 											<div className="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-emerald-400/10 blur-3xl" aria-hidden />
 										</div>
 									</div>
 
-									<div className="relative rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 p-4 sm:p-5 shadow-[0_12px_40px_rgba(0,0,0,0.28)]">
-										<div className="absolute left-4 top-8 bottom-8 hidden lg:block w-px bg-gradient-to-b from-[var(--accent-emerald)] via-[var(--stroke-soft)] to-transparent" aria-hidden />
-										<div className="grid gap-4">
+									<div className="relative rounded-2xl sm:rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 p-3 sm:p-4 md:p-5 shadow-[0_12px_40px_rgba(0,0,0,0.28)]">
+										<div className="absolute left-3 sm:left-4 top-8 bottom-8 hidden lg:block w-px bg-gradient-to-b from-[var(--accent-emerald)] via-[var(--stroke-soft)] to-transparent" aria-hidden />
+										<div className="grid gap-3 sm:gap-4">
 											{workflowList.map((step, index) => (
-												<div key={step.title} className="relative pl-12 lg:pl-16">
-													<div className="absolute left-0 lg:left-1 top-1">
-														<div className="relative h-10 w-10 rounded-2xl bg-[var(--accent-emerald)]/20 border border-[var(--accent-emerald)]/50 flex items-center justify-center text-sm font-semibold text-[var(--accent-emerald)] shadow-[0_10px_30px_rgba(16,185,129,0.25)]">
+												<div key={step.title} className="relative pl-10 sm:pl-12 lg:pl-16">
+													<div className="absolute left-0 sm:left-1 top-1 lg:top-1">
+														<div className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-2xl bg-[var(--accent-emerald)]/20 border border-[var(--accent-emerald)]/50 flex items-center justify-center text-xs sm:text-sm font-semibold text-[var(--accent-emerald)] shadow-[0_10px_30px_rgba(16,185,129,0.25)]">
 															{(index + 1).toString().padStart(2, "0")}
 															<span className="absolute inset-0 rounded-2xl border border-white/5" aria-hidden />
 														</div>
 													</div>
-													<div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-4 space-y-2 transition hover:border-[var(--stroke-glow)]/70 hover:shadow-[0_16px_46px_rgba(0,0,0,0.35)]">
-														<div className="flex items-center justify-between gap-3">
-															<span className="text-xs uppercase tracking-[0.22em] text-emerald-200">{step.badge}</span>
-															<span className="hidden sm:inline-flex items-center gap-2 text-xs text-subtle">
+													<div className="rounded-xl sm:rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-3 sm:p-4 space-y-2 transition hover:border-[var(--stroke-glow)]/70 hover:shadow-[0_16px_46px_rgba(0,0,0,0.35)]">
+														<div className="flex items-center justify-between gap-2 sm:gap-3 flex-wrap">
+															<span className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-emerald-200">{step.badge}</span>
+															<span className="hidden sm:inline-flex items-center gap-2 text-[11px] sm:text-xs text-subtle">
 																<span className="h-2 w-2 rounded-full bg-[var(--accent-emerald)]" />
 																{t("workflow.status.step", { step: (index + 1).toString().padStart(2, "0") })}
 															</span>
 														</div>
-														<h3 className="text-lg font-semibold text-[var(--color-foreground)]">{step.title}</h3>
-														<p className={`text-base leading-relaxed ${strongSubtleText}`}>{step.detail}</p>
-														<div className="flex flex-wrap gap-2 text-xs text-subtle">
-															<span className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 px-3 py-1">
+														<h3 className="text-base sm:text-lg font-semibold text-[var(--color-foreground)]">{step.title}</h3>
+														<p className={`text-sm sm:text-base leading-relaxed ${strongSubtleText}`}>{step.detail}</p>
+														<div className="flex flex-wrap gap-2 text-xs sm:text-sm text-subtle">
+															<span className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 px-2 sm:px-3 py-0.5 sm:py-1">
 																{t("workflow.status.syncing")}
 															</span>
-															<span className="rounded-full border border-[var(--accent-emerald)]/50 bg-[var(--accent-emerald)]/10 px-3 py-1 text-[var(--accent-emerald)]">
+															<span className="rounded-full border border-[var(--accent-emerald)]/50 bg-[var(--accent-emerald)]/10 px-2 sm:px-3 py-0.5 sm:py-1 text-[var(--accent-emerald)]">
 																{t("workflow.status.ready")}
 															</span>
 														</div>
@@ -392,67 +392,67 @@ export default function Home() {
 									</div>
 								</section>
 
-								<section id="templates" className={`rounded-3xl border p-5 sm:p-7 space-y-5 transition-all duration-200 ease-out ${cardSecondary}`}>
-									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+								<section id="templates" className={`rounded-2xl sm:rounded-3xl border p-4 sm:p-5 md:p-7 space-y-4 sm:space-y-5 transition-all duration-200 ease-out ${cardSecondary}`}>
+									<div className="flex flex-col gap-2 sm:gap-3">
 										<div>
-											<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">{t("nav.templates")}</p>
-											<h2 className="text-2xl sm:text-3xl font-semibold">{t("gallery.inspired")}</h2>
-											<p className={`text-base mt-1 ${subtleText}`}>{t("persona.galleryCaption", { tones: toneLabelList })}</p>
+											<p className="text-xs sm:text-sm uppercase tracking-[0.28em] text-emerald-300">{t("nav.templates")}</p>
+											<h2 className="text-xl sm:text-2xl md:text-3xl font-semibold">{t("gallery.inspired")}</h2>
+											<p className={`text-sm sm:text-base mt-1 ${subtleText}`}>{t("persona.galleryCaption", { tones: toneLabelList })}</p>
 										</div>
-										<div className="text-sm text-right text-subtle">
+										<div className="text-xs sm:text-sm text-right text-subtle">
 											<p>{t("gallery.subtitle")}</p>
 											<p>{t("gallery.description")}</p>
 										</div>
 									</div>
 
-									<div className="grid md:grid-cols-3 gap-3">
+									<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
 										{caseStudyList.map((study) => (
-											<div key={study.company} className="rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-4 flex flex-col gap-3 transition-all duration-200 ease-out hover:border-[var(--stroke-glow)]/70 hover:shadow-[0_12px_32px_rgba(0,0,0,0.28)] hover:-translate-y-1">
-												<div className="flex items-center justify-between">
+											<div key={study.company} className="rounded-xl sm:rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-3 sm:p-4 flex flex-col gap-3 transition-all duration-200 ease-out hover:border-[var(--stroke-glow)]/70 hover:shadow-[0_12px_32px_rgba(0,0,0,0.28)] hover:-translate-y-1">
+												<div className="flex items-center justify-between gap-2">
 													<div>
-														<p className="text-sm uppercase tracking-[0.3em] text-subtle">{study.industry}</p>
-														<h3 className="text-xl font-semibold text-[var(--color-foreground)]">{study.company}</h3>
+														<p className="text-xs sm:text-sm uppercase tracking-[0.3em] text-subtle">{study.industry}</p>
+														<h3 className="text-lg sm:text-xl font-semibold text-[var(--color-foreground)]">{study.company}</h3>
 													</div>
-													<span className="text-sm rounded-full border border-emerald-400/50 text-emerald-200 px-2 py-0.5">{study.tonality}</span>
+													<span className="text-xs sm:text-sm rounded-full border border-emerald-400/50 text-emerald-200 px-2 py-0.5 whitespace-nowrap flex-shrink-0">{study.tonality}</span>
 												</div>
-												<p className={`text-base leading-relaxed ${strongSubtleText}`}>{study.snippet}</p>
-												<div className="flex flex-wrap gap-1 text-sm text-subtle">
+												<p className={`text-sm sm:text-base leading-relaxed ${strongSubtleText}`}>{study.snippet}</p>
+												<div className="flex flex-wrap gap-1 text-xs sm:text-sm text-subtle">
 													{study.tags.map((tag) => (
 														<span key={`${study.company}-${tag}`} className="rounded-full border border-[var(--stroke-soft)] px-2 py-0.5">
 															#{tag}
 														</span>
 													))}
 												</div>
-												<div className="text-sm text-emerald-300">{study.metric}</div>
+												<div className="text-xs sm:text-sm text-emerald-300">{study.metric}</div>
 											</div>
 										))}
 									</div>
 
-									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border border-dashed border-[var(--stroke-soft)] p-4">
-										<p className={`text-base ${subtleText}`}>{t("gallery.footer")}</p>
+									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg sm:rounded-2xl border border-dashed border-[var(--stroke-soft)] p-3 sm:p-4">
+										<p className={`text-sm sm:text-base ${subtleText}`}>{t("gallery.footer")}</p>
 										<Link
 											href="/reports"
-											className="self-start rounded-full border border-emerald-400 px-4 py-2 text-base text-emerald-300 hover:bg-emerald-400/10"
+											className="self-start rounded-full border border-emerald-400 px-3 sm:px-4 py-2 text-xs sm:text-base text-emerald-300 hover:bg-emerald-400/10 whitespace-nowrap"
 										>
 											{t("gallery.cta")}
 										</Link>
 									</div>
 								</section>
 
-								<section id="pricing" className={`rounded-3xl border p-5 sm:p-7 space-y-6 transition-all duration-200 ease-out scroll-mt-32 ${cardSecondary}`}>
-									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-										<div className="space-y-1.5">
-											<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">Pricing</p>
-											<h2 className="text-2xl sm:text-3xl font-semibold">{t("pricing.title")}</h2>
-											<p className={`text-base ${subtleText}`}>{t("pricing.caption")}</p>
+								<section id="pricing" className={`rounded-2xl sm:rounded-3xl border p-4 sm:p-5 md:p-7 space-y-4 sm:space-y-6 transition-all duration-200 ease-out ${cardSecondary}`}>
+									<div className="flex flex-col gap-2 sm:gap-3">
+										<div className="space-y-1">
+											<p className="text-xs sm:text-sm uppercase tracking-[0.28em] text-emerald-300">Pricing</p>
+											<h2 className="text-xl sm:text-2xl md:text-3xl font-semibold">{t("pricing.title")}</h2>
+											<p className={`text-sm sm:text-base ${subtleText}`}>{t("pricing.caption")}</p>
 										</div>
-										<div className="flex flex-col gap-1 text-sm text-subtle sm:text-right">
+										<div className="flex flex-col gap-1 text-xs sm:text-sm text-subtle sm:text-right">
 											<p>{t("pricing.note1")}</p>
 											<p>{t("pricing.note2")}</p>
 										</div>
 									</div>
 
-									<div className="grid gap-5 grid-cols-1 lg:grid-cols-3 lg:items-stretch">
+									<div className="grid gap-3 sm:gap-4 md:gap-5 grid-cols-1 lg:grid-cols-3 lg:items-stretch">
 										{pricingList.map((plan) => {
 											const handleClick = () => {
 												if (plan.tier === "free") return handlePrimaryCta();
@@ -464,7 +464,7 @@ export default function Home() {
 											return (
 												<article
 													key={plan.name}
-													className={`rounded-3xl border p-6 sm:p-7 space-y-5 transition-all duration-200 ease-out flex flex-col h-full ${
+													className={`rounded-xl sm:rounded-3xl border p-4 sm:p-6 md:p-7 space-y-3 sm:space-y-5 transition-all duration-200 ease-out flex flex-col h-full ${
 														plan.highlight
 															? "border-[var(--accent-emerald)]/50 bg-[var(--bg-layer)]/85 bg-gradient-to-br from-emerald-500/8 via-emerald-400/4 to-cyan-400/6 shadow-[0_20px_50px_rgba(16,185,129,0.25)] hover:shadow-[0_20px_50px_rgba(16,185,129,0.32)] hover:-translate-y-1"
 															: "border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 hover:border-[var(--stroke-glow)]/50 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.25)]"
@@ -474,7 +474,7 @@ export default function Home() {
 													{(plan.highlight || plan.secondary) && (
 														<div>
 															<span
-																className={`inline-block text-xs uppercase tracking-[0.24em] px-3 py-1 rounded-full ${
+																className={`inline-block text-xs uppercase tracking-[0.24em] px-2 sm:px-3 py-0.5 sm:py-1 rounded-full ${
 																	plan.highlight
 																		? "bg-emerald-400/20 text-emerald-200 border border-emerald-400/40"
 																		: "bg-blue-400/20 text-blue-200 border border-blue-400/40"
@@ -491,8 +491,8 @@ export default function Home() {
 													)}
 
 													<div>
-														<h3 className="text-xl sm:text-2xl font-semibold text-[var(--color-foreground)] mb-2">{plan.name}</h3>
-														<p className={`text-3xl sm:text-4xl font-bold ${
+														<h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-[var(--color-foreground)] mb-1 sm:mb-2">{plan.name}</h3>
+														<p className={`text-2xl sm:text-3xl md:text-4xl font-bold ${
 															plan.highlight
 																? "text-[var(--accent-emerald)]"
 																: plan.secondary
@@ -503,9 +503,9 @@ export default function Home() {
 														</p>
 													</div>
 
-													<p className={`text-sm leading-relaxed ${subtleText}`}>{plan.tagline}</p>
+													<p className={`text-xs sm:text-sm leading-relaxed ${subtleText}`}>{plan.tagline}</p>
 
-													<ul className="space-y-2 text-base leading-relaxed text-dim flex-1">
+													<ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-base leading-relaxed text-dim flex-1">
 														{plan.features.map((feature) => (
 															<li key={feature} className="flex items-start gap-2">
 																<span className={`flex-shrink-0 mt-0.5 ${
@@ -522,7 +522,7 @@ export default function Home() {
 
 													<button
 														type="button"
-														className={`mt-auto w-full rounded-full py-3 text-base font-semibold transition-all duration-200 ease-out ${
+														className={`mt-auto w-full rounded-full py-2 sm:py-3 text-xs sm:text-base font-semibold transition-all duration-200 ease-out ${
 															plan.highlight
 																? "bg-emerald-400 text-slate-900 hover:bg-emerald-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.3)] active:translate-y-0.5"
 																: plan.secondary
@@ -536,7 +536,7 @@ export default function Home() {
 
 													{/* Annual plan note */}
 													{plan.tier === "annual" && (
-														<p className="text-sm text-center text-subtle">
+														<p className="text-xs text-center text-subtle">
 															{t("pricing.plan.annual.note")}
 														</p>
 													)}
@@ -560,19 +560,19 @@ export default function Home() {
 									}}
 								/>
 
-								<section id="faq" className={`rounded-3xl border p-5 sm:p-7 space-y-5 transition-all duration-200 ease-out scroll-mt-32 ${cardSecondary}`}>
+								<section id="faq" className={`rounded-2xl sm:rounded-3xl border p-4 sm:p-5 md:p-7 space-y-4 sm:space-y-5 transition-all duration-200 ease-out ${cardSecondary}`}>
 									<div className="space-y-2">
-										<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">FAQ</p>
-										<h2 className="text-2xl sm:text-3xl font-semibold">{t("faq.title")}</h2>
-										<p className={`text-base ${subtleText}`}>{t("faq.caption")}</p>
+										<p className="text-xs sm:text-sm uppercase tracking-[0.28em] text-emerald-300">FAQ</p>
+										<h2 className="text-xl sm:text-2xl md:text-3xl font-semibold">{t("faq.title")}</h2>
+										<p className={`text-sm sm:text-base ${subtleText}`}>{t("faq.caption")}</p>
 									</div>
-									<div className="space-y-3">
+									<div className="space-y-2 sm:space-y-3">
 										{faqList.map((item) => (
-											<details key={item.question} className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-4 motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out group open:border-[var(--stroke-glow)]/50">
-												<summary className="cursor-pointer text-base font-semibold text-[var(--color-foreground)] motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out motion-safe:hover:-translate-y-0.5">
+											<details key={item.question} className="rounded-lg sm:rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-3 sm:p-4 motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out group open:border-[var(--stroke-glow)]/50">
+												<summary className="cursor-pointer text-sm sm:text-base font-semibold text-[var(--color-foreground)] motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out motion-safe:hover:-translate-y-0.5">
 													{item.question}
 												</summary>
-												<p className={`mt-2 text-base leading-relaxed ${strongSubtleText} motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out motion-safe:animate-fadeInUp`}>{item.answer}</p>
+												<p className={`mt-2 text-sm sm:text-base leading-relaxed ${strongSubtleText} motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out motion-safe:animate-fadeInUp`}>{item.answer}</p>
 											</details>
 										))}
 									</div>
