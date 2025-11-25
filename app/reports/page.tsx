@@ -75,11 +75,8 @@ export default function ReportsPage() {
 							>
 								{t("reports.page.hero.contact")}
 							</Link>
-							<Link
-								href="/"
-								className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] transition-colors"
-							>
-								返回首页
+							<Link href="/" className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] transition-colors">
+								{t("reports.page.hero.backHome")}
 							</Link>
 						</div>
 					</div>
