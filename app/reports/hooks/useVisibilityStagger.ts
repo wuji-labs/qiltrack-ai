@@ -7,13 +7,24 @@ export interface UseVisibilityStaggerOptions {
   threshold?: number;
   interval?: number;
   respectReducedMotion?: boolean;
+  /**
+   * 依赖项数组，当这些值变化时，会重新初始化 observer
+   * 用于处理分页/筛选等导致 DOM 节点变化的场景
+   */
+  deps?: unknown[];
 }
 
 export function useVisibilityStagger(
   containerRef: React.RefObject<HTMLElement>,
   options: UseVisibilityStaggerOptions
 ) {
-  const { itemSelector, threshold = 0.1, interval = 60, respectReducedMotion = true } = options;
+  const {
+    itemSelector,
+    threshold = 0.1,
+    interval = 60,
+    respectReducedMotion = true,
+    deps = []
+  } = options;
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -61,5 +72,5 @@ export function useVisibilityStagger(
       items.forEach((item) => observer.unobserve(item));
       observer.disconnect();
     };
-  }, [containerRef, itemSelector, threshold, interval, respectReducedMotion]);
+  }, [containerRef, itemSelector, threshold, interval, respectReducedMotion, deps]);
 }

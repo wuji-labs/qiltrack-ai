@@ -17,6 +17,7 @@ export default function ReportsPage() {
 	useVisibilityStagger(gridRef, {
 		itemSelector: '[data-stagger-item]',
 		threshold: 0.1,
+		deps: [pageIndex, selectedCategory],
 	});
 
 	// 分页翻页时，重置卡片的 data-visible 状态以触发动画重绑
