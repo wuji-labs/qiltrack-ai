@@ -26,7 +26,7 @@ export function ModesSection({ options, selected, onSelect, personaSentence, hea
 				<div className="absolute right-0 bottom-0 h-52 w-52 rounded-full bg-cyan-400/10 blur-[120px]" aria-hidden />
 			</div>
 
-			<div className="relative flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-2 sm:gap-3">
+			<div className="relative flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-2 sm:gap-3 min-w-0">
 				<div className="relative inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-xs sm:text-sm uppercase tracking-[0.22em] text-[var(--accent-emerald)] shadow-[0_12px_30px_rgba(0,0,0,0.24)] min-w-0">
 					<span className="rounded-full bg-[var(--accent-emerald)]/20 px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold text-emerald-200 flex-shrink-0">
 						Step 1
@@ -56,7 +56,7 @@ export function ModesSection({ options, selected, onSelect, personaSentence, hea
 						>
 							<div className="pointer-events-none absolute -left-6 top-2 h-16 w-16 rounded-full bg-[var(--accent-emerald)]/12 blur-3xl" aria-hidden />
 							<div className="pointer-events-none absolute -right-4 bottom-2 h-12 w-12 rounded-full bg-cyan-400/10 blur-2xl" aria-hidden />
-							<div className="relative flex items-center justify-between mb-2 gap-2">
+							<div className="relative flex items-center justify-between mb-2 gap-2 min-w-0">
 								<span className="text-base sm:text-lg drop-shadow-sm flex-shrink-0">{option.emoji}</span>
 								{active && (
 									<span className="rounded-full border border-[var(--accent-emerald)]/70 bg-[var(--bg-layer)] px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-[11px] uppercase tracking-[0.22em] text-[var(--accent-emerald)] shadow-[0_8px_22px_rgba(91,224,176,0.3)] whitespace-nowrap flex-shrink-0">

@@ -608,7 +608,7 @@ export function ReportGeneratorSection({
 						</div>
 
 							<div className="space-y-4 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/60 p-4 text-dim">
-								<div className="flex flex-wrap items-center justify-between gap-4">
+								<div className="flex flex-wrap items-center justify-between gap-4 min-w-0">
 									<div>
 										<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">
 											{keyInsightsSubtitle}
@@ -746,7 +746,7 @@ export function ReportGeneratorSection({
 						<div className="absolute -right-8 top-4 h-32 w-32 rounded-full bg-[var(--accent-emerald)]/18 blur-[90px]" aria-hidden />
 						<div className="absolute left-0 bottom-0 h-28 w-28 rounded-full bg-[var(--accent-blue)]/12 blur-[90px]" aria-hidden />
 					</div>
-					<div className="relative flex items-center justify-between gap-3">
+					<div className="relative flex items-center justify-between gap-3 min-w-0">
 						<div>
 							<p className="text-xs uppercase tracking-[0.28em] text-emerald-300">{t("nav.product")}</p>
 							<h3 className="text-lg sm:text-xl font-semibold text-[var(--color-foreground)]">{t("hero.title")}</h3>

@@ -35,7 +35,7 @@ export function WhySection({
 
 			<div className="relative grid gap-4 sm:gap-6 lg:grid-cols-[1.1fr_0.9fr]">
 				<div className="rounded-xl sm:rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/92 p-4 sm:p-5 md:p-6 flex flex-col gap-3 sm:gap-4 shadow-[0_18px_60px_rgba(0,0,0,0.24)]">
-					<div className="flex items-center justify-between gap-2 sm:gap-3 flex-wrap">
+					<div className="flex items-center justify-between gap-2 sm:gap-3 flex-wrap min-w-0">
 						<div className="space-y-1">
 							<p className="text-xs sm:text-sm uppercase tracking-[0.3em] text-emerald-300">{labels.combined}</p>
 							<h2 className="text-lg sm:text-2xl md:text-3xl font-semibold text-[var(--color-foreground)]">{combinedTitle}</h2>

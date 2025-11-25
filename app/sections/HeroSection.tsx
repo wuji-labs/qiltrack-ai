@@ -220,14 +220,14 @@ export function HeroSection({
 			<div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10">
 				<div className="lg:hidden px-3 sm:px-4 py-2 border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 backdrop-blur-xl overflow-x-auto flex gap-2 sm:gap-4 text-xs sm:text-sm uppercase tracking-[0.2em] text-subtle rounded-2xl mb-4">
 					{navItems.map((item) => (
-						<a key={item.href} href={item.href} className="whitespace-nowrap hover:text-[var(--accent-blue)]">
+						<a key={item.href} href={item.href} className="hover:text-[var(--accent-blue)] min-w-0">
 							{item.label}
 						</a>
 					))}
 				</div>
 			</div>
 
-			<div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10 overflow-x-hidden">
+			<div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10 overflow-x-hidden min-w-0">
 				<section
 					id="overview"
 					className="relative overflow-hidden rounded-[36px] border border-[var(--stroke-soft)]/80 bg-[var(--bg-layer)]/85 px-5 py-6 sm:px-8 sm:py-9 shadow-[0_16px_60px_rgba(0,0,0,0.32)]"
