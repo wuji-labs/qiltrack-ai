@@ -540,3 +540,162 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ====== Phase 1: /reports 动效增强 - Keyframes 与 Utility Classes ====== */
+
+/* Keyframes for Reports Motion Enhancement */
+@keyframes fade-in-up-reports {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes stagger-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mesh-drift {
+  0% {
+    background-position: 0% 0%, 0% 0%, center, 0 0, 0 0;
+    opacity: 0.85;
+  }
+  50% {
+    background-position: 3% -2%, -3% 2%, center, 0 0, 0 0;
+    opacity: 0.95;
+  }
+  100% {
+    background-position: 0% 0%, 0% 0%, center, 0 0, 0 0;
+    opacity: 0.85;
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(91, 224, 176, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(91, 224, 176, 0.6);
+  }
+}
+
+@keyframes slide-underline {
+  from {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  to {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+/* Utility Classes */
+.animate-fade-in-up {
+  animation: fade-in-up-reports 0.2s ease-out;
+}
+
+.animate-stagger-fade-in {
+  animation: stagger-fade-in 0.6s ease-out forwards;
+}
+
+/* Group Hover Classes */
+.group:hover .group-hover\:scale-104 {
+  transition: transform 0.3s ease-out;
+  transform: scale(1.04);
+}
+
+.group:hover .group-hover\:-translate-y-6px {
+  transition: transform 0.3s ease-out;
+  transform: translateY(-6px);
+}
+
+.group:hover .group-hover\:shadow-elevated {
+  transition: box-shadow 0.2s ease-out;
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.55);
+}
+
+/* Motion-safe Classes */
+@media (prefers-reduced-motion: no-preference) {
+  .motion-safe\:animate-mesh-drift {
+    animation: mesh-drift 12s ease-in-out infinite;
+  }
+
+  .motion-safe\:hover\:glow-pulse:hover {
+    animation: glow-pulse 0.8s ease-in-out infinite;
+  }
+}
+
+/* Pills underline styling */
+button[data-selected="true"]::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--accent-emerald);
+  animation: slide-underline 0.2s ease-out forwards;
+}
+
+/* List cards stagger entrance */
+[data-stagger-item] {
+  --item-opacity: 0;
+  --item-transform: translateY(8px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition-delay: var(--stagger-delay, 0ms);
+}
+
+[data-stagger-item][data-visible="true"] {
+  --item-opacity: 1;
+  --item-transform: translateY(0);
+}
+
+/* ====== Reports Motion - Reduce Motion Support ====== */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Disable keyframe animations for reports motion */
+  .animate-fade-in-up,
+  .animate-stagger-fade-in {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  .motion-safe\:animate-mesh-drift {
+    animation: none !important;
+  }
+
+  .motion-safe\:hover\:glow-pulse:hover {
+    animation: none !important;
+  }
+
+  /* Shorten transitions for reports motion classes */
+  .group:hover .group-hover\:scale-104,
+  .group:hover .group-hover\:-translate-y-6px,
+  .group:hover .group-hover\:shadow-elevated,
+  [data-stagger-item] {
+    transition-duration: 0.05s !important;
+  }
+
+  /* Disable pills underline animation */
+  button[data-selected="true"]::after {
+    animation: none !important;
+  }
+
+  /* Remove stagger delay for list cards */
+  [data-stagger-item] {
+    --stagger-delay: 0ms !important;
+  }
+}
