@@ -376,8 +376,9 @@ export default function Home() {
 										<div className="grid gap-4">
 											{workflowList.map((step, index) => {
 												const stepNumber = index + 1;
-												const isActive = progress.status === "running" && progress.currentStep === stepNumber;
-												const isCompleted = progress.status === "done" || (progress.status === "running" && progress.currentStep > stepNumber);
+												const clampedStep = Math.min(progress.currentStep, workflowList.length);
+												const isActive = progress.status === "running" && clampedStep === stepNumber;
+												const isCompleted = progress.status === "done" || (progress.status === "running" && clampedStep > stepNumber);
 												return (
 													<div key={step.title} className="relative pl-12 lg:pl-16">
 														<div className="absolute left-0 lg:left-1 top-1">
