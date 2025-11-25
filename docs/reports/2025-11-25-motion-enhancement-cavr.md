@@ -3,17 +3,28 @@
 **PR**: https://github.com/explore0012/ai-report/pull/16
 **分支**: feat/reports-motion-enhancement-v2
 **日期**: 2025-11-25
-**状态**: ✅ 修复完成 - 支持分页重绑与无障碍立即显示
+**状态**: ✅ 全部修复完成 - 支持分页重初始化、无障碍立即显示、文案国际化
 
 ## 修复记录
 
-### Issue #1: 分页翻页后卡片隐藏
-**描述**: 分页翻页时，新卡片保持 `data-visible="false"` 状态，因为 useEffect 依赖未包含翻页触发。
-**修复**: 在 page.tsx 添加 `useEffect(() => { ... }, [pageIndex])`，翻页时重置所有卡片的 `data-visible` 为 false，hook 的 observer 随后重新观察并触发进场。
+### Issue #1: 分页翻页后新卡片未被观察（高优）
+**描述**: 分页翻页时，新渲染的卡片不被 IntersectionObserver 观察，因为 hook 中 `items` 在首次渲染后固定不变，新分页的 DOM 节点无法进入 observer。
+**修复**:
+  - useVisibilityStagger 添加 `deps?: unknown[]` 参数
+  - page.tsx 调用时传入 `deps: [pageIndex, selectedCategory]`
+  - 当这些依赖变化时，hook 重新查询容器内所有 items 并重新初始化 observer
+  - 确保分页翻页后的新卡片能正确被观察和触发进场动画
 
-### Issue #2: prefers-reduced-motion 场景卡片可能隐藏
+### Issue #2: prefers-reduced-motion 下卡片隐藏（高优）
 **描述**: 无障碍模式下，hook 初始化时若 media query 不被检测，卡片可能保持隐藏。
 **修复**: hook 添加 `respectReducedMotion` 选项，初始化时显式检测 `prefers-reduced-motion`，无障碍模式下立即设置 `data-visible="true"`，跳过 observer。
+
+### Issue #3: 文案编码错误导致乱码（高优）
+**描述**: 返回首页按钮文案显示为 "杩斿洖棣栭〉" 等乱码。
+**修复**:
+  - 将硬编码中文改为 i18n key `reports.page.hero.backHome`
+  - 在 lib/i18n.tsx 添加完整多语言翻译（EN/JA/KO/繁體/簡體）
+  - 确保文案编码正确，与其他按钮保持国际化一致性
 
 ## 实现范围
 
@@ -50,17 +61,19 @@
 
 ## 代码变更
 
-### 代码变更
-- **app/reports/page.tsx**（+13 行，导入 useEffect，添加分页重绑 effect）
-  - 导入 `useEffect`
-  - 添加 `useEffect(() => { ... }, [pageIndex])`，翻页时重置卡片 `data-visible` 状态
-  - hook 调用保持不变，但现已通过此 effect 触发重新观察
-
+### 文件修改列表
 - **app/reports/hooks/useVisibilityStagger.ts**（更新）
-  - 新增 `respectReducedMotion?: boolean` 选项（默认 true）
-  - 初始化时检测 `window.matchMedia('(prefers-reduced-motion: reduce)')`
-  - 无障碍模式下立即设置 `data-visible="true"`，正常模式则使用 IntersectionObserver
-  - 确保 deps 包含 `respectReducedMotion`
+  - 新增 `deps?: unknown[]` 参数，支持传入依赖项数组
+  - 当 pageIndex/selectedCategory 等依赖变化时，hook 重新初始化 observer
+  - 确保新渲染的 DOM 节点被正确观察
+
+- **app/reports/page.tsx**（更新）
+  - hook 调用时添加 `deps: [pageIndex, selectedCategory]`
+  - 当分页或筛选时，hook 自动重新查询 items 并重初始化
+
+- **lib/i18n.tsx**（新增）
+  - 添加新 key `reports.page.hero.backHome`
+  - 支持 5 种语言：EN、JA、KO、繁體中文、簡體中文
 
 ### CSS（无新增）
 - 所有 keyframes 和 utility 类已在 globals.css 中定义（Phase 1）
@@ -96,30 +109,27 @@
 ## 遗留风险与后续
 
 ### 已解决
-- ✅ 首次加载时 stagger delay 正确计算
-- ✅ **分页翻页时卡片重新触发 stagger 动画**（通过 useEffect 重置 data-visible）
-- ✅ **prefers-reduced-motion 场景下卡片立即显示**（hook 显式检测媒体查询）
-- ✅ 无障碍支持完整（globals.css 中 prefers-reduced-motion 已覆盖所有类）
-- ✅ 分页切换后也支持无障碍立即显示（hook 每次初始化都检测）
+- ✅ **分页翻页后新卡片未被观察**（通过 hook deps 参数支持动态重初始化）
+- ✅ **reduce-motion 场景卡片隐藏**（hook 显式检测媒体查询并立即显示）
+- ✅ **文案乱码**（改用 i18n 国际化，确保 UTF-8 编码）
 - ✅ lint 通过，无新增警告
+- ✅ 首次加载时 stagger delay 正确计算
+- ✅ 无障碍支持完整（globals.css 中 prefers-reduced-motion 已覆盖所有类）
+- ✅ 分页和筛选后都支持无障碍立即显示
 
 ### 可选增强（不在本期范围）
 - 动效配置可考虑参数化（delay、duration、easin function），目前硬编码以保持简洁
 - useVisibilityStagger hook 可扩展支持自定义 unobserve 时机（目前持续观察）
 
-## 提交信息
+## 提交历史
 
 ```
-feat: /reports 分页动效标准化 - 完整实现
-
-- 新增 useVisibilityStagger hook 实现列表卡片 stagger 进场动效
-- Hero 部分套用 fade-in-up 进场和 mesh 背景浮动动效
-- Pills 筛选按钮添加光晕效果和悬停缩放反馈
-- Featured 卡片添加抬升和封面视差动效
-- 列表卡片采用 stagger 渐进式进场，优化分页体验
-- 所有动效支持 prefers-reduced-motion 无障碍降级
-- 锚点跳转添加 scroll-mt 补偿，避免导航遮挡
-- 通过 npm run lint 检查，无新增警告
+47de2e5 feat: /reports 分页动效标准化 - 完整实现
+9522f2f fix: useVisibilityStagger 支持分页重绑与 reduce-motion 立即显示
+a551bd8 docs: /reports 动效实现检查报告与验收清单
+84b1c8a docs: 更新 CAVR 文档 - 记录分页重绑与无障碍修复
+a78b1e9 fix: useVisibilityStagger 支持动态 deps，解决分页后新卡片未被观察的问题
+10c6004 fix: 修复返回首页文案编码 - 改用 i18n 国际化翻译
 ```
 
 ## 相关文档
