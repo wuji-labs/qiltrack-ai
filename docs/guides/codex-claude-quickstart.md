@@ -24,6 +24,7 @@
 - **知识同步**：涉及 env / README / PLAN / 设计决策时同步更新相应文件。
 
 ## 快速检查表
+- [ ] GitHub CLI 已登录（默认 explore0012/SSH，异常先跑 `gh auth status`；PR 直接 `git checkout -b <feature>` → `git push origin <feature>` → `gh pr create --fill`）。
 - [ ] 是否已阅读最新 Snapshot 并确认依赖？
 - [ ] 是否在 feature 分支？禁止直推 `main`。
 - [ ] 是否已有对标文档记录 CAVR + lint/test？
