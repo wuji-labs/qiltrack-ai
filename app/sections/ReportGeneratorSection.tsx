@@ -25,6 +25,7 @@ type AuthInfo = {
 	planLabel: string;
 	userEmail: string | null;
 	refreshSession: () => Promise<void>;
+	refreshQuota?: () => Promise<void>;
 };
 
 type ReportGeneratorSectionProps = {
@@ -135,7 +136,7 @@ export function ReportGeneratorSection({
 			clearTimeout(timer);
 			setSearching(false);
 		};
-	}, [inputValue]);
+	}, [inputValue, suppressNextSearch]);
 
 	useEffect(() => {
 		if (typeof window === "undefined") return;
@@ -254,6 +255,9 @@ export function ReportGeneratorSection({
 			await progress.complete(t("generator.progress.done"));
 			setReportData(data);
 			await auth.refreshSession();
+			if (auth.refreshQuota) {
+				await auth.refreshQuota();
+			}
 		} catch (err) {
 			console.error("调用接口异常:", err);
 			const message = err instanceof Error ? err.message : t("error.submit.generic");
@@ -261,6 +265,9 @@ export function ReportGeneratorSection({
 			progress.fail(message);
 			if ((message || "").toLowerCase().includes("unauthorized")) {
 				onRequireLogin();
+			} else if ((message || "").toLowerCase().includes("quota exceeded")) {
+				// Quota exhausted - offer upgrade option
+				setError(t("generator.alert.quota"));
 			}
 		} finally {
 			setLoading(false);
