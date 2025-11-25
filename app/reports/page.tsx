@@ -107,12 +107,14 @@ export default function ReportsPage() {
 							<Link
 								key={`${report.symbol}-featured`}
 								href={report.url}
-								className="group relative overflow-hidden rounded-[32px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-6 shadow-[0_22px_70px_rgba(0,0,0,0.45)] transition hover:-translate-y-1"
+			className="group relative overflow-hidden rounded-[32px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-6 transition group-hover:shadow-elevated group-hover:-translate-y-2"
 							>
+							<div className="relative mb-5 overflow-hidden rounded-[20px]">
 								<div
-									className="relative mb-5 h-48 overflow-hidden rounded-[20px] bg-[var(--bg-base)]"
+									className="h-48 bg-[var(--bg-base)] transition-transform group-hover:scale-104 group-hover:-translate-y-6px"
 									style={{ backgroundImage: report.cover, backgroundSize: "cover", backgroundPosition: "center" }}
 								/>
+							</div>
 								<p className="text-xs uppercase tracking-[0.3em] text-dim">{formatDate(report.date)}</p>
 								<h3 className="mt-2 text-2xl font-semibold leading-tight">{report.title}</h3>
 								<p className="mt-3 text-sm text-dim leading-relaxed">{report.snippet}</p>
