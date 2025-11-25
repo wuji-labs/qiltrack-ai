@@ -1431,6 +1431,24 @@ const translations: Record<string, TranslationEntry> = {
 			"hans": "年付用户享额外额度保障及开票支持",
 		},
 	}),
+	"pricing.plan.monthly.cta.notReady": withChineseVariants({
+		"en": "Subscription coming soon",
+		"ja": "サブスクリプション間もなく開始",
+		"ko": "구독 기능 곧 출시",
+		"zh": {
+			"hant": "訂閱功能即將上線",
+			"hans": "订阅功能即将上线",
+		},
+	}),
+	"pricing.plan.annual.cta.notReady": withChineseVariants({
+		"en": "Subscription coming soon",
+		"ja": "サブスクリプション間もなく開始",
+		"ko": "구독 기능 곧 출시",
+		"zh": {
+			"hant": "訂閱功能即將上線",
+			"hans": "订阅功能即将上线",
+		},
+	}),
 	"faq.title": {
 		"en": "FAQ & Safety Statement",
 		"ja": "FAQ と安全性声明",
