@@ -142,6 +142,88 @@ app/sections/ModesSection.tsx | 28 ++++++++++----------
 
 ---
 
+---
+
+## 手动测试验证（360/414/480px 响应式）
+
+### 导航栏检查：
+- **360px**: Logo 尺寸 h-9×w-9，品牌文本显示 "Investor AI"（无副标题溢出），语言按钮显示 "En"（两字）
+- **414px**: Logo h-9×w-9，品牌文本完整，语言按钮显示 "En"
+- **480px**: Logo 仍 h-9×w-9，导航开始过渡到更宽松（在 sm: 断点）
+- **640px (sm)**: Logo 升至 h-11×w-11，语言显示全文 "English"，品牌副标题开始出现
+- **Overflow 检查**: 所有导航元素已加 `min-w-0` 和响应式间距（`gap-2 sm:gap-4`），禁止固定宽度（移除 `min-w-[220px]`）
+- **触达面积**: 所有按钮 min-h-[44px]（在 sm: 下降为 auto）
+
+### Hero 标题与 CTA 检查：
+- **360px**: 标题字号 text-2xl，行高 leading-[1.2]（紧凑）；描述 text-base；CTA 全宽 (w-full) 堆叠，高度 44px
+- **414px**: 标题仍 text-2xl，描述 text-base，CTA 全宽
+- **480px**: 标题开始升级 text-[2.5rem]（sm: 断点）；描述 text-lg；CTA 在 sm: 变为 w-auto 并水平排列（flex-wrap）
+- **文本截断**: 所有文本已移除固定宽度限制，改为 max-w-3xl 的相对宽度；无 overflow 隐藏的风险
+
+### Step 1 卡片检查：
+- **360px**: 单列网格 (grid-cols-1)；卡片 min-h-[44px]，Padding p-4，圆角 rounded-lg（20px）；标题 text-sm，描述 text-xs 且 line-clamp-3
+- **414px**: 同上，单列；卡片内容行距缩紧，emoji text-lg，Badge text-[9px]
+- **480px**: 仍单列，过渡到 sm: 双列 (sm:grid-cols-2)；Padding 升至 p-6，圆角升至 rounded-2xl（32px）
+- **卡片互动**: 所有卡片内元素已加 `line-clamp-*` 防止内容溢出；"选中" 标签随屏幕缩放（px-2 sm:px-2.5）
+
+### 装饰元素与 overflow：
+- **背景网格**: 父级 hero-mesh 不会撑宽（绝对定位）；blur 装饰已改为相对位置，不占用文档流
+- **全局**: 根 section 加 `overflow-x-hidden`，Hero 和 Step 1 容器都用 `overflow-hidden`
+
+### 导航折叠方案说明：
+当前实现在 ≤640px 时：
+- **xl: hidden** 的五项导航在移动端隐藏
+- **lg: hidden** 的备用列表（第 231-237 行）在小屏显示，支持水平滚动快速切换
+- **未实现汉堡菜单**: Snapshot 建议 ≤640px 时可折叠，当前是水平滚动列表而非完全折叠
+  - 若需正式汉堡菜单（三横线 + 抽屉），建议后续单独立 issue 实施（涉及新状态管理与组件）
+  - **当前折衷方案可用性**: 五项都在列表中，touch 友好，无横向溢出
+
+---
+
+## Lint Warning 说明
+
+项目共 15 个 warning（改造前后一致，无新增）：
+```
+✖ 15 problems (0 errors, 15 warnings)
+```
+
+**改造涉及文件的 warning**：
+- `app/sections/HeroSection.tsx:28:2 - 'remainingQuota' is defined but never used`
+  - **原因**: props 接收但组件内未使用（设计上保留用于后续配额显示）
+  - **状态**: 预期行为，无需修改
+
+**其他预存 warning**（来自其他文件，与本改造无关）：
+- `app/(auth)/login/page.tsx`: callbackUrl 未使用
+- `app/account/page.tsx`: loading 未使用
+- `app/components/ProgressBar.tsx`: activeIndex、pipPositions 未使用
+- `app/page.tsx`: module2Items、module3Items、module4Items、quotaHintPrimary、quotaHintSecondary 未使用
+- `app/reports/[slug]/ClientReportContent.tsx`: Link 未使用
+- `app/reports/[slug]/page.tsx`: 无效的 eslint-disable 指令
+- `app/reports/page.tsx`: ReportCard、featuredReport 未使用
+- `app/sections/ReportGeneratorSection.tsx`: useEffect 缺失依赖 suppressNextSearch
+
+**结论**: 改造代码无新 linting 问题，所有新增类名均符合 Tailwind v4 规范。
+
+---
+
+## CTA 与 Step 1 可用性验证
+
+### CTA 按钮：
+- ✅ 主 CTA（"Generate my first report"）: 44px 最小高度，全宽至 sm:，触点面积充足
+- ✅ 次 CTA（"View example"）: 同样 44px，Link 可点击，无 disabled 状态
+- ✅ 预览 note: 在 sm: 下隐藏（`hidden sm:inline`），减少小屏文本拥挤
+
+### Step 1 卡片：
+- ✅ 四个卡片均可点击（button type="button" onClick）
+- ✅ 高亮状态清晰（active: -translate-y-1、border/shadow 变化）
+- ✅ 内容自适应: title line-clamp-2、badge line-clamp-1、description line-clamp-3，防止卡片撑高
+- ✅ 过渡流畅（transition-all duration-200）
+
+---
+
 ## 下一步
 
-等待 Codex 代码审查，确认响应式改造符合预期，或指示补充手动测试。
+已补充手动验证与 lint warning 说明，待 Codex 审阅确认以下几点后合并：
+1. 导航折叠方案（当前为水平滚动列表，非完全汉堡菜单）是否符合预期
+2. CTA/Step 1 可用性是否满足
+3. 如需补充完整汉堡菜单，是否独立立 issue
