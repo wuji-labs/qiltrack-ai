@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n";
+import { useVisibilityStagger } from "./hooks/useVisibilityStagger";
 import { reports, type ReportCard } from "./data";
 
 const categories = ["All", ...Array.from(new Set(reports.map((item) => item.theme)))];
@@ -11,6 +12,12 @@ export default function ReportsPage() {
 	const { t, language } = useLanguage();
 	const [selectedCategory, setSelectedCategory] = useState(categories[0]);
 	const [pageIndex, setPageIndex] = useState(1);
+	const gridRef = useRef<HTMLDivElement>(null);
+
+	useVisibilityStagger(gridRef, {
+		itemSelector: '[data-stagger-item]',
+		threshold: 0.1,
+	});
 
 	const filteredReports = useMemo(() => {
 		return selectedCategory === "All"
@@ -126,12 +133,17 @@ export default function ReportsPage() {
 						))}
 					</div>
 
-					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" ref={gridRef}>
 						{pagedReports.slice(2).map((report) => (
 							<Link
 								key={`${report.symbol}-tile`}
+				data-stagger-item
 								href={report.url}
 								className="group flex flex-col overflow-hidden rounded-[24px] border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 shadow-[0_18px_50px_rgba(0,0,0,0.35)] transition hover:-translate-y-1"
+				style={{
+					opacity: 'var(--item-opacity, 0)',
+					transform: 'var(--item-transform, translateY(8px))',
+				}}
 							>
 								<div
 									className="relative aspect-[4/3] overflow-hidden rounded-[18px] bg-[var(--bg-layer)]"
@@ -156,7 +168,7 @@ export default function ReportsPage() {
 							<button
 								type="button"
 								onClick={() => setPageIndex((prev) => Math.max(prev - 1, 1))}
-								className="rounded-full border border-[var(--stroke-soft)] px-3 py-1 text-[0.7rem] uppercase tracking-[0.3em] disabled:opacity-40"
+								className="rounded-full border border-[var(--stroke-soft)] px-3 py-1 text-[0.7rem] uppercase tracking-[0.3em] transition-transform hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
 								disabled={pageIndex === 1}
 							>
 								{t("reports.pagination.prev")}
@@ -164,7 +176,7 @@ export default function ReportsPage() {
 							<button
 								type="button"
 								onClick={() => setPageIndex((prev) => Math.min(prev + 1, totalPages))}
-								className="rounded-full border border-[var(--stroke-soft)] px-3 py-1 text-[0.7rem] uppercase tracking-[0.3em] disabled:opacity-40"
+								className="rounded-full border border-[var(--stroke-soft)] px-3 py-1 text-[0.7rem] uppercase tracking-[0.3em] transition-transform hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
 								disabled={pageIndex === totalPages}
 							>
 								{t("reports.pagination.next")}
