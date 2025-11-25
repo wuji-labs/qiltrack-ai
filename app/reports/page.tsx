@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n";
-import { reports, type ReportCard } from "./data";
+import { useVisibilityStagger } from "./hooks/useVisibilityStagger";
+import { reports } from "./data";
 
 const categories = ["All", ...Array.from(new Set(reports.map((item) => item.theme)))];
 
@@ -11,6 +12,22 @@ export default function ReportsPage() {
 	const { t, language } = useLanguage();
 	const [selectedCategory, setSelectedCategory] = useState(categories[0]);
 	const [pageIndex, setPageIndex] = useState(1);
+	const gridRef = useRef<HTMLDivElement>(null);
+
+	useVisibilityStagger(gridRef, {
+		itemSelector: '[data-stagger-item]',
+		threshold: 0.1,
+		deps: [pageIndex, selectedCategory],
+	});
+
+	// 分页翻页时，重置卡片的 data-visible 状态以触发动画重绑
+	useEffect(() => {
+		if (!gridRef.current) return;
+		const items = Array.from(gridRef.current.querySelectorAll('[data-stagger-item]')) as HTMLElement[];
+		items.forEach((item) => {
+			item.setAttribute('data-visible', 'false');
+		});
+	}, [pageIndex]);
 
 	const filteredReports = useMemo(() => {
 		return selectedCategory === "All"
@@ -26,8 +43,6 @@ export default function ReportsPage() {
 		return filteredReports.slice(start, start + pageSize);
 	}, [filteredReports, pageIndex]);
 
-	const featuredReport = reports[0];
-
 	const formatDate = (dateStr: string) =>
 		new Date(dateStr).toLocaleDateString(language === "en" ? "en-US" : "zh-CN", {
 			year: "numeric",
@@ -39,34 +54,35 @@ export default function ReportsPage() {
 		<main className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)]">
 			<div className="mx-auto max-w-6xl space-y-10 px-4 py-12 sm:px-6 lg:px-10">
 				<section className="relative overflow-hidden rounded-[32px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-6 shadow-[0_26px_90px_rgba(0,0,0,0.45)] text-center">
-					<div className="pointer-events-none absolute inset-0 hero-mesh" aria-hidden />
+					<div className="pointer-events-none absolute inset-0 hero-mesh motion-safe:animate-mesh-drift" aria-hidden />
 					<div className="relative mx-auto max-w-3xl space-y-4">
-						<p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)]">
+						<p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)] animate-fade-in-up" style={{ animationDelay: '0ms' }}>
 							{t("reports.page.hero.kicker")}
 						</p>
-						<h1 className="text-3xl sm:text-4xl font-semibold leading-tight">{t("reports.page.hero.title")}</h1>
-						<p className="text-base text-dim">{t("reports.page.hero.description")}</p>
-						<div className="flex flex-wrap items-center justify-center gap-3">
+						<h1 className="text-3xl sm:text-4xl font-semibold leading-tight animate-fade-in-up" style={{ animationDelay: '80ms' }}>
+							{t("reports.page.hero.title")}
+						</h1>
+						<p className="text-base text-dim animate-fade-in-up" style={{ animationDelay: '160ms' }}>
+							{t("reports.page.hero.description")}
+						</p>
+						<div className="flex flex-wrap items-center justify-center gap-3 animate-fade-in-up" style={{ animationDelay: '240ms' }}>
 							<Link href="#archive" className="btn-gradient px-5 py-2 text-sm font-semibold">
 								{t("reports.page.hero.cta")}
 							</Link>
 							<Link
 								href="mailto:contact@investor.ai"
-								className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)]"
+								className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] transition-colors"
 							>
 								{t("reports.page.hero.contact")}
 							</Link>
-							<Link
-								href="/"
-								className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)]"
-							>
-								返回首页
+							<Link href="/" className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] transition-colors">
+								{t("reports.page.hero.backHome")}
 							</Link>
 						</div>
 					</div>
 				</section>
 
-				<section id="archive" className="space-y-8">
+				<section id="archive" className="space-y-8 scroll-mt-28 md:scroll-mt-32">
 					<div className="space-y-2">
 						<p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)]">
 							{t("reports.page.archiveTag")}
@@ -84,11 +100,15 @@ export default function ReportsPage() {
 									setSelectedCategory(category);
 									setPageIndex(1);
 								}}
-								className={`rounded-full border px-4 py-1 text-sm transition ${
+								className={`relative rounded-full border px-4 py-1 text-sm transition-all duration-200 ease-out ${
 									selectedCategory === category
-										? "border-[var(--accent-emerald)] bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)]"
-										: "border-[var(--stroke-soft)] text-dim"
+										? "border-[var(--accent-emerald)] bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)] motion-safe:hover:glow-pulse scale-100"
+										: "border-[var(--stroke-soft)] text-dim hover:border-[var(--accent-emerald)]/50 hover:scale-102"
 								}`}
+								data-selected={selectedCategory === category ? "true" : "false"}
+								style={selectedCategory === category ? {
+									boxShadow: '0 0 12px rgba(91, 224, 176, 0.4)'
+								} : {}}
 							>
 								{category}
 							</button>
@@ -100,14 +120,18 @@ export default function ReportsPage() {
 							<Link
 								key={`${report.symbol}-featured`}
 								href={report.url}
-								className="group relative overflow-hidden rounded-[32px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-6 shadow-[0_22px_70px_rgba(0,0,0,0.45)] transition hover:-translate-y-1"
+								className="group relative overflow-hidden rounded-[32px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-6 transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-2 group-hover:shadow-elevated"
 							>
-								<div
-									className="relative mb-5 h-48 overflow-hidden rounded-[20px] bg-[var(--bg-base)]"
-									style={{ backgroundImage: report.cover, backgroundSize: "cover", backgroundPosition: "center" }}
-								/>
+								<div className="relative mb-5 overflow-hidden rounded-[20px]">
+									<div
+										className="h-48 bg-[var(--bg-base)] transition-transform duration-300 ease-out group-hover:scale-104 group-hover:-translate-y-6px"
+										style={{ backgroundImage: report.cover, backgroundSize: "cover", backgroundPosition: "center" }}
+									/>
+								</div>
 								<p className="text-xs uppercase tracking-[0.3em] text-dim">{formatDate(report.date)}</p>
-								<h3 className="mt-2 text-2xl font-semibold leading-tight">{report.title}</h3>
+								<h3 className="mt-2 text-2xl font-semibold leading-tight animate-fade-in-up" style={{ animationDelay: '120ms' }}>
+									{report.title}
+								</h3>
 								<p className="mt-3 text-sm text-dim leading-relaxed">{report.snippet}</p>
 								<div className="mt-5 flex items-center justify-between text-xs uppercase tracking-[0.3em] text-[var(--accent-emerald)]">
 									<span>{report.theme}</span>
@@ -117,12 +141,17 @@ export default function ReportsPage() {
 						))}
 					</div>
 
-					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" ref={gridRef}>
 						{pagedReports.slice(2).map((report) => (
 							<Link
 								key={`${report.symbol}-tile`}
+								data-stagger-item
 								href={report.url}
-								className="group flex flex-col overflow-hidden rounded-[24px] border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 shadow-[0_18px_50px_rgba(0,0,0,0.35)] transition hover:-translate-y-1"
+								className="group flex flex-col overflow-hidden rounded-[24px] border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 shadow-[0_18px_50px_rgba(0,0,0,0.35)] transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(0,0,0,0.45)]"
+								style={{
+									opacity: 'var(--item-opacity, 0)',
+									transform: 'var(--item-transform, translateY(8px))',
+								}}
 							>
 								<div
 									className="relative aspect-[4/3] overflow-hidden rounded-[18px] bg-[var(--bg-layer)]"
@@ -147,7 +176,7 @@ export default function ReportsPage() {
 							<button
 								type="button"
 								onClick={() => setPageIndex((prev) => Math.max(prev - 1, 1))}
-								className="rounded-full border border-[var(--stroke-soft)] px-3 py-1 text-[0.7rem] uppercase tracking-[0.3em] disabled:opacity-40"
+								className="rounded-full border border-[var(--stroke-soft)] px-3 py-1 text-[0.7rem] uppercase tracking-[0.3em] transition-transform duration-200 ease-out hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
 								disabled={pageIndex === 1}
 							>
 								{t("reports.pagination.prev")}
@@ -155,7 +184,7 @@ export default function ReportsPage() {
 							<button
 								type="button"
 								onClick={() => setPageIndex((prev) => Math.min(prev + 1, totalPages))}
-								className="rounded-full border border-[var(--stroke-soft)] px-3 py-1 text-[0.7rem] uppercase tracking-[0.3em] disabled:opacity-40"
+								className="rounded-full border border-[var(--stroke-soft)] px-3 py-1 text-[0.7rem] uppercase tracking-[0.3em] transition-transform duration-200 ease-out hover:scale-105 disabled:opacity-40 disabled:hover:scale-100"
 								disabled={pageIndex === totalPages}
 							>
 								{t("reports.pagination.next")}

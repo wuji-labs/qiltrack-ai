@@ -1679,6 +1679,13 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hant": "分享靈感",
 		"zh-Hans": "分享灵感",
 	},
+	"reports.page.hero.backHome": {
+		"en": "Back to Home",
+		"ja": "ホームに戻る",
+		"ko": "홈으로 돌아가기",
+		"zh-Hant": "返回首頁",
+		"zh-Hans": "返回首页",
+	},
 	"reports.page.archiveTag": {
 		"en": "SEO-readable insights",
 		"ja": "SEO対応のインサイト",
