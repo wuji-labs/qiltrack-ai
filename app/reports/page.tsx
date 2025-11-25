@@ -39,14 +39,18 @@ export default function ReportsPage() {
 		<main className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)]">
 			<div className="mx-auto max-w-6xl space-y-10 px-4 py-12 sm:px-6 lg:px-10">
 				<section className="relative overflow-hidden rounded-[32px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-6 shadow-[0_26px_90px_rgba(0,0,0,0.45)] text-center">
-					<div className="pointer-events-none absolute inset-0 hero-mesh" aria-hidden />
+					<div className="pointer-events-none absolute inset-0 hero-mesh motion-safe:animate-mesh-drift" aria-hidden />
 					<div className="relative mx-auto max-w-3xl space-y-4">
-						<p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)]">
+						<p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)] animate-fade-in-up" style={{ animationDelay: '0ms' }}>
 							{t("reports.page.hero.kicker")}
 						</p>
-						<h1 className="text-3xl sm:text-4xl font-semibold leading-tight">{t("reports.page.hero.title")}</h1>
-						<p className="text-base text-dim">{t("reports.page.hero.description")}</p>
-						<div className="flex flex-wrap items-center justify-center gap-3">
+						<h1 className="text-3xl sm:text-4xl font-semibold leading-tight animate-fade-in-up" style={{ animationDelay: '60ms' }}>
+							{t("reports.page.hero.title")}
+						</h1>
+						<p className="text-base text-dim animate-fade-in-up" style={{ animationDelay: '120ms' }}>
+							{t("reports.page.hero.description")}
+						</p>
+						<div className="flex flex-wrap items-center justify-center gap-3 animate-fade-in-up" style={{ animationDelay: '180ms' }}>
 							<Link href="#archive" className="btn-gradient px-5 py-2 text-sm font-semibold">
 								{t("reports.page.hero.cta")}
 							</Link>
