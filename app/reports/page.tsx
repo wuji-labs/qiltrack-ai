@@ -88,12 +88,15 @@ export default function ReportsPage() {
 									setSelectedCategory(category);
 									setPageIndex(1);
 								}}
-								className={`rounded-full border px-4 py-1 text-sm transition ${
+								className={`relative rounded-full border px-4 py-1 text-sm transition ${
 									selectedCategory === category
-										? "border-[var(--accent-emerald)] bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)]"
-										: "border-[var(--stroke-soft)] text-dim"
+										? "border-[var(--accent-emerald)] bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)] motion-safe:hover:glow-pulse scale-100 transition-transform"
+										: "border-[var(--stroke-soft)] text-dim hover:border-[var(--accent-emerald)]/50"
 								}`}
-							>
+								data-selected={selectedCategory === category ? "true" : "false"}
+								style={selectedCategory === category ? {
+									boxShadow: '0 0 12px rgba(91, 224, 176, 0.4)'
+								} : {}}>
 								{category}
 							</button>
 						))}
