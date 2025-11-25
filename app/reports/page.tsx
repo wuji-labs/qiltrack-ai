@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n";
 import { useVisibilityStagger } from "./hooks/useVisibilityStagger";
 import { reports } from "./data";
@@ -18,6 +18,15 @@ export default function ReportsPage() {
 		itemSelector: '[data-stagger-item]',
 		threshold: 0.1,
 	});
+
+	// 分页翻页时，重置卡片的 data-visible 状态以触发动画重绑
+	useEffect(() => {
+		if (!gridRef.current) return;
+		const items = Array.from(gridRef.current.querySelectorAll('[data-stagger-item]')) as HTMLElement[];
+		items.forEach((item) => {
+			item.setAttribute('data-visible', 'false');
+		});
+	}, [pageIndex]);
 
 	const filteredReports = useMemo(() => {
 		return selectedCategory === "All"
