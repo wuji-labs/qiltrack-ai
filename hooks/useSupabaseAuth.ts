@@ -127,7 +127,7 @@ export function useSupabaseAuth() {
 
   // Sign in with OAuth provider
   const signInWithProvider = useCallback(
-    async (provider: "google" | "github" | "microsoft") => {
+    async (provider: "google" | "microsoft" | "apple") => {
       try {
         const { error } = await supabase.auth.signInWithOAuth({
           provider,
