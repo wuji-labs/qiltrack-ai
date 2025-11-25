@@ -79,17 +79,17 @@ export function HeroSection({
 	};
 
 	return (
-		<section className="w-full">
+		<section className="w-full overflow-x-hidden">
 			<div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4 sm:px-6 lg:px-10">
-				<nav className="flex flex-wrap xl:flex-nowrap justify-between items-center gap-3 sm:gap-4 rounded-2xl border border-[var(--stroke-soft)]/80 bg-[var(--bg-frosted)]/85 px-5 sm:px-10 py-4 sm:py-5 min-h-[72px] backdrop-blur-xl shadow-[0_14px_38px_rgba(0,0,0,0.35)] transition-all duration-300">
-					<div className="flex items-center gap-3 min-w-[200px] shrink-0 mr-4">
-						<div className="h-11 w-11 rounded-2xl bg-[var(--accent-emerald)] flex items-center justify-center text-[12px] font-black tracking-[0.28em] text-slate-950 shadow-[0_10px_28px_rgba(91,224,176,0.35)]">
+				<nav className="flex flex-wrap xl:flex-nowrap justify-between items-center gap-2 sm:gap-4 rounded-2xl border border-[var(--stroke-soft)]/80 bg-[var(--bg-frosted)]/85 px-3 sm:px-10 py-3 sm:py-5 min-h-[72px] backdrop-blur-xl shadow-[0_14px_38px_rgba(0,0,0,0.35)] transition-all duration-300 min-w-0">
+					<div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink-0">
+						<div className="h-9 sm:h-11 w-9 sm:w-11 rounded-2xl bg-[var(--accent-emerald)] flex items-center justify-center text-[10px] sm:text-[12px] font-black tracking-[0.28em] text-slate-950 shadow-[0_10px_28px_rgba(91,224,176,0.35)] flex-shrink-0">
 							IA
 						</div>
-						<div className="flex flex-col leading-tight">
-							<span className="text-lg sm:text-xl font-semibold tracking-[0.1em] uppercase text-dim">{t("brand.title")}</span>
+						<div className="flex flex-col leading-tight min-w-0">
+							<span className="text-sm sm:text-lg font-semibold tracking-[0.1em] uppercase text-dim truncate">{t("brand.title")}</span>
 							{t("brand.subtitle") ? (
-								<span className="text-sm text-subtle tracking-[0.12em] uppercase">{t("brand.subtitle")}</span>
+								<span className="text-xs sm:text-sm text-subtle tracking-[0.12em] uppercase truncate">{t("brand.subtitle")}</span>
 							) : null}
 						</div>
 					</div>
@@ -108,16 +108,17 @@ export function HeroSection({
 						))}
 					</div>
 
-					<div className="flex flex-1 md:flex-none items-center justify-end gap-2 md:gap-2.5 text-[12px] min-w-[220px] flex-nowrap">
+					<div className="flex items-center justify-end gap-1.5 sm:gap-2 text-[12px] flex-nowrap min-w-0">
 						<div ref={languageMenuRef} className="relative">
 							<button
 								type="button"
 								onClick={() => setLanguageMenuOpen((open) => !open)}
-								className="inline-flex items-center gap-1.5 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3.5 py-2 text-sm text-dim transition hover:border-[var(--stroke-glow)] hover:text-[var(--accent-blue)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40"
+								className="inline-flex items-center gap-1 sm:gap-1.5 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm text-dim transition hover:border-[var(--stroke-glow)] hover:text-[var(--accent-blue)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40 whitespace-nowrap min-h-[44px] sm:min-h-auto"
 								aria-haspopup="listbox"
 								aria-expanded={languageMenuOpen}
 							>
-								<span>{LANGUAGE_LABEL[language]}</span>
+								<span className="hidden sm:inline">{LANGUAGE_LABEL[language]}</span>
+								<span className="sm:hidden text-xs">{LANGUAGE_LABEL[language].slice(0, 2)}</span>
 								<span className="text-xs text-subtle">▾</span>
 							</button>
 							{languageMenuOpen && (
@@ -150,9 +151,9 @@ export function HeroSection({
 								<button
 									type="button"
 									onClick={() => setAccountMenuOpen((open) => !open)}
-									className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-2.5 py-1.5 text-sm text-dim transition hover:border-[var(--stroke-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40"
+									className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-1.5 sm:px-2.5 py-1.5 sm:py-1.5 text-sm text-dim transition hover:border-[var(--stroke-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40 min-h-[44px] sm:min-h-auto"
 								>
-									<span className="h-8 w-8 rounded-full bg-[var(--accent-emerald)]/20 border border-[var(--stroke-soft)] overflow-hidden flex items-center justify-center text-xs font-semibold text-[var(--accent-emerald)]">
+									<span className="h-7 sm:h-8 w-7 sm:w-8 rounded-full bg-[var(--accent-emerald)]/20 border border-[var(--stroke-soft)] overflow-hidden flex items-center justify-center text-xs font-semibold text-[var(--accent-emerald)] flex-shrink-0">
 										{userImage ? (
 											// eslint-disable-next-line @next/next/no-img-element
 											<img src={userImage} alt="avatar" className="h-full w-full object-cover" />
@@ -160,7 +161,7 @@ export function HeroSection({
 											avatarInitial
 										)}
 									</span>
-									<span className="text-[var(--color-foreground)] hidden sm:inline-block">{t("auth.account.label").replace(/[:：]$/, "")}</span>
+									<span className="text-[var(--color-foreground)] hidden sm:inline text-sm">{t("auth.account.label").replace(/[:：]$/, "")}</span>
 								</button>
 								{accountMenuOpen && (
 									<div className="absolute right-0 mt-2 w-60 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/95 p-3 shadow-[0_20px_80px_rgba(0,0,0,0.65)] backdrop-blur-xl space-y-3">
@@ -212,11 +213,11 @@ export function HeroSection({
 							<button
 								type="button"
 								onClick={onPrimaryCta}
-								className="btn-gradient px-[18px] py-2 text-sm font-semibold shadow-[0_10px_30px_rgba(16,185,129,0.35)] transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_14px_40px_rgba(16,185,129,0.45)] active:translate-y-0.5"
+								className="btn-gradient px-3 sm:px-[18px] py-1.5 sm:py-2 text-xs sm:text-sm font-semibold shadow-[0_10px_30px_rgba(16,185,129,0.35)] transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_14px_40px_rgba(16,185,129,0.45)] active:translate-y-0.5 min-h-[44px] sm:min-h-auto flex items-center whitespace-nowrap"
 							>
 								{t("cta.preview")}
 								{previewNote && (
-									<span className="text-xs font-normal text-slate-900/70 normal-case tracking-normal">
+									<span className="text-[10px] sm:text-xs font-normal text-slate-900/70 normal-case tracking-normal hidden sm:inline">
 										{previewNote}
 									</span>
 								)}
@@ -237,44 +238,44 @@ export function HeroSection({
 				</div>
 			</div>
 
-			<div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10">
+			<div className="mx-auto w-full max-w-full px-4 sm:px-6 lg:px-10">
 				<section
 					id="hero"
-					className="relative overflow-hidden rounded-[36px] border border-[var(--stroke-soft)]/80 bg-[var(--bg-layer)]/85 px-5 py-6 sm:px-8 sm:py-9 shadow-[0_16px_60px_rgba(0,0,0,0.32)]"
+					className="relative overflow-hidden rounded-[20px] sm:rounded-[36px] border border-[var(--stroke-soft)]/80 bg-[var(--bg-layer)]/85 px-4 sm:px-8 py-6 sm:py-9 shadow-[0_16px_60px_rgba(0,0,0,0.32)]"
 				>
 					<div className="pointer-events-none absolute inset-0 hero-mesh" aria-hidden />
-					<div className="relative space-y-7 text-center">
+					<div className="relative space-y-4 sm:space-y-7 text-center">
 					{tagline ? (
-						<div className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)]/90 bg-[var(--bg-layer)]/90 px-4 py-2 text-sm uppercase tracking-[0.24em] text-[var(--accent-emerald)]">
-							<span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-emerald)]" />
-							<span>{tagline}</span>
+						<div className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)]/90 bg-[var(--bg-layer)]/90 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm uppercase tracking-[0.24em] text-[var(--accent-emerald)]">
+								<span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-emerald)]" />
+								<span>{tagline}</span>
 						</div>
 					) : null}
 
-						<div className="space-y-4 text-center">
-							<h1 className="text-[2.5rem] sm:text-[3rem] leading-[1.05] font-semibold text-emerald-200">
+						<div className="space-y-3 sm:space-y-4 text-center">
+							<h1 className="text-2xl sm:text-[2.5rem] lg:text-[3rem] leading-[1.2] sm:leading-[1.05] font-semibold text-emerald-200">
 								{t("hero.title")}
 							</h1>
-							<p className="mx-auto max-w-3xl text-lg sm:text-xl text-dim leading-relaxed">
+							<p className="mx-auto max-w-3xl text-base sm:text-lg lg:text-xl text-dim leading-relaxed">
 								{t("hero.description")}
 							</p>
 							{t("hero.positioning") ? (
-								<p className="text-base uppercase tracking-[0.24em] text-emerald-200/70">{t("hero.positioning")}</p>
+								<p className="text-sm sm:text-base uppercase tracking-[0.24em] text-emerald-200/70">{t("hero.positioning")}</p>
 							) : null}
-							<p className="text-lg font-medium text-[var(--accent-emerald)]">{t("hero.brandline")}</p>
+							<p className="text-base sm:text-lg font-medium text-[var(--accent-emerald)]">{t("hero.brandline")}</p>
 						</div>
 
-						<div className="flex flex-wrap items-center justify-center gap-3 mt-6">
+						<div className="flex flex-col sm:flex-wrap items-center justify-center gap-3 mt-4 sm:mt-6">
 							<button
 								type="button"
 								onClick={onPrimaryCta}
-								className="rounded-full border border-[var(--accent-emerald)]/70 bg-[var(--accent-emerald)]/12 px-6 py-2 text-base font-semibold text-[var(--accent-emerald)] shadow-[0_10px_24px_rgba(91,224,176,0.18)] transition-all duration-200 ease-out hover:bg-[var(--accent-emerald)]/20 hover:-translate-y-1 hover:shadow-[0_14px_32px_rgba(91,224,176,0.28)] active:translate-y-0.5"
+								className="w-full sm:w-auto rounded-full border border-[var(--accent-emerald)]/70 bg-[var(--accent-emerald)]/12 px-4 sm:px-6 py-2.5 sm:py-2 text-sm sm:text-base font-semibold text-[var(--accent-emerald)] shadow-[0_10px_24px_rgba(91,224,176,0.18)] transition-all duration-200 ease-out hover:bg-[var(--accent-emerald)]/20 hover:-translate-y-1 hover:shadow-[0_14px_32px_rgba(91,224,176,0.28)] active:translate-y-0.5 min-h-[44px] flex items-center justify-center"
 							>
 								{t("hero.cta.primary")}
 							</button>
-							<Link href="/reports" className="btn-ghost px-5 py-2 text-base transition-all duration-200 ease-out hover:-translate-y-0.5">
+							<Link href="/reports" className="w-full sm:w-auto btn-ghost px-4 sm:px-5 py-2.5 sm:py-2 text-sm sm:text-base transition-all duration-200 ease-out hover:-translate-y-0.5 min-h-[44px] flex items-center justify-center">
 								<span>{t("hero.cta.secondary")}</span>
-								<span className="text-xs text-subtle">↗</span>
+								<span className="text-xs text-subtle ml-1">↗</span>
 							</Link>
 						</div>
 
