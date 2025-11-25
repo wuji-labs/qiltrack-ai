@@ -68,6 +68,16 @@ export function HeroSection({
 
 	const avatarInitial = userEmail ? userEmail.charAt(0).toUpperCase() : "A";
 
+	const handleNavClick = (href: string, e: React.MouseEvent<HTMLAnchorElement>) => {
+		if (href.startsWith("#")) {
+			e.preventDefault();
+			const element = document.querySelector(href);
+			if (element) {
+				element.scrollIntoView({ behavior: "smooth", block: "start" });
+			}
+		}
+	};
+
 	return (
 		<section className="w-full">
 			<div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4 sm:px-6 lg:px-10">
@@ -89,6 +99,7 @@ export function HeroSection({
 							<a
 								key={item.href}
 								href={item.href}
+								onClick={(e) => handleNavClick(item.href, e)}
 								className="rounded-full px-3 py-2 transition-all duration-200 ease-out relative text-subtle hover:text-[var(--accent-blue)] hover:-translate-y-0.5 hover:bg-[var(--bg-layer)]/70 group"
 							>
 								{item.label}
@@ -219,7 +230,7 @@ export function HeroSection({
 			<div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10">
 				<div className="lg:hidden px-4 py-2 border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 backdrop-blur-xl overflow-x-auto flex gap-4 text-sm uppercase tracking-[0.2em] text-subtle rounded-2xl mb-4">
 					{navItems.map((item) => (
-						<a key={item.href} href={item.href} className="whitespace-nowrap hover:text-[var(--accent-blue)]">
+						<a key={item.href} href={item.href} onClick={(e) => handleNavClick(item.href, e)} className="whitespace-nowrap hover:text-[var(--accent-blue)]">
 							{item.label}
 						</a>
 					))}
@@ -228,7 +239,7 @@ export function HeroSection({
 
 			<div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10">
 				<section
-					id="overview"
+					id="hero"
 					className="relative overflow-hidden rounded-[36px] border border-[var(--stroke-soft)]/80 bg-[var(--bg-layer)]/85 px-5 py-6 sm:px-8 sm:py-9 shadow-[0_16px_60px_rgba(0,0,0,0.32)]"
 				>
 					<div className="pointer-events-none absolute inset-0 hero-mesh" aria-hidden />
