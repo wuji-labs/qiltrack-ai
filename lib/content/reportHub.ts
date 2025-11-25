@@ -115,7 +115,7 @@ const reportData: ReportSummary[] = [
  * @returns Array of featured report summaries, sorted by date (newest first)
  */
 export function getFeaturedReports(limit = 3): ReportSummary[] {
-	return reportData
+	return [...reportData]
 		.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 		.slice(0, limit);
 }
