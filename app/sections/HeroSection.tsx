@@ -16,6 +16,7 @@ type HeroSectionProps = {
 	planLabel: string;
 	isAuthenticated: boolean;
 	onPrimaryCta: () => void;
+	onSmoothScroll?: (href: string) => void;
 	onSignOut: () => void;
 	t: (key: string, vars?: Record<string, string>) => string;
 	belowCta?: ReactNode;
@@ -31,6 +32,7 @@ export function HeroSection({
 	planLabel,
 	isAuthenticated,
 	onPrimaryCta,
+	onSmoothScroll,
 	onSignOut,
 	t,
 	belowCta,
@@ -71,9 +73,13 @@ export function HeroSection({
 	const handleNavClick = (href: string, e: React.MouseEvent<HTMLAnchorElement>) => {
 		if (href.startsWith("#")) {
 			e.preventDefault();
-			const element = document.querySelector(href);
-			if (element) {
-				element.scrollIntoView({ behavior: "smooth", block: "start" });
+			if (onSmoothScroll) {
+				onSmoothScroll(href);
+			} else {
+				const element = document.querySelector(href);
+				if (element) {
+					element.scrollIntoView({ behavior: "smooth", block: "start" });
+				}
 			}
 		}
 	};
