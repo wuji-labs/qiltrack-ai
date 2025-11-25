@@ -403,15 +403,15 @@ export function HeroSection({
 							<p className="text-base sm:text-lg font-medium text-[var(--accent-emerald)]">{t("hero.brandline")}</p>
 						</div>
 
-						<div className="flex flex-col sm:flex-wrap items-center justify-center gap-3 mt-4 sm:mt-6">
+						<div className="flex items-center justify-center gap-3 sm:gap-4 mt-4 sm:mt-6">
 							<button
 								type="button"
 								onClick={onPrimaryCta}
-								className="w-full sm:w-auto rounded-full border border-[var(--accent-emerald)]/70 bg-[var(--accent-emerald)]/12 px-4 sm:px-6 py-2.5 sm:py-2 text-sm sm:text-base font-semibold text-[var(--accent-emerald)] shadow-[0_10px_24px_rgba(91,224,176,0.18)] transition-all duration-200 ease-out hover:bg-[var(--accent-emerald)]/20 hover:-translate-y-1 hover:shadow-[0_14px_32px_rgba(91,224,176,0.28)] active:translate-y-0.5 min-h-[44px] flex items-center justify-center"
+								className="flex-1 sm:flex-none min-w-[136px] rounded-full border border-[var(--accent-emerald)]/70 bg-[var(--accent-emerald)]/12 px-4 sm:px-6 py-2.5 sm:py-2 text-sm sm:text-base font-semibold text-[var(--accent-emerald)] shadow-[0_10px_24px_rgba(91,224,176,0.18)] transition-all duration-200 ease-out hover:bg-[var(--accent-emerald)]/20 hover:-translate-y-1 hover:shadow-[0_14px_32px_rgba(91,224,176,0.28)] active:translate-y-0.5 min-h-[44px] flex items-center justify-center"
 							>
 								{t("hero.cta.primary")}
 							</button>
-							<Link href="/reports" className="w-full sm:w-auto btn-ghost px-4 sm:px-5 py-2.5 sm:py-2 text-sm sm:text-base transition-all duration-200 ease-out hover:-translate-y-0.5 min-h-[44px] flex items-center justify-center">
+							<Link href="/reports" className="flex-1 sm:flex-none min-w-[136px] btn-ghost px-4 sm:px-5 py-2.5 sm:py-2 text-sm sm:text-base transition-all duration-200 ease-out hover:-translate-y-0.5 min-h-[44px] flex items-center justify-center">
 								<span>{t("hero.cta.secondary")}</span>
 								<span className="text-xs text-subtle ml-1">↗</span>
 							</Link>
