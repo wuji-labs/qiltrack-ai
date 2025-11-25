@@ -2519,6 +2519,13 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hant": "匯出中…",
 		"zh-Hans": "导出中...",
 	},
+	"auth.provider.coming": {
+		"en": "coming soon",
+		"ja": "近日公開",
+		"ko": "곧 출시",
+		"zh-Hant": "即將推出",
+		"zh-Hans": "即将推出",
+	},
 } as const satisfies Record<string, TranslationEntry>;
 
 export type TranslationKey = keyof typeof translations;

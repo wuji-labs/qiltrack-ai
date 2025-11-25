@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState, type FormEvent } from "react";
@@ -8,9 +9,9 @@ import { useLanguage } from "@/lib/i18n";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 const providerButtons = [
-	{ id: "google", icon: "☉", labelKey: "auth.provider.google" },
-	{ id: "apple", icon: "", labelKey: "auth.provider.apple" },
-	{ id: "azure-ad", icon: "◆", labelKey: "auth.provider.microsoft" },
+	{ id: "google" as const, iconSrc: "/providers/google.svg", labelKey: "auth.provider.google", enabled: true },
+	{ id: "microsoft" as const, iconSrc: "/providers/microsoft.svg", labelKey: "auth.provider.microsoft", enabled: true },
+	{ id: "apple" as const, iconSrc: "/providers/apple.svg", labelKey: "auth.provider.apple", enabled: false },
 ] as const;
 
 export default function LoginPage() {
@@ -41,7 +42,7 @@ function LoginContent() {
 	const errorMessage = requestError ? t("auth.error.generic") : null;
 	const successMessage = emailStatus === "sent" ? t("auth.success.magicLink") : null;
 
-	const handleProvider = async (provider: "google" | "github" | "microsoft") => {
+	const handleProvider = async (provider: "google" | "microsoft" | "apple") => {
 		try {
 			setPendingProvider(provider);
 			const result = await signInWithProvider(provider);
@@ -97,6 +98,29 @@ function LoginContent() {
 
 				<div className="space-y-3">
 					{providerButtons.map((provider) => {
+						if (!provider.enabled) {
+							return (
+								<div key={provider.id} className="group">
+									<button
+										type="button"
+										disabled={true}
+										className="w-full inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-700 px-4 py-3 text-base font-medium opacity-50 cursor-not-allowed"
+										title={`${t(provider.labelKey)} · ${t("auth.provider.coming")}`}
+									>
+										<Image
+											src={provider.iconSrc}
+											alt={provider.id}
+											width={20}
+											height={20}
+											priority={false}
+										/>
+										<span>{t(provider.labelKey)}</span>
+										<span className="text-xs text-slate-500 ml-auto">{t("auth.provider.coming")}</span>
+									</button>
+								</div>
+							);
+						}
+
 						const loading = pendingProvider === provider.id;
 						return (
 							<button
@@ -110,7 +134,13 @@ function LoginContent() {
 										: "hover:border-emerald-400 hover:bg-slate-900"
 								}`}
 							>
-								<span>{provider.icon}</span>
+								<Image
+									src={provider.iconSrc}
+									alt={provider.id}
+									width={20}
+									height={20}
+									priority={false}
+								/>
 								<span>{t(provider.labelKey)}</span>
 							</button>
 						);
