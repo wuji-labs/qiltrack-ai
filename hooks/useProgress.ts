@@ -22,6 +22,12 @@ export type ProgressState = {
 	status: ProgressStatus;
 	text: string | null;
 	currentStep: number;
+} & {
+	start: (label?: string) => void;
+	complete: (label?: string) => Promise<void>;
+	forceComplete: () => void;
+	fail: (label?: string) => void;
+	reset: () => void;
 };
 
 const STEP_THRESHOLDS = [0, 10, 22, 35, 50, 65, 80, 92];

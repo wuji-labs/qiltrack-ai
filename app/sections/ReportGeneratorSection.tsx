@@ -6,7 +6,7 @@ import * as docx from "docx";
 import { saveAs } from "file-saver";
 
 import { ProgressBar } from "@/app/components/ProgressBar";
-import { useProgress } from "@/hooks/useProgress";
+import { type ProgressState } from "@/hooks/useProgress";
 import { generateReport, searchSymbols } from "@/lib/services/api";
 import type { Language } from "@/lib/i18n-config";
 import type { ReportResponse, ReportTone, SearchResult } from "@/types/report";
@@ -34,6 +34,13 @@ type ReportGeneratorSectionProps = {
 	highlightFallback: string[];
 	heroHighlights: { title: string; description: string }[];
 	auth: AuthInfo;
+	progress: ProgressState & {
+		start: (label?: string) => void;
+		complete: (label?: string) => Promise<void>;
+		fail: (label?: string) => void;
+		reset: () => void;
+		forceComplete: () => void;
+	};
 	onRequireLogin: () => void;
 	t: (key: string, vars?: Record<string, string>) => string;
 };
@@ -45,6 +52,7 @@ export function ReportGeneratorSection({
 	highlightFallback,
 	heroHighlights,
 	auth,
+	progress,
 	onRequireLogin,
 	t,
 }: ReportGeneratorSectionProps) {
@@ -58,8 +66,6 @@ export function ReportGeneratorSection({
 	const [reportData, setReportData] = useState<ReportResponse | null>(null);
 	const [exportingDocx, setExportingDocx] = useState(false);
 	const [lastReportTone, setLastReportTone] = useState<ReportTone>("baseline");
-
-	const progress = useProgress();
 	const reportContentRef = useRef<HTMLDivElement>(null);
 	const testToken = process.env.NEXT_PUBLIC_TEST_REPORT_TOKEN;
 	const canBypassAuth = Boolean(testToken);
