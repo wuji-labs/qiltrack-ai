@@ -34,6 +34,7 @@
 2) **Design & Breakdown**：Codex 给组件/数据流/测试矩阵；Claude 输出实施清单。  
 3) **Implementation Loop**：Claude 在短分支开发，跑 `npm run lint` / `npm test`，每段产出变更说明；Codex 随时答疑。  
    - 分支策略：Claude 必须用独立 feature 分支，禁止直接改/推 main；通过 PR 合并，lint/test 必过。  
+   - worktree 同步：使用 git worktree 开发时，提 PR 前固定跑 `git fetch origin` -> `git rebase origin/main` -> `git status`，确认工作区干净且基于最新 main，再 push；rebase 冲突由 Claude 解决。
    - 提交 PR 时必须使用 `.github/pull_request_template.md`，确保 CAVR、验证结果与终端三行简讯全部填妥。  
 4) **Review & Validation**：Codex 按行为/韧性/风格审查，指出缺陷与风险；Claude 修复并补充验证。  
 5) **Knowledge Capture**：Codex 更新策略/方案文档；Claude 补 README/env/回归测试。  
