@@ -40,6 +40,7 @@ export function HeroSection({
 	const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
 	const [accountMenuOpen, setAccountMenuOpen] = useState(false);
 	const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+	const [hasScrolled, setHasScrolled] = useState(false);
 	const languageMenuRef = useRef<HTMLDivElement>(null);
 	const accountMenuRef = useRef<HTMLDivElement>(null);
 	const mobileDrawerRef = useRef<HTMLDivElement>(null);
@@ -82,6 +83,14 @@ export function HeroSection({
 		return () => document.removeEventListener("mousedown", handleClick);
 	}, [mobileDrawerOpen]);
 
+	useEffect(() => {
+		const handleScroll = () => {
+			setHasScrolled(window.scrollY > 20);
+		};
+		window.addEventListener("scroll", handleScroll);
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, []);
+
 	const avatarInitial = userEmail ? userEmail.charAt(0).toUpperCase() : "A";
 
 	const handleNavClick = (href: string, e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -101,10 +110,15 @@ export function HeroSection({
 	// Shared container class for consistent alignment across nav, hero, and main content
 	const pageContainer = "mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10";
 
+	// Dynamic nav styles based on scroll state
+	const navBgClass = hasScrolled ? "bg-[var(--bg-frosted)]/98" : "bg-[var(--bg-frosted)]/95";
+	const navBorderClass = hasScrolled ? "border-[var(--stroke-glow)]/40" : "border-[var(--stroke-soft)]";
+	const navShadowClass = hasScrolled ? "shadow-[0_20px_60px_rgba(0,0,0,0.48)]" : "shadow-[0_16px_48px_rgba(0,0,0,0.42)]";
+
 	return (
 		<section className="w-full overflow-x-hidden">
 			<div className={`fixed top-3 left-1/2 -translate-x-1/2 z-50 ${pageContainer}`}>
-				<nav className="flex flex-wrap xl:flex-nowrap justify-between items-center gap-2 sm:gap-4 rounded-2xl border border-[var(--stroke-soft)]/80 bg-[var(--bg-frosted)]/85 px-3 sm:px-10 py-3 sm:py-5 min-h-[72px] backdrop-blur-xl shadow-[0_14px_38px_rgba(0,0,0,0.35)] transition-all duration-300 min-w-0">
+				<nav className={`flex flex-wrap xl:flex-nowrap justify-between items-center gap-2 sm:gap-4 rounded-2xl border px-3 sm:px-10 py-3 sm:py-5 min-h-[72px] backdrop-blur-2xl transition-all duration-300 min-w-0 ${navBgClass} ${navBorderClass} ${navShadowClass}`}>
 					<div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink-0">
 						<div className="h-9 sm:h-11 w-9 sm:w-11 rounded-2xl bg-[var(--accent-emerald)] flex items-center justify-center text-[10px] sm:text-[12px] font-black tracking-[0.28em] text-slate-950 shadow-[0_10px_28px_rgba(91,224,176,0.35)] flex-shrink-0">
 							IA
