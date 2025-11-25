@@ -3,6 +3,17 @@
 **PR**: https://github.com/explore0012/ai-report/pull/16
 **分支**: feat/reports-motion-enhancement-v2
 **日期**: 2025-11-25
+**状态**: ✅ 修复完成 - 支持分页重绑与无障碍立即显示
+
+## 修复记录
+
+### Issue #1: 分页翻页后卡片隐藏
+**描述**: 分页翻页时，新卡片保持 `data-visible="false"` 状态，因为 useEffect 依赖未包含翻页触发。
+**修复**: 在 page.tsx 添加 `useEffect(() => { ... }, [pageIndex])`，翻页时重置所有卡片的 `data-visible` 为 false，hook 的 observer 随后重新观察并触发进场。
+
+### Issue #2: prefers-reduced-motion 场景卡片可能隐藏
+**描述**: 无障碍模式下，hook 初始化时若 media query 不被检测，卡片可能保持隐藏。
+**修复**: hook 添加 `respectReducedMotion` 选项，初始化时显式检测 `prefers-reduced-motion`，无障碍模式下立即设置 `data-visible="true"`，跳过 observer。
 
 ## 实现范围
 
@@ -39,16 +50,17 @@
 
 ## 代码变更
 
-### 文件列表
-- **app/reports/page.tsx**（98 行新增/删除）
-  - 导入 `useVisibilityStagger` 和 `useRef`
-  - 添加 `gridRef` 和 hook 调用
-  - Hero、Pills、Featured、List、Pagination 各部分补充动效类和 transition 配置
-  - 移除未使用变量 `featuredReport`
+### 代码变更
+- **app/reports/page.tsx**（+13 行，导入 useEffect，添加分页重绑 effect）
+  - 导入 `useEffect`
+  - 添加 `useEffect(() => { ... }, [pageIndex])`，翻页时重置卡片 `data-visible` 状态
+  - hook 调用保持不变，但现已通过此 effect 触发重新观察
 
-- **app/reports/hooks/useVisibilityStagger.ts**（新增）
-  - 标准 React hook 实现，使用 IntersectionObserver API
-  - 无额外依赖，组件挂载时自动设置 stagger delay
+- **app/reports/hooks/useVisibilityStagger.ts**（更新）
+  - 新增 `respectReducedMotion?: boolean` 选项（默认 true）
+  - 初始化时检测 `window.matchMedia('(prefers-reduced-motion: reduce)')`
+  - 无障碍模式下立即设置 `data-visible="true"`，正常模式则使用 IntersectionObserver
+  - 确保 deps 包含 `respectReducedMotion`
 
 ### CSS（无新增）
 - 所有 keyframes 和 utility 类已在 globals.css 中定义（Phase 1）
@@ -68,6 +80,7 @@
 ### 无障碍检查
 - [ ] 系统设置 → 辅助功能 → 显示 → 减少动画 ✓
 - [ ] 刷新 /reports，所有动画应立即完成或禁用，内容仍可读
+- [ ] **分页翻页后，卡片应仍保持可见**（修复项）
 
 ### 工具检查
 - [ ] `npm run lint` 通过，无新增警告
@@ -84,8 +97,11 @@
 
 ### 已解决
 - ✅ 首次加载时 stagger delay 正确计算
-- ✅ 分页切换不会导致动画丢失（IntersectionObserver 保持活跃）
+- ✅ **分页翻页时卡片重新触发 stagger 动画**（通过 useEffect 重置 data-visible）
+- ✅ **prefers-reduced-motion 场景下卡片立即显示**（hook 显式检测媒体查询）
 - ✅ 无障碍支持完整（globals.css 中 prefers-reduced-motion 已覆盖所有类）
+- ✅ 分页切换后也支持无障碍立即显示（hook 每次初始化都检测）
+- ✅ lint 通过，无新增警告
 
 ### 可选增强（不在本期范围）
 - 动效配置可考虑参数化（delay、duration、easin function），目前硬编码以保持简洁
