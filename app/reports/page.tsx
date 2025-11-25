@@ -54,7 +54,7 @@ export default function ReportsPage() {
 		<main className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)]">
 			<div className="mx-auto max-w-6xl space-y-10 px-4 py-12 sm:px-6 lg:px-10">
 				<section className="relative overflow-hidden rounded-[32px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-6 shadow-[0_26px_90px_rgba(0,0,0,0.45)] text-center">
-					<div className="pointer-events-none absolute inset-0 hero-mesh motion-safe:animate-mesh-drift" aria-hidden />
+					<div className="pointer-events-none absolute inset-0 hero-mesh" aria-hidden />
 					<div className="relative mx-auto max-w-3xl space-y-4">
 						<p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)] animate-fade-in-up" style={{ animationDelay: '0ms' }}>
 							{t("reports.page.hero.kicker")}
@@ -66,16 +66,16 @@ export default function ReportsPage() {
 							{t("reports.page.hero.description")}
 						</p>
 						<div className="flex flex-wrap items-center justify-center gap-3 animate-fade-in-up" style={{ animationDelay: '240ms' }}>
-							<Link href="#archive" className="btn-gradient px-5 py-2 text-sm font-semibold">
+							<Link href="#archive" className="btn-gradient px-5 py-2 text-sm font-semibold motion-safe:hover:glow-pulse motion-safe:transition-transform motion-safe:hover:-translate-y-0.5">
 								{t("reports.page.hero.cta")}
 							</Link>
 							<Link
 								href="mailto:contact@investor.ai"
-								className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] transition-colors"
+								className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] transition-colors motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 motion-safe:hover:glow-pulse"
 							>
 								{t("reports.page.hero.contact")}
 							</Link>
-							<Link href="/" className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] transition-colors">
+							<Link href="/" className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] transition-colors motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 motion-safe:hover:glow-pulse">
 								{t("reports.page.hero.backHome")}
 							</Link>
 						</div>
