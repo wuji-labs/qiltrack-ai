@@ -695,48 +695,90 @@ export function ReportGeneratorSection({
 
 		<section className="rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-5 sm:p-6 space-y-4 shadow-[0_16px_60px_rgba(0,0,0,0.3)]">
 			<div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
-				<div className="relative overflow-hidden rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/85 p-4 sm:p-5">
-					<div className="pointer-events-none absolute inset-0 opacity-70">
-						<div className="absolute -left-6 top-2 h-28 w-28 rounded-full bg-[var(--accent-emerald)]/18 blur-[90px]" aria-hidden />
-						<div className="absolute right-0 bottom-0 h-36 w-36 rounded-full bg-[var(--accent-blue)]/14 blur-[110px]" aria-hidden />
+				{/* Premium Membership Card */}
+				<div className="relative overflow-hidden rounded-[28px] border border-[rgba(91,224,176,0.2)] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 shadow-[0_25px_80px_rgba(0,0,0,0.5)]">
+					{/* Decorative layers for premium feel */}
+					<div className="pointer-events-none absolute inset-0">
+						{/* Radial gradient for depth */}
+						<div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(91,224,176,0.1),transparent_40%)]" aria-hidden />
+						{/* Linear gradient for shine effect */}
+						<div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0))]" aria-hidden />
+						{/* Micro-grid for metallic texture */}
+						<div className="absolute inset-0" style={{backgroundImage: "linear-gradient(0deg, rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)", backgroundSize: "50px 50px"}} aria-hidden />
+						{/* Corner accent glows */}
+						<div className="absolute -top-10 -left-10 h-40 w-40 rounded-full bg-[var(--accent-emerald)]/8 blur-3xl" aria-hidden />
+						<div className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full bg-cyan-500/6 blur-3xl" aria-hidden />
 					</div>
-					<div className="relative flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center justify-between">
-						<div className="space-y-3 flex-1">
-							<p className="text-xs uppercase tracking-[0.28em] text-emerald-300">{t("hero.quota")}</p>
-							<h3 className="text-lg font-semibold text-[var(--color-foreground)]">
+
+					{/* Card content */}
+					<div className="relative flex flex-col gap-6">
+						{/* Header: Brand + Status */}
+						<div className="flex items-start justify-between">
+							<div className="space-y-2">
+								<p className="text-[10px] uppercase tracking-[0.3em] text-emerald-300/80 font-semibold">{t("hero.quota")}</p>
+								{auth.isAuthenticated && (
+									<div className="inline-flex items-center gap-2 rounded-full border border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald)]/10 px-3 py-1">
+										<span className="h-2 w-2 rounded-full bg-[var(--accent-emerald)] animate-pulse" aria-hidden />
+										<span className="text-xs font-semibold text-[var(--accent-emerald)]">{auth.planLabel}</span>
+									</div>
+								)}
+								{!auth.isAuthenticated && (
+									<div className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1">
+										<span className="text-xs font-semibold text-amber-200">Guest</span>
+									</div>
+								)}
+							</div>
+							{/* Chip-like element for card effect */}
+							<div className="w-12 h-8 rounded border border-[rgba(91,224,176,0.25)] bg-gradient-to-b from-[var(--accent-emerald)]/20 to-[var(--accent-emerald)]/5 shadow-[inset_0_0_8px_rgba(91,224,176,0.1)]" aria-hidden />
+						</div>
+
+						{/* Main content: Heading + Email */}
+						<div className="space-y-2">
+							<h3 className="text-xl sm:text-2xl font-bold text-[var(--color-foreground)] leading-tight">
 								{auth.isAuthenticated
 									? t("quota.card.heading", { plan: auth.planLabel })
 									: t("quota.banner.title")}
 							</h3>
 							{auth.isAuthenticated && (
-								<p className="text-sm text-subtle">
+								<p className="text-xs text-subtle/70">
 									{t("quota.card.email", { email: auth.userEmail ?? t("auth.session.fallback") })}
 								</p>
 							)}
-							<div className="text-3xl font-bold text-[var(--accent-emerald)]">
+						</div>
+
+						{/* Quota display: Large number + note */}
+						<div className="border-t border-[rgba(91,224,176,0.1)] pt-4 space-y-2">
+							<div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-[var(--accent-emerald)] to-cyan-300 bg-clip-text text-transparent">
 								{auth.isAuthenticated
 									? t("quota.card.count", { count: auth.remainingQuota.toString() })
 									: t("quota.banner.description")}
 							</div>
-							<p className="text-xs text-subtle/80">
+							<p className="text-xs text-subtle/70">
 								{auth.isAuthenticated ? t("quota.card.note") : t("quota.banner.hint.register")}
 							</p>
 						</div>
-						<div className="flex flex-col gap-2 w-full sm:w-40 flex-shrink-0">
+
+						{/* Action buttons: CTA + Secondary */}
+						<div className="flex flex-col gap-3 pt-2">
 							<button
 								type="button"
 								onClick={auth.isAuthenticated ? auth.refreshSession : onRequireLogin}
-								className="btn-gradient px-4 py-2 text-sm font-semibold shadow-[0_12px_32px_rgba(91,224,176,0.26)]"
+								className="w-full rounded-full bg-gradient-to-r from-[var(--accent-emerald)] via-emerald-300 to-cyan-300 px-6 py-3 text-sm font-semibold text-slate-950 shadow-[0_12px_40px_rgba(91,224,176,0.3)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_50px_rgba(91,224,176,0.4)] active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)]/50 disabled:opacity-60 disabled:cursor-not-allowed"
 							>
 								{auth.isAuthenticated ? t("quota.card.refreshCta") : t("cta.preview")}
 							</button>
 							<button
 								type="button"
 								onClick={() => document.querySelector("#generator")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-								className="btn-ghost px-4 py-2 text-sm"
+								className="w-full rounded-full border border-[var(--accent-emerald)]/40 bg-transparent px-6 py-2.5 text-sm font-semibold text-[var(--accent-emerald)] transition-all duration-200 hover:bg-[var(--accent-emerald)]/5 hover:border-[var(--accent-emerald)]/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)]/40"
 							>
 								{t("quota.card.exampleCta")}
 							</button>
+						</div>
+
+						{/* Signature strip effect */}
+						<div className="border-t border-[rgba(91,224,176,0.08)] pt-3">
+							<p className="text-[9px] text-subtle/50 tracking-[0.15em]">INVESTOR AI © 2025</p>
 						</div>
 					</div>
 				</div>
