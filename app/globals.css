@@ -544,7 +544,7 @@ body {
 /* ====== Phase 1: /reports 动效增强 - Keyframes 与 Utility Classes ====== */
 
 /* Keyframes for Reports Motion Enhancement */
-@keyframes fade-in-up-reports {
+@keyframes fade-in-up {
   from {
     opacity: 0;
     transform: translateY(16px);
@@ -563,6 +563,24 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes scale-hover {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes parallax-shift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-6px);
   }
 }
 
@@ -601,9 +619,20 @@ body {
   }
 }
 
+@keyframes card-lift {
+  from {
+    transform: translateY(0);
+    box-shadow: 0 22px 70px rgba(0, 0, 0, 0.45);
+  }
+  to {
+    transform: translateY(-2px);
+    box-shadow: 0 28px 90px rgba(0, 0, 0, 0.55);
+  }
+}
+
 /* Utility Classes */
 .animate-fade-in-up {
-  animation: fade-in-up-reports 0.2s ease-out;
+  animation: fade-in-up 0.2s ease-out;
 }
 
 .animate-stagger-fade-in {
