@@ -239,7 +239,7 @@ export function HeroSection({
 
 			<div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10">
 				<section
-					id="overview"
+					id="hero"
 					className="relative overflow-hidden rounded-[36px] border border-[var(--stroke-soft)]/80 bg-[var(--bg-layer)]/85 px-5 py-6 sm:px-8 sm:py-9 shadow-[0_16px_60px_rgba(0,0,0,0.32)]"
 				>
 					<div className="pointer-events-none absolute inset-0 hero-mesh" aria-hidden />
