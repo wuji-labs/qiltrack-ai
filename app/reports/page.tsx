@@ -4,9 +4,10 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n";
 import { useVisibilityStagger } from "./hooks/useVisibilityStagger";
-import { reports } from "./data";
+import { getAllReports, listCategories } from "@/lib/content/reportHub";
 
-const categories = ["All", ...Array.from(new Set(reports.map((item) => item.theme)))];
+const reports = getAllReports();
+const categories = ["All", ...listCategories()];
 
 export default function ReportsPage() {
 	const { t, language } = useLanguage();

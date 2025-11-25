@@ -73,3 +73,17 @@ export type SearchResult = {
 };
 
 export type ReportTone = "baseline" | "buffett" | "musk" | "muddy";
+
+export type ReportSummary = {
+	symbol: string;
+	title: string;
+	snippet: string;
+	date: string;
+	author: string;
+	theme: string;
+	url: string;
+	tags: string[];
+	cover: string;
+	readTime: string;
+	body: string[];
+};

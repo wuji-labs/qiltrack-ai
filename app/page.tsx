@@ -14,6 +14,7 @@ import { useProgress } from "@/hooks/useProgress";
 import { useLanguage } from "@/lib/i18n";
 import { type Language } from "@/lib/i18n-config";
 import type { ReportTone } from "@/types/report";
+import { getFeaturedReports } from "@/lib/content/reportHub";
 
 type TranslationKey = string;
 
@@ -248,6 +249,20 @@ export default function Home() {
 		metric: t(study.metricKey),
 	}));
 
+	const featuredReports = useMemo(() => {
+		return getFeaturedReports(3).map((report) => ({
+			symbol: report.symbol,
+			title: report.title,
+			snippet: report.snippet,
+			date: report.date,
+			theme: report.theme,
+			url: report.url,
+			tags: report.tags,
+			cover: report.cover,
+			readTime: report.readTime,
+		}));
+	}, []);
+
 	const workflowList = workflowSteps.map((step) => ({ badge: t(step.badge), title: t(step.title), detail: t(step.detail) }));
 	const pricingList = pricingPlans.map((plan) => ({
 		tier: plan.tier,
@@ -420,41 +435,50 @@ export default function Home() {
 										<div>
 											<p className="text-sm uppercase tracking-[0.28em] text-emerald-300">{t("nav.templates")}</p>
 											<h2 className="text-2xl sm:text-3xl font-semibold">{t("gallery.inspired")}</h2>
-											<p className={`text-base mt-1 ${subtleText}`}>{t("persona.galleryCaption", { tones: toneLabelList })}</p>
+											<p className={`text-base mt-1 ${subtleText}`}>{t("gallery.subtitle")}</p>
 										</div>
 										<div className="text-sm text-right text-subtle">
-											<p>{t("gallery.subtitle")}</p>
 											<p>{t("gallery.description")}</p>
 										</div>
 									</div>
 
 									<div className="grid md:grid-cols-3 gap-3">
-										{caseStudyList.map((study) => (
-											<div key={study.company} className="rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-4 flex flex-col gap-3 transition-all duration-200 ease-out hover:border-[var(--stroke-glow)]/70 hover:shadow-[0_12px_32px_rgba(0,0,0,0.28)] hover:-translate-y-1">
+										{featuredReports.map((report) => (
+											<Link
+												key={report.symbol}
+												href={report.url}
+												className="rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-4 flex flex-col gap-3 transition-all duration-200 ease-out hover:border-[var(--stroke-glow)]/70 hover:shadow-[0_12px_32px_rgba(0,0,0,0.28)] hover:-translate-y-1"
+											>
 												<div className="flex items-center justify-between">
 													<div>
-														<p className="text-sm uppercase tracking-[0.3em] text-subtle">{study.industry}</p>
-														<h3 className="text-xl font-semibold text-[var(--color-foreground)]">{study.company}</h3>
+														<p className="text-sm uppercase tracking-[0.3em] text-subtle">{report.theme}</p>
+														<h3 className="text-lg font-semibold text-[var(--color-foreground)]">{report.symbol}</h3>
 													</div>
-													<span className="text-sm rounded-full border border-emerald-400/50 text-emerald-200 px-2 py-0.5">{study.tonality}</span>
+													<span className="text-sm rounded-full border border-emerald-400/50 text-emerald-200 px-2 py-0.5">{report.readTime}</span>
 												</div>
-												<p className={`text-base leading-relaxed ${strongSubtleText}`}>{study.snippet}</p>
-												<div className="flex flex-wrap gap-1 text-sm text-subtle">
-													{study.tags.map((tag) => (
-														<span key={`${study.company}-${tag}`} className="rounded-full border border-[var(--stroke-soft)] px-2 py-0.5">
+												<p className={`text-sm leading-relaxed ${strongSubtleText}`}>{report.snippet}</p>
+												<div className="flex flex-wrap gap-1 text-xs text-subtle">
+													{report.tags.map((tag) => (
+														<span key={`${report.symbol}-${tag}`} className="rounded-full border border-[var(--stroke-soft)] px-2 py-0.5">
 															#{tag}
 														</span>
 													))}
 												</div>
-												<div className="text-sm text-emerald-300">{study.metric}</div>
-											</div>
+												<div className="text-xs text-emerald-300">
+													{new Date(report.date).toLocaleDateString(language === "en" ? "en-US" : "zh-CN", {
+														year: "numeric",
+														month: "short",
+														day: "numeric",
+													})}
+												</div>
+											</Link>
 										))}
 									</div>
 
 									<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border border-dashed border-[var(--stroke-soft)] p-4">
 										<p className={`text-base ${subtleText}`}>{t("gallery.footer")}</p>
 										<Link
-											href="/reports"
+											href="/reports#archive"
 											className="self-start rounded-full border border-emerald-400 px-4 py-2 text-base text-emerald-300 hover:bg-emerald-400/10"
 										>
 											{t("gallery.cta")}

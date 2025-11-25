@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import ClientReportContent from "./ClientReportContent";
-import { reports } from "../data";
+import { getAllReports } from "@/lib/content/reportHub";
 
 // Force dynamic rendering so slug is read from the incoming request (SSG was producing empty params).
 export const dynamic = "force-dynamic";
@@ -25,6 +25,7 @@ const matchReport = async (slugRaw: string | string[] | undefined) => {
 	}
 
 	const slug = decodeURIComponent(raw).trim().toLowerCase();
+	const reports = getAllReports();
 	const match = reports.find((item) => {
 		const symbolMatch = (item.symbol || "").toLowerCase() === slug;
 		const urlSlug = (item.url || "").split("/").filter(Boolean).pop();
