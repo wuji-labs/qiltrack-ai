@@ -98,9 +98,12 @@ export function HeroSection({
 		}
 	};
 
+	// Shared container class for consistent alignment across nav, hero, and main content
+	const pageContainer = "mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10";
+
 	return (
 		<section className="w-full overflow-x-hidden">
-			<div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4 sm:px-6 lg:px-10">
+			<div className={`fixed top-3 left-1/2 -translate-x-1/2 z-50 ${pageContainer}`}>
 				<nav className="flex flex-wrap xl:flex-nowrap justify-between items-center gap-2 sm:gap-4 rounded-2xl border border-[var(--stroke-soft)]/80 bg-[var(--bg-frosted)]/85 px-3 sm:px-10 py-3 sm:py-5 min-h-[72px] backdrop-blur-xl shadow-[0_14px_38px_rgba(0,0,0,0.35)] transition-all duration-300 min-w-0">
 					<div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink-0">
 						<div className="h-9 sm:h-11 w-9 sm:w-11 rounded-2xl bg-[var(--accent-emerald)] flex items-center justify-center text-[10px] sm:text-[12px] font-black tracking-[0.28em] text-slate-950 shadow-[0_10px_28px_rgba(91,224,176,0.35)] flex-shrink-0">
@@ -373,7 +376,7 @@ export function HeroSection({
 			</div>
 			<div className="h-[120px] sm:h-[140px]" />
 
-			<div className="mx-auto w-full max-w-full px-4 sm:px-6 lg:px-10">
+			<div className={pageContainer}>
 				<section
 					id="hero"
 					className="relative overflow-hidden rounded-[20px] sm:rounded-[36px] border border-[var(--stroke-soft)]/80 bg-[var(--bg-layer)]/85 px-4 sm:px-8 py-6 sm:py-9 shadow-[0_16px_60px_rgba(0,0,0,0.32)]"
