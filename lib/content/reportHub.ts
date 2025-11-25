@@ -1,18 +1,10 @@
-export type ReportCard = {
-	symbol: string;
-	title: string;
-	snippet: string;
-	date: string;
-	author: string;
-	theme: string;
-	url: string;
-	tags: string[];
-	cover: string;
-	readTime: string;
-	body: string[];
-};
+import type { ReportSummary } from "@/types/report";
 
-export const reports: ReportCard[] = [
+/**
+ * Featured reports data source - shared between home page and /reports
+ * This is the single source of truth for report hub content
+ */
+const reportData: ReportSummary[] = [
 	{
 		symbol: "MSFT",
 		title: "Microsoft 云端效率与 AI 投资机会",
@@ -116,3 +108,43 @@ export const reports: ReportCard[] = [
 		],
 	},
 ];
+
+/**
+ * Get featured reports (e.g., latest N reports for home page)
+ * @param limit - Number of reports to return (default: 3)
+ * @returns Array of featured report summaries, sorted by date (newest first)
+ */
+export function getFeaturedReports(limit = 3): ReportSummary[] {
+	return reportData
+		.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+		.slice(0, limit);
+}
+
+/**
+ * Get all reports
+ * @returns Array of all report summaries
+ */
+export function getAllReports(): ReportSummary[] {
+	return reportData;
+}
+
+/**
+ * Get unique categories from all reports
+ * @returns Array of unique theme categories
+ */
+export function listCategories(): string[] {
+	const categories = new Set(reportData.map((item) => item.theme));
+	return Array.from(categories);
+}
+
+/**
+ * Fetch report summaries (placeholder for future API/DB integration)
+ * @param options - Optional parameters (e.g., limit, offset)
+ * @returns Promise resolving to featured reports
+ */
+export async function fetchReportSummaries(options?: { limit?: number; offset?: number }): Promise<ReportSummary[]> {
+	// Default behavior: return static data
+	// Future: can be replaced with Supabase/API call
+	const { limit = 3 } = options || {};
+	return getFeaturedReports(limit);
+}
