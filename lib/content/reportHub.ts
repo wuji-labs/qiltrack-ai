@@ -14,7 +14,7 @@ const reportData: ReportSummary[] = [
 		theme: "Cloud + AI",
 		url: "/reports/msft",
 		tags: ["效率", "云", "Copilot"],
-		cover: "radial-gradient(circle at 20% 20%, rgba(91,224,176,0.18), transparent 35%), radial-gradient(circle at 80% 30%, rgba(77,208,166,0.14), transparent 40%), linear-gradient(135deg, rgba(18,73,58,0.9), rgba(8,21,19,0.8))",
+		cover: "linear-gradient(135deg, rgba(20,100,150,0.85), rgba(50,140,200,0.75)), url('/reports/covers/msft.webp')",
 		readTime: "6 min",
 		body: [
 			"当我们把办公的入口和决策链条搬到云端，AI 便不再是点缀，而是背景操作系统。Azure 的统计数据显示，Copilot 每天被激活的次数翻了三倍：它担任助理、审稿、Summarize、模拟电话会议，所有流程都围绕着一句话——让人专注于更高的判断。",
@@ -31,7 +31,7 @@ const reportData: ReportSummary[] = [
 		theme: "Semiconductor",
 		url: "/reports/nvda",
 		tags: ["GPU", "数据中心", "AI Infra"],
-		cover: "radial-gradient(circle at 25% 30%, rgba(255,153,102,0.18), transparent 45%), radial-gradient(circle at 70% 20%, rgba(255,204,153,0.16), transparent 50%), linear-gradient(135deg, rgba(21,24,34,0.92), rgba(8,12,22,0.85))",
+		cover: "linear-gradient(135deg, rgba(30,30,30,0.9), rgba(100,180,50,0.75)), url('/reports/covers/nvda.webp')",
 		readTime: "5 min",
 		body: [
 			"NVIDIA 不再只是 GPU 设计公司，而是以 Hopper 架构为核心的『AI 中枢城市』。我们统计了 14 家云端超级计算中心的 chip deployment 节奏，发现 Hopper 系列在 2025 年的 Q1-Q3 中站稳了 42% 的市场份额。",
@@ -48,7 +48,7 @@ const reportData: ReportSummary[] = [
 		theme: "Defense & Aerospace",
 		url: "/reports/rtx",
 		tags: ["预算", "订单", "供应链"],
-		cover: "radial-gradient(circle at 18% 20%, rgba(237,162,73,0.18), transparent 40%), radial-gradient(circle at 75% 30%, rgba(252,94,40,0.15), transparent 50%), linear-gradient(135deg, rgba(28,18,12,0.94), rgba(8,8,10,0.9))",
+		cover: "linear-gradient(135deg, rgba(180,60,20,0.85), rgba(220,120,60,0.75)), url('/reports/covers/rtx.webp')",
 		readTime: "4 min",
 		body: [
 			"雷神的订单在 2025 年加速恢复，国防预算转向高空气战的硬件，订单增长了 9%。本篇报告把预算表、军工承包周期与民用侧的零部件整合在一起，以说明供应链弹性是当前估值的关键。",
@@ -65,7 +65,7 @@ const reportData: ReportSummary[] = [
 		theme: "Mobility",
 		url: "/reports/tsla",
 		tags: ["FSD", "储能", "产品节奏"],
-		cover: "radial-gradient(circle at 20% 25%, rgba(255,255,255,0.12), transparent 40%), radial-gradient(circle at 70% 20%, rgba(91,224,176,0.14), transparent 40%), linear-gradient(145deg, rgba(12,20,22,0.93), rgba(9,12,16,0.9))",
+		cover: "linear-gradient(135deg, rgba(30,30,30,0.9), rgba(180,100,200,0.75)), url('/reports/covers/tsla.webp')",
 		readTime: "7 min",
 		body: [
 			"Tesla 的能量站正在变成 AI 驱动的预测系统，充电桩实时调整功率以应对突发交通潮。这一模式在本季度的 X 次出行中提高了 14% 的资源利用率。",
@@ -82,7 +82,7 @@ const reportData: ReportSummary[] = [
 		theme: "Healthtech",
 		url: "/reports/nvax",
 		tags: ["疫苗", "研发管线", "数据"],
-		cover: "radial-gradient(circle at 22% 22%, rgba(63,157,255,0.2), transparent 45%), radial-gradient(circle at 78% 18%, rgba(255,255,255,0.12), transparent 45%), linear-gradient(135deg, rgba(9,15,28,0.95), rgba(7,11,20,0.9))",
+		cover: "linear-gradient(135deg, rgba(20,120,180,0.85), rgba(100,180,255,0.75)), url('/reports/covers/nvax.webp')",
 		readTime: "6 min",
 		body: [
 			"这次我们聚焦一家公司将 AI 用在疫苗产能预测上：通过跨地域的冷链数据整合，发现原料的波动对生产率影响高达 18%。报告列举了 5 个关键指标，让投资者可以及时监测产能恢复。",
@@ -99,7 +99,7 @@ const reportData: ReportSummary[] = [
 		theme: "Media",
 		url: "/reports/nflx",
 		tags: ["订阅", "广告", "国际化"],
-		cover: "radial-gradient(circle at 20% 25%, rgba(255,99,99,0.2), transparent 45%), radial-gradient(circle at 70% 25%, rgba(255,255,255,0.12), transparent 45%), linear-gradient(145deg, rgba(18,9,10,0.95), rgba(12,8,12,0.9))",
+		cover: "linear-gradient(135deg, rgba(180,20,20,0.85), rgba(50,50,50,0.75)), url('/reports/covers/nflx.webp')",
 		readTime: "5 min",
 		body: [
 			"Netflix 这次的报告揭示了广告收入在 2025 年的回暖路径，其中互动式广告带来的时长增加了 8%。我们用了全球 14 个市场的数据，列出不同内容类型的单次点击价值（CPM）与留存拉动。",
