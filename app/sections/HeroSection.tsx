@@ -111,15 +111,15 @@ export function HeroSection({
 	const pageContainer = "mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10";
 
 	// Dynamic nav styles based on scroll state
-	const navBgClass = hasScrolled ? "bg-[var(--bg-frosted)]/98" : "bg-[var(--bg-frosted)]/95";
-	const navBorderClass = hasScrolled ? "border-[var(--stroke-glow)]/40" : "border-[var(--stroke-soft)]";
-	const navShadowClass = hasScrolled ? "shadow-[0_20px_60px_rgba(0,0,0,0.48)]" : "shadow-[0_16px_48px_rgba(0,0,0,0.42)]";
+	const navBgClass = hasScrolled ? "bg-[var(--bg-base)]/94" : "bg-[var(--bg-base)]/92";
+	const navBorderClass = hasScrolled ? "border-[var(--stroke-glow)]/40" : "border-[var(--stroke-soft)]/80";
+	const navShadowClass = hasScrolled ? "shadow-[0_20px_60px_rgba(0,0,0,0.48)]" : "shadow-[0_14px_38px_rgba(0,0,0,0.35)]";
 
 	return (
 		<section className="w-full overflow-x-hidden">
 			<div className={`fixed top-3 left-1/2 -translate-x-1/2 z-50 ${pageContainer}`}>
-				<nav className={`flex flex-wrap xl:flex-nowrap justify-between items-center gap-2 sm:gap-4 rounded-2xl border px-3 sm:px-10 py-3 sm:py-5 min-h-[72px] backdrop-blur-2xl transition-all duration-300 min-w-0 ${navBgClass} ${navBorderClass} ${navShadowClass}`}>
-					<div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink-0">
+				<nav className={`relative flex flex-wrap xl:flex-nowrap justify-between items-center gap-2 sm:gap-4 rounded-2xl border px-3 sm:px-10 py-3 sm:py-5 min-h-[72px] backdrop-blur-xl transition-all duration-300 min-w-0 before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-b before:from-white/6 before:via-white/5 before:to-white/4 before:pointer-events-none ${navBgClass} ${navBorderClass} ${navShadowClass}`}>
+					<div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink-0 relative z-10">
 						<div className="h-9 sm:h-11 w-9 sm:w-11 rounded-2xl bg-[var(--accent-emerald)] flex items-center justify-center text-[10px] sm:text-[12px] font-black tracking-[0.28em] text-slate-950 shadow-[0_10px_28px_rgba(91,224,176,0.35)] flex-shrink-0">
 							IA
 						</div>
@@ -131,7 +131,7 @@ export function HeroSection({
 						</div>
 					</div>
 
-					<div className="hidden xl:flex flex-1 items-center justify-center gap-4 xl:gap-5 text-xs md:text-sm font-semibold uppercase tracking-[0.14em] text-dim whitespace-nowrap">
+					<div className="hidden xl:flex flex-1 items-center justify-center gap-4 xl:gap-5 text-xs md:text-sm font-semibold uppercase tracking-[0.14em] text-dim whitespace-nowrap relative z-10">
 						{navItems.map((item) => (
 							<a
 								key={item.href}
@@ -146,7 +146,7 @@ export function HeroSection({
 					</div>
 
 					{/* 桌面端：语言 + 账户 + 登录（lg:以上显示） */}
-					<div className="hidden lg:flex items-center justify-end gap-1.5 sm:gap-2 text-[12px] flex-nowrap min-w-0">
+					<div className="hidden lg:flex items-center justify-end gap-1.5 sm:gap-2 text-[12px] flex-nowrap min-w-0 relative z-10">
 						<div ref={languageMenuRef} className="relative">
 							<button
 								type="button"
@@ -263,7 +263,7 @@ export function HeroSection({
 					</div>
 
 					{/* 移动端：汉堡菜单（lg:以下显示） */}
-					<div className="lg:hidden">
+					<div className="lg:hidden relative z-10">
 						<button
 							type="button"
 							onClick={() => setMobileDrawerOpen((open) => !open)}
