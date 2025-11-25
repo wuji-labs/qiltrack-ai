@@ -25,6 +25,7 @@
 
 ## 3. 共同原则
 - 单一事实源：需求以 Codex 笔记为准，范围变化同步 README/PLAN。
+- GitHub CLI 已预配 SSH 登录（`gh auth status` 显示 explore0012，remote `git@github.com:explore0012/ai-report.git`），正常 PR 流程直接 `git checkout -b <feature>` → `git push origin <feature>` → `gh pr create --fill`，禁止再声称无法 PR；若异常先跑 `gh auth status`，必要时 `gh auth refresh -h github.com -s repo,read:org,gist`。
 - 增量交付：按区块垂直切片，API 不稳时用 mock/feature flag。
 - 测试优先：Codex 定验收，Claude 编码成测试或脚本。
 - 可追溯：决策写入 `docs/` 或 issue 记录，避免口头漂移。
