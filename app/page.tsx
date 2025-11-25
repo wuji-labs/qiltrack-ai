@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -13,6 +13,7 @@ import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useProgress } from "@/hooks/useProgress";
 import { useLanguage } from "@/lib/i18n";
 import { type Language } from "@/lib/i18n-config";
+import { fetchCredits } from "@/lib/services/api";
 import type { ReportTone } from "@/types/report";
 import { getFeaturedReports } from "@/lib/content/reportHub";
 
@@ -173,8 +174,28 @@ export default function Home() {
 	const { language, setLanguage, t } = useLanguage();
 	const { isAuthenticated, user, signOut, refreshSession } = useSupabaseAuth();
 	const router = useRouter();
-	const [selectedTone, setSelectedTone] = useState<ReportTone>("baseline");
 	const progress = useProgress();
+	const [selectedTone, setSelectedTone] = useState<ReportTone>("baseline");
+	const [remainingQuota, setRemainingQuota] = useState(0);
+
+	// Fetch remaining credits on mount and when authenticated
+	useEffect(() => {
+		const loadCredits = async () => {
+			if (!isAuthenticated) {
+				setRemainingQuota(0);
+				return;
+			}
+			try {
+				const creditsData = await fetchCredits();
+				setRemainingQuota(creditsData.credits?.remaining_credits ?? 0);
+			} catch (err) {
+				console.error("Failed to load credits:", err);
+				setRemainingQuota(0);
+			}
+		};
+
+		loadCredits();
+	}, [isAuthenticated]);
 
 	const isDark = true;
 	const mainBg = isDark ? "bg-[var(--bg-base)] text-[var(--color-foreground)] pb-16" : "bg-slate-50 text-slate-900";
@@ -280,6 +301,16 @@ export default function Home() {
 
 	const planLabel = user?.user_metadata?.plan && user?.user_metadata?.plan !== "free" ? user?.user_metadata?.plan : t("quota.plan.free");
 
+	// Refresh quota from API
+	const refreshQuota = async () => {
+		try {
+			const creditsData = await fetchCredits();
+			setRemainingQuota(creditsData.credits?.remaining_credits ?? 0);
+		} catch (err) {
+			console.error("Failed to refresh credits:", err);
+		}
+	};
+
 	const handleSmoothScroll = (href: string) => {
 		const element = document.querySelector(href);
 		if (element) {
@@ -295,18 +326,27 @@ export default function Home() {
 		handleSmoothScroll("#generator");
 	};
 
-	// TODO: Implement subscription handlers when checkout functions are ready
+	// TODO: Implement subscription handlers when Stripe checkout is ready
 	const handleSubscribeMonthly = () => {
-		// Placeholder for monthly subscription logic
-		console.log("Monthly subscription requested");
-		// Fallback to primary CTA for now
+		if (!isAuthenticated) {
+			// Redirect to login if not authenticated
+			router.push("/login");
+			return;
+		}
+		// Once authenticated, show a message and fallback to primary CTA
+		// This ensures Stripe integration doesn't break the flow
+		alert(t("pricing.plan.monthly.cta.notReady") || "Subscription is coming soon. Contact us for early access.");
 		handlePrimaryCta();
 	};
 
 	const handleSubscribeAnnual = () => {
-		// Placeholder for annual subscription logic
-		console.log("Annual subscription requested");
-		// Fallback to primary CTA for now
+		if (!isAuthenticated) {
+			// Redirect to login if not authenticated
+			router.push("/login");
+			return;
+		}
+		// Once authenticated, show a message and fallback to primary CTA
+		alert(t("pricing.plan.annual.cta.notReady") || "Subscription is coming soon. Contact us for early access.");
 		handlePrimaryCta();
 	};
 
@@ -321,7 +361,7 @@ export default function Home() {
 						navItems={navLinks}
 						language={language as Language}
 						setLanguage={setLanguage}
-						remainingQuota={1}
+						remainingQuota={remainingQuota}
 						planLabel={planLabel}
 						userEmail={user?.email}
 						userImage={user?.user_metadata?.avatar_url}
@@ -351,10 +391,11 @@ export default function Home() {
 										heroHighlights={heroHighlightList}
 										auth={{
 											isAuthenticated: isAuthenticated,
-											remainingQuota: 1,
+											remainingQuota: remainingQuota,
 											planLabel,
 											userEmail: user?.email,
 											refreshSession: refreshSession,
+											refreshQuota: refreshQuota,
 										}}
 										progress={progress}
 										onRequireLogin={() => router.push("/login")}
