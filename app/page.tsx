@@ -10,6 +10,7 @@ import { ReportGeneratorSection } from "@/app/sections/ReportGeneratorSection";
 import { WhySection } from "@/app/sections/WhySection";
 import { FooterSection } from "@/app/sections/FooterSection";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useProgress } from "@/hooks/useProgress";
 import { useLanguage } from "@/lib/i18n";
 import { type Language } from "@/lib/i18n-config";
 import type { ReportTone } from "@/types/report";
@@ -172,6 +173,7 @@ export default function Home() {
 	const { isAuthenticated, user, signOut, refreshSession } = useSupabaseAuth();
 	const router = useRouter();
 	const [selectedTone, setSelectedTone] = useState<ReportTone>("baseline");
+	const progress = useProgress();
 
 	const isDark = true;
 	const mainBg = isDark ? "bg-[var(--bg-base)] text-[var(--color-foreground)] pb-16" : "bg-slate-50 text-slate-900";
@@ -339,6 +341,7 @@ export default function Home() {
 											userEmail: user?.email,
 											refreshSession: refreshSession,
 										}}
+										progress={progress}
 										onRequireLogin={() => router.push("/login")}
 										t={t}
 									/>
@@ -358,8 +361,12 @@ export default function Home() {
 											<p className={`text-base ${subtleText}`}>{t("workflow.caption")}</p>
 										</div>
 										<div className="relative rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 px-4 py-3 text-sm text-right text-emerald-100 shadow-[0_14px_40px_rgba(0,0,0,0.3)]">
-											<p className="font-semibold tracking-[0.16em] uppercase">{t("workflow.status.step", { step: "01" })}</p>
-											<p className="text-subtle">{t("workflow.status.idle")}</p>
+											<p className="font-semibold tracking-[0.16em] uppercase">{t("workflow.status.step", { step: Math.min(progress.currentStep, workflowList.length).toString().padStart(2, "0") })}</p>
+											<p className="text-subtle">
+												{progress.status === "idle" && t("workflow.status.idle")}
+												{progress.status === "running" && t("workflow.status.syncing")}
+												{progress.status === "done" && t("workflow.status.ready")}
+											</p>
 											<div className="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-emerald-400/10 blur-3xl" aria-hidden />
 										</div>
 									</div>
@@ -367,35 +374,43 @@ export default function Home() {
 									<div className="relative rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 p-4 sm:p-5 shadow-[0_12px_40px_rgba(0,0,0,0.28)]">
 										<div className="absolute left-4 top-8 bottom-8 hidden lg:block w-px bg-gradient-to-b from-[var(--accent-emerald)] via-[var(--stroke-soft)] to-transparent" aria-hidden />
 										<div className="grid gap-4">
-											{workflowList.map((step, index) => (
-												<div key={step.title} className="relative pl-12 lg:pl-16">
-													<div className="absolute left-0 lg:left-1 top-1">
-														<div className="relative h-10 w-10 rounded-2xl bg-[var(--accent-emerald)]/20 border border-[var(--accent-emerald)]/50 flex items-center justify-center text-sm font-semibold text-[var(--accent-emerald)] shadow-[0_10px_30px_rgba(16,185,129,0.25)]">
-															{(index + 1).toString().padStart(2, "0")}
-															<span className="absolute inset-0 rounded-2xl border border-white/5" aria-hidden />
+											{workflowList.map((step, index) => {
+												const stepNumber = index + 1;
+												const clampedStep = Math.min(progress.currentStep, workflowList.length);
+												const isActive = progress.status === "running" && clampedStep === stepNumber;
+												const isCompleted = progress.status === "done" || (progress.status === "running" && clampedStep > stepNumber);
+												return (
+													<div key={step.title} className="relative pl-12 lg:pl-16">
+														<div className="absolute left-0 lg:left-1 top-1">
+															<div className={`relative h-10 w-10 rounded-2xl ${isCompleted || isActive ? "bg-[var(--accent-emerald)]/20 border-[var(--accent-emerald)]/50" : "bg-[var(--accent-emerald)]/10 border-[var(--stroke-soft)]/50"} border flex items-center justify-center text-sm font-semibold ${isCompleted || isActive ? "text-[var(--accent-emerald)]" : "text-subtle"} shadow-[0_10px_30px_rgba(16,185,129,0.25)]`}>
+																{stepNumber.toString().padStart(2, "0")}
+																<span className="absolute inset-0 rounded-2xl border border-white/5" aria-hidden />
+															</div>
+														</div>
+														<div className={`rounded-2xl border ${isCompleted || isActive ? "border-[var(--accent-emerald)]/50 bg-[var(--bg-layer)]/85" : "border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85"} p-4 space-y-2 transition hover:border-[var(--stroke-glow)]/70 hover:shadow-[0_16px_46px_rgba(0,0,0,0.35)]`}>
+															<div className="flex items-center justify-between gap-3">
+																<span className={`text-xs uppercase tracking-[0.22em] ${isCompleted || isActive ? "text-emerald-200" : "text-subtle"}`}>{step.badge}</span>
+																<span className="hidden sm:inline-flex items-center gap-2 text-xs text-subtle">
+																	{isCompleted && (
+																		<>
+																			<span className="h-2 w-2 rounded-full bg-[var(--accent-emerald)]" />
+																			{t("workflow.step.status.done")}
+																		</>
+																	)}
+																	{isActive && (
+																		<>
+																			<span className="h-2 w-2 rounded-full bg-[var(--accent-emerald)] animate-pulse" />
+																			{t("workflow.step.status.running")}
+																		</>
+																	)}
+																</span>
+															</div>
+															<h3 className="text-lg font-semibold text-[var(--color-foreground)]">{step.title}</h3>
+															<p className={`text-base leading-relaxed ${strongSubtleText}`}>{step.detail}</p>
 														</div>
 													</div>
-													<div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-4 space-y-2 transition hover:border-[var(--stroke-glow)]/70 hover:shadow-[0_16px_46px_rgba(0,0,0,0.35)]">
-														<div className="flex items-center justify-between gap-3">
-															<span className="text-xs uppercase tracking-[0.22em] text-emerald-200">{step.badge}</span>
-															<span className="hidden sm:inline-flex items-center gap-2 text-xs text-subtle">
-																<span className="h-2 w-2 rounded-full bg-[var(--accent-emerald)]" />
-																{t("workflow.status.step", { step: (index + 1).toString().padStart(2, "0") })}
-															</span>
-														</div>
-														<h3 className="text-lg font-semibold text-[var(--color-foreground)]">{step.title}</h3>
-														<p className={`text-base leading-relaxed ${strongSubtleText}`}>{step.detail}</p>
-														<div className="flex flex-wrap gap-2 text-xs text-subtle">
-															<span className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 px-3 py-1">
-																{t("workflow.status.syncing")}
-															</span>
-															<span className="rounded-full border border-[var(--accent-emerald)]/50 bg-[var(--accent-emerald)]/10 px-3 py-1 text-[var(--accent-emerald)]">
-																{t("workflow.status.ready")}
-															</span>
-														</div>
-													</div>
-												</div>
-											))}
+												);
+											})}
 										</div>
 									</div>
 								</section>
