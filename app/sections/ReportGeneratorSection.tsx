@@ -43,6 +43,7 @@ type ReportGeneratorSectionProps = {
 	highlightFallback: string[];
 	heroHighlights: { title: string; description: string }[];
 	auth: AuthInfo;
+	initialSearchResults?: SearchResult[];
 	progress: ProgressState & {
 		start: (label?: string) => void;
 		complete: (label?: string) => Promise<void>;
@@ -61,12 +62,13 @@ export function ReportGeneratorSection({
 	highlightFallback,
 	heroHighlights,
 	auth,
+	initialSearchResults,
 	progress,
 	onRequireLogin,
 	t,
 }: ReportGeneratorSectionProps) {
 	const [inputValue, setInputValue] = useState("");
-	const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+	const [searchResults, setSearchResults] = useState<SearchResult[]>(initialSearchResults ?? []);
 	const [searching, setSearching] = useState(false);
 	const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
 	const [suppressNextSearch, setSuppressNextSearch] = useState(false);

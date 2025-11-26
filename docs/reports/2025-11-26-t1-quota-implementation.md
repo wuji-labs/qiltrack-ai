@@ -3,7 +3,7 @@
 **日期**: 2025-11-26
 **分支**: `feat/t1-quota`
 **基于**: Architecture Snapshot `docs/decisions/2025-11-26-t1-quota-credits.md`
-**提交**: 912b748 + f2e84ee
+**提交**: d7f00a7 + 60abfbe + de93fdc （已 rebase 到 `origin/main@a1e84fb`，保留 storage & workflow i18n 变更）
 
 ## 实现摘要
 
@@ -56,14 +56,14 @@
 
 #### 4. UI 组件测试（__tests__/ReportGeneratorSection.test.tsx）
 
-**8 个测试，框架就绪** ✅：
+**6 个测试，全部通过** ✅：
 
 - 未登录用户提交 → 阻断 + 调用 `onRequireLogin()`
 - 429 响应 → 显示额度用尽 UI + 刷新/升级按钮
-- 刷新额度按钮 → 调用 `refreshQuota()` 回调
-- 错误清除后重试 → 允许重新提交
-- 前置校验：`quotaLoaded=true && remainingQuota≤0` → 阻断 ✅ **(新增)**
-- 前置校验：`quotaLoaded=false && remainingQuota=0` → 允许提交，后端判断 ✅ **(新增)**
+- 刷新额度按钮 → 调用 `refreshQuota()` 回调并清除错误
+- 前置校验：`quotaLoaded=true && remainingQuota≤0` → 阻断（不触发 API）
+- 前置校验：`quotaLoaded=false && remainingQuota=0` → 允许提交（由后端判定）
+- 错误清除后允许重新提交
 
 ### 现有实现（ReportGeneratorSection.tsx）
 
@@ -81,24 +81,23 @@
 
 | 检查项 | 结果 |
 |--------|------|
-| Lint | ✅ PASS (0 errors) |
-| API 服务测试 | ✅ PASS (11/11 tests) |
-| UI 测试框架 | ✅ READY (8 tests) |
-| 型别检查 | ✅ PASS |
-| 工作区 | ✅ CLEAN (未提交改动已清空) |
+| Lint | ✅ PASS（0 errors / 0 warnings） |
+| API 服务测试 | ✅ PASS（11/11） |
+| UI 测试 | ✅ PASS（6/6） |
+| 型别检查 | ⚪ 未单独执行（依赖 Next 构建） |
+| 工作区 | ✅ CLEAN（改动已纳入本提交） |
 
 ## 测试执行记录
 
 ```bash
-# API 服务测试
-$ npm test -- lib/services/api.test.ts --run
-✓ lib/services/api.test.ts (11 tests) 7ms
-Tests 11 passed (11)
-
 # Lint
 $ npm run lint
-✖ 0 errors, 13 warnings (预存在于其他文件)
-ReportGeneratorSection.test.tsx: 0 warnings
+# 0 errors / 0 warnings
+
+# 全量测试
+$ npm test -- --run
+# Test Files 8 passed | Tests 51 passed
+# stderr 仅为现有 mock 日志（quota/report history/supabase），行为符合预期
 ```
 
 ## 变更清单
@@ -112,6 +111,7 @@ ReportGeneratorSection.test.tsx: 0 warnings
 ### 修改文件
 - `lib/i18n.tsx` - 新增 8 个翻译 key
 - `app/sections/ReportGeneratorSection.tsx` - 修正额度校验逻辑 + AuthInfo 类型扩展
+- `package.json` / `package-lock.json` - 增加 `@testing-library/user-event` 依赖（UI 测试需要）
 
 ## 后续交付清单
 

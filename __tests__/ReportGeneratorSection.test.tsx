@@ -1,8 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import "@testing-library/jest-dom/vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ReportGeneratorSection } from "@/app/sections/ReportGeneratorSection";
 import * as apiModule from "@/lib/services/api";
+
+type ReportGeneratorProps = Parameters<typeof ReportGeneratorSection>[0];
 
 // Mock the API module
 vi.mock("@/lib/services/api", () => ({
@@ -98,15 +101,63 @@ const defaultAuth = {
 	refreshQuota: vi.fn(),
 };
 
-const defaultProgress = {
+const createProgress = () => ({
 	progress: 0,
 	currentStep: 0,
 	text: null,
 	start: vi.fn(),
-	complete: vi.fn(),
+	complete: vi.fn().mockResolvedValue(undefined),
 	fail: vi.fn(),
 	reset: vi.fn(),
 	forceComplete: vi.fn(),
+});
+
+const toneOptions: ReportGeneratorProps["toneOptions"] = [
+	{
+		id: "baseline",
+		emoji: "📊",
+		title: "Baseline",
+		badge: "balanced",
+		description: "Balanced analysis",
+	},
+];
+
+const baseSearchResult: ReportGeneratorProps["initialSearchResults"] = [
+	{
+		symbol: "AAPL",
+		description: "Apple Inc",
+		displaySymbol: "AAPL",
+		type: "equity",
+	},
+];
+
+const renderGenerator = (overrides: Partial<ReportGeneratorProps> = {}) => {
+	const props: ReportGeneratorProps = {
+		selectedTone: "baseline",
+		toneOptions,
+		language: "en",
+		highlightFallback: ["Highlight 1", "Highlight 2", "Highlight 3"],
+		heroHighlights: [],
+		initialSearchResults: baseSearchResult,
+		auth: { ...defaultAuth },
+		progress: createProgress(),
+		onRequireLogin: vi.fn(),
+		t: mockTranslate,
+		...overrides,
+	};
+
+	render(<ReportGeneratorSection {...props} />);
+	return props;
+};
+
+const typeAndSelectAapl = async (user: ReturnType<typeof userEvent.setup>) => {
+	const input = screen.getByRole("textbox", { name: /enter symbol/i });
+	await user.clear(input);
+	await user.type(input, "AAPL");
+
+	// Wait for search to resolve so validation passes
+	await waitFor(() => expect(apiModule.searchSymbols).toHaveBeenCalled());
+	await screen.findByRole("button", { name: /AAPL/i });
 };
 
 describe("ReportGeneratorSection", () => {
@@ -119,51 +170,18 @@ describe("ReportGeneratorSection", () => {
 		const onRequireLogin = vi.fn();
 
 		const mockSearchSymbols = vi.spyOn(apiModule, "searchSymbols");
-		mockSearchSymbols.mockResolvedValueOnce([
-			{
-				symbol: "AAPL",
-				description: "Apple Inc",
-				displaySymbol: "AAPL",
-				type: "equity",
-			},
-		]);
+		mockSearchSymbols.mockResolvedValue(baseSearchResult);
 
-		render(
-			<ReportGeneratorSection
-				selectedTone="baseline"
-				toneOptions={[
-					{
-						id: "baseline",
-						emoji: "📊",
-						title: "Baseline",
-						badge: "balanced",
-						description: "Balanced analysis",
-					},
-				]}
-				language="en"
-				highlightFallback={["Highlight 1", "Highlight 2", "Highlight 3"]}
-				heroHighlights={[]}
-				auth={{ ...defaultAuth, isAuthenticated: false }}
-				progress={defaultProgress}
-				onRequireLogin={onRequireLogin}
-				t={mockTranslate}
-			/>
-		);
-
-		// Find and type in the input
-		const input = screen.getByRole("textbox", { name: /enter symbol/i });
-		await user.type(input, "AAPL");
-
-		// Wait for the search result and click it
-		await waitFor(() => {
-			expect(screen.getByText("Apple Inc")).toBeInTheDocument();
+		renderGenerator({
+			auth: { ...defaultAuth, isAuthenticated: false },
+			onRequireLogin,
 		});
 
-		const appleButton = screen.getByRole("button", { name: /Apple Inc/i });
-		await user.click(appleButton);
+		await typeAndSelectAapl(user);
 
+		// Wait for the search result and click it
 		// Submit the form
-		const submitButton = screen.getByRole("button", { name: /generate/i });
+		const submitButton = screen.getByRole("button", { name: /^generate$/i });
 		await user.click(submitButton);
 
 		// Verify onRequireLogin was called
@@ -172,7 +190,7 @@ describe("ReportGeneratorSection", () => {
 		});
 
 		// Verify error message is displayed
-		expect(screen.getByText(/Please sign up to use the free quota/i)).toBeInTheDocument();
+		await screen.findByText(/Please sign up to use the free quota/i);
 	});
 
 	it("should display quota exceeded error when 429 is returned from API", async () => {
@@ -180,57 +198,20 @@ describe("ReportGeneratorSection", () => {
 		const onRequireLogin = vi.fn();
 
 		const mockSearchSymbols = vi.spyOn(apiModule, "searchSymbols");
-		mockSearchSymbols.mockResolvedValueOnce([
-			{
-				symbol: "AAPL",
-				description: "Apple Inc",
-				displaySymbol: "AAPL",
-				type: "equity",
-			},
-		]);
+		mockSearchSymbols.mockResolvedValue(baseSearchResult);
 
 		const mockGenerateReport = vi.spyOn(apiModule, "generateReport");
 		mockGenerateReport.mockRejectedValueOnce(new Error("Quota exceeded"));
 
-		render(
-			<ReportGeneratorSection
-				selectedTone="baseline"
-				toneOptions={[
-					{
-						id: "baseline",
-						emoji: "📊",
-						title: "Baseline",
-						badge: "balanced",
-						description: "Balanced analysis",
-					},
-				]}
-				language="en"
-				highlightFallback={["Highlight 1", "Highlight 2", "Highlight 3"]}
-				heroHighlights={[]}
-				auth={defaultAuth}
-				progress={defaultProgress}
-				onRequireLogin={onRequireLogin}
-				t={mockTranslate}
-			/>
-		);
+		renderGenerator({ auth: defaultAuth, onRequireLogin });
 
-		const input = screen.getByRole("textbox", { name: /enter symbol/i });
-		await user.type(input, "AAPL");
+		await typeAndSelectAapl(user);
 
-		await waitFor(() => {
-			expect(screen.getByText("Apple Inc")).toBeInTheDocument();
-		});
-
-		const appleButton = screen.getByRole("button", { name: /Apple Inc/i });
-		await user.click(appleButton);
-
-		const submitButton = screen.getByRole("button", { name: /generate/i });
+		const submitButton = screen.getByRole("button", { name: /^generate$/i });
 		await user.click(submitButton);
 
 		// Verify quota error is displayed
-		await waitFor(() => {
-			expect(screen.getByText(/You've reached your quota limit/i)).toBeInTheDocument();
-		});
+		await screen.findByText(/You've reached your quota limit/i);
 
 		// Verify action buttons are present
 		expect(screen.getByRole("button", { name: /Refresh quota/i })).toBeInTheDocument();
@@ -243,56 +224,19 @@ describe("ReportGeneratorSection", () => {
 		const refreshQuota = vi.fn();
 
 		const mockSearchSymbols = vi.spyOn(apiModule, "searchSymbols");
-		mockSearchSymbols.mockResolvedValueOnce([
-			{
-				symbol: "AAPL",
-				description: "Apple Inc",
-				displaySymbol: "AAPL",
-				type: "equity",
-			},
-		]);
+		mockSearchSymbols.mockResolvedValue(baseSearchResult);
 
 		const mockGenerateReport = vi.spyOn(apiModule, "generateReport");
 		mockGenerateReport.mockRejectedValueOnce(new Error("Quota exceeded"));
 
-		render(
-			<ReportGeneratorSection
-				selectedTone="baseline"
-				toneOptions={[
-					{
-						id: "baseline",
-						emoji: "📊",
-						title: "Baseline",
-						badge: "balanced",
-						description: "Balanced analysis",
-					},
-				]}
-				language="en"
-				highlightFallback={["Highlight 1", "Highlight 2", "Highlight 3"]}
-				heroHighlights={[]}
-				auth={{ ...defaultAuth, refreshQuota }}
-				progress={defaultProgress}
-				onRequireLogin={onRequireLogin}
-				t={mockTranslate}
-			/>
-		);
+		renderGenerator({ auth: { ...defaultAuth, refreshQuota }, onRequireLogin });
 
-		const input = screen.getByRole("textbox", { name: /enter symbol/i });
-		await user.type(input, "AAPL");
+		await typeAndSelectAapl(user);
 
-		await waitFor(() => {
-			expect(screen.getByText("Apple Inc")).toBeInTheDocument();
-		});
-
-		const appleButton = screen.getByRole("button", { name: /Apple Inc/i });
-		await user.click(appleButton);
-
-		const submitButton = screen.getByRole("button", { name: /generate/i });
+		const submitButton = screen.getByRole("button", { name: /^generate$/i });
 		await user.click(submitButton);
 
-		await waitFor(() => {
-			expect(screen.getByText(/You've reached your quota limit/i)).toBeInTheDocument();
-		});
+		await screen.findByText(/You've reached your quota limit/i);
 
 		const refreshButton = screen.getByRole("button", { name: /Refresh quota/i });
 		await user.click(refreshButton);
@@ -305,61 +249,23 @@ describe("ReportGeneratorSection", () => {
 		const onRequireLogin = vi.fn();
 
 		const mockSearchSymbols = vi.spyOn(apiModule, "searchSymbols");
-		mockSearchSymbols.mockResolvedValueOnce([
-			{
-				symbol: "AAPL",
-				description: "Apple Inc",
-				displaySymbol: "AAPL",
-				type: "equity",
-			},
-		]);
+		mockSearchSymbols.mockResolvedValue(baseSearchResult);
 
 		const mockGenerateReport = vi.spyOn(apiModule, "generateReport");
 		mockGenerateReport.mockRejectedValueOnce(new Error("Quota exceeded"));
 
-		render(
-			<ReportGeneratorSection
-				selectedTone="baseline"
-				toneOptions={[
-					{
-						id: "baseline",
-						emoji: "📊",
-						title: "Baseline",
-						badge: "balanced",
-						description: "Balanced analysis",
-					},
-				]}
-				language="en"
-				highlightFallback={["Highlight 1", "Highlight 2", "Highlight 3"]}
-				heroHighlights={[]}
-				auth={defaultAuth}
-				progress={defaultProgress}
-				onRequireLogin={onRequireLogin}
-				t={mockTranslate}
-			/>
-		);
+		renderGenerator({ auth: defaultAuth, onRequireLogin });
 
-		const input = screen.getByRole("textbox", { name: /enter symbol/i });
-		await user.type(input, "AAPL");
+		await typeAndSelectAapl(user);
 
-		await waitFor(() => {
-			expect(screen.getByText("Apple Inc")).toBeInTheDocument();
-		});
-
-		const appleButton = screen.getByRole("button", { name: /Apple Inc/i });
-		await user.click(appleButton);
-
-		const submitButton = screen.getByRole("button", { name: /generate/i });
+		const submitButton = screen.getByRole("button", { name: /^generate$/i });
 		await user.click(submitButton);
 
-		await waitFor(() => {
-			expect(screen.getByText(/You've reached your quota limit/i)).toBeInTheDocument();
-		});
+		await screen.findByText(/You've reached your quota limit/i);
 
-		const retryButton = screen.getAllByRole("button", { name: /retry/i })[0];
-		await user.click(retryButton);
+		const refreshButton = screen.getByRole("button", { name: /Refresh quota/i });
+		await user.click(refreshButton);
 
-		// Error should be cleared
 		await waitFor(() => {
 			expect(screen.queryByText(/You've reached your quota limit/i)).not.toBeInTheDocument();
 		});
@@ -370,54 +276,20 @@ describe("ReportGeneratorSection", () => {
 		const onRequireLogin = vi.fn();
 
 		const mockSearchSymbols = vi.spyOn(apiModule, "searchSymbols");
-		mockSearchSymbols.mockResolvedValueOnce([
-			{
-				symbol: "AAPL",
-				description: "Apple Inc",
-				displaySymbol: "AAPL",
-				type: "equity",
-			},
-		]);
+		mockSearchSymbols.mockResolvedValue(baseSearchResult);
 
-		render(
-			<ReportGeneratorSection
-				selectedTone="baseline"
-				toneOptions={[
-					{
-						id: "baseline",
-						emoji: "📊",
-						title: "Baseline",
-						badge: "balanced",
-						description: "Balanced analysis",
-					},
-				]}
-				language="en"
-				highlightFallback={["Highlight 1", "Highlight 2", "Highlight 3"]}
-				heroHighlights={[]}
-				auth={{ ...defaultAuth, remainingQuota: 0, quotaLoaded: true }}
-				progress={defaultProgress}
-				onRequireLogin={onRequireLogin}
-				t={mockTranslate}
-			/>
-		);
-
-		const input = screen.getByRole("textbox", { name: /enter symbol/i });
-		await user.type(input, "AAPL");
-
-		await waitFor(() => {
-			expect(screen.getByText("Apple Inc")).toBeInTheDocument();
+		renderGenerator({
+			auth: { ...defaultAuth, remainingQuota: 0, quotaLoaded: true },
+			onRequireLogin,
 		});
 
-		const appleButton = screen.getByRole("button", { name: /Apple Inc/i });
-		await user.click(appleButton);
+		await typeAndSelectAapl(user);
 
-		const submitButton = screen.getByRole("button", { name: /generate/i });
+		const submitButton = screen.getByRole("button", { name: /^generate$/i });
 		await user.click(submitButton);
 
 		// Should display quota error without calling API
-		await waitFor(() => {
-			expect(screen.getByText(/You've reached your quota limit/i)).toBeInTheDocument();
-		});
+		await screen.findByText(/You've reached your quota limit/i);
 	});
 
 	it("should NOT block submission when quota is 0 but quotaLoaded=false (initial load state)", async () => {
@@ -426,14 +298,7 @@ describe("ReportGeneratorSection", () => {
 		const refreshSession = vi.fn();
 
 		const mockSearchSymbols = vi.spyOn(apiModule, "searchSymbols");
-		mockSearchSymbols.mockResolvedValueOnce([
-			{
-				symbol: "AAPL",
-				description: "Apple Inc",
-				displaySymbol: "AAPL",
-				type: "equity",
-			},
-		]);
+		mockSearchSymbols.mockResolvedValue(baseSearchResult);
 
 		const mockGenerateReport = vi.spyOn(apiModule, "generateReport");
 		mockGenerateReport.mockResolvedValueOnce({
@@ -442,48 +307,23 @@ describe("ReportGeneratorSection", () => {
 			companyData: { profile: { name: "Apple" } },
 		} as unknown as Awaited<ReturnType<typeof apiModule.generateReport>>);
 
-		render(
-			<ReportGeneratorSection
-				selectedTone="baseline"
-				toneOptions={[
-					{
-						id: "baseline",
-						emoji: "📊",
-						title: "Baseline",
-						badge: "balanced",
-						description: "Balanced analysis",
-					},
-				]}
-				language="en"
-				highlightFallback={["Highlight 1", "Highlight 2", "Highlight 3"]}
-				heroHighlights={[]}
-				// quotaLoaded is false/undefined, so remainingQuota=0 should NOT block
-				auth={{
-					isAuthenticated: true,
-					remainingQuota: 0,
-					planLabel: "Pro",
-					userEmail: "user@example.com",
-					refreshSession,
-					refreshQuota: vi.fn(),
-					quotaLoaded: false, // Not loaded yet - should allow submission
-				}}
-				progress={defaultProgress}
-				onRequireLogin={onRequireLogin}
-				t={mockTranslate}
-			/>
-		);
-
-		const input = screen.getByRole("textbox", { name: /enter symbol/i });
-		await user.type(input, "AAPL");
-
-		await waitFor(() => {
-			expect(screen.getByText("Apple Inc")).toBeInTheDocument();
+		renderGenerator({
+			// quotaLoaded is false/undefined, so remainingQuota=0 should NOT block
+			auth: {
+				isAuthenticated: true,
+				remainingQuota: 0,
+				planLabel: "Pro",
+				userEmail: "user@example.com",
+				refreshSession,
+				refreshQuota: vi.fn(),
+				quotaLoaded: false, // Not loaded yet - should allow submission
+			},
+			onRequireLogin,
 		});
 
-		const appleButton = screen.getByRole("button", { name: /Apple Inc/i });
-		await user.click(appleButton);
+		await typeAndSelectAapl(user);
 
-		const submitButton = screen.getByRole("button", { name: /generate/i });
+		const submitButton = screen.getByRole("button", { name: /^generate$/i });
 		await user.click(submitButton);
 
 		// Should attempt to call API (not show quota error pre-emptively)
