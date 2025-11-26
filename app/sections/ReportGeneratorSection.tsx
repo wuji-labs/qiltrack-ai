@@ -28,6 +28,13 @@ type AuthInfo = {
 	refreshQuota?: () => Promise<void>;
 };
 
+type ErrorKind = "unauthorized" | "quota" | "generic";
+
+type ErrorState = {
+	type: ErrorKind;
+	message: string;
+};
+
 type ReportGeneratorSectionProps = {
 	selectedTone: ReportTone;
 	toneOptions: ToneOption[];
@@ -63,13 +70,14 @@ export function ReportGeneratorSection({
 	const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
 	const [suppressNextSearch, setSuppressNextSearch] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const [errorState, setErrorState] = useState<ErrorState | null>(null);
 	const [reportData, setReportData] = useState<ReportResponse | null>(null);
 	const [exportingDocx, setExportingDocx] = useState(false);
 	const [lastReportTone, setLastReportTone] = useState<ReportTone>("baseline");
 	const reportContentRef = useRef<HTMLDivElement>(null);
 	const testToken = process.env.NEXT_PUBLIC_TEST_REPORT_TOKEN;
 	const canBypassAuth = Boolean(testToken);
+	const isQuotaExhausted = !canBypassAuth && auth.remainingQuota <= 0;
 
 	const selectedToneInfo =
 		toneOptions.find((option) => option.id === selectedTone) || toneOptions[0];
@@ -215,11 +223,11 @@ export function ReportGeneratorSection({
 		e.preventDefault();
 		const raw = inputValue.trim().toUpperCase();
 		if (!raw) {
-			setError(t("error.submit.empty"));
+			setErrorState({ type: "generic", message: t("error.submit.empty") });
 			return;
 		}
 		if (!/^[A-Z]+$/.test(raw)) {
-			setError(t("error.submit.format"));
+			setErrorState({ type: "generic", message: t("error.submit.format") });
 			return;
 		}
 		const validResults = searchResults.filter(
@@ -228,27 +236,27 @@ export function ReportGeneratorSection({
 		const matchedFromResults = validResults.some((item) => item.symbol.toUpperCase() === raw);
 		const matchedFromSelection = selectedSymbol ? selectedSymbol.toUpperCase() === raw : false;
 		if (!matchedFromResults && !matchedFromSelection) {
-			setError(t("error.submit.notFound"));
+			setErrorState({ type: "generic", message: t("error.submit.notFound") });
 			return;
 		}
 		setSearchResults([]);
 
 		if (!auth.isAuthenticated && !canBypassAuth) {
-			setError(t("generator.alert.unregistered"));
+			setErrorState({ type: "unauthorized", message: t("generator.alert.unregistered") });
 			onRequireLogin();
 			return;
 		}
 
 		// Only block if quota is truly 0 (not during initial load after auth state change)
 		// Backend will return 429 if quota is actually exhausted
-		if (auth.remainingQuota < 0) {
-			setError(t("generator.alert.quota"));
+		if (isQuotaExhausted) {
+			setErrorState({ type: "quota", message: t("generator.alert.quota") });
 			return;
 		}
 
 		setLastReportTone(selectedTone);
 		setLoading(true);
-		setError(null);
+		setErrorState(null);
 		setReportData(null);
 		progress.start(t("generator.progress.init"));
 
@@ -263,14 +271,16 @@ export function ReportGeneratorSection({
 		} catch (err) {
 			console.error("调用接口异常:", err);
 			const message = err instanceof Error ? err.message : t("error.submit.generic");
-			setError(message);
-			progress.fail(message);
-			if ((message || "").toLowerCase().includes("unauthorized")) {
+			const normalized = (message || "").toLowerCase();
+			if (normalized.includes("unauthorized")) {
+				setErrorState({ type: "unauthorized", message: t("quota.error.unauthorized") });
 				onRequireLogin();
-			} else if ((message || "").toLowerCase().includes("quota exceeded")) {
-				// Quota exhausted - offer upgrade option
-				setError(t("generator.alert.quota"));
+			} else if (normalized.includes("quota exceeded") || normalized.includes("429")) {
+				setErrorState({ type: "quota", message: t("generator.alert.quota") });
+			} else {
+				setErrorState({ type: "generic", message });
 			}
+			progress.fail(message);
 		} finally {
 			setLoading(false);
 		}
@@ -422,6 +432,113 @@ export function ReportGeneratorSection({
 		} finally {
 			setExportingDocx(false);
 		}
+	};
+
+	const handleRefreshQuota = async () => {
+		try {
+			if (auth.refreshQuota) {
+				await auth.refreshQuota();
+			} else {
+				await auth.refreshSession();
+			}
+			setErrorState(null);
+		} catch (refreshError) {
+			console.error("刷新额度失败:", refreshError);
+			setErrorState({ type: "generic", message: t("quota.error.generic") });
+		}
+	};
+
+	const handleViewPricing = () => {
+		if (typeof window === "undefined") return;
+		window.location.assign("/pricing#quota");
+	};
+
+	const renderError = () => {
+		if (!errorState) return null;
+
+		if (errorState.type === "unauthorized") {
+			return (
+				<div className="rounded-2xl border border-amber-400/50 bg-amber-500/10 px-4 py-3 text-base text-amber-50 shadow-[0_10px_35px_rgba(251,191,36,0.18)] space-y-2">
+					<div className="flex items-start gap-3">
+						<span aria-hidden>⚠️</span>
+						<div className="space-y-1">
+							<p className="text-sm uppercase tracking-[0.24em] text-amber-200">{t("alert.error.title")}</p>
+							<p className="text-amber-50">{errorState.message}</p>
+						</div>
+					</div>
+					<div className="flex flex-wrap gap-2">
+						<button
+							type="button"
+							onClick={() => {
+								setErrorState(null);
+								onRequireLogin();
+							}}
+							className="inline-flex items-center gap-2 rounded-full bg-amber-300 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-amber-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
+						>
+							{t("quota.action.login")}
+						</button>
+						<button
+							type="button"
+							onClick={() => setErrorState(null)}
+							className="inline-flex items-center gap-2 rounded-full border border-amber-300/60 px-4 py-2 text-sm text-amber-50 transition hover:border-amber-200 hover:text-amber-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
+						>
+							{t("quota.action.retry")}
+						</button>
+					</div>
+				</div>
+			);
+		}
+
+		if (errorState.type === "quota") {
+			return (
+				<div className="rounded-2xl border border-amber-400/50 bg-amber-500/10 px-4 py-3 text-base text-amber-50 shadow-[0_10px_35px_rgba(251,191,36,0.18)] space-y-3">
+					<div className="flex items-start gap-3">
+						<span aria-hidden>⏳</span>
+						<div className="flex-1 space-y-1">
+							<p className="text-sm uppercase tracking-[0.24em] text-amber-200">{t("generator.alert.quota")}</p>
+							<p className="text-sm text-amber-100/80">
+								{t("report.quota.remaining")} {Math.max(0, auth.remainingQuota).toString()}
+							</p>
+						</div>
+						{isQuotaExhausted && auth.isAuthenticated && (
+							<span className="rounded-full border border-amber-300/60 bg-amber-400/20 px-3 py-1 text-xs font-semibold text-amber-50">
+								{t("quota.badge.exhausted")}
+							</span>
+						)}
+					</div>
+					<div className="flex flex-wrap gap-2">
+						<button
+							type="button"
+							onClick={handleRefreshQuota}
+							className="inline-flex items-center gap-2 rounded-full bg-amber-300 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-amber-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
+						>
+							{t("quota.action.refresh")}
+						</button>
+						<button
+							type="button"
+							onClick={handleViewPricing}
+							className="inline-flex items-center gap-2 rounded-full border border-amber-300/60 px-4 py-2 text-sm text-amber-50 transition hover:border-amber-200 hover:text-amber-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
+						>
+							{t("quota.action.upgrade")}
+						</button>
+					</div>
+				</div>
+			);
+		}
+
+		return (
+			<div className="rounded-2xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-base text-amber-100 flex items-center gap-2 shadow-[0_10px_35px_rgba(251,191,36,0.18)]">
+				<span aria-hidden>⚠️</span>
+				<div className="flex-1">{errorState.message}</div>
+				<button
+					type="button"
+					onClick={() => setErrorState(null)}
+					className="rounded-full border border-amber-300/60 px-3 py-1 text-xs text-amber-50 transition hover:border-amber-200 hover:text-amber-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
+				>
+					{t("quota.action.retry")}
+				</button>
+			</div>
+		);
 	};
 
 	const workflowList = [
@@ -586,12 +703,7 @@ export function ReportGeneratorSection({
 				</div>
 			</form>
 
-			{error && (
-				<div className="rounded-2xl border border-amber-400/40 bg-amber-400/10 px-4 py-3 text-base text-amber-100 flex items-center gap-2 shadow-[0_10px_35px_rgba(251,191,36,0.18)]">
-					<span>⚠️</span>
-					<span>{error}</span>
-				</div>
-			)}
+			{renderError()}
 
 			{loading && (
 				<div className="space-y-3">
@@ -715,19 +827,24 @@ export function ReportGeneratorSection({
 						<div className="absolute -left-6 top-2 h-28 w-28 rounded-full bg-[var(--accent-emerald)]/18 blur-[90px]" aria-hidden />
 						<div className="absolute right-0 bottom-0 h-36 w-36 rounded-full bg-[var(--accent-blue)]/14 blur-[110px]" aria-hidden />
 					</div>
-					<div className="relative flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center justify-between">
-						<div className="space-y-3 flex-1">
-							<p className="text-xs uppercase tracking-[0.28em] text-emerald-300">{t("hero.quota")}</p>
-							<h3 className="text-lg font-semibold text-[var(--color-foreground)]">
-								{auth.isAuthenticated
-									? t("quota.card.heading", { plan: auth.planLabel })
-									: t("quota.banner.title")}
-							</h3>
-							{auth.isAuthenticated && (
-								<p className="text-sm text-subtle">
-									{t("quota.card.email", { email: auth.userEmail ?? t("auth.session.fallback") })}
-								</p>
-							)}
+								<div className="relative flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center justify-between">
+									<div className="space-y-3 flex-1">
+										<p className="text-xs uppercase tracking-[0.28em] text-emerald-300">{t("hero.quota")}</p>
+										<h3 className="text-lg font-semibold text-[var(--color-foreground)]">
+											{auth.isAuthenticated
+												? t("quota.card.heading", { plan: auth.planLabel })
+												: t("quota.banner.title")}
+										</h3>
+										{auth.isAuthenticated && isQuotaExhausted && (
+											<span className="inline-flex items-center gap-2 rounded-full border border-amber-300/60 bg-amber-400/20 px-3 py-1 text-xs font-semibold text-amber-50">
+												{t("quota.badge.exhausted")}
+											</span>
+										)}
+										{auth.isAuthenticated && (
+											<p className="text-sm text-subtle">
+												{t("quota.card.email", { email: auth.userEmail ?? t("auth.session.fallback") })}
+											</p>
+										)}
 							<div className="text-3xl font-bold text-[var(--accent-emerald)]">
 								{auth.isAuthenticated
 									? t("quota.card.count", { count: auth.remainingQuota.toString() })

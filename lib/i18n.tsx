@@ -2565,6 +2565,55 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hant": "即將推出",
 		"zh-Hans": "即将推出",
 	},
+	"quota.action.login": {
+		"en": "Log in",
+		"ja": "ログイン",
+		"ko": "로그인",
+		"zh-Hant": "登入",
+		"zh-Hans": "登录",
+	},
+	"quota.action.upgrade": {
+		"en": "Upgrade",
+		"ja": "アップグレード",
+		"ko": "업그레이드",
+		"zh-Hant": "升級",
+		"zh-Hans": "升级",
+	},
+	"quota.action.refresh": {
+		"en": "Refresh quota",
+		"ja": "額度を更新",
+		"ko": "쿼터 새로 고침",
+		"zh-Hant": "刷新額度",
+		"zh-Hans": "刷新额度",
+	},
+	"quota.action.retry": {
+		"en": "Retry",
+		"ja": "再試行",
+		"ko": "다시 시도",
+		"zh-Hant": "重試",
+		"zh-Hans": "重试",
+	},
+	"quota.badge.exhausted": {
+		"en": "Exhausted",
+		"ja": "枯渇済み",
+		"ko": "소진됨",
+		"zh-Hant": "已用盡",
+		"zh-Hans": "已用尽",
+	},
+	"quota.error.unauthorized": {
+		"en": "Please sign in to generate reports.",
+		"ja": "レポート生成にはログインが必要です。",
+		"ko": "리포트를 생성하려면 로그인해야 합니다.",
+		"zh-Hant": "需要登入才能生成報告。",
+		"zh-Hans": "需要登录才能生成报告。",
+	},
+	"quota.error.generic": {
+		"en": "Failed to fetch quota information. Please try again.",
+		"ja": "額度情報の取得に失敗しました。もう一度お試しください。",
+		"ko": "쿼터 정보를 가져오지 못했습니다. 다시 시도해주세요.",
+		"zh-Hant": "無法取得額度資訊，請重試。",
+		"zh-Hans": "无法获取额度信息，请重试。",
+	},
 } as const satisfies Record<string, TranslationEntry>;
 
 export type TranslationKey = keyof typeof translations;
