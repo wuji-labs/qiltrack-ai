@@ -112,9 +112,14 @@ Duration:  1.20s
 ---
 
 ## Files Modified
-- **No new files created**
+- **New file created**: `docs/decisions/2025-11-26-stripe-fallback.md` (decision record)
 - **No existing code changed** (validation only)
 - Branch: `feat/stripe-fallback` (based on origin/main)
+
+## Known Issues / Corrections
+⚠️ **Error in initial assessment**: Document claims "no new files created" but decision record itself is a new file. This was inaccurate.
+
+**I18n Status**: The keys `pricing.plan.monthly.cta.notReady` and `pricing.plan.annual.cta.notReady` exist in `lib/i18n.tsx` (lines 1434, 1443) with complete translations across all 5 languages. However, further runtime validation needed to confirm they render correctly in production UI.
 
 ---
 
