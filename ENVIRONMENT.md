@@ -14,6 +14,7 @@
 | **Git** | 2.40.0 | 2.52.0+ ✅ | `git --version` |
 | **Python** (可选) | 3.8.0 | 3.14.0+ ✅ | `python --version` |
 | **GitHub CLI** (可选) | 1.12.0 | 2.83.1+ ✅ | `gh --version` |
+| **Supabase CLI** (可选) | 1.0.0 | 2.62.10+ ✅ | `supabase --version` |
 
 ---
 
@@ -43,6 +44,7 @@ npm run env:check
 
   ✓ GitHub CLI: gh version 2.83.1 (2025-11-13) (需求: >=1.12.0)
   ✓ Python: Python 3.14.0 (需求: >=3.8.0)
+  ✓ Supabase CLI: supabase version 2.62.10 (需求: >=1.0.0)
 
 3. Git 配置
 
@@ -135,6 +137,18 @@ gh --version
 
 # 验证认证状态
 gh auth status
+```
+
+#### Supabase CLI（可选）
+
+```bash
+supabase --version
+# 预期: supabase version 2.62.10 或更高
+
+# 验证认证状态（已登录）
+supabase projects list
+# 或
+supabase auth whoami
 ```
 
 #### npm 依赖
@@ -542,6 +556,62 @@ nvm use 20
   }
   ```
 
+### 8.4 Supabase CLI（可选但推荐用于数据库管理）
+
+**为什么装**：管理 Supabase 项目、数据库迁移、本地开发。
+
+**Windows（使用 Scoop）**：
+```bash
+scoop install supabase
+```
+
+**Mac（使用 Homebrew）**：
+```bash
+brew install supabase/tap/supabase
+```
+
+**Linux（使用 npm）**：
+```bash
+npm install -g supabase
+```
+
+**验证安装**：
+```bash
+supabase --version
+# 预期: supabase version 2.62.10 或更高
+
+# 登录 Supabase 账户
+supabase login
+# 按提示在浏览器中验证
+
+# 查看已登录的账户
+supabase auth whoami
+
+# 列出项目
+supabase projects list
+```
+
+**常用命令**：
+```bash
+# 初始化本地 Supabase 环境
+supabase init
+
+# 启动本地开发服务器
+supabase start
+
+# 停止本地服务
+supabase stop
+
+# 查看本地数据库连接信息
+supabase status
+
+# 推送数据库迁移到远程
+supabase db push
+
+# 查看项目中的表结构
+supabase db tables list
+```
+
 ---
 
 ## 9. 常见问题解答（FAQ）
@@ -601,6 +671,7 @@ nvm alias default 20
 - [ ] 已配置 `.env.local` 并获得必要的 API 密钥
 - [ ] 已成功运行 `npm run dev` 并访问 http://localhost:3000
 - [ ] 已成功运行 `npm run lint` 和 `npm run test`
+- [ ] （可选）已安装 Supabase CLI 并运行 `supabase projects list` 验证认证
 - [ ] 已阅读 `docs/guides/claude-pr-workflow.md`（PR 工作流）
 - [ ] 已理解项目的协作规范（见 `CODEX_CLAUDE_COLLAB.md`）
 
@@ -616,5 +687,5 @@ nvm alias default 20
 
 ---
 
-**最后更新**：2025-11-27（已验证所有环境配置）
+**最后更新**：2025-11-27（已验证所有环境配置，补充 Supabase CLI）
 **维护者**：团队全体

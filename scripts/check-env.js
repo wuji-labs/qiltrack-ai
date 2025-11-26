@@ -208,6 +208,7 @@ function main() {
   print("\n2. 可选工具\n", "bold");
   checkCommand("GitHub CLI", "gh --version", "1.12.0", true);
   checkCommand("Python", "python --version", "3.8.0", true);
+  checkCommand("Supabase CLI", "supabase --version", "1.0.0", true);
 
   // 2. Check Git configuration
   print("\n3. Git 配置\n", "bold");
