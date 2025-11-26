@@ -365,7 +365,7 @@ describe("ReportGeneratorSection", () => {
 		});
 	});
 
-	it("should block submission when quota is exhausted (remainingQuota <= 0)", async () => {
+	it("should block submission when quota is exhausted (remainingQuota <= 0 AND quotaLoaded=true)", async () => {
 		const user = userEvent.setup();
 		const onRequireLogin = vi.fn();
 
@@ -394,7 +394,7 @@ describe("ReportGeneratorSection", () => {
 				language="en"
 				highlightFallback={["Highlight 1", "Highlight 2", "Highlight 3"]}
 				heroHighlights={[]}
-				auth={{ ...defaultAuth, remainingQuota: 0 }}
+				auth={{ ...defaultAuth, remainingQuota: 0, quotaLoaded: true }}
 				progress={defaultProgress}
 				onRequireLogin={onRequireLogin}
 				t={mockTranslate}
@@ -418,5 +418,80 @@ describe("ReportGeneratorSection", () => {
 		await waitFor(() => {
 			expect(screen.getByText(/You've reached your quota limit/i)).toBeInTheDocument();
 		});
+	});
+
+	it("should NOT block submission when quota is 0 but quotaLoaded=false (initial load state)", async () => {
+		const user = userEvent.setup();
+		const onRequireLogin = vi.fn();
+		const refreshSession = vi.fn();
+
+		const mockSearchSymbols = vi.spyOn(apiModule, "searchSymbols");
+		mockSearchSymbols.mockResolvedValueOnce([
+			{
+				symbol: "AAPL",
+				description: "Apple Inc",
+				displaySymbol: "AAPL",
+				type: "equity",
+			},
+		]);
+
+		const mockGenerateReport = vi.spyOn(apiModule, "generateReport");
+		mockGenerateReport.mockResolvedValueOnce({
+			symbol: "AAPL",
+			report: "# Test Report\nContent",
+			companyData: { profile: { name: "Apple" } },
+		} as unknown as Awaited<ReturnType<typeof apiModule.generateReport>>);
+
+		render(
+			<ReportGeneratorSection
+				selectedTone="baseline"
+				toneOptions={[
+					{
+						id: "baseline",
+						emoji: "📊",
+						title: "Baseline",
+						badge: "balanced",
+						description: "Balanced analysis",
+					},
+				]}
+				language="en"
+				highlightFallback={["Highlight 1", "Highlight 2", "Highlight 3"]}
+				heroHighlights={[]}
+				// quotaLoaded is false/undefined, so remainingQuota=0 should NOT block
+				auth={{
+					isAuthenticated: true,
+					remainingQuota: 0,
+					planLabel: "Pro",
+					userEmail: "user@example.com",
+					refreshSession,
+					refreshQuota: vi.fn(),
+					quotaLoaded: false, // Not loaded yet - should allow submission
+				}}
+				progress={defaultProgress}
+				onRequireLogin={onRequireLogin}
+				t={mockTranslate}
+			/>
+		);
+
+		const input = screen.getByRole("textbox", { name: /enter symbol/i });
+		await user.type(input, "AAPL");
+
+		await waitFor(() => {
+			expect(screen.getByText("Apple Inc")).toBeInTheDocument();
+		});
+
+		const appleButton = screen.getByRole("button", { name: /Apple Inc/i });
+		await user.click(appleButton);
+
+		const submitButton = screen.getByRole("button", { name: /generate/i });
+		await user.click(submitButton);
+
+		// Should attempt to call API (not show quota error pre-emptively)
+		await waitFor(() => {
+			expect(mockGenerateReport).toHaveBeenCalled();
+		});
+
+		mockSearchSymbols.mockRestore();
+		mockGenerateReport.mockRestore();
 	});
 });

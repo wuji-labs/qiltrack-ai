@@ -26,6 +26,7 @@ type AuthInfo = {
 	userEmail: string | null;
 	refreshSession: () => Promise<void>;
 	refreshQuota?: () => Promise<void>;
+	quotaLoaded?: boolean;
 };
 
 type ErrorKind = "unauthorized" | "quota" | "generic";
@@ -77,7 +78,8 @@ export function ReportGeneratorSection({
 	const reportContentRef = useRef<HTMLDivElement>(null);
 	const testToken = process.env.NEXT_PUBLIC_TEST_REPORT_TOKEN;
 	const canBypassAuth = Boolean(testToken);
-	const isQuotaExhausted = !canBypassAuth && auth.remainingQuota <= 0;
+	// Only block if quota is 0 AND it has been loaded (initial default 0 should not block)
+	const isQuotaExhausted = !canBypassAuth && auth.isAuthenticated && auth.quotaLoaded && auth.remainingQuota <= 0;
 
 	const selectedToneInfo =
 		toneOptions.find((option) => option.id === selectedTone) || toneOptions[0];
@@ -247,8 +249,8 @@ export function ReportGeneratorSection({
 			return;
 		}
 
-		// Only block if quota is truly 0 (not during initial load after auth state change)
-		// Backend will return 429 if quota is actually exhausted
+		// Only block if quota is 0 AND has been loaded (not initial load state)
+		// If quotaLoaded is false/undefined, allow request; backend will return 429 if needed
 		if (isQuotaExhausted) {
 			setErrorState({ type: "quota", message: t("generator.alert.quota") });
 			return;
