@@ -21,6 +21,7 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 - 更详细的条款与定位说明见 [`/legal`](./app/legal/page.tsx) 页面。
 
 ## 开发指南
+
 | 命令 | 说明 |
 | --- | --- |
 | `npm run dev` | 启动开发服务器，默认 http://localhost:3000 |
@@ -28,8 +29,23 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 | `npm start` | 运行生产构建 |
 | `npm run lint` | ESLint（core-web-vitals） |
 | `npm run test` | Vitest（jsdom），覆盖 API service 与进度条 hook |
+| `npm run env:check` | 检查开发环境是否满足要求 |
+| `npm run pr:ready` | 一键验证代码质量（lint + test） |
 
 > 运行前请复制 `.env.local.example` 为 `.env.local` 并补齐密钥。
+
+### 环境要求
+
+- **Node.js** 18.0.0+ （推荐 v20.19.5+）
+- **npm** 8.0.0+ （推荐 10.8.2+）
+- **Git** 2.40.0+
+
+**首次使用，请运行环境检查**：
+```bash
+npm run env:check
+```
+
+详见 [`ENVIRONMENT.md`](./ENVIRONMENT.md) 获取完整的环境配置指南。
 
 ### SSH 配置（推送代码）
 

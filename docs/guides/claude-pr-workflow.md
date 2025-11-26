@@ -8,7 +8,21 @@
 
 ## 1. 工具链检查清单
 
-### 1.1 前置环境（必须可用）
+### 1.1 一键环境检查（推荐）
+
+```bash
+# 运行项目提供的环境检查脚本（已更新）
+npm run env:check
+
+# 该脚本会自动检查：
+# ✓ Node.js 版本（需要 >=18.0.0）
+# ✓ npm 版本（需要 >=8.0.0）
+# ✓ Git 版本与配置
+# ✓ SSH 密钥配置
+# ✓ npm 依赖完整性
+```
+
+### 1.2 前置环境（必须可用）
 
 ```bash
 # 检查 Git
@@ -29,12 +43,12 @@ git config user.name    # 应显示提交者名称
 git config user.email   # 应显示提交者邮箱
 ```
 
-### 1.2 项目配置检查
+### 1.3 项目配置检查
 
 ```bash
 # 检查远程仓库
 git remote -v
-# 预期：origin  git@github.com:explore0012/ai-report.git (fetch/push)
+# 预期：origin  git@github.com:explore0012/investor-ai.git (fetch/push)
 
 # 检查 PR 模板是否存在
 ls -la .github/pull_request_template.md
@@ -43,6 +57,10 @@ ls -la .github/pull_request_template.md
 # 检查 GitHub Workflows 是否配置
 ls -la .github/workflows/
 # 预期：至少有 1+ workflow 文件
+
+# 检查 npm 依赖已安装
+npm ls --depth=0
+# 预期：显示依赖列表，无 ERR
 ```
 
 ---
@@ -75,13 +93,19 @@ git branch
 
 ### 2.3 本地代码检查（必须通过）
 
+**核心原则**：提交前必须通过所有检查，否则 PR 会在 CI 中失败，浪费时间。
+
 ```bash
+# 一键检查（推荐）
+npm run pr:ready
+
+# 或逐步检查：
 # 1. 检查 lint
 npm run lint
-# 预期：✓ 无错误 或 仅有警告可接受
+# 预期：✓ 无 error（warning 可接受）
 
 # 2. 运行单元测试
-npm test
+npm run test
 # 预期：✓ 所有测试通过
 
 # 3. 本地构建（可选但推荐）
@@ -89,7 +113,22 @@ npm run build
 # 预期：✓ 构建成功无错误
 ```
 
-**提前失败原则**：如果 lint/test 失败，必须修复后才能推送。
+**提前失败原则**：如果 lint/test 失败，必须修复后才能推送。不要把问题留给 CI。
+
+**常见错误及快速修复**：
+```bash
+# Lint 错误：代码风格不符合规范
+npm run lint -- --fix
+# 这会自动修复大部分风格问题（如缩进、引号等）
+
+# 依赖安装错误：node_modules 损坏或过期
+rm -rf node_modules package-lock.json
+npm install
+
+# 类型错误：TypeScript 类型不匹配
+npm run build
+# 仔细阅读错误信息，可能需要添加类型注解
+```
 
 ### 2.4 提交代码
 

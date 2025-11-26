@@ -9,7 +9,9 @@
     "lint": "eslint",
     "test": "vitest --environment jsdom --pool=forks",
     "test:ci": "cross-env CI=true vitest --environment jsdom --pool=forks run",
-    "helicone:sync-models": "node scripts/update-helicone-models.js"
+    "helicone:sync-models": "node scripts/update-helicone-models.js",
+    "env:check": "node scripts/check-env.js",
+    "pr:ready": "npm run lint && npm run test && echo '✅ 代码已准备好提交 PR'"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
