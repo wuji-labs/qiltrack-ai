@@ -470,7 +470,7 @@ export function ReportGeneratorSection({
 					<div className="relative flex flex-wrap items-center justify-between gap-3 text-sm uppercase tracking-[0.2em] text-subtle">
 					<div className="relative inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3.5 py-1.5 text-[var(--accent-emerald)] shadow-[0_12px_30px_rgba(0,0,0,0.24)]">
 						<span className="rounded-full bg-[var(--accent-emerald)]/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-200">
-							Step 2
+				{t("generator.step.two")}
 						</span>
 						<span>{t("generator.input.label")}</span>
 					</div>
@@ -688,7 +688,7 @@ export function ReportGeneratorSection({
 					<div className="relative flex flex-wrap items-center justify-between gap-3 text-sm uppercase tracking-[0.22em] text-subtle">
 						<div className="relative inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3.5 py-1.5 text-sm text-[var(--accent-emerald)] shadow-[0_12px_30px_rgba(0,0,0,0.24)]">
 							<span className="rounded-full bg-[var(--accent-emerald)]/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-200">
-								Step 3
+					{t("generator.step.three")}
 							</span>
 							<span className="whitespace-nowrap">{t("report.tip.title")}</span>
 							<div className="pointer-events-none absolute inset-0 rounded-full border border-[var(--stroke-soft)]/70" aria-hidden />
