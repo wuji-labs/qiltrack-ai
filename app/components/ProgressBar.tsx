@@ -16,14 +16,8 @@ type ProgressBarProps = {
 };
 
 export function ProgressBar({ percent, label, steps, activeStep, extra }: ProgressBarProps) {
-	const computedIndex = steps.findIndex((item) => item.step === activeStep);
-	const fallbackIndex = Math.min(steps.length - 1, Math.floor((percent / 100) * (steps.length - 1)));
-	const activeIndex = computedIndex === -1 ? fallbackIndex : computedIndex;
-
-	const pipPositions = steps.map((_, idx) => {
-		if (steps.length === 1) return 100;
-		return (idx / (steps.length - 1)) * 100;
-	});
+	// Note: activeIndex computation kept for potential future use with animated progress indicators
+	// const activeIndex = computedIndex === -1 ? fallbackIndex : computedIndex;
 
 	return (
 		<div className="space-y-3 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-4">
