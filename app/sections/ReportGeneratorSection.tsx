@@ -239,7 +239,9 @@ export function ReportGeneratorSection({
 			return;
 		}
 
-		if (auth.remainingQuota <= 0) {
+		// Only block if quota is truly 0 (not during initial load after auth state change)
+		// Backend will return 429 if quota is actually exhausted
+		if (auth.remainingQuota < 0) {
 			setError(t("generator.alert.quota"));
 			return;
 		}
