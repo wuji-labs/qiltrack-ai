@@ -2306,6 +2306,20 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hant": "登入即可啟用結構化報告與額度管理。",
 		"zh-Hans": "登录后即可生成结构化报告并同步额度。",
 	},
+	"generator.step.two": {
+		"en": "Step 2",
+		"ja": "ステップ 2",
+		"ko": "2단계",
+		"zh-Hant": "步驟 2",
+		"zh-Hans": "步骤 2",
+	},
+	"generator.step.three": {
+		"en": "Step 3",
+		"ja": "ステップ 3",
+		"ko": "3단계",
+		"zh-Hant": "步驟 3",
+		"zh-Hans": "步骤 3",
+	},
 	"disclaimer.source": {
 		"en": "Powered by Finnhub + OpenRouter. Reports are for education only—",
 		"ja": "Finnhub + OpenRouter 連携。レポートは教育目的です—",
