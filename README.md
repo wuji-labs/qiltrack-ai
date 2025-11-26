@@ -21,6 +21,7 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 - 更详细的条款与定位说明见 [`/legal`](./app/legal/page.tsx) 页面。
 
 ## 开发指南
+
 | 命令 | 说明 |
 | --- | --- |
 | `npm run dev` | 启动开发服务器，默认 http://localhost:3000 |
@@ -28,8 +29,23 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 | `npm start` | 运行生产构建 |
 | `npm run lint` | ESLint（core-web-vitals） |
 | `npm run test` | Vitest（jsdom），覆盖 API service 与进度条 hook |
+| `npm run env:check` | 检查开发环境是否满足要求 |
+| `npm run pr:ready` | 一键验证代码质量（lint + test） |
 
 > 运行前请复制 `.env.local.example` 为 `.env.local` 并补齐密钥。
+
+### 环境要求
+
+- **Node.js** 18.0.0+ （推荐 v20.19.5+）
+- **npm** 8.0.0+ （推荐 10.8.2+）
+- **Git** 2.40.0+
+
+**首次使用，请运行环境检查**：
+```bash
+npm run env:check
+```
+
+详见 [`ENVIRONMENT.md`](./ENVIRONMENT.md) 获取完整的环境配置指南。
 
 ### SSH 配置（推送代码）
 
@@ -227,6 +243,11 @@ curl -H "Cookie: ..." "http://localhost:3000/api/report/history"
 3. 输入 `NVDA`，从下拉选择生成报告；留意进度条与错误提示。
 4. 点击「复制报告」「导出 DOCX」确认交互正常。
 5. 再次尝试生成，确认 UI 提示"仅首份报告免费，订阅后解锁更多"（额度校验上线后替换成真实逻辑）。
+
+## 调试工具与 MCP
+- 推荐直接使用浏览器 DevTools；如需远程或脚本化调试，可启用 Chrome DevTools MCP（`docs/guides/chrome-devtools-mcp-guide.md`）。
+- 需要查官方文档时，可使用 Context7 MCP（`docs/guides/context7-mcp-guide.md`）搜索/拉取库的 API 参考。
+- 团队成员在使用 MCP 前需确认本地环境满足要求，并避免多个实例竞争同一浏览器进程。
 
 ## 路线图摘要
 - **Phase 0**：信息架构、README、环境变量模板（当前完成）。
