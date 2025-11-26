@@ -228,6 +228,11 @@ curl -H "Cookie: ..." "http://localhost:3000/api/report/history"
 4. 点击「复制报告」「导出 DOCX」确认交互正常。
 5. 再次尝试生成，确认 UI 提示"仅首份报告免费，订阅后解锁更多"（额度校验上线后替换成真实逻辑）。
 
+## 调试工具与 MCP
+- 推荐直接使用浏览器 DevTools；如需远程或脚本化调试，可启用 Chrome DevTools MCP（`docs/guides/chrome-devtools-mcp-guide.md`）。
+- 需要查官方文档时，可使用 Context7 MCP（`docs/guides/context7-mcp-guide.md`）搜索/拉取库的 API 参考。
+- 团队成员在使用 MCP 前需确认本地环境满足要求，并避免多个实例竞争同一浏览器进程。
+
 ## 路线图摘要
 - **Phase 0**：信息架构、README、环境变量模板（当前完成）。
 - **Phase 1**：导航 + 核心入口体验，突出仅首份免费（进行中）。

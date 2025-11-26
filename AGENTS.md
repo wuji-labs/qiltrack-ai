@@ -57,4 +57,4 @@
 ### 浏览器 DevTools（推荐）
 使用 `npm run dev` 启动开发服务器，打开 http://localhost:3000，使用浏览器内置 DevTools 进行调试。
 
-> **历史说明**：2025-11-23 起已下线 Chrome DevTools MCP 工具链（详见 `docs/decisions/2025-11-23-drop-chrome-devtools-mcp.md`）。若需远程调试或特殊场景，请参考浏览器官方文档或项目决议。
+> **工具补充**：允许使用 Chrome DevTools MCP 进行远程/脚本化调试（`docs/guides/chrome-devtools-mcp-guide.md`）与 Context7 MCP 查询官方库文档（`docs/guides/context7-mcp-guide.md`）。使用前确认本地环境满足要求。
