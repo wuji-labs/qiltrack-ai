@@ -47,3 +47,7 @@
 - LLM 成本与速率：默认模型走 Helicone/OpenRouter，必要时加 `OPENROUTER_MODEL`/`HELICONE_MODEL` 兜底；限制 `testToken` 渠道。  
 - 配额同步延迟：每次成功生成后强制刷新 session，后端以事务扣减 quota。  
 - 多语言漏文案：统一检查 `lib/i18n` 字典，新增 key 需双语同步。
+
+---
+
+**状态**：计划已完成并归档，详见收尾报告 `docs/reports/2025-11-26-launch-closeout.md`。
