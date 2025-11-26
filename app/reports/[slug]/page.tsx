@@ -35,7 +35,7 @@ const matchReport = async (slugRaw: string | string[] | undefined) => {
 
 	if (process.env.DEBUG_REPORTS === "true") {
 		// Log helpful diagnostics in dev/ops without exposing in UI
-		// eslint-disable-next-line no-console
+		 
 		const h = await headers();
 		console.log("[reports][slug]", {
 			slugRaw,

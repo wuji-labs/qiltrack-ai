@@ -10,7 +10,6 @@ type HeroSectionProps = {
 	navItems: NavItem[];
 	language: Language;
 	setLanguage: (lang: Language) => void;
-	remainingQuota: number;
 	userEmail: string | null;
 	userImage: string | null;
 	planLabel: string;
@@ -26,7 +25,6 @@ export function HeroSection({
 	navItems,
 	language,
 	setLanguage,
-	remainingQuota,
 	userEmail,
 	userImage,
 	planLabel,

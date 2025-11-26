@@ -141,7 +141,10 @@ type CaseStudy = {
 	metricKey: TranslationKey;
 };
 
-const caseStudies: CaseStudy[] = [
+// Note: caseStudies data prepared for future case studies section
+// Currently unused, kept for future implementation
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _caseStudies: CaseStudy[] = [
 	{
 		company: "NVIDIA",
 		industryKey: "case.nvidia.industry",
@@ -216,33 +219,6 @@ export default function Home() {
 	const toneLabelList = useMemo(() => toneOptionsLabeled.map((option) => option.title).join(" / "), [toneOptionsLabeled]);
 	const personaSentence = t("persona.caption", { tones: toneLabelList });
 
-	const module2Items = useMemo(() => {
-		try {
-			return JSON.parse(t("landing.module2.items")) as { q: string; a: string }[];
-		} catch (err) {
-			console.warn("Failed to parse module2 items", err);
-			return [];
-		}
-	}, [t]);
-
-	const module3Items = useMemo(() => {
-		try {
-			return JSON.parse(t("landing.module3.items")) as { title: string; body: string }[];
-		} catch (err) {
-			console.warn("Failed to parse module3 items", err);
-			return [];
-		}
-	}, [t]);
-
-	const module4Items = useMemo(() => {
-		try {
-			return JSON.parse(t("landing.module4.items")) as string[];
-		} catch (err) {
-			console.warn("Failed to parse module4 items", err);
-			return [];
-		}
-	}, [t]);
-
 	const module6Items = useMemo(() => {
 		try {
 			return JSON.parse(t("landing.module6.items")) as string[];
@@ -260,15 +236,6 @@ export default function Home() {
 			return [];
 		}
 	}, [t]);
-
-	const caseStudyList = caseStudies.map((study) => ({
-		company: study.company,
-		industry: t(study.industryKey),
-		tonality: t(study.tonalityKey),
-		tags: study.tagKeys.map((tagKey) => t(tagKey)),
-		snippet: t(study.snippetKey),
-		metric: t(study.metricKey),
-	}));
 
 	const featuredReports = useMemo(() => {
 		return getFeaturedReports(3).map((report) => ({
@@ -350,9 +317,6 @@ export default function Home() {
 		handlePrimaryCta();
 	};
 
-	const quotaHintPrimary = isAuthenticated ? t("quota.banner.hint.refresh") : t("quota.banner.hint.register");
-	const quotaHintSecondary = t("quota.banner.description");
-
 	return (
 		<>
 			<main className={`min-h-screen ${mainBg}`} style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont" }}>
@@ -361,7 +325,6 @@ export default function Home() {
 						navItems={navLinks}
 						language={language as Language}
 						setLanguage={setLanguage}
-						remainingQuota={remainingQuota}
 						planLabel={planLabel}
 						userEmail={user?.email}
 						userImage={user?.user_metadata?.avatar_url}

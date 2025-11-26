@@ -16,7 +16,7 @@ type Preferences = {
 
 export default function AccountPage() {
 	const router = useRouter();
-	const { isAuthenticated, loading, user, getReportCredits, signOut } = useSupabaseAuth();
+	const { isAuthenticated, user, getReportCredits, signOut } = useSupabaseAuth();
 	const { language, setLanguage, t } = useLanguage();
 	const [prefs, setPrefs] = useState<Preferences>({
 		language,
@@ -51,6 +51,27 @@ export default function AccountPage() {
 		if (!loaded) return;
 		window.localStorage.setItem(PREF_KEY, JSON.stringify(prefs));
 	}, [prefs, loaded]);
+
+	// Fetch real quota from /api/report/credits on component mount
+	useEffect(() => {
+		if (!isAuthenticated) return;
+		const fetchCredits = async () => {
+			try {
+				const response = await fetch("/api/report/credits");
+				if (response.ok) {
+					const data = await response.json();
+					// Map API response to component state
+					setReportCredits({
+						credits_available: data.credits?.remaining_credits ?? 0,
+						credits_used: 0, // For display; actual tracking is in Supabase
+					});
+				}
+			} catch (err) {
+				console.error("Failed to fetch credits:", err);
+			}
+		};
+		fetchCredits();
+	}, [isAuthenticated]);
 
 	if (!isAuthenticated) {
 		return (
@@ -118,7 +139,9 @@ export default function AccountPage() {
 					<div className="grid gap-4 sm:grid-cols-2">
 						<div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 space-y-2">
 							<p className="text-sm text-subtle">{t("account.page.remainingTitle")}</p>
-							<p className="text-3xl font-bold text-[var(--accent-emerald)]">{reportCredits?.credits_available ?? 5}</p>
+							<p className="text-3xl font-bold text-[var(--accent-emerald)]">
+								{reportCredits && reportCredits.credits_available <= 0 ? 0 : (reportCredits?.credits_available ?? 1)}
+							</p>
 							<p className="text-sm text-dim">{t("account.page.remainingNote")}</p>
 						</div>
 						<div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 space-y-2">
