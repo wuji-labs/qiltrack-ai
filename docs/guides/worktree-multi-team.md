@@ -17,16 +17,23 @@
 # 列现有 worktree
 powershell -ExecutionPolicy Bypass -File scripts/worktree-manager.ps1 list
 
-# 新建 group-a 分支工作区（自动 --no-checkout + sparse-checkout + node_modules 链接）
+# 推荐：使用 prep 脚本（创建 + env 合并 + 生成 GROUP.md）
+powershell -ExecutionPolicy Bypass -File scripts/prep-group.ps1 `
+  -Name g1 `
+  -Branch g1/feature-reporting `
+  -GroupEnvFile .env.group-a
+
+# 仅建 worktree（不处理 env）
 powershell -ExecutionPolicy Bypass -File scripts/worktree-manager.ps1 `
   -Command add `
   -Name g1 `
-  -Branch group-a/feature-reporting `
+  -Branch g1/feature-reporting `
   -Folders app,docs,hooks,lib,supabase,types,__tests__,scripts
 ```
 会生成 `D:\Projects\investor-ai-g1`，其中：
 - 仅检出指定目录；其余文件按需可 `git -C <path> sparse-checkout add <dir>`。
 - `node_modules` 自动创建到总部的符号链接（需管理员权限）。如链接失败，手动运行 `cmd /c mklink /J "<worktree>\node_modules" "<root>\node_modules"`。
+- `scripts/prep-group.ps1` 还会写入 `.env.local` 与 `GROUP.md`（记录组别、分支、启动模板），打开目录即可知道自己所属的组别与标准指令。
 
 ## 4. 依赖与脚本
 - 所有 `npm run ...` 命令从总部触发并传 `--prefix`：

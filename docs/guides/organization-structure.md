@@ -22,12 +22,14 @@
   @HQ 请阅读 CODEX_CLAUDE_COLLAB.md，打开 docs/plans/workstreams.md 等待分派任务
   ```
 - **HQ → 各组默认指令模板**（示例 G1，其余替换编号）
-  ```
-  @G1-Codex 请阅读 CODEX_CLAUDE_COLLAB.md 与 docs/guides/organization-structure.md，
-  查阅 docs/plans/workstreams.md，等待 HQ 的任务
-  @G1-Claude 请阅读 CODEX_CLAUDE_COLLAB.md，等待 G1-Codex 的 Snapshot 与实施指令
-  ```
+```
+@G1-Codex 请阅读 CODEX_CLAUDE_COLLAB.md 与 docs/guides/organization-structure.md，
+查阅 docs/plans/workstreams.md，等待 HQ 的任务
+@G1-Claude 请阅读 CODEX_CLAUDE_COLLAB.md，等待 G1-Codex 的 Snapshot 与实施指令
+```
 > Claude 不直接接受 HQ 指令，必须通过所属组 Codex。
+
+每个工作组的 worktree 根目录会自动生成 `GROUP.md`（由 `scripts/prep-group.ps1` 写入），其中记录组别、分支、以及上述两条启动模板，方便成员随时确认“自己是哪一组”与如何汇报。
 
 ## 3. 信息流
 
