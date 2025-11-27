@@ -1,6 +1,12 @@
 # Codex–Claude 协作手册
 
-本手册说明架构师（Codex）与实现工程师（Claude）在 investor-ai 项目的协作方式、职责分工与交付规范。命令/路径保持英文，其余叙述统一中文。如需 1 页速查，请参阅 `docs/guides/codex-claude-quickstart.md`；若存在冲突，以本手册为准。
+> **📌 重要声明**：本文档是项目协作的**唯一权威规范**。
+> 如与其他文档冲突，**以本文档为准**。
+> - 速查版：`docs/guides/codex-claude-quickstart.md`（1 页摘要）
+> - 组织架构：`docs/guides/organization-structure.md`（HQ 和各组职责）
+> - 老板手册：`docs/guides/BOSS-OPERATION-MANUAL.md`（完整操作流程）
+
+本手册说明架构师（Codex）与实现工程师（Claude）在 investor-ai 项目的协作方式、职责分工与交付规范。命令/路径保持英文，其余叙述统一中文。
 
 ## 1. 目的与范围
 - 确保每个需求从清晰的架构意图出发，最终以经过审查与测试的代码交付。
