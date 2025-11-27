@@ -37,6 +37,11 @@ ALTER COLUMN document_type SET NOT NULL,
 ALTER COLUMN storage_path SET NOT NULL;
 
 -- Remove old columns (they have been migrated)
+-- First drop the policies that reference these columns
+DROP POLICY IF EXISTS "Users can read their own report documents" ON public.report_documents;
+DROP POLICY IF EXISTS "Service role can manage report documents" ON public.report_documents;
+DROP POLICY IF EXISTS "Service role can delete report documents" ON public.report_documents;
+
 ALTER TABLE public.report_documents
 DROP COLUMN IF EXISTS run_id,
 DROP COLUMN IF EXISTS user_id,
@@ -128,4 +133,4 @@ CREATE POLICY "Service role can manage report documents" ON public.report_docume
   FOR INSERT WITH CHECK (auth.role() = 'service_role');
 
 CREATE POLICY "Service role can delete report documents" ON public.report_documents
-  FOR DELETE WITH CHECK (auth.role() = 'service_role');
+  FOR DELETE USING (auth.role() = 'service_role');
