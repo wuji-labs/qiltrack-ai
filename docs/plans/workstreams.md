@@ -10,8 +10,7 @@
 
 | ID | Group | Branch | Scope | Progress | Owner | Due | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| WS-G1-LOCAL-AUTH | G1 | `g1/local-auth-signal` | Login 页面 Supabase 状态提示、`lib/config/supabaseEnv` util、i18n & Vitest、dev console guard | 0% | G1-Codex / G1-Claude | 2025-11-27 EOD | Snapshot: `docs/decisions/2025-11-27-supabase-local-auth.md` |
-| WS-G2-CLI-ENV | G2 | `g2/supabase-env-sync` | `scripts/supabase-env.mjs` 一键切换、`.env` 模板与指南更新、worktree 提示 | 0% | G2-Codex / G2-Claude | 2025-11-27 EOD | Snapshot: `docs/decisions/2025-11-27-supabase-local-auth.md` |
+| ??? | - | - | ????????? | - | - | - | - |
 
 ---
 

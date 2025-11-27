@@ -71,7 +71,8 @@ export function ReportGeneratorSection({
 	const [searchResults, setSearchResults] = useState<SearchResult[]>(initialSearchResults ?? []);
 	const [searching, setSearching] = useState(false);
 	const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
-	const [suppressNextSearch, setSuppressNextSearch] = useState(false);
+	const suppressNextSearchRef = useRef(false);
+	const [dropdownClosed, setDropdownClosed] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [errorState, setErrorState] = useState<ErrorState | null>(null);
 	const [reportData, setReportData] = useState<ReportResponse | null>(null);
@@ -116,8 +117,8 @@ export function ReportGeneratorSection({
 	);
 
 	useEffect(() => {
-		if (suppressNextSearch) {
-			setSuppressNextSearch(false);
+		if (suppressNextSearchRef.current) {
+			suppressNextSearchRef.current = false;
 			return;
 		}
 
@@ -148,7 +149,7 @@ export function ReportGeneratorSection({
 			clearTimeout(timer);
 			setSearching(false);
 		};
-	}, [inputValue, suppressNextSearch]);
+	}, [inputValue]);
 
 	useEffect(() => {
 		if (typeof window === "undefined") return;
@@ -558,7 +559,7 @@ export function ReportGeneratorSection({
 
 	const maxVisibleResults = 3;
 	const visibleResults = searchResults.slice(0, maxVisibleResults);
-	const hasDropdown = visibleResults.length > 0 || searching;
+	const hasDropdown = !dropdownClosed && (visibleResults.length > 0 || searching);
 	const currentStageIndex = Math.min(
 		workflowList.length - 1,
 		Math.max(0, progress.currentStep - 1)
@@ -638,7 +639,10 @@ export function ReportGeneratorSection({
 										type="text"
 										autoFocus
 										value={inputValue}
-										onChange={(event) => setInputValue(event.target.value)}
+										onChange={(event) => {
+											setInputValue(event.target.value);
+											setDropdownClosed(false);
+										}}
 										placeholder={t("generator.input.placeholder")}
 										autoComplete="off"
 										spellCheck={false}
@@ -674,7 +678,8 @@ export function ReportGeneratorSection({
 														setInputValue(item.symbol);
 														setSelectedSymbol(item.symbol);
 														setSearchResults([]);
-														setSuppressNextSearch(true);
+														suppressNextSearchRef.current = true;
+														setDropdownClosed(true);
 													}}
 													className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--bg-layer)] focus:outline-none focus-visible:bg-[var(--bg-layer)]"
 												>

@@ -379,75 +379,62 @@ HQ 会更新状态：
 
 ---
 
-### 阶段 9：清理工作区（任务完成后）
+### 阶段 9：重置工作区（任务完成后）
 
-#### 9.1 HQ 通知清理
+#### 9.1 HQ 通知准备下一个任务
 
 ```
 @老板
 Report: docs/plans/workstreams.md
 Status: G1 任务已完成并合并
-Next: 可以删除 G1 工作区了
+Next: 可以重置 G1 工作区准备下一个任务了
 ```
 
 **你确认**：
 ```
-@HQ 清理 G1
+@HQ 重置 G1
 ```
 
-#### 9.2 删除 worktree
+#### 9.2 重置 worktree（不删除）
 
 ```powershell
-# HQ 会运行或你手动运行：
-cd D:\Projects\investor-ai
-git worktree remove D:\Projects\investor-ai-g1 --force
-git worktree prune
-git branch -D g1/local-auth-signal  # 删除本地分支
+# 重置工作区到最新 main
+.\scripts\reset-worktree.ps1 -Name g1
+
+# 如果依赖没变，跳过 npm ci 更快
+.\scripts\reset-worktree.ps1 -Name g1 -SkipNpmCi
 ```
 
-#### 9.3 关闭对应终端
+#### 9.3 工作区准备好接受下一个任务
 
-- 关闭 G1-Codex 和 G1-Claude 的终端
-- 关闭对应的 AI 对话窗口
+- G1-Codex 和 G1-Claude 的终端保持打开
+- AI 对话历史保留，可以继续使用
 
 ---
 
 ## 🔄 常驻 vs 临时工作区
 
-### 方案 A：常驻工作区（你以前的方式）
+### 推荐方案：长期保留工作区
+
+**5 个 worktree 长期保留，不删除**。每次新任务前重置即可。
 
 **优点**：
 - 终端一直开着，不用重复建
 - AI 对话历史保留
+- 独立 `node_modules`，避免 Turbopack 冲突
+- 可以同时运行多个 `npm run dev`
 
-**缺点**：
-- 占用磁盘空间（5 × 完整代码）
-- 分支混乱，容易冲突
-
-**适合场景**：长期开发，每个组有固定职责
-
-### 方案 B：临时工作区（新方案）
-
-**优点**：
-- 节省空间（共享 node_modules）
-- 分支干净，任务结束就删
-
-**缺点**：
-- 每次任务要重建 worktree
-- 终端和 AI 对话要重新打开
-
-**适合场景**：短期任务，任务完成立即合并
-
-### 推荐方案：混合模式
-
-```
-G1-G3: 常驻（核心功能组）
-G4-G5: 临时（临时任务组）
+**每次新任务前运行**：
+```powershell
+# 重置工作区到最新 main
+.\scripts\reset-worktree.ps1 -Name g1
 ```
 
-**操作**：
-- G1-G3 的 worktree 一直保留，不删除
-- G4-G5 按需创建，用完就删
+这个脚本会自动：
+1. `git fetch origin` - 获取最新代码
+2. `git reset --hard origin/main` - 重置到 main
+3. `git clean -fd` - 清理（保留 node_modules、.env.local）
+4. `npm ci`（如需要）- 更新依赖
 
 ---
 
@@ -494,14 +481,17 @@ cd D:\Projects\investor-ai
 git checkout main
 git pull
 
-# 2. 打开 VS Code
+# 2. 重置要用的工作区（如 G1）
+.\scripts\reset-worktree.ps1 -Name g1
+
+# 3. 打开 VS Code
 code .
 
-# 3. 打开多个终端（HQ + 各组）
+# 4. 打开多个终端（HQ + 各组）
 
-# 4. 启动各个 AI 对话窗口
+# 5. 启动各个 AI 对话窗口
 
-# 5. 跟 HQ 说话
+# 6. 跟 HQ 说话
 @HQ 早上好，今天继续昨天的任务
 ```
 
@@ -561,6 +551,10 @@ git push
 
 **解决**：
 ```powershell
+# 使用重置脚本
+.\scripts\reset-worktree.ps1 -Name gX
+
+# 或手动重置
 cd D:\Projects\investor-ai-gX
 git reset --hard HEAD
 git sparse-checkout set app docs hooks lib supabase types __tests__ scripts
@@ -578,29 +572,41 @@ git rebase origin/main
 
 ### Q6: 如何暂停一个任务？
 
-**方法 1：保留 worktree**
+**方法：保留 worktree，提交到远程**
 ```powershell
 cd D:\Projects\investor-ai-g1
 git add .
 git commit -m "WIP: paused"
 git push
-# worktree 保留，随时恢复
+
+# 下次继续时直接 pull
+git pull
 ```
 
-**方法 2：删除 worktree**
+### Q7: Turbopack/npm run dev 报错？
+
+**解决**：独立安装 node_modules
 ```powershell
-# 先提交到远程
-git push
-
-# 删除 worktree
-cd D:\Projects\investor-ai
-git worktree remove D:\Projects\investor-ai-g1
-
-# 稍后恢复
-powershell -ExecutionPolicy Bypass -File scripts/prep-group.ps1 `
-  -Name g1 -Branch g1/local-auth-signal
 cd D:\Projects\investor-ai-g1
-git pull
+
+# 删除旧的 node_modules（可能是 Junction 链接）
+Remove-Item -Recurse -Force node_modules -ErrorAction SilentlyContinue
+
+# 重新安装
+npm ci
+```
+
+### Q8: 多个 worktree 同时运行 dev server？
+
+**解决**：每个用不同端口
+```powershell
+# G1
+cd D:\Projects\investor-ai-g1
+npm run dev -- --port 3001
+
+# G2
+cd D:\Projects\investor-ai-g2
+npm run dev -- --port 3002
 ```
 
 ---
@@ -699,14 +705,16 @@ Next: 确认合并吗？
 HQ: 已合并，功能已上线
 ```
 
-#### 8. 清理（17:00）
+#### 8. 重置准备下一个任务（17:00）
 
 ```powershell
-git worktree remove D:\Projects\investor-ai-g3
-git worktree remove D:\Projects\investor-ai-g4
+# 重置 G3 和 G4 工作区
+.\scripts\reset-worktree.ps1 -Name g3
+.\scripts\reset-worktree.ps1 -Name g4
 ```
 
 **总耗时**：7 小时（需求 → 上线）
+**工作区状态**：G3、G4 已重置，准备接受下一个任务
 
 ---
 
@@ -718,6 +726,7 @@ git worktree remove D:\Projects\investor-ai-g4
 2. **确认计划** - HQ 给你看计划，你说 OK 或改
 3. **转发消息** - 在各个 AI 之间复制粘贴
 4. **确认合并** - 功能做好了，你说合并
+5. **重置工作区** - 任务完成后运行 `.\scripts\reset-worktree.ps1 -Name gX`
 
 ### AI 的工作
 
@@ -730,7 +739,8 @@ git worktree remove D:\Projects\investor-ai-g4
 1. **终端命名清楚** - 一眼看出这是哪个 AI
 2. **复制粘贴准确** - 不要漏掉 @XXX
 3. **定期查看进度** - 看 workstreams.md
-4. **任务完成就清理** - 删除 worktree，保持干净
+4. **任务完成就重置** - 运行 `reset-worktree.ps1`，保持干净
+5. **独立端口** - 每个 worktree 用不同端口 `--port 300X`
 
 ---
 

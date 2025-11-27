@@ -676,9 +676,29 @@ nvm alias default 20
 - [ ] 已理解项目的协作规范（见 `CODEX_CLAUDE_COLLAB.md`）
 
 ### 2.3 Worktree 协作指引
-- 默认只在总部仓库（`D:\Projects\investor-ai`）安装一次依赖，其余工作区通过脚本共享。
-- 多分支/多团队协作需使用 `scripts/worktree-manager.ps1` 创建/清理 worktree，并遵循 `docs/guides/worktree-multi-team.md` 中的 sparse-checkout、依赖共享、环境变量合并策略。
-- 同步流程：`git worktree list` → `git worktree add --no-checkout`（或脚本）→ `git fetch && git rebase` → `npm run lint/test --prefix <worktree>`。
+
+每个 worktree 拥有**独立的 `node_modules`**，避免 Turbopack 缓存冲突。
+
+**创建 worktree**：
+```powershell
+# 使用 prep 脚本（自动运行 npm ci）
+powershell -ExecutionPolicy Bypass -File scripts/prep-group.ps1 -Name g1 -Branch g1/feature-x
+```
+
+**每次新任务前重置**：
+```powershell
+# 重置到最新 main（保留 node_modules）
+.\scripts\reset-worktree.ps1 -Name g1
+```
+
+**多 worktree 并行开发**：
+```bash
+# 每个 worktree 用不同端口
+cd D:\Projects\investor-ai-g1 && npm run dev -- --port 3001
+cd D:\Projects\investor-ai-g2 && npm run dev -- --port 3002
+```
+
+详见 `docs/guides/worktree-multi-team.md`。
 
 ---
 

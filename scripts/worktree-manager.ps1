@@ -39,19 +39,9 @@ function Invoke-Git {
   }
 }
 
-function Ensure-NodeModulesLink {
-  param([string]$RepoRoot, [string]$TargetPath)
-  $source = Join-Path $RepoRoot "node_modules"
-  $destination = Join-Path $TargetPath "node_modules"
-  if (-not (Test-Path $source)) {
-    Write-Warning "Root node_modules not found, skip linking."
-    return
-  }
-  if (Test-Path $destination) {
-    return
-  }
-  cmd /c "mklink /J `"$destination`" `"$source`"" | Out-Null
-}
+# 注意：不再创建 node_modules 链接
+# 每个 worktree 应独立运行 npm ci 安装依赖
+# 这样可以避免 Turbopack 缓存冲突和多 worktree 并行运行问题
 
 function Add-Worktree {
   param([string]$RepoRoot, [string]$Name, [string]$Branch, [string[]]$Folders)
@@ -73,8 +63,11 @@ function Add-Worktree {
     Invoke-Git -RepoRoot $target -GitArgs @("sparse-checkout", "set", $Folders)
   }
 
-  Ensure-NodeModulesLink -RepoRoot $RepoRoot -TargetPath $target
   Write-Host "Worktree created at $target (branch: $Branch)"
+  Write-Host ""
+  Write-Host "IMPORTANT: Run 'npm ci' in the worktree to install dependencies:"
+  Write-Host "  cd `"$target`""
+  Write-Host "  npm ci"
 }
 
 function Remove-Worktree {

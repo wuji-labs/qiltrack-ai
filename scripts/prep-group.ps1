@@ -195,7 +195,6 @@ function Write-GroupProfile {
 
   $profile = Join-Path $TargetPath "GROUP.md"
   if ($DryRun -and -not (Test-Path $TargetPath)) {
-    # avoid Resolve-Path failing during dry-run
     $displayPath = $TargetPath
   }
   else {
@@ -204,34 +203,35 @@ function Write-GroupProfile {
     }
     $displayPath = (Resolve-Path $TargetPath).Path
   }
+
   $codexHandle = "$GroupLabel-Codex"
   $claudeHandle = "$GroupLabel-Claude"
-  $content = @(
-    "# Worktree Profile",
-    "",
-    "- Group: $GroupLabel",
-    "- Worktree: $displayPath",
-    "- Branch: $Branch",
-    "- Handles: $codexHandle / $claudeHandle",
-    "",
-    "## 启动模板",
-    "",
-    "**$codexHandle 启动指令：**",
-    "``````",
-    "@$codexHandle 请阅读 CODEX_CLAUDE_COLLAB.md 与 docs/guides/organization-structure.md，查看 docs/plans/workstreams.md 中属于 $GroupLabel 的条目，等待 HQ 分派任务",
-    "``````",
-    "",
-    "**$claudeHandle 启动指令：**",
-    "``````",
-    "@$claudeHandle 请阅读 CODEX_CLAUDE_COLLAB.md，等待 $codexHandle 的 Snapshot/指令",
-    "``````",
-    "",
-    "## 参考",
-    "- 任务看板：docs/plans/workstreams.md",
-    "- 组内 Snapshot：docs/decisions/<date>-$($GroupLabel.ToLower())-*.md",
-    "- 实施计划：docs/plans/$($GroupLabel.ToLower())-*.md",
-    "- CAVR：docs/reports/<date>-$($GroupLabel.ToLower())-*-cavr.md"
-  )
+  $content = @"
+# Worktree Profile
+
+- Group: $GroupLabel
+- Worktree: $displayPath
+- Branch: $Branch
+- Handles: $codexHandle / $claudeHandle
+
+## ????
+
+**$codexHandle ????**
+```
+@$codexHandle ??? CODEX_CLAUDE_COLLAB.md ? docs/guides/organization-structure.md??? docs/plans/workstreams.md ??? $GroupLabel ?????? HQ ????
+```
+
+**$claudeHandle ????**
+```
+@$claudeHandle ??? CODEX_CLAUDE_COLLAB.md???? $codexHandle ?? Snapshot/??
+```
+
+## ????
+- ?????docs/plans/workstreams.md
+- ?? Snapshot?docs/decisions/<date>-$($GroupLabel.ToLower())-*.md
+- ?????docs/plans/$($GroupLabel.ToLower())-*.md
+- CAVR?docs/reports/<date>-$($GroupLabel.ToLower())-*-cavr.md
+"@
 
   if ($DryRun) {
     Write-Host "[dry-run] would write GROUP.md at $profile"
@@ -239,6 +239,36 @@ function Write-GroupProfile {
   else {
     Set-Content -Path $profile -Value $content -Encoding UTF8
     Write-Host "Wrote $profile"
+  }
+}
+function Install-WorktreeDependencies {
+  param(
+    [string]$TargetPath,
+    [switch]$DryRun
+  )
+
+  if ($DryRun) {
+    Write-Host "[dry-run] would run 'npm ci' in $TargetPath"
+    return
+  }
+
+  if (-not (Test-Path (Join-Path $TargetPath "package.json"))) {
+    Write-Warning "package.json not found in $TargetPath, skipping npm ci"
+    return
+  }
+
+  Write-Host "Installing dependencies in worktree (npm ci)..."
+  Push-Location $TargetPath
+  try {
+    $output = & npm ci 2>&1
+    if ($LASTEXITCODE -ne 0) {
+      Write-Warning "npm ci failed: $output"
+    } else {
+      Write-Host "Dependencies installed successfully."
+    }
+  }
+  finally {
+    Pop-Location
   }
 }
 
@@ -272,6 +302,9 @@ else {
 }
 
 Write-GroupProfile -TargetPath $targetPath -GroupLabel $groupLabel -Branch $Branch -Name $Name -DryRun:$DryRun
+
+# Install independent node_modules for the worktree
+Install-WorktreeDependencies -TargetPath $targetPath -DryRun:$DryRun
 
 if (-not $DryRun) {
   Write-Host "Worktree ready at $targetPath"
