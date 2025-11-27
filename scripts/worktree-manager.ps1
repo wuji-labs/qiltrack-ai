@@ -24,24 +24,19 @@ function Get-WorktreePath {
 }
 
 function Invoke-Git {
-  param([string]$RepoRoot, [string[]]$Args)
-  $psi = New-Object System.Diagnostics.ProcessStartInfo
-  $psi.FileName = "git"
-  $psi.WorkingDirectory = $RepoRoot
-  $psi.RedirectStandardOutput = $true
-  $psi.RedirectStandardError = $true
-  $psi.UseShellExecute = $false
-  $psi.ArgumentList = $Args
-  $p = New-Object System.Diagnostics.Process
-  $p.StartInfo = $psi
-  $p.Start() | Out-Null
-  $stdout = $p.StandardOutput.ReadToEnd()
-  $stderr = $p.StandardError.ReadToEnd()
-  $p.WaitForExit()
-  if ($p.ExitCode -ne 0) {
-    throw "git $($Args -join ' ') failed: $stderr"
+  param([string]$RepoRoot, [string[]]$GitArgs)
+  Push-Location $RepoRoot
+  try {
+    $output = & git @GitArgs 2>&1
+    if ($LASTEXITCODE -ne 0) {
+      $msg = if ($output) { $output -join "`n" } else { "git exited with code $LASTEXITCODE" }
+      throw "git $($GitArgs -join ' ') failed: $msg"
+    }
+    return ($output -join [Environment]::NewLine)
   }
-  return $stdout
+  finally {
+    Pop-Location
+  }
 }
 
 function Ensure-NodeModulesLink {
@@ -60,6 +55,7 @@ function Ensure-NodeModulesLink {
 
 function Add-Worktree {
   param([string]$RepoRoot, [string]$Name, [string]$Branch, [string[]]$Folders)
+
   if ([string]::IsNullOrWhiteSpace($Branch)) {
     throw "Branch is required when adding a worktree."
   }
@@ -67,14 +63,14 @@ function Add-Worktree {
   if (Test-Path $target) {
     throw "Target path $target already exists."
   }
-  Invoke-Git -RepoRoot $RepoRoot -Args @("worktree", "add", "--no-checkout", $target, $Branch)
+  Invoke-Git -RepoRoot $RepoRoot -GitArgs @("worktree", "add", "--no-checkout", $target, $Branch)
 
-  Invoke-Git -RepoRoot $RepoRoot -Args @("worktree", "lock", $target, "--reason", "managed via scripts/worktree-manager.ps1") | Out-Null
+  Invoke-Git -RepoRoot $RepoRoot -GitArgs @("worktree", "lock", $target, "--reason", "managed via scripts/worktree-manager.ps1") | Out-Null
 
-  Invoke-Git -RepoRoot $target -Args @("sparse-checkout", "init", "--cone") | Out-Null
-  Invoke-Git -RepoRoot $target -Args @("sparse-checkout", "set") | Out-Null
+  Invoke-Git -RepoRoot $target -GitArgs @("sparse-checkout", "init", "--cone") | Out-Null
+  Invoke-Git -RepoRoot $target -GitArgs @("sparse-checkout", "set") | Out-Null
   if ($Folders -and $Folders.Count -gt 0) {
-    Invoke-Git -RepoRoot $target -Args @("sparse-checkout", "set", $Folders)
+    Invoke-Git -RepoRoot $target -GitArgs @("sparse-checkout", "set", $Folders)
   }
 
   Ensure-NodeModulesLink -RepoRoot $RepoRoot -TargetPath $target
@@ -88,8 +84,8 @@ function Remove-Worktree {
     Write-Warning "Worktree $target not found."
     return
   }
-  Invoke-Git -RepoRoot $RepoRoot -Args @("worktree", "unlock", $target) | Out-Null
-  Invoke-Git -RepoRoot $RepoRoot -Args @("worktree", "remove", $target)
+  Invoke-Git -RepoRoot $RepoRoot -GitArgs @("worktree", "unlock", $target) | Out-Null
+  Invoke-Git -RepoRoot $RepoRoot -GitArgs @("worktree", "remove", $target)
   Write-Host "Removed worktree $target"
 }
 
@@ -99,8 +95,8 @@ function Sync-Worktree {
   if (-not (Test-Path $target)) {
     throw "Worktree $target not found."
   }
-  Invoke-Git -RepoRoot $target -Args @("fetch", "--all")
-  Invoke-Git -RepoRoot $target -Args @("rebase")
+  Invoke-Git -RepoRoot $target -GitArgs @("fetch", "--all")
+  Invoke-Git -RepoRoot $target -GitArgs @("rebase")
   Write-Host "Synced worktree $target with its upstream branch."
 }
 
@@ -114,7 +110,7 @@ switch ($Command) {
     Remove-Worktree -RepoRoot $repoRoot -Name $Name
   }
   "list" {
-    $output = Invoke-Git -RepoRoot $repoRoot -Args @("worktree", "list")
+    $output = Invoke-Git -RepoRoot $repoRoot -GitArgs @("worktree", "list")
     Write-Output $output
   }
   "sync" {
