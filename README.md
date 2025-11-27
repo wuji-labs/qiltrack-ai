@@ -2,11 +2,23 @@
 
 Investor AI 是一个「三分钟理解美股上市公司」的投研助手。产品基于 Next.js App Router、Finnhub 实时行情与 OpenRouter LLM，输出结构化 Markdown 报告，并支持复制、DOCX 导出以及即将上线的登录/支付/额度闭环。
 
-### 协作规范入口
-- 主协作手册：`docs/guides/codex-claude-collaboration.md`（根目录 `CODEX_CLAUDE_COLLAB.md` 为跳转 stub）
-- 速查版：`docs/guides/codex-claude-quickstart.md`
+---
 
-### 核心能力
+## 📚 必读文档 Top 5
+
+**新成员请按顺序阅读以下文档：**
+
+1. **[老板操作手册](docs/guides/BOSS-OPERATION-MANUAL.md)** - 完整的多 AI 并行开发流程
+2. **[Codex-Claude 协作手册](CODEX_CLAUDE_COLLAB.md)** - 唯一权威协作规范
+3. **[组织架构](docs/guides/organization-structure.md)** - HQ 和各组的角色与职责
+4. **[Worktree 多组协作](docs/guides/worktree-multi-team.md)** - Git worktree 使用指南
+5. **[任务看板](docs/plans/workstreams.md)** - 当前所有任务状态
+
+**速查版**：[Codex-Claude 快速入门](docs/guides/codex-claude-quickstart.md)
+
+---
+
+## 🎯 核心能力
 - **模糊搜索**：输入英文公司名或股票代码，自动补全来自 `/api/search`。
 - **一键生成报告**：`/api/report` 汇总 Finnhub 数据并调度 OpenRouter，产出结构化分析。
 - **额度管控**：NextAuth 登录后默认配额 1 份，后端按用户表的 `quota` / `reportsUsed` 校验，401/429 会在前端提示。
