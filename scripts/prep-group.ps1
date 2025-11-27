@@ -33,6 +33,27 @@ function Get-WorktreePath {
   return (Join-Path $parent ("investor-ai-{0}" -f $sanitized))
 }
 
+function Invoke-GitLocal {
+  param([string]$RepoRoot, [string[]]$GitArgs)
+
+  if (-not $GitArgs -or $GitArgs.Count -eq 0) {
+    throw "Git arguments cannot be empty"
+  }
+
+  Push-Location $RepoRoot
+  try {
+    $output = & git @GitArgs 2>&1
+    if ($LASTEXITCODE -ne 0) {
+      $msg = if ($output) { $output -join "`n" } else { "git exited with code $LASTEXITCODE" }
+      throw "git $($GitArgs -join ' ') failed: $msg"
+    }
+    return ($output -join [Environment]::NewLine)
+  }
+  finally {
+    Pop-Location
+  }
+}
+
 function Resolve-GroupLabel {
   param([string]$Name, [string]$Branch)
   if ($Name -match "(g\d+)") {
@@ -42,6 +63,41 @@ function Resolve-GroupLabel {
     return $Matches[1].ToUpper()
   }
   return $Name.Trim().ToUpper()
+}
+
+function Ensure-BranchExists {
+  param(
+    [string]$RepoRoot,
+    [string]$Branch,
+    [switch]$DryRun
+  )
+
+  if ($DryRun) {
+    Write-Host "[dry-run] would ensure branch $Branch exists (create locally if missing)"
+    return
+  }
+
+  # Check if branch exists
+  try {
+    $gitArgs = @("rev-parse", "--verify", $Branch)
+    Invoke-GitLocal -RepoRoot $RepoRoot -GitArgs $gitArgs | Out-Null
+    Write-Host "Branch $Branch already exists locally."
+    return
+  }
+  catch {
+    # Branch doesn't exist, create it
+  }
+
+  # Get current branch
+  $gitArgs = @("rev-parse", "--abbrev-ref", "HEAD")
+  $currentBranch = (Invoke-GitLocal -RepoRoot $RepoRoot -GitArgs $gitArgs).Trim()
+
+  Write-Host "Creating branch $Branch from main (local only)..."
+  Invoke-GitLocal -RepoRoot $RepoRoot -GitArgs @("checkout", "main") | Out-Null
+  Invoke-GitLocal -RepoRoot $RepoRoot -GitArgs @("pull", "--ff-only") | Out-Null
+  Invoke-GitLocal -RepoRoot $RepoRoot -GitArgs @("checkout", "-b", $Branch) | Out-Null
+  Invoke-GitLocal -RepoRoot $RepoRoot -GitArgs @("checkout", $currentBranch) | Out-Null
+  Write-Host "Branch $Branch created locally."
 }
 
 function Invoke-WorktreeManager {
@@ -63,11 +119,21 @@ function Invoke-WorktreeManager {
     return
   }
 
-  powershell -ExecutionPolicy Bypass -File $managerPath `
-    -Command add `
-    -Name $Name `
-    -Branch $Branch `
-    -Folders $Folders
+  # Save parameters before dot-sourcing to avoid them being overwritten
+  $savedName = $Name
+  $savedBranch = $Branch
+  $savedFolders = $Folders
+
+  # Dot-source the worktree-manager script to call its functions directly
+  . $managerPath
+
+  # Call the Add-Worktree function directly instead of spawning a new process
+  try {
+    Add-Worktree -RepoRoot $RepoRoot -Name $savedName -Branch $savedBranch -Folders $savedFolders
+  }
+  catch {
+    throw "worktree-manager failed: $_"
+  }
 }
 
 function Merge-EnvFiles {
@@ -105,6 +171,10 @@ function Merge-EnvFiles {
     Write-Host "[dry-run] would write merged env to $Destination with $($ordered.Count) entries"
   }
   else {
+    $destinationDir = Split-Path -Path $Destination -Parent
+    if (-not (Test-Path $destinationDir)) {
+      New-Item -ItemType Directory -Path $destinationDir -Force | Out-Null
+    }
     $content = @()
     foreach ($key in $ordered.Keys) {
       $content += "$key=$($ordered[$key])"
@@ -129,6 +199,9 @@ function Write-GroupProfile {
     $displayPath = $TargetPath
   }
   else {
+    if (-not (Test-Path $TargetPath)) {
+      throw "Cannot write GROUP.md because target path $TargetPath does not exist."
+    }
     $displayPath = (Resolve-Path $TargetPath).Path
   }
   $codexHandle = "$GroupLabel-Codex"
@@ -164,7 +237,14 @@ $repoRoot = Resolve-RepoRoot
 $targetPath = Get-WorktreePath -RepoRoot $repoRoot -Name $Name
 $groupLabel = Resolve-GroupLabel -Name $Name -Branch $Branch
 
+# Ensure target branch exists locally (creates from main when缺失)
+Ensure-BranchExists -RepoRoot $repoRoot -Branch $Branch -DryRun:$DryRun
+
 Invoke-WorktreeManager -RepoRoot $repoRoot -Name $Name -Branch $Branch -Folders $Folders -DryRun:$DryRun
+
+if (-not $DryRun -and -not (Test-Path $targetPath)) {
+  throw "Worktree path $targetPath was not created. Please check git output above."
+}
 
 $envSources = @()
 foreach ($file in @($SharedEnvFile, $GroupEnvFile, $ExampleEnvFile)) {
