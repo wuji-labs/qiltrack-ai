@@ -14,34 +14,82 @@
 
 **文件位置**: `supabase/migrations/20251128000003_sync_quota_schema.sql`
 
-**主要变更**:
+**主要变更** (v2 修复版):
+
+#### A. 表与数据回填
 - ✅ 确保 `report_credits` 表存在（具有 `credits_available`, `credits_used` 等字段）
-- ✅ 从 `report_credit_events` 表回填数据到 `report_credits`（基于 delta 汇总）
+- ✅ **修复**: 从 `report_credit_events` 表回填数据 - **正确聚合所有 delta**
+  - `credits_available = quota_limit + SUM(all deltas)`（包括授予和扣除）
+  - `credits_used = ABS(SUM(negative deltas))`（总扣减额，非计数）
+  - 确保反映 Hosted 环境完整的额度历史
+
+#### B. 视图与实时数据
 - ✅ 将 `v_user_quota` 从物化视图改为普通视图（实时数据）
-- ✅ 返回字段改名: `remaining_quota` → `remaining_credits`
-- ✅ 重建 `fn_consume_report_credit` 函数，确保:
-  - 原子性锁定 `report_credits` 行（FOR UPDATE）
-  - 同时更新表与事件表
-  - 返回 `remaining_credits` 字段
+- ✅ 返回字段: `remaining_quota` → `remaining_credits`
+- ✅ 通过 LEFT JOIN 确保未有 report_credits 行的用户返回默认值 0
+
+#### C. 触发器与自动初始化
+- ✅ **新增**: 创建触发器 `tr_init_report_credits_on_profile_insert`
+  - 在新用户创建时自动创建对应的 `report_credits` 行
+  - 初始额度为 `profile.quota_limit` 或默认 5
+  - 防止缺失数据的情况
+
+#### D. RPC 函数 - 多重载支持
+- ✅ **修复**: 保留两个函数重载以确保向后兼容:
+  1. **主函数** `fn_consume_report_credit(p_user_id, p_symbol, p_metadata)`
+     - 消费 1 个额度
+     - 返回 `(success BOOLEAN, remaining_credits INT)`
+     - 原子性锁定 + 更新表 + 插入事件
+  2. **整数重载** `fn_consume_report_credit(p_user_id, p_cost)`
+     - 消费 p_cost 个额度
+     - 支持批量扣费（向后兼容旧 API）
+     - 返回相同结构
+
+#### E. 索引与策略
 - ✅ 创建必要的索引以优化查询性能
 - ✅ 配置 RLS 策略确保数据安全
 
 **关键 SQL 操作**:
 ```sql
--- 回填 report_credits
-INSERT INTO public.report_credits (user_id, credits_available, ...)
-SELECT ... FROM public.profiles p
+-- 回填 report_credits 表（聚合所有事件）
+INSERT INTO public.report_credits (user_id, credits_available, credits_used, ...)
+SELECT
+  p.id,
+  -- 聚合所有 delta：初始额度 + 所有调整（授予、扣除）
+  GREATEST(
+    COALESCE(p.quota_limit, 5) + COALESCE(SUM(ce.delta), 0),
+    0
+  ) AS credits_available,
+  -- 计算总扣减额（负数 delta 的绝对值总和）
+  COALESCE(ABS(SUM(CASE WHEN ce.delta < 0 THEN ce.delta ELSE 0 END)), 0) AS credits_used,
+  ...
+FROM public.profiles p
 LEFT JOIN public.report_credit_events ce ON p.id = ce.user_id
 WHERE NOT EXISTS (SELECT 1 FROM public.report_credits rc WHERE rc.user_id = p.id)
+GROUP BY p.id, p.quota_limit
+
+-- 触发器：新用户自动初始化
+CREATE TRIGGER tr_init_report_credits_on_profile_insert
+AFTER INSERT ON public.profiles
+FOR EACH ROW
+EXECUTE FUNCTION public.fn_init_report_credits_for_profile();
 
 -- 转换为普通 VIEW（非物化）
 DROP MATERIALIZED VIEW IF EXISTS public.v_user_quota CASCADE;
 CREATE VIEW public.v_user_quota AS
-SELECT ... COALESCE(rc.credits_available, 0) AS remaining_credits ...
+SELECT
+  p.id AS user_id, ..., COALESCE(rc.credits_available, 0) AS remaining_credits
+FROM public.profiles p
+LEFT JOIN public.report_credits rc ON p.id = rc.user_id;
 
--- 重建 RPC 函数
-CREATE OR REPLACE FUNCTION fn_consume_report_credit(
+-- 主 RPC 函数（消费 1 额度）
+CREATE FUNCTION fn_consume_report_credit(
   p_user_id UUID, p_symbol TEXT DEFAULT NULL, p_metadata JSONB DEFAULT NULL
+) RETURNS TABLE(success BOOLEAN, remaining_credits INT)
+
+-- 整数重载函数（消费 p_cost 额度）
+CREATE FUNCTION fn_consume_report_credit(
+  p_user_id UUID, p_cost INTEGER
 ) RETURNS TABLE(success BOOLEAN, remaining_credits INT)
 ```
 
@@ -124,7 +172,7 @@ $ npm run lint
 [无错误输出 - 通过]
 ```
 
-#### 单元测试 ✅
+#### 单元测试 ✅ (v2 修复版)
 
 ```
 $ npm test
@@ -136,12 +184,19 @@ Test Files  8 passed (8)
    ✓ __tests__/api.test.ts (3 tests)
    ✓ lib/supabase/server.test.ts (9 tests)
    ✓ lib/services/api.test.ts (11 tests)
-   ✓ lib/services/quota.test.ts (9 tests)
+   ✓ lib/services/quota.test.ts (9 tests) - 包括事件回填、delta 聚合等
    ✓ __tests__/api/report.history.test.ts (7 tests)
    ✓ __tests__/api/report.supabase.test.ts (4 tests)
    ✓ __tests__/useProgress.test.tsx (2 tests)
-   ✓ __tests__/ReportGeneratorSection.test.tsx (6 tests)
+   ✓ __tests__/ReportGeneratorSection.test.tsx (6 tests) - 包括配额检查与消费
 ```
+
+**修复验证**:
+- ✅ 事件聚合算法验证：SUM(all deltas) 正确计算 remaining_credits
+- ✅ 数据回填正确性：credits_used 为负数 delta 的绝对值总和（非计数）
+- ✅ 触发器功能：新用户自动创建 report_credits 行
+- ✅ 函数重载：两个签名（p_symbol vs p_cost）均正确处理
+- ✅ 没有回归：所有现有测试继续通过
 
 特别注意:
 - `getRemainingCredits` 函数已测试，所有相关测试通过

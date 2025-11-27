@@ -16,13 +16,17 @@ CREATE TABLE IF NOT EXISTS public.report_credits (
 );
 
 -- 2. Backfill report_credits from report_credit_events (if table was empty or new records exist)
--- Calculate credits_available as: quota_limit (from profiles) + SUM(delta from events)
--- This assumes profiles.quota_limit is the starting credit allocation
+-- Calculate credits_available as: quota_limit (from profiles) + SUM(all deltas from events)
+-- Calculate credits_used as: ABS(SUM(negative deltas)) = total deductions
+-- This aggregates ALL events (grants, deductions) to derive current state
 INSERT INTO public.report_credits (user_id, credits_available, credits_used, created_at, updated_at)
 SELECT
   p.id,
-  GREATEST(COALESCE(p.quota_limit, 5) + COALESCE(SUM(ce.delta), 0), 0) AS credits_available,
-  COUNT(CASE WHEN ce.delta < 0 THEN 1 END) AS credits_used,
+  GREATEST(
+    COALESCE(p.quota_limit, 5) + COALESCE(SUM(ce.delta), 0),
+    0
+  ) AS credits_available,
+  COALESCE(ABS(SUM(CASE WHEN ce.delta < 0 THEN ce.delta ELSE 0 END)), 0) AS credits_used,
   CURRENT_TIMESTAMP,
   CURRENT_TIMESTAMP
 FROM public.profiles p
@@ -47,12 +51,27 @@ SELECT
 FROM public.profiles p
 LEFT JOIN public.report_credits rc ON p.id = rc.user_id;
 
--- 5. Recreate fn_consume_report_credit with corrected signature and behavior
--- - Takes p_user_id (required), p_symbol and p_metadata (optional) for audit trail
--- - Returns (success BOOLEAN, remaining_credits INT)
--- - Locks report_credits row for atomicity
--- - Updates table AND inserts event for audit
--- - Returns remaining_credits after deduction
+-- 5. Create trigger to auto-create report_credits row for new users
+-- When a new profile is inserted, automatically create corresponding report_credits entry
+CREATE OR REPLACE FUNCTION public.fn_init_report_credits_for_profile()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.report_credits (user_id, credits_available, credits_used)
+  VALUES (NEW.id, COALESCE(NEW.quota_limit, 5), 0)
+  ON CONFLICT (user_id) DO NOTHING;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS tr_init_report_credits_on_profile_insert ON public.profiles;
+CREATE TRIGGER tr_init_report_credits_on_profile_insert
+AFTER INSERT ON public.profiles
+FOR EACH ROW
+EXECUTE FUNCTION public.fn_init_report_credits_for_profile();
+
+-- 6. Recreate fn_consume_report_credit with new signature and legacy integer overload
+-- Primary signature: takes p_user_id, p_symbol, p_metadata (optional)
+-- Returns (success BOOLEAN, remaining_credits INT)
 DROP FUNCTION IF EXISTS public.fn_consume_report_credit(UUID, INTEGER);
 DROP FUNCTION IF EXISTS public.fn_consume_report_credit(UUID, TEXT, JSONB);
 
@@ -105,6 +124,60 @@ BEGIN
 
   -- Return success with remaining credits after deduction
   RETURN QUERY SELECT TRUE, (v_credits_available - 1)::INT;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Legacy integer overload for backwards compatibility: p_cost parameter
+-- Delegates to primary function, consuming p_cost credits
+CREATE OR REPLACE FUNCTION public.fn_consume_report_credit(
+  p_user_id UUID,
+  p_cost INTEGER
+)
+RETURNS TABLE(success BOOLEAN, remaining_credits INT) AS $$
+DECLARE
+  v_credits_available INT;
+  v_loop_count INT;
+BEGIN
+  -- Lock and fetch current balance
+  SELECT credits_available INTO v_credits_available
+  FROM public.report_credits
+  WHERE user_id = p_user_id
+  FOR UPDATE;
+
+  -- If insufficient credits, return failure immediately
+  IF v_credits_available IS NULL OR v_credits_available < COALESCE(p_cost, 1) THEN
+    RETURN QUERY SELECT FALSE, COALESCE(v_credits_available, 0);
+    RETURN;
+  END IF;
+
+  -- Deduct p_cost credits atomically
+  UPDATE public.report_credits
+  SET
+    credits_available = credits_available - COALESCE(p_cost, 1),
+    credits_used = credits_used + COALESCE(p_cost, 1),
+    updated_at = CURRENT_TIMESTAMP
+  WHERE user_id = p_user_id;
+
+  -- Record single audit event with cost metadata
+  INSERT INTO public.report_credit_events (
+    user_id,
+    event_type,
+    credits_amount,
+    reason,
+    metadata,
+    delta
+  )
+  VALUES (
+    p_user_id,
+    'consumed',
+    -COALESCE(p_cost, 1),
+    'Report generation (batch)',
+    jsonb_build_object('cost', p_cost),
+    -COALESCE(p_cost, 1)
+  );
+
+  -- Return success with remaining credits after deduction
+  RETURN QUERY SELECT TRUE, (v_credits_available - COALESCE(p_cost, 1))::INT;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
