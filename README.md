@@ -133,100 +133,87 @@ git push
 - `public/`：静态资源。
 - `test-api.js`：用于单独验证 OpenAI/OpenRouter SDK。
 
-## Supabase 部署（Hosted 实例）
+## Supabase ?????????? CLI
 
-### 前置条件
-- Node 18+，Supabase CLI ≥ 2.58
-- Hosted Supabase 项目已创建（[Supabase Dashboard](https://app.supabase.com)）
-- Finnhub API Key（免费或付费）
-- LLM 供应商：Helicone（优先）或 OpenRouter（兜底）
+> TL;DR????????? Supabase Hosted ????????????????? Supabase CLI + Docker Stack??????? `docs/guides/supabase-local-cli.md`.
 
-### 部署步骤
+### ???????
+- Node 18+ ?? npm 10+
+- Docker Desktop ?? container runtime?`supabase start` ????
+- Supabase CLI ?2.58?`npm install -g supabase` ?? `npx supabase <cmd>` ??????
+- Finnhub / Helicone / OpenRouter API Key ?? `.env.local` ?? ready
 
-#### 1. 初始化 Supabase 连接
-```bash
-# 登录 Supabase CLI
-npx supabase login
+### Hosted ?????
+1. **CLI ??? + ???????**
+   ```bash
+   npx supabase login
+   npx supabase link --project-ref <your-project-ref>   # Dashboard Settings > General > Project Ref
+   ```
+2. **??? schema ?? TypeScript ?????**
+   ```bash
+   npx supabase db push                                # ???? supabase/migrations
+   npx supabase gen types typescript --linked --schema public > types/database.ts
+   ```
+3. **Storage ?????**?Dashboard ? Storage ? `report-assets`?Private???? Service Role ?????????????
+4. **Hosted `.env.local` ?????**
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
+   SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
+   SUPABASE_STORAGE_REPORT_BUCKET=report-assets
+   FINNHUB_API_KEY=<finnhub-key>
+   HELICONE_API_KEY=<helicone-optional>
+   HELICONE_MODEL=gpt-4o-mini
+   OPENROUTER_API_KEY=<openrouter-optional>
+   OPENROUTER_MODEL=openrouter/anthropic/claude-3.5-sonnet
+   NEXTAUTH_SECRET=$(openssl rand -base64 32)
+   NEXTAUTH_URL=http://localhost:3000
+   TEST_REPORT_TOKEN=test-token-12345
+   ```
+5. **??????**?`npm run lint && npm test && npm run dev`???? `/api/report` / `history` / `credits` cURL ?? 401 / 429 / 200 ?????
 
-# 连接 Hosted 项目（替换 <your-project-ref>）
-# 项目 ref 见 Dashboard → Settings → General → Project Ref
-npx supabase link --project-ref <your-project-ref>
-```
+### ???? CLI ???????
+1. **???? Docker Stack**
+   ```bash
+   npx supabase start      # ???????? Postgres/Auth/Storage
+   npx supabase status     # ??? API URL + anon/service_role key
+   ```
+2. **???? `.env.local`??????? localhost ????**
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<local-anon-key>
+   SUPABASE_SERVICE_ROLE_KEY=<local-service-role>
+   SUPABASE_STORAGE_REPORT_BUCKET=report-assets
+   TEST_REPORT_TOKEN=local-test-token
+   ```
+3. **?????/???? CLI**?
+   ```bash
+   npm run lint && npm test && npm run dev
+   curl "http://localhost:3000/api/report?symbol=AAPL&testToken=local-test-token"
+   ```
+   ???? JSON ?? `remainingQuota` ?? `report` ??????? locally ???
+4. **Schema ???? workflow**?
+   ```bash
+   npx supabase migration new add_report_fields
+   # ?? supabase/migrations/<timestamp>_add_report_fields.sql
+   npx supabase db push
+   npx supabase gen types typescript --local --schema public > types/database.ts
+   ```
+5. **????? Hosted**????? link???
+   ```bash
+   npx supabase db push --linked
+   npx supabase gen types typescript --linked --schema public > types/database.ts
+   ```
+6. **???/????????**?`npx supabase stop` ?? `npx supabase db reset`?CLI ????? `supabase/config.toml` ?????? seed ?????
 
-#### 2. 推送数据库迁移
-```bash
-# 将本地 migrations/ 推送到 Hosted 实例
-npx supabase db push
-
-# 生成 TypeScript 类型（与实际 schema 同步）
-npx supabase gen types typescript --linked --schema public > types/database.ts
-```
-
-#### 3. 创建存储桶
-在 [Supabase Dashboard](https://app.supabase.com) → Storage 中创建私有桶：
-- **桶名**：`report-assets`
-- **设为私有**：勾选 "Private"
-- **RLS 策略**：仅 Service Role 可上传；客户端通过签名 URL 读取
-
-#### 4. 配置环境变量
-复制 `.env.local.example` 为 `.env.local`，补齐以下值：
-
-```bash
-# Supabase（从 Dashboard → Settings → API 获取）
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-SUPABASE_STORAGE_REPORT_BUCKET=report-assets
-
-# Finnhub（免费 API Key: https://finnhub.io）
-FINNHUB_API_KEY=your-finnhub-key
-
-# LLM 供应商（至少配置其一）
-# Helicone（优先，支持监控与日志）
-HELICONE_API_KEY=your-helicone-key
-HELICONE_MODEL=gpt-4o-mini
-
-# OpenRouter（兜底）
-OPENROUTER_API_KEY=your-openrouter-key
-OPENROUTER_MODEL=openrouter/anthropic/claude-3.5-sonnet
-
-# Auth（任意随机字符串）
-NEXTAUTH_SECRET=$(openssl rand -base64 32)
-NEXTAUTH_URL=http://localhost:3000
-
-# 测试 Token（开发/验证使用，任意值）
-TEST_REPORT_TOKEN=test-token-12345
-```
-
-#### 5. 本地校验
-```bash
-npm run lint   # 检查代码风格
-npm run test   # 运行单元与集成测试
-npm run dev    # 启动开发服务器
-```
-
-#### 6. 手动 API 验证
-```bash
-# 测试报告生成（需 LLM 配置）
-curl "http://localhost:3000/api/report?symbol=AAPL&testToken=test-token-12345"
-
-# 查询额度（需登录 Session，返回 { userId, credits: { remaining_credits: number } }）
-curl -H "Cookie: ..." "http://localhost:3000/api/report/credits"
-
-# 查询历史报告（返回报告列表与分页信息）
-curl -H "Cookie: ..." "http://localhost:3000/api/report/history"
-
-# 验证 401（未授权） / 429（额度耗尽） / 200（成功）
-```
-
-### 常见问题
-- **部署失败**：检查 CLI 是否已 `link` 到项目，且网络连接正常。
-- **类型错误**：运行 `npx supabase gen types typescript --linked > types/database.ts` 重新生成。
-- **存储上传失败**：确认桶为私有，Service Role 策略已启用。
-- **额度查询返回 null**：检查 `v_user_quota` 视图是否存在，及 RLS 策略。
-
-更详细的部署与故障排查见 `docs/guides/supabase-report-stage2-cavr.md`。
-
+### ???????????
+- `docs/guides/supabase-local-cli.md`???? CLI ???? env ??????????????????????????
+- `docs/guides/supabase-report-stage2-cavr.md`?Stage2 CAVR ?????????
+- ?????????
+  - CLI ??? `link` ??? ? ?????????????????
+  - TypeScript ?????? ? ???? `npx supabase gen types ...` ?????????
+  - Storage 404 ? ??? bucket ? Private ?? Service Role Key ?????
+  - `v_user_quota` ??? ? ??? migrations ????????? stack ?? `npx supabase db push` ?????????????????
 ## 注册 / 额度逻辑（当前实现）
 - NextAuth（Email / Google / Apple / Azure AD）登录，Prisma SQLite 存储用户信息与会话。
 - `User.quota` 默认为 1，`reportsUsed` 每次生成成功后递增，后端 `/api/report` 直接校验并返回 401/429。
