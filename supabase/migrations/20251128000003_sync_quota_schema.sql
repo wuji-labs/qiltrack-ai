@@ -193,6 +193,7 @@ ALTER TABLE public.report_credits ENABLE ROW LEVEL SECURITY;
 -- 8. Create RLS policies for report_credits
 DROP POLICY IF EXISTS "Users can view their own report credits" ON public.report_credits;
 DROP POLICY IF EXISTS "Service role can manage report credits" ON public.report_credits;
+DROP POLICY IF EXISTS "Service role can update report credits" ON public.report_credits;
 
 CREATE POLICY "Users can view their own report credits" ON public.report_credits
   FOR SELECT USING (auth.uid() = user_id);
@@ -201,4 +202,4 @@ CREATE POLICY "Service role can manage report credits" ON public.report_credits
   FOR INSERT WITH CHECK (auth.role() = 'service_role');
 
 CREATE POLICY "Service role can update report credits" ON public.report_credits
-  FOR UPDATE WITH CHECK (auth.role() = 'service_role');
+  FOR UPDATE USING (auth.role() = 'service_role');

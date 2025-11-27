@@ -2,6 +2,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE EXTENSION IF NOT EXISTS "pg_cron";
+CREATE EXTENSION IF NOT EXISTS "citext";
 
 -- Create auth.users reference (using Supabase Auth)
 CREATE TABLE IF NOT EXISTS public.profiles (
