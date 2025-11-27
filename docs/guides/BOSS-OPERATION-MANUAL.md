@@ -48,22 +48,21 @@ git status  # 确保在 main 分支
 npm install  # 确保依赖已安装
 ```
 
-### 2. 清理旧的工作区（如果有）
+### 2. 创建 5 个长期工作区
 
 ```powershell
-# 查看现有 worktree
+# 创建 G1-G5 工作区（每个都会自动安装独立的 node_modules）
+.\scripts\prep-group.ps1 -Name g1 -Branch g1/init
+.\scripts\prep-group.ps1 -Name g2 -Branch g2/init
+.\scripts\prep-group.ps1 -Name g3 -Branch g3/init
+.\scripts\prep-group.ps1 -Name g4 -Branch g4/init
+.\scripts\prep-group.ps1 -Name g5 -Branch g5/init
+
+# 验证
 git worktree list
-
-# 如果有旧的 G1-G5，全部删除
-git worktree remove D:\Projects\investor-ai-g1 --force
-git worktree remove D:\Projects\investor-ai-g2 --force
-git worktree remove D:\Projects\investor-ai-g3 --force
-git worktree remove D:\Projects\investor-ai-g4 --force
-git worktree remove D:\Projects\investor-ai-g5 --force
-
-# 清理残留
-git worktree prune
 ```
+
+**这些工作区会长期保留，不需要每次任务都重建。**
 
 ---
 
@@ -95,7 +94,7 @@ HQ 会自动：
 @老板
 Report: docs/plans/workstreams.md
 Status: 已拆分为 G1（UI）和 G2（配置脚本）两个任务
-Next: 确认后我开始分配，需要创建工作区吗？
+Next: 确认后我开始分配
 ```
 
 **你回复**：
@@ -105,30 +104,31 @@ Next: 确认后我开始分配，需要创建工作区吗？
 
 ---
 
-### 阶段 2：HQ 创建工作区
+### 阶段 2：重置工作区
 
-#### 2.1 HQ 会运行脚本
+#### 2.1 重置要用的工作区
 
-HQ 会帮你运行（你也可以手动运行）：
+工作区已经存在，只需重置到最新 main：
 
 ```powershell
-# 为 G1 创建工作区
-powershell -ExecutionPolicy Bypass -File scripts/prep-group.ps1 `
-  -Name g1 `
-  -Branch g1/local-auth-signal
-
-# 为 G2 创建工作区
-powershell -ExecutionPolicy Bypass -File scripts/prep-group.ps1 `
-  -Name g2 `
-  -Branch g2/supabase-env-sync
+# 重置 G1 和 G2 工作区
+.\scripts\reset-worktree.ps1 -Name g1
+.\scripts\reset-worktree.ps1 -Name g2
 ```
 
-**结果**：
-- 创建了 `D:\Projects\investor-ai-g1` 和 `D:\Projects\investor-ai-g2`
-- 每个工作区有完整的代码文件
-- 自动生成了 `GROUP.md` 文件（记录组信息）
+#### 2.2 创建任务分支
 
-#### 2.2 验证工作区创建成功
+```powershell
+# G1 创建任务分支
+cd D:\Projects\investor-ai-g1
+git checkout -b g1/local-auth-signal
+
+# G2 创建任务分支
+cd D:\Projects\investor-ai-g2
+git checkout -b g2/supabase-env-sync
+```
+
+#### 2.3 验证工作区状态
 
 ```powershell
 git worktree list
@@ -634,11 +634,16 @@ Next: 确认后开始
 你 → HQ: 确认
 ```
 
-#### 3. HQ 创建工作区（10:10）
+#### 3. 重置工作区 + 创建分支（10:10）
 
 ```powershell
-powershell -File scripts/prep-group.ps1 -Name g3 -Branch g3/pdf-export-ui
-powershell -File scripts/prep-group.ps1 -Name g4 -Branch g4/pdf-generation
+# 重置 G3 和 G4 到最新 main
+.\scripts\reset-worktree.ps1 -Name g3
+.\scripts\reset-worktree.ps1 -Name g4
+
+# 创建任务分支
+cd D:\Projects\investor-ai-g3 && git checkout -b g3/pdf-export-ui
+cd D:\Projects\investor-ai-g4 && git checkout -b g4/pdf-generation
 ```
 
 #### 4. HQ 分配任务（10:15）
