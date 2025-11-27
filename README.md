@@ -34,6 +34,19 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 
 ## 开发指南
 
+### Worktree 多组并行开发
+```powershell
+# 新建工作区（首次）
+.\scripts\prep-group.ps1 -Name g1 -Branch g1/task-name
+
+# 每次新任务前重置
+.\scripts\reset-worktree.ps1 -Name g1
+
+# 启动开发服务器（不同端口避免冲突）
+cd D:\Projects\investor-ai-g1 && npm run dev -- --port 3001
+```
+详见 [Worktree 多组协作](docs/guides/worktree-multi-team.md)。
+
 | 命令 | 说明 |
 | --- | --- |
 | `npm run dev` | 启动开发服务器，默认 http://localhost:3000 |

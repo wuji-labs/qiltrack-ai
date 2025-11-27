@@ -3,6 +3,19 @@
 ## Codex–Claude Collaboration Protocol
 **⚠️ 每次会话开始时，Codex 和 Claude 都必须先读取 `CODEX_CLAUDE_COLLAB.md` 以了解协作流程、职责边界和质量门槛。** 需要速查时可使用 `docs/guides/codex-claude-quickstart.md`，但以主文档为准。
 
+## Worktree 快速命令
+```powershell
+# 新建工作区（首次）
+.\scripts\prep-group.ps1 -Name g1 -Branch g1/task-name
+
+# 每次新任务前重置
+.\scripts\reset-worktree.ps1 -Name g1
+
+# 启动开发服务器（不同端口）
+cd D:\Projects\investor-ai-g1 && npm run dev -- --port 3001
+```
+详见 `docs/guides/worktree-multi-team.md`。
+
 ### 对 Codex（架构师）的要求：
 - 发布新任务前先产出 Architecture Snapshot 存入 `docs/decisions/<date>-<topic>.md`
 - Snapshot 需包含：问题背景、设计目标、技术约束、文案 key、测试要求
