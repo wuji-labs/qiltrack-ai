@@ -675,6 +675,11 @@ nvm alias default 20
 - [ ] 已阅读 `docs/guides/claude-pr-workflow.md`（PR 工作流）
 - [ ] 已理解项目的协作规范（见 `CODEX_CLAUDE_COLLAB.md`）
 
+### 2.3 Worktree 协作指引
+- 默认只在总部仓库（`D:\Projects\investor-ai`）安装一次依赖，其余工作区通过脚本共享。
+- 多分支/多团队协作需使用 `scripts/worktree-manager.ps1` 创建/清理 worktree，并遵循 `docs/guides/worktree-multi-team.md` 中的 sparse-checkout、依赖共享、环境变量合并策略。
+- 同步流程：`git worktree list` → `git worktree add --no-checkout`（或脚本）→ `git fetch && git rebase` → `npm run lint/test --prefix <worktree>`。
+
 ---
 
 ## 11. 相关文档
