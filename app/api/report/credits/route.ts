@@ -4,11 +4,9 @@ import { createServerClient } from "@/lib/supabase/server";
 export async function GET(request: NextRequest) {
   try {
     // Get Supabase server client
-    const supabase = createServerClient({
-      get: (name: string) => {
-        const cookieValue = request.cookies.get(name)?.value;
-        return cookieValue ? { value: cookieValue } : undefined;
-      },
+    const supabase = createServerClient((name: string) => {
+      const cookieValue = request.cookies.get(name)?.value;
+      return cookieValue ? { value: cookieValue } : undefined;
     });
 
     // Get user session
@@ -23,10 +21,11 @@ export async function GET(request: NextRequest) {
 
     const userId = session.user.id;
 
-    // Query quota view (RLS-protected)
+    // Query v_user_quota view for real-time remaining credits
+    // This view is synced with report_credits table via fn_consume_report_credit
     const { data: quotaData, error: quotaError } = await supabase
       .from("v_user_quota")
-      .select("user_id, remaining_credits")
+      .select("remaining_credits")
       .eq("user_id", userId)
       .single();
 
@@ -40,8 +39,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       userId,
-      credits: quotaData || {
-        remaining_credits: 0,
+      credits: {
+        remaining_credits: quotaData?.remaining_credits ?? 0,
       },
     });
   } catch (err) {

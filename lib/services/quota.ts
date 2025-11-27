@@ -63,6 +63,7 @@ export async function consumeReportCredit(
 
 /**
  * Get current user's remaining credits without consuming
+ * Reads from v_user_quota view for consistency with RPC function
  * @param userId User ID from Supabase auth
  */
 export async function getRemainingCredits(userId: string): Promise<number> {
