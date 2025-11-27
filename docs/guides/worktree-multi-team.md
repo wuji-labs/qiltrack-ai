@@ -1,6 +1,6 @@
 # 多工作组 Git Worktree 指南
 
-**目标**：在“总部 + 5 个工作组”模式下，利用 Git worktree 共享 `.git` 与依赖，避免重复安装 `node_modules`，保证各分支隔离、文档同步、磁盘占用最小。
+**目标**：在“总部 + 5 个工作组”模式（结构详情见 `docs/guides/organization-structure.md`）下，利用 Git worktree 共享 `.git` 与依赖，避免重复安装 `node_modules`，保证各分支隔离、文档同步、磁盘占用最小。
 
 ## 1. 术语
 - **总部**：`D:\Projects\investor-ai`，常驻 `main`，维护 Snapshot/Plan/Report。
@@ -72,8 +72,8 @@ powershell -ExecutionPolicy Bypass -File scripts/worktree-manager.ps1 -Command r
 | sparse-checkout 缺文件 | 未列入 `Folders` | `git -C <wt> sparse-checkout add <dir>` 补齐 |
 
 ## 10. 责任划分
-- 总部负责：更新 `docs/plans/workstreams.md`、派发分工、维护共享依赖、批准 PR。
-- 工作组 Codex：撰写组内 Snapshot、答疑、确保 `docs/decisions/` 与实施保持一致。
-- 工作组 Claude：编写实现、更新 `docs/reports/`、按规定输出 `npm run lint/test` 结果。
+- HQ（老板 + HQ Claude）负责：更新 `docs/plans/workstreams.md`、派发分工、维护共享依赖、批准 PR（沟通链路参见 `docs/guides/organization-structure.md`）。
+- 工作组 Codex：撰写组内 Snapshot、答疑、确保 `docs/decisions/` 与实施保持一致，并定期向 HQ Claude 汇报进度。
+- 工作组 Claude：编写实现、更新 `docs/reports/`、按规定输出 `npm run lint/test` 结果，完成后通过组内 Codex → HQ 逐级上报。
 
 > 所有流程变更请同步 `CODEX_CLAUDE_COLLAB.md` 并在 PR 描述附上新指南链接。
