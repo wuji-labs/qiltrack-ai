@@ -91,17 +91,32 @@ if ($DryRun) {
 }
 
 # Step 4: git clean -fd (keep node_modules and .next)
-Write-Host "[4/5] Cleaning untracked files (keeping node_modules, .next, .env.local)..." -ForegroundColor Yellow
+Write-Host "[4/6] Cleaning untracked files (keeping node_modules, .next)..." -ForegroundColor Yellow
 if ($DryRun) {
-  Write-Host "[dry-run] git clean -fd -e node_modules -e .next -e .env.local"
+  Write-Host "[dry-run] git clean -fd -e node_modules -e .next"
 } else {
-  Invoke-GitLocal -RepoRoot $targetPath -GitArgs @("clean", "-fd", "-e", "node_modules", "-e", ".next", "-e", ".env.local")
+  Invoke-GitLocal -RepoRoot $targetPath -GitArgs @("clean", "-fd", "-e", "node_modules", "-e", ".next")
   Write-Host "Done." -ForegroundColor Green
 }
 
-# Step 5: npm ci (optional)
+# Step 5: Copy .env.local from root
+Write-Host "[5/6] Syncing .env.local from root..." -ForegroundColor Yellow
+$sourceEnv = Join-Path $repoRoot ".env.local"
+$targetEnv = Join-Path $targetPath ".env.local"
+if ($DryRun) {
+  Write-Host "[dry-run] would copy $sourceEnv to $targetEnv"
+} else {
+  if (Test-Path $sourceEnv) {
+    Copy-Item -Path $sourceEnv -Destination $targetEnv -Force
+    Write-Host "Done." -ForegroundColor Green
+  } else {
+    Write-Warning "Root .env.local not found at $sourceEnv, skipping."
+  }
+}
+
+# Step 6: npm ci (optional)
 if (-not $SkipNpmCi) {
-  Write-Host "[5/5] Checking if npm ci is needed..." -ForegroundColor Yellow
+  Write-Host "[6/6] Checking if npm ci is needed..." -ForegroundColor Yellow
 
   if ($DryRun) {
     Write-Host "[dry-run] would check package-lock.json changes and run npm ci if needed"
@@ -144,7 +159,7 @@ if (-not $SkipNpmCi) {
     }
   }
 } else {
-  Write-Host "[5/5] Skipping npm ci (--SkipNpmCi flag)" -ForegroundColor Yellow
+  Write-Host "[6/6] Skipping npm ci (--SkipNpmCi flag)" -ForegroundColor Yellow
 }
 
 Write-Host ""
