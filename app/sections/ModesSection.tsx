@@ -53,9 +53,9 @@ export function ModesSection({ options, selected, onSelect, personaSentence, hea
 					<span className="whitespace-nowrap text-xs sm:text-sm">{heading}</span>
 					<div className="pointer-events-none absolute inset-0 rounded-full border border-[var(--stroke-soft)]/70" aria-hidden />
 				</div>
-				<div className="inline-flex items-center gap-2 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/90 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-dim shadow-[0_10px_32px_rgba(0,0,0,0.18)]">
+				<div className="inline-flex w-full sm:w-auto items-start gap-2 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/90 px-3 sm:px-4 py-1.5 sm:py-2 text-left text-xs sm:text-sm text-dim shadow-[0_10px_32px_rgba(0,0,0,0.18)]">
 					<span className="h-2.5 w-2.5 rounded-full bg-[var(--accent-emerald)] animate-pulse" aria-hidden />
-					<span className="whitespace-nowrap text-xs sm:text-sm">{personaSentence}</span>
+					<span className="text-xs sm:text-sm leading-relaxed break-words">{personaSentence}</span>
 				</div>
 			</div>
 
