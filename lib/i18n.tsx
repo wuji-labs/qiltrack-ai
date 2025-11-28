@@ -654,11 +654,11 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hans": "股票代码 / 公司英文名",
 	},
 	"generator.input.placeholder": {
-		"en": " Enter a US ticker or company, e.g. TSLA / NVDA / Apple",
-		"ja": " 米国ティッカーや社名を入力（例: TSLA / NVDA / Apple）",
-		"ko": " 미국 티커 또는 회사명을 입력하세요 (예: TSLA / NVDA / Apple)",
-		"zh-Hant": " 請輸入美股代號或公司名，例如：TSLA / NVDA / Apple",
-		"zh-Hans": " 输入美股代码或公司名，例如：TSLA / NVDA / Apple",
+		"en": " Enter a US ticker or company, e.g. NVDA / TSLA / Apple",
+		"ja": " 米国ティッカーや社名を入力（例: NVDA / TSLA / Apple）",
+		"ko": " 미국 티커 또는 회사명을 입력하세요 (예: NVDA / TSLA / Apple)",
+		"zh-Hant": " 請輸入美股代號或公司名，例如：NVDA / TSLA / Apple",
+		"zh-Hans": " 输入美股代码或公司名，例如：NVDA / TSLA / Apple",
 	},
 	"generator.submit": {
 		"en": "Generate AI report",
