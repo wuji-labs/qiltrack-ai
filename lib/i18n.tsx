@@ -2474,6 +2474,326 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hant": "市場資訊由多家境內外第三方資訊商提供，最終準確性與時效性由相應提供方負責。",
 		"zh-Hans": "数据来自若干境内外第三方市场信息提供方，最终准确性由相应提供方负责。",
 	},
+	"footer.brand.title": {
+		"en": "Investor AI",
+		"ja": "Investor AI",
+		"ko": "Investor AI",
+		"zh-Hant": "Investor AI",
+		"zh-Hans": "Investor AI",
+	},
+	"footer.brand.caption": withChineseVariants({
+		"en": "Institutional-grade investment research powered by generative AI",
+		"ja": "生成AIが提供する機関向け投資リサーチ",
+		"ko": "생성형 AI로 구동되는 기관급 투자 리서치",
+		"zh": {
+			"hant": "用生成式 AI 自動撰寫機構級投資研究",
+			"hans": "用生成式 AI 自动撰写机构级投资研究",
+		},
+	}),
+	"footer.brand.cta.label": withChineseVariants({
+		"en": "Experience Report Generator",
+		"ja": "レポート生成を試す",
+		"ko": "리포트 생성 체험",
+		"zh": {
+			"hant": "體驗報告生成器",
+			"hans": "体验报告生成器",
+		},
+	}),
+	"footer.links.product.title": withChineseVariants({
+		"en": "Product",
+		"ja": "プロダクト",
+		"ko": "제품",
+		"zh": {
+			"hant": "產品",
+			"hans": "产品",
+		},
+	}),
+	"footer.links.product.items": {
+		"en": JSON.stringify([
+			{ "label": "Report Generator", "href": "#generator" },
+			{ "label": "Templates", "href": "/reports" },
+			{ "label": "API Documentation", "href": "/docs/api" },
+			{ "label": "Integrations", "href": "/integrations" },
+			{ "label": "Pricing", "href": "#pricing", "badge": "NEW" },
+		]),
+		"ja": JSON.stringify([
+			{ "label": "レポート生成器", "href": "#generator" },
+			{ "label": "テンプレート", "href": "/reports" },
+			{ "label": "API ドキュメント", "href": "/docs/api" },
+			{ "label": "統合", "href": "/integrations" },
+			{ "label": "料金", "href": "#pricing", "badge": "新" },
+		]),
+		"ko": JSON.stringify([
+			{ "label": "리포트 생성기", "href": "#generator" },
+			{ "label": "템플릿", "href": "/reports" },
+			{ "label": "API 문서", "href": "/docs/api" },
+			{ "label": "통합", "href": "/integrations" },
+			{ "label": "가격", "href": "#pricing", "badge": "신규" },
+		]),
+		"zh-Hant": JSON.stringify([
+			{ "label": "報告生成器", "href": "#generator" },
+			{ "label": "範本", "href": "/reports" },
+			{ "label": "API 文檔", "href": "/docs/api" },
+			{ "label": "集成", "href": "/integrations" },
+			{ "label": "定價", "href": "#pricing", "badge": "新" },
+		]),
+		"zh-Hans": JSON.stringify([
+			{ "label": "报告生成器", "href": "#generator" },
+			{ "label": "模板", "href": "/reports" },
+			{ "label": "API 文档", "href": "/docs/api" },
+			{ "label": "集成", "href": "/integrations" },
+			{ "label": "定价", "href": "#pricing", "badge": "新" },
+		]),
+	},
+	"footer.links.solutions.title": withChineseVariants({
+		"en": "Solutions",
+		"ja": "ソリューション",
+		"ko": "솔루션",
+		"zh": {
+			"hant": "解決方案",
+			"hans": "解决方案",
+		},
+	}),
+	"footer.links.solutions.items": {
+		"en": JSON.stringify([
+			{ "label": "For Analysts", "href": "/solutions/analysts" },
+			{ "label": "For Managers", "href": "/solutions/managers" },
+			{ "label": "Enterprise", "href": "/solutions/enterprise" },
+			{ "label": "Case Studies", "href": "/case-studies" },
+		]),
+		"ja": JSON.stringify([
+			{ "label": "アナリスト向け", "href": "/solutions/analysts" },
+			{ "label": "マネージャー向け", "href": "/solutions/managers" },
+			{ "label": "エンタープライズ", "href": "/solutions/enterprise" },
+			{ "label": "ケーススタディ", "href": "/case-studies" },
+		]),
+		"ko": JSON.stringify([
+			{ "label": "분석가용", "href": "/solutions/analysts" },
+			{ "label": "매니저용", "href": "/solutions/managers" },
+			{ "label": "엔터프라이즈", "href": "/solutions/enterprise" },
+			{ "label": "사례 연구", "href": "/case-studies" },
+		]),
+		"zh-Hant": JSON.stringify([
+			{ "label": "分析師方案", "href": "/solutions/analysts" },
+			{ "label": "經理方案", "href": "/solutions/managers" },
+			{ "label": "企業版", "href": "/solutions/enterprise" },
+			{ "label": "案例研究", "href": "/case-studies" },
+		]),
+		"zh-Hans": JSON.stringify([
+			{ "label": "分析师方案", "href": "/solutions/analysts" },
+			{ "label": "经理方案", "href": "/solutions/managers" },
+			{ "label": "企业版", "href": "/solutions/enterprise" },
+			{ "label": "案例研究", "href": "/case-studies" },
+		]),
+	},
+	"footer.links.company.title": withChineseVariants({
+		"en": "Company",
+		"ja": "企業",
+		"ko": "회사",
+		"zh": {
+			"hant": "公司",
+			"hans": "公司",
+		},
+	}),
+	"footer.links.company.items": {
+		"en": JSON.stringify([
+			{ "label": "About", "href": "/about" },
+			{ "label": "Blog", "href": "/blog" },
+			{ "label": "Careers", "href": "/careers" },
+			{ "label": "Contact", "href": "/contact" },
+		]),
+		"ja": JSON.stringify([
+			{ "label": "企業情報", "href": "/about" },
+			{ "label": "ブログ", "href": "/blog" },
+			{ "label": "採用情報", "href": "/careers" },
+			{ "label": "お問い合わせ", "href": "/contact" },
+		]),
+		"ko": JSON.stringify([
+			{ "label": "회사 정보", "href": "/about" },
+			{ "label": "블로그", "href": "/blog" },
+			{ "label": "채용 정보", "href": "/careers" },
+			{ "label": "문의", "href": "/contact" },
+		]),
+		"zh-Hant": JSON.stringify([
+			{ "label": "關於", "href": "/about" },
+			{ "label": "部落格", "href": "/blog" },
+			{ "label": "招聘", "href": "/careers" },
+			{ "label": "聯繫", "href": "/contact" },
+		]),
+		"zh-Hans": JSON.stringify([
+			{ "label": "关于", "href": "/about" },
+			{ "label": "博客", "href": "/blog" },
+			{ "label": "招聘", "href": "/careers" },
+			{ "label": "联系", "href": "/contact" },
+		]),
+	},
+	"footer.links.resources.title": withChineseVariants({
+		"en": "Resources",
+		"ja": "リソース",
+		"ko": "리소스",
+		"zh": {
+			"hant": "資源",
+			"hans": "资源",
+		},
+	}),
+	"footer.links.resources.items": {
+		"en": JSON.stringify([
+			{ "label": "Documentation", "href": "/docs" },
+			{ "label": "FAQ", "href": "/faq" },
+			{ "label": "Help Center", "href": "/help" },
+			{ "label": "Community", "href": "/community" },
+		]),
+		"ja": JSON.stringify([
+			{ "label": "ドキュメント", "href": "/docs" },
+			{ "label": "よくある質問", "href": "/faq" },
+			{ "label": "ヘルプセンター", "href": "/help" },
+			{ "label": "コミュニティ", "href": "/community" },
+		]),
+		"ko": JSON.stringify([
+			{ "label": "문서", "href": "/docs" },
+			{ "label": "FAQ", "href": "/faq" },
+			{ "label": "지원 센터", "href": "/help" },
+			{ "label": "커뮤니티", "href": "/community" },
+		]),
+		"zh-Hant": JSON.stringify([
+			{ "label": "文檔", "href": "/docs" },
+			{ "label": "常見問題", "href": "/faq" },
+			{ "label": "幫助中心", "href": "/help" },
+			{ "label": "社區", "href": "/community" },
+		]),
+		"zh-Hans": JSON.stringify([
+			{ "label": "文档", "href": "/docs" },
+			{ "label": "常见问题", "href": "/faq" },
+			{ "label": "帮助中心", "href": "/help" },
+			{ "label": "社区", "href": "/community" },
+		]),
+	},
+	"footer.links.compare.title": withChineseVariants({
+		"en": "Compare",
+		"ja": "比較",
+		"ko": "비교",
+		"zh": {
+			"hant": "比較",
+			"hans": "比较",
+		},
+	}),
+	"footer.links.compare.items": {
+		"en": JSON.stringify([
+			{ "label": "vs. Bloomberg Terminal", "href": "/compare/bloomberg" },
+			{ "label": "vs. FactSet", "href": "/compare/factset" },
+			{ "label": "vs. Manual Research", "href": "/compare/manual" },
+		]),
+		"ja": JSON.stringify([
+			{ "label": "vs. Bloomberg Terminal", "href": "/compare/bloomberg" },
+			{ "label": "vs. FactSet", "href": "/compare/factset" },
+			{ "label": "vs. 手作業リサーチ", "href": "/compare/manual" },
+		]),
+		"ko": JSON.stringify([
+			{ "label": "vs. Bloomberg Terminal", "href": "/compare/bloomberg" },
+			{ "label": "vs. FactSet", "href": "/compare/factset" },
+			{ "label": "vs. 수동 조사", "href": "/compare/manual" },
+		]),
+		"zh-Hant": JSON.stringify([
+			{ "label": "vs. Bloomberg Terminal", "href": "/compare/bloomberg" },
+			{ "label": "vs. FactSet", "href": "/compare/factset" },
+			{ "label": "vs. 手動研究", "href": "/compare/manual" },
+		]),
+		"zh-Hans": JSON.stringify([
+			{ "label": "vs. Bloomberg Terminal", "href": "/compare/bloomberg" },
+			{ "label": "vs. FactSet", "href": "/compare/factset" },
+			{ "label": "vs. 手动研究", "href": "/compare/manual" },
+		]),
+	},
+	"footer.download.title": withChineseVariants({
+		"en": "Download App",
+		"ja": "アプリをダウンロード",
+		"ko": "앱 다운로드",
+		"zh": {
+			"hant": "下載應用",
+			"hans": "下载应用",
+		},
+	}),
+	"footer.download.caption": withChineseVariants({
+		"en": "Access reports anywhere",
+		"ja": "どこからでもレポートにアクセス",
+		"ko": "어디서나 보고서에 접근",
+		"zh": {
+			"hant": "隨時隨地查看報告",
+			"hans": "随时随地查看报告",
+		},
+	}),
+	"footer.meta.legal.terms": withChineseVariants({
+		"en": "Terms of Service",
+		"ja": "利用規約",
+		"ko": "이용약관",
+		"zh": {
+			"hant": "使用條款",
+			"hans": "使用条款",
+		},
+	}),
+	"footer.meta.legal.privacy": withChineseVariants({
+		"en": "Privacy Policy",
+		"ja": "プライバシーポリシー",
+		"ko": "개인정보 보호정책",
+		"zh": {
+			"hant": "隱私政策",
+			"hans": "隐私政策",
+		},
+	}),
+	"footer.meta.legal.acceptable-use": withChineseVariants({
+		"en": "Acceptable Use",
+		"ja": "利用可能な用途",
+		"ko": "승인된 사용",
+		"zh": {
+			"hant": "可接受使用政策",
+			"hans": "可接受使用政策",
+		},
+	}),
+	"footer.meta.legal.legal": withChineseVariants({
+		"en": "Legal",
+		"ja": "法務",
+		"ko": "법률",
+		"zh": {
+			"hant": "法律",
+			"hans": "法律",
+		},
+	}),
+	"footer.social.instagram": withChineseVariants({
+		"en": "Follow us on Instagram",
+		"ja": "Instagramでフォロー",
+		"ko": "Instagram에서 팔로우",
+		"zh": {
+			"hant": "在 Instagram 上關注我們",
+			"hans": "在 Instagram 上关注我们",
+		},
+	}),
+	"footer.social.youtube": withChineseVariants({
+		"en": "Subscribe on YouTube",
+		"ja": "YouTubeで購読",
+		"ko": "YouTube에 구독",
+		"zh": {
+			"hant": "在 YouTube 上訂閱",
+			"hans": "在 YouTube 上订阅",
+		},
+	}),
+	"footer.social.twitter": withChineseVariants({
+		"en": "Follow on X (Twitter)",
+		"ja": "X（Twitter）をフォロー",
+		"ko": "X(Twitter) 팔로우",
+		"zh": {
+			"hant": "在 X (Twitter) 上關注",
+			"hans": "在 X (Twitter) 上关注",
+		},
+	}),
+	"footer.social.linkedin": withChineseVariants({
+		"en": "Connect on LinkedIn",
+		"ja": "LinkedInで接続",
+		"ko": "LinkedIn에서 연결",
+		"zh": {
+			"hant": "在 LinkedIn 上連接",
+			"hans": "在 LinkedIn 上连接",
+		},
+	}),
 	"workflow.step.status.running": {
 		"en": "In progress",
 		"ja": "進行中",
