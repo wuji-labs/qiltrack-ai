@@ -168,47 +168,6 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hant": "但現實情況是：資訊多到塞不下、專有名詞擋在前面、研報太長、新聞太碎、觀點互相衝突。你沒時間，也不想被帶節奏，最後得到的不是理解，而是疲憊。Investor AI 出現的初衷很簡單：幫普通人把「複雜」翻成「明白」，讓你不靠運氣、不靠情緒，而是靠理解做決定。",
 		"zh-Hans": "但现实情况是：资讯多到塞不下、专有名词挡在前面、研报太长、新闻太碎、观点互相冲突。你没时间，也不想被带节奏，最后得到的不是理解，而是疲惫。Investor AI 出现的初衷很简单：帮普通人把“复杂”翻成“明白”，让你不靠运气、不靠情绪，而是靠理解做决策。",
 	},
-	"landing.moduleCombined.title": {
-		"en": "In one sweep: what you get, why it reads well, who it is for",
-		"ja": "1 つに凝縮：何が得られ、なぜ読みやすく、誰のためか",
-		"ko": "한 번에 압축: 무엇을 얻고, 왜 잘 읽히며, 누구를 위한가",
-		"zh-Hant": "一屏講清：能拿到什麼、為何好懂、適合誰",
-		"zh-Hans": "一屏讲清：能拿到什么、为何好懂、适合谁",
-	},
-	"landing.moduleCombined.caption": {
-		"en": "We compress the original three modules into one glance so you know the promise, the method, and whether it matches you.",
-		"ja": "3 つのモジュールを 1 つに集約し、得られる価値・進め方・自分に合うかを一目で示します。",
-		"ko": "세 가지 모듈을 한눈에 보이도록 압축해, 가치·방식·적합성을 바로 판단할 수 있게 합니다.",
-		"zh-Hant": "把原本三段內容濃縮在一屏，讓你一眼看懂：報告給什麼、為何好讀、是否對路。",
-		"zh-Hans": "把原本三段内容浓缩在一屏，让你一眼看懂：报告给什么、为何好读、是否对路。",
-	},
-	"landing.moduleCombined.items": {
-		"en": JSON.stringify([
-			{ title: "What one report hands you", body: "A single, explainable brief: what the company does, how it earns, where the moat and cracks are—no jargon maze." },
-			{ title: "Why it stays sharp yet readable", body: "Built as an understanding engine: start with the real business, insist on traceable evidence, keep only the 3–5 essentials." },
-			{ title: "Who gets the most value", body: "Builders, investors, and researchers who want to escape noise, grasp unfamiliar companies fast, and reuse the same thinking spine." },
-		]),
-		"ja": JSON.stringify([
-			{ title: "1 本のレポートで受け取るもの", body: "会社は何をし、どう稼ぎ、どこに優位と脆さがあるかを、専門用語の迷路なしで一気に掴めます。" },
-			{ title: "鋭さと読みやすさを両立できる理由", body: "理解エンジンとして設計。実ビジネスから入り、根拠を必ず添え、本質的な 3〜5 点だけを残します。" },
-			{ title: "最も価値を得る人", body: "ノイズから離れ、未知の企業を素早く把握し、同じ思考の背骨を再利用したいビルダー・投資家・リサーチャー。" },
-		]),
-		"ko": JSON.stringify([
-			{ title: "리포트 한 건이 주는 것", body: "회사가 무엇을 하고 어떻게 벌며, 강점과 균열이 어디에 있는지까지 jargon 없이 한 번에 파악합니다." },
-			{ title: "날카롭고 읽기 쉬운 이유", body: "‘이해 엔진’ 설계: 실제 비즈니스에서 출발하고, 근거를 명시하며, 핵심 3~5가지만 남깁니다." },
-			{ title: "가장 큰 혜택을 보는 사람", body: "노이즈를 떠나 낯선 회사를 빨리 파악하고 같은 사고 뼈대를 재사용하고 싶은 빌더·투자자·리서처." },
-		]),
-		"zh-Hant": JSON.stringify([
-			{ title: "一份報告給你什麼", body: "一句話講清這公司做什麼、錢怎麼來、優勢與裂縫在哪，不迷路於術語。" },
-			{ title: "為何專業但好懂", body: "按「理解引擎」三步走：先看真實業務、所有判斷可追溯、只保留最關鍵的 3–5 點。" },
-			{ title: "誰最受用", body: "想擺脫噪音、快速看懂陌生公司、重複利用同一思考脊柱的投資人、創業者、研究者。" },
-		]),
-		"zh-Hans": JSON.stringify([
-			{ title: "一份报告给你什么", body: "一句话讲清这家公司做什么、钱怎么来、优势和裂缝在哪，不迷路于术语。" },
-			{ title: "为何专业且好懂", body: "按“理解引擎”三步走：先看真实业务，所有判断都有出处，只保留最关键的 3–5 点。" },
-			{ title: "谁最受用", body: "想摆脱噪音、快速看懂陌生公司、重复利用同一思考脊柱的投资人、创业者、研究者。" },
-		]),
-	},
 	"landing.module2.title": {
 		"en": "What does one report actually tell you?",
 		"ja": "1 本のレポートで何が分かるのか",

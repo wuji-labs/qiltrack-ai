@@ -228,15 +228,6 @@ export default function Home() {
 		}
 	}, [t]);
 
-	const combinedItems = useMemo(() => {
-		try {
-			return JSON.parse(t("landing.moduleCombined.items")) as { title: string; body: string }[];
-		} catch (err) {
-			console.warn("Failed to parse moduleCombined items", err);
-			return [];
-		}
-	}, [t]);
-
 	const featuredReports = useMemo(() => {
 		return getFeaturedReports(3).map((report) => ({
 			symbol: report.symbol,
@@ -598,17 +589,12 @@ export default function Home() {
 								</section>
 
 								<WhySection
-									combinedItems={combinedItems}
 									module6Items={module6Items}
 									subtleTextClass={subtleText}
-									combinedTitle={t("landing.moduleCombined.title")}
-									combinedCaption={t("landing.moduleCombined.caption")}
 									valueTitle={t("landing.module6.title")}
 									valueCaption={t("landing.module6.caption")}
-									labels={{
-										combined: t("landing.moduleCombined.title"),
-										module6: t("landing.module6.title"),
-									}}
+									punchline={t("landing.module6.punchline")}
+									label={t("landing.module6.title")}
 								/>
 
 								<section id="faq" className={`rounded-3xl border p-5 sm:p-7 space-y-5 transition-all duration-200 ease-out ${cardSecondary} overflow-hidden`}>
