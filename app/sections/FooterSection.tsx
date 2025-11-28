@@ -192,10 +192,6 @@ export function FooterSection({
 			title: t("footer.links.resources.title"),
 			items: parseItems(t("footer.links.resources.items")),
 		},
-		compare: {
-			title: t("footer.links.compare.title"),
-			items: parseItems(t("footer.links.compare.items")),
-		},
 	};
 
 	const legalLinks: LegalLink[] = [

@@ -2668,43 +2668,6 @@ const translations: Record<string, TranslationEntry> = {
 			{ "label": "社区", "href": "/community" },
 		]),
 	},
-	"footer.links.compare.title": withChineseVariants({
-		"en": "Compare",
-		"ja": "比較",
-		"ko": "비교",
-		"zh": {
-			"hant": "比較",
-			"hans": "比较",
-		},
-	}),
-	"footer.links.compare.items": {
-		"en": JSON.stringify([
-			{ "label": "vs. Bloomberg Terminal", "href": "/compare/bloomberg" },
-			{ "label": "vs. FactSet", "href": "/compare/factset" },
-			{ "label": "vs. Manual Research", "href": "/compare/manual" },
-		]),
-		"ja": JSON.stringify([
-			{ "label": "vs. Bloomberg Terminal", "href": "/compare/bloomberg" },
-			{ "label": "vs. FactSet", "href": "/compare/factset" },
-			{ "label": "vs. 手作業リサーチ", "href": "/compare/manual" },
-		]),
-		"ko": JSON.stringify([
-			{ "label": "vs. Bloomberg Terminal", "href": "/compare/bloomberg" },
-			{ "label": "vs. FactSet", "href": "/compare/factset" },
-			{ "label": "vs. 수동 조사", "href": "/compare/manual" },
-		]),
-		"zh-Hant": JSON.stringify([
-			{ "label": "vs. Bloomberg Terminal", "href": "/compare/bloomberg" },
-			{ "label": "vs. FactSet", "href": "/compare/factset" },
-			{ "label": "vs. 手動研究", "href": "/compare/manual" },
-		]),
-		"zh-Hans": JSON.stringify([
-			{ "label": "vs. Bloomberg Terminal", "href": "/compare/bloomberg" },
-			{ "label": "vs. FactSet", "href": "/compare/factset" },
-			{ "label": "vs. 手动研究", "href": "/compare/manual" },
-		]),
-	},
-
 	"footer.meta.legal.terms": withChineseVariants({
 		"en": "Terms of Service",
 		"ja": "利用規約",
