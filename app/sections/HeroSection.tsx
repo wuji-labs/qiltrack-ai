@@ -103,7 +103,7 @@ export function HeroSection({
 	return (
 		<section className="w-full overflow-x-hidden">
 			<div className={`fixed top-3 left-1/2 -translate-x-1/2 z-50 ${navContainer}`}>
-				<nav className="flex flex-nowrap items-center justify-between gap-2 sm:gap-4 rounded-2xl border border-[var(--stroke-soft)]/80 bg-[var(--bg-frosted)]/85 px-3 sm:px-10 py-3 sm:py-5 min-h-[72px] backdrop-blur-xl shadow-[0_14px_38px_rgba(0,0,0,0.35)] transition-all duration-300 min-w-0">
+				<nav className="flex flex-nowrap items-center gap-2 sm:gap-4 rounded-2xl border border-[var(--stroke-soft)]/80 bg-[var(--bg-frosted)]/85 px-3 sm:px-10 py-3 sm:py-5 min-h-[72px] backdrop-blur-xl shadow-[0_14px_38px_rgba(0,0,0,0.35)] transition-all duration-300 min-w-0">
 					<div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink-0">
 						<div className="h-9 sm:h-11 w-9 sm:w-11 rounded-2xl bg-[var(--accent-emerald)] flex items-center justify-center text-[10px] sm:text-[12px] font-black tracking-[0.28em] text-slate-950 shadow-[0_10px_28px_rgba(91,224,176,0.35)] flex-shrink-0">
 							IA
@@ -130,8 +130,26 @@ export function HeroSection({
 						))}
 					</div>
 
-					{/* 桌面端：语言 + 账户 + 登录（lg:以上显示） */}
-					<div className="hidden lg:flex items-center justify-end gap-1.5 sm:gap-2 text-[12px] flex-nowrap flex-shrink-0">
+					{/* 右侧容器：汉堡 + 桌面端按钮 */}
+					<div className="ml-auto flex items-center gap-1.5 sm:gap-2 text-[12px] flex-nowrap flex-shrink-0">
+						{/* 汉堡菜单（lg以下显示） */}
+						<div className="lg:hidden">
+							<button
+								type="button"
+								onClick={() => setMobileDrawerOpen((open) => !open)}
+								className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] text-dim transition hover:border-[var(--stroke-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40 min-h-[44px]"
+								aria-haspopup="dialog"
+								aria-expanded={mobileDrawerOpen}
+							>
+								<span className="sr-only">Open navigation menu</span>
+								<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+								</svg>
+							</button>
+						</div>
+
+						{/* 桌面端：语言 + 账户 + 登录（lg:以上显示） */}
+						<div className="hidden lg:flex items-center gap-1.5 sm:gap-2">
 						<div ref={languageMenuRef} className="relative">
 							<button
 								type="button"
@@ -247,20 +265,6 @@ export function HeroSection({
 						)}
 					</div>
 
-					{/* 移动端：汉堡菜单（xl:以下显示） */}
-					<div className="xl:hidden">
-						<button
-							type="button"
-							onClick={() => setMobileDrawerOpen((open) => !open)}
-							className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] text-dim transition hover:border-[var(--stroke-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40 min-h-[44px]"
-							aria-haspopup="dialog"
-							aria-expanded={mobileDrawerOpen}
-						>
-							<span className="sr-only">Open navigation menu</span>
-							<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-							</svg>
-						</button>
 					</div>
 				</nav>
 
