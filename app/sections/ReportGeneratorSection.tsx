@@ -55,6 +55,22 @@ type ReportGeneratorSectionProps = {
 	t: (key: string, vars?: Record<string, string>) => string;
 };
 
+type PlaceholderVariant = "xs" | "sm" | "md" | "xl";
+
+const placeholderKeyByVariant: Record<PlaceholderVariant, string> = {
+	xs: "generator.input.placeholder.xs",
+	sm: "generator.input.placeholder.sm",
+	md: "generator.input.placeholder.md",
+	xl: "generator.input.placeholder",
+};
+
+const getPlaceholderVariant = (width: number): PlaceholderVariant => {
+	if (width >= 1024) return "xl";
+	if (width >= 768) return "md";
+	if (width >= 640) return "sm";
+	return "xs";
+};
+
 export function ReportGeneratorSection({
 	selectedTone,
 	toneOptions,
@@ -78,6 +94,7 @@ export function ReportGeneratorSection({
 	const [reportData, setReportData] = useState<ReportResponse | null>(null);
 	const [exportingDocx, setExportingDocx] = useState(false);
 	const [lastReportTone, setLastReportTone] = useState<ReportTone>("baseline");
+	const [placeholderVariant, setPlaceholderVariant] = useState<PlaceholderVariant>("xs");
 	const reportContentRef = useRef<HTMLDivElement>(null);
 	const testToken = process.env.NEXT_PUBLIC_TEST_REPORT_TOKEN;
 	const canBypassAuth = Boolean(testToken);
@@ -114,6 +131,11 @@ export function ReportGeneratorSection({
 						description: desc,
 					})),
 		[heroHighlights, highlightFallback, t]
+	);
+
+	const placeholderText = useMemo(
+		() => t(placeholderKeyByVariant[placeholderVariant]),
+		[placeholderVariant, t]
 	);
 
 	useEffect(() => {
@@ -167,6 +189,19 @@ export function ReportGeneratorSection({
 
 		window.addEventListener("hashchange", handleHash);
 		return () => window.removeEventListener("hashchange", handleHash);
+	}, []);
+
+	useEffect(() => {
+		if (typeof window === "undefined") return;
+
+		const updatePlaceholder = () => {
+			const next = getPlaceholderVariant(window.innerWidth);
+			setPlaceholderVariant((current) => (current === next ? current : next));
+		};
+
+		updatePlaceholder();
+		window.addEventListener("resize", updatePlaceholder);
+		return () => window.removeEventListener("resize", updatePlaceholder);
 	}, []);
 
 	const markdownComponents: Components = {
@@ -643,7 +678,7 @@ export function ReportGeneratorSection({
 											setInputValue(event.target.value);
 											setDropdownClosed(false);
 										}}
-										placeholder={t("generator.input.placeholder")}
+										placeholder={placeholderText}
 										autoComplete="off"
 										spellCheck={false}
 										autoCorrect="off"
