@@ -132,8 +132,8 @@ export function HeroSection({
 
 					{/* 右侧容器：汉堡 + 桌面端按钮 */}
 					<div className="ml-auto flex items-center gap-1.5 sm:gap-2 text-[12px] flex-nowrap flex-shrink-0">
-						{/* 汉堡菜单（lg以下显示） */}
-						<div className="lg:hidden">
+						{/* 汉堡菜单（<xl显示） */}
+						<div className="xl:hidden">
 							<button
 								type="button"
 								onClick={() => setMobileDrawerOpen((open) => !open)}
