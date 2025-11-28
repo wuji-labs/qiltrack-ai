@@ -648,15 +648,12 @@ export function ReportGeneratorSection({
 										spellCheck={false}
 										autoCorrect="off"
 										autoCapitalize="none"
-										className="w-full bg-transparent pl-10 pr-28 py-2.5 text-base text-[var(--color-foreground)] placeholder:text-subtle focus:outline-none transition-shadow duration-200 ease-out"
+										className="w-full bg-transparent pl-10 pr-24 py-2.5 text-base text-[var(--color-foreground)] placeholder:text-subtle focus:outline-none transition-shadow duration-200 ease-out"
 										aria-label={t("generator.input.label")}
 									/>
 									<div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-[11px] text-subtle">
-										<span className="rounded-full border border-[var(--accent-emerald)]/40 bg-[var(--accent-emerald)]/10 px-2 py-0.5">
+										<span className="rounded-full border border-[var(--accent-emerald)]/40 bg-[var(--accent-emerald)]/10 px-2.5 py-0.5 text-[var(--accent-emerald)]">
 											Ticker / Name
-										</span>
-										<span className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 px-2 py-0.5">
-											回车生成
 										</span>
 									</div>
 								</div>
