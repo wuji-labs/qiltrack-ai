@@ -98,11 +98,12 @@ export function HeroSection({
 
 	// Shared container class for consistent alignment across nav, hero, and main content
 	const pageContainer = "mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10";
+	const navContainer = "mx-auto w-full max-w-7xl px-4 sm:px-8 xl:px-12";
 
 	return (
 		<section className="w-full overflow-x-hidden">
-			<div className={`fixed top-3 left-1/2 -translate-x-1/2 z-50 ${pageContainer}`}>
-				<nav className="flex flex-wrap xl:flex-nowrap justify-between items-center gap-2 sm:gap-4 rounded-2xl border border-[var(--stroke-soft)]/80 bg-[var(--bg-frosted)]/85 px-3 sm:px-10 py-3 sm:py-5 min-h-[72px] backdrop-blur-xl shadow-[0_14px_38px_rgba(0,0,0,0.35)] transition-all duration-300 min-w-0">
+			<div className={`fixed top-3 left-1/2 -translate-x-1/2 z-50 ${navContainer}`}>
+				<nav className="flex flex-nowrap items-center justify-between gap-2 sm:gap-4 rounded-2xl border border-[var(--stroke-soft)]/80 bg-[var(--bg-frosted)]/85 px-3 sm:px-10 py-3 sm:py-5 min-h-[72px] backdrop-blur-xl shadow-[0_14px_38px_rgba(0,0,0,0.35)] transition-all duration-300 min-w-0">
 					<div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink-0">
 						<div className="h-9 sm:h-11 w-9 sm:w-11 rounded-2xl bg-[var(--accent-emerald)] flex items-center justify-center text-[10px] sm:text-[12px] font-black tracking-[0.28em] text-slate-950 shadow-[0_10px_28px_rgba(91,224,176,0.35)] flex-shrink-0">
 							IA
@@ -115,13 +116,13 @@ export function HeroSection({
 						</div>
 					</div>
 
-					<div className="hidden xl:flex flex-1 items-center justify-center gap-4 xl:gap-5 text-xs md:text-sm font-semibold uppercase tracking-[0.14em] text-dim whitespace-nowrap">
+					<div className="hidden xl:flex flex-1 min-w-0 items-center justify-center gap-4 xl:gap-5 2xl:gap-6 text-xs 2xl:text-sm font-semibold uppercase tracking-[0.14em] text-dim whitespace-nowrap">
 						{navItems.map((item) => (
 							<a
 								key={item.href}
 								href={item.href}
 								onClick={(e) => handleNavClick(item.href, e)}
-								className="rounded-full px-3 py-2 transition-all duration-200 ease-out relative text-subtle hover:text-[var(--accent-blue)] hover:-translate-y-0.5 hover:bg-[var(--bg-layer)]/70 group"
+								className="rounded-full px-3 xl:px-3.5 py-2 transition-all duration-200 ease-out relative text-subtle hover:text-[var(--accent-blue)] hover:-translate-y-0.5 hover:bg-[var(--bg-layer)]/70 group"
 							>
 								{item.label}
 								<span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[var(--accent-blue)] to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-out origin-left" />
@@ -130,12 +131,12 @@ export function HeroSection({
 					</div>
 
 					{/* 桌面端：语言 + 账户 + 登录（lg:以上显示） */}
-					<div className="hidden lg:flex items-center justify-end gap-1.5 sm:gap-2 text-[12px] flex-nowrap min-w-0">
+					<div className="hidden lg:flex items-center justify-end gap-1.5 sm:gap-2 text-[12px] flex-nowrap flex-shrink-0">
 						<div ref={languageMenuRef} className="relative">
 							<button
 								type="button"
 								onClick={() => setLanguageMenuOpen((open) => !open)}
-								className="inline-flex items-center gap-1 sm:gap-1.5 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm text-dim transition hover:border-[var(--stroke-glow)] hover:text-[var(--accent-blue)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40 whitespace-nowrap min-h-[44px]"
+								className="inline-flex items-center gap-1 sm:gap-1.5 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm text-dim transition hover:border-[var(--stroke-glow)] hover:text-[var(--accent-blue)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40 whitespace-nowrap min-h-[44px] min-w-[112px]"
 								aria-haspopup="listbox"
 								aria-expanded={languageMenuOpen}
 							>
@@ -246,8 +247,8 @@ export function HeroSection({
 						)}
 					</div>
 
-					{/* 移动端：汉堡菜单（lg:以下显示） */}
-					<div className="lg:hidden">
+					{/* 移动端：汉堡菜单（xl:以下显示） */}
+					<div className="xl:hidden">
 						<button
 							type="button"
 							onClick={() => setMobileDrawerOpen((open) => !open)}
@@ -263,11 +264,11 @@ export function HeroSection({
 					</div>
 				</nav>
 
-				{/* 移动端抽屉（lg:以下在汉堡菜单打开时显示） */}
+				{/* 移动端抽屉（xl:以下在汉堡菜单打开时显示） */}
 				{mobileDrawerOpen && (
 					<div
 						ref={mobileDrawerRef}
-						className="fixed inset-0 z-40 lg:hidden"
+						className="fixed inset-0 z-40 xl:hidden"
 						style={{ top: "calc(100% + 12px)" }}
 					>
 						<div className="absolute right-4 top-0 w-80 max-w-[calc(100vw-32px)] rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/95 p-4 shadow-[0_20px_80px_rgba(0,0,0,0.65)] backdrop-blur-xl space-y-4">
