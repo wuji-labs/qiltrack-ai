@@ -569,8 +569,8 @@ export function ReportGeneratorSection({
 	const loadingSubtitle = t("generator.searching.wait");
 
 	return (
-		<div className="space-y-6 md:space-y-8" id="generator">
-		<section className="space-y-5 md:space-y-6">
+		<div className="space-y-6 md:space-y-8 min-w-0" id="generator">
+		<section className="space-y-5 md:space-y-6 min-w-0">
 			{(progress.progress > 0 || loading) && (
 				<ProgressBar
 					percent={progress.progress}
@@ -582,14 +582,14 @@ export function ReportGeneratorSection({
 
 			<form
 				onSubmit={handleSubmit}
-				className="relative overflow-visible space-y-5 rounded-[28px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-4 sm:p-6 shadow-[0_20px_70px_rgba(0,0,0,0.34)]"
+				className="relative overflow-hidden space-y-5 rounded-[28px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-4 sm:p-6 shadow-[0_20px_70px_rgba(0,0,0,0.34)]"
 			>
 				<div className="pointer-events-none absolute inset-0">
 					<div className="absolute -left-10 top-8 h-40 w-40 rounded-full bg-[var(--accent-emerald)]/12 blur-[110px]" aria-hidden />
 					<div className="absolute right-0 bottom-0 h-52 w-52 rounded-full bg-[var(--accent-blue)]/10 blur-[140px]" aria-hidden />
 				</div>
 
-					<div className="relative flex flex-wrap items-center justify-between gap-3 text-sm uppercase tracking-[0.2em] text-subtle">
+					<div className="relative flex flex-wrap items-center justify-between gap-3 text-sm uppercase tracking-[0.2em] text-subtle min-w-0">
 					<div className="relative inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3.5 py-1.5 text-[var(--accent-emerald)] shadow-[0_12px_30px_rgba(0,0,0,0.24)]">
 						<span className="rounded-full bg-[var(--accent-emerald)]/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-200">
 				{t("generator.step.two")}
@@ -604,16 +604,16 @@ export function ReportGeneratorSection({
 					</span>
 				</div>
 
-				<div className="relative flex flex-col gap-5 sm:gap-6">
+				<div className="relative flex flex-col gap-5 sm:gap-6 min-w-0">
 					<div className="flex-1">
-						<div className="group relative overflow-visible rounded-[24px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/90 shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
+						<div className="group relative overflow-hidden rounded-[24px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/90 shadow-[0_18px_50px_rgba(0,0,0,0.28)] min-w-0">
 							<div className="pointer-events-none absolute inset-0">
 								<div className="absolute -left-6 top-2 h-24 w-24 rounded-full bg-[var(--accent-emerald)]/20 blur-[90px]" aria-hidden />
 								<div className="absolute right-0 bottom-0 h-28 w-28 rounded-full bg-[var(--accent-blue)]/16 blur-[110px]" aria-hidden />
 								<div className="absolute inset-0 rounded-[24px] bg-[linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0)),radial-gradient(circle_at_16%_12%,rgba(91,224,176,0.14),transparent_34%)]" aria-hidden />
 							</div>
 
-							<div className="relative flex items-center justify-between px-4 py-2 text-[11px] uppercase tracking-[0.24em] text-subtle">
+							<div className="relative flex items-center justify-between px-4 py-2 text-[11px] uppercase tracking-[0.24em] text-subtle min-w-0">
 								<div className="flex items-center gap-2">
 									<span className="inline-flex items-center gap-1 rounded-full border border-[var(--accent-emerald)]/40 bg-[var(--accent-emerald)]/10 px-2 py-1 text-[var(--accent-emerald)]">
 										<span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-emerald)] animate-ping" aria-hidden />
@@ -816,12 +816,12 @@ export function ReportGeneratorSection({
 							{t("generator.progress.ready")}
 						</span>
 					</div>
-					<div className="relative grid gap-3 md:grid-cols-[1.2fr] items-start">
+				<div className="relative grid gap-3 md:grid-cols-[1.2fr] items-start overflow-hidden">
 						<div className="space-y-3">
 							<p className="text-base text-dim leading-relaxed">{t("report.tip.body")}</p>
 							<p className="text-sm text-subtle">{t("report.tip.action")}</p>
 						</div>
-					</div>
+				</div>
 				</div>
 			)}
 		</section>
