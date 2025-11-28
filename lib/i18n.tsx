@@ -2704,24 +2704,7 @@ const translations: Record<string, TranslationEntry> = {
 			{ "label": "vs. 手动研究", "href": "/compare/manual" },
 		]),
 	},
-	"footer.download.title": withChineseVariants({
-		"en": "Download App",
-		"ja": "アプリをダウンロード",
-		"ko": "앱 다운로드",
-		"zh": {
-			"hant": "下載應用",
-			"hans": "下载应用",
-		},
-	}),
-	"footer.download.caption": withChineseVariants({
-		"en": "Access reports anywhere",
-		"ja": "どこからでもレポートにアクセス",
-		"ko": "어디서나 보고서에 접근",
-		"zh": {
-			"hant": "隨時隨地查看報告",
-			"hans": "随时随地查看报告",
-		},
-	}),
+
 	"footer.meta.legal.terms": withChineseVariants({
 		"en": "Terms of Service",
 		"ja": "利用規約",

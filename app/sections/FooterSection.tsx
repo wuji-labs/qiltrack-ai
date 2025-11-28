@@ -30,7 +30,6 @@ type FooterSectionProps = {
 	dataSource: string;
 	showBrand?: boolean;
 	showLinks?: boolean;
-	showDownload?: boolean;
 	showMeta?: boolean;
 	brandTitle?: string;
 	brandCaption?: string;
@@ -94,47 +93,6 @@ function FooterLinks({ linkGroups }: { linkGroups: Record<string, LinkGroup> }) 
 					</ul>
 				</div>
 			))}
-		</div>
-	);
-}
-
-function FooterDownloadCard({
-	title,
-	caption,
-}: {
-	title: string;
-	caption: string;
-}) {
-	return (
-		<div className="rounded-lg bg-[var(--bg-layer)] border border-[var(--stroke-soft)] p-4 sm:p-6">
-			{title && (
-				<h4 className="text-sm font-semibold text-[var(--color-foreground)] mb-2">
-					{title}
-				</h4>
-			)}
-			{caption && (
-				<p className="text-xs text-[var(--text-subtle)] mb-3">{caption}</p>
-			)}
-			<div className="flex flex-col gap-2">
-				<a
-					href="https://apps.apple.com"
-					className="btn-ghost px-3 py-2 rounded-md text-xs font-medium border border-[var(--stroke-soft)] hover:bg-[var(--bg-frosted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)]"
-					aria-label="Download from App Store"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					App Store
-				</a>
-				<a
-					href="https://play.google.com"
-					className="btn-ghost px-3 py-2 rounded-md text-xs font-medium border border-[var(--stroke-soft)] hover:bg-[var(--bg-frosted)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)]"
-					aria-label="Download from Google Play"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					Google Play
-				</a>
-			</div>
 		</div>
 	);
 }
@@ -204,7 +162,6 @@ export function FooterSection({
 	dataSource,
 	showBrand = true,
 	showLinks = true,
-	showDownload = true,
 	showMeta = true,
 }: FooterSectionProps) {
 	const { t } = useLanguage();
@@ -278,7 +235,7 @@ export function FooterSection({
 
 			{/* Main content grid */}
 			<div className="max-w-7xl mx-auto">
-				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-10 mb-8">
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 mb-8">
 					{showBrand && (
 						<div className="lg:col-span-1">
 							<FooterBrand
@@ -293,15 +250,6 @@ export function FooterSection({
 					{showLinks && (
 						<div className={showBrand ? "sm:col-span-2 lg:col-span-3" : "lg:col-span-4"}>
 							<FooterLinks linkGroups={linkGroups} />
-						</div>
-					)}
-
-					{showDownload && (
-						<div className="lg:col-span-1">
-							<FooterDownloadCard
-								title={t("footer.download.title")}
-								caption={t("footer.download.caption")}
-							/>
 						</div>
 					)}
 				</div>
