@@ -2668,43 +2668,24 @@ const translations: Record<string, TranslationEntry> = {
 			{ "label": "社区", "href": "/community" },
 		]),
 	},
-	"footer.links.compare.title": withChineseVariants({
-		"en": "Compare",
-		"ja": "比較",
-		"ko": "비교",
+	"footer.download.title": withChineseVariants({
+		"en": "Download App",
+		"ja": "アプリをダウンロード",
+		"ko": "앱 다운로드",
 		"zh": {
-			"hant": "比較",
-			"hans": "比较",
+			"hant": "下載應用",
+			"hans": "下载应用",
 		},
 	}),
-	"footer.links.compare.items": {
-		"en": JSON.stringify([
-			{ "label": "vs. Bloomberg Terminal", "href": "/compare/bloomberg" },
-			{ "label": "vs. FactSet", "href": "/compare/factset" },
-			{ "label": "vs. Manual Research", "href": "/compare/manual" },
-		]),
-		"ja": JSON.stringify([
-			{ "label": "vs. Bloomberg Terminal", "href": "/compare/bloomberg" },
-			{ "label": "vs. FactSet", "href": "/compare/factset" },
-			{ "label": "vs. 手作業リサーチ", "href": "/compare/manual" },
-		]),
-		"ko": JSON.stringify([
-			{ "label": "vs. Bloomberg Terminal", "href": "/compare/bloomberg" },
-			{ "label": "vs. FactSet", "href": "/compare/factset" },
-			{ "label": "vs. 수동 조사", "href": "/compare/manual" },
-		]),
-		"zh-Hant": JSON.stringify([
-			{ "label": "vs. Bloomberg Terminal", "href": "/compare/bloomberg" },
-			{ "label": "vs. FactSet", "href": "/compare/factset" },
-			{ "label": "vs. 手動研究", "href": "/compare/manual" },
-		]),
-		"zh-Hans": JSON.stringify([
-			{ "label": "vs. Bloomberg Terminal", "href": "/compare/bloomberg" },
-			{ "label": "vs. FactSet", "href": "/compare/factset" },
-			{ "label": "vs. 手动研究", "href": "/compare/manual" },
-		]),
-	},
-
+	"footer.download.caption": withChineseVariants({
+		"en": "Access reports anywhere",
+		"ja": "どこからでもレポートにアクセス",
+		"ko": "어디서나 보고서에 접근",
+		"zh": {
+			"hant": "隨時隨地查看報告",
+			"hans": "随时随地查看报告",
+		},
+	}),
 	"footer.meta.legal.terms": withChineseVariants({
 		"en": "Terms of Service",
 		"ja": "利用規約",
