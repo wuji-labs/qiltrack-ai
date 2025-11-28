@@ -127,7 +127,10 @@ const translations: Record<string, TranslationEntry> = {
 		en: "Understanding is the foundation of investing.",
 		ja: "理解こそが投資の起点。",
 		ko: "이해가 투자 시작의 모든 것입니다.",
-		zh: "理解，是投資的起點。",
+		zh: {
+			hant: "理解，是投資的起點。",
+			hans: "理解，是投资的起点。",
+		},
 	}),
 	"hero.positioning": withChineseVariants({
 		en: "",
