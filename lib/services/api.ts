@@ -46,9 +46,21 @@ type CreditsResponse = {
 	credits: {
 		remaining_credits: number;
 	};
+	source?: string;
 };
 
-async function handleJson<T>(res: Response, defaultMessage: string): Promise<T> {
+type DailyRewardResponse = {
+	success: boolean;
+	message: string;
+	remainingCredits: number;
+};
+
+type ApiErrorResponse = {
+	error: string;
+	code?: "unauthorized" | "quota_exceeded" | "quota_fetch_failed" | "reward_claim_failed" | "internal_error";
+};
+
+async function handleJson<T>(res: Response, defaultMessage: string): Promise<T & { __statusCode?: number }> {
 	let body: unknown = null;
 	try {
 		body = await res.json();
@@ -57,14 +69,18 @@ async function handleJson<T>(res: Response, defaultMessage: string): Promise<T> 
 	}
 
 	if (!res.ok) {
+		const apiError = body as ApiErrorResponse;
 		const message =
-			typeof (body as Record<string, unknown>)?.error === "string"
-				? (body as { error: string }).error
+			typeof apiError?.error === "string"
+				? apiError.error
 				: defaultMessage;
-		throw new Error(message);
+		const error = new Error(message) as Error & { code?: string; statusCode?: number };
+		error.code = apiError?.code;
+		error.statusCode = res.status;
+		throw error;
 	}
 
-	return body as T;
+	return body as T & { __statusCode?: number };
 }
 
 export async function searchSymbols(query: string): Promise<SearchResult[]> {
@@ -126,6 +142,14 @@ export async function fetchReportHistory(
 export async function fetchCredits(): Promise<CreditsResponse> {
 	const res = await fetch("/api/report/credits");
 	return handleJson<CreditsResponse>(res, "Failed to fetch credits");
+}
+
+/**
+ * Claim daily reward (10 credits)
+ */
+export async function claimDailyReward(): Promise<DailyRewardResponse> {
+	const res = await fetch("/api/report/daily-reward", { method: "POST" });
+	return handleJson<DailyRewardResponse>(res, "Failed to claim daily reward");
 }
 
 export async function fetchSimilarReports(params: {

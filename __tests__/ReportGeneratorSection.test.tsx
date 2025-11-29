@@ -334,4 +334,82 @@ describe("ReportGeneratorSection", () => {
 		mockSearchSymbols.mockRestore();
 		mockGenerateReport.mockRestore();
 	});
+
+	it("should show mismatch message on unauthorized error (code: unauthorized)", async () => {
+		const user = userEvent.setup();
+		const onRequireLogin = vi.fn();
+
+		const mockSearchSymbols = vi.spyOn(apiModule, "searchSymbols");
+		mockSearchSymbols.mockResolvedValue(baseSearchResult);
+
+		const mockGenerateReport = vi.spyOn(apiModule, "generateReport");
+		const unauthorizedError = new Error("Detected quota mismatch, refresh session and retry") as Error & { code?: string };
+		unauthorizedError.code = "unauthorized";
+		mockGenerateReport.mockRejectedValueOnce(unauthorizedError);
+
+		renderGenerator({ auth: defaultAuth, onRequireLogin });
+
+		await typeAndSelectAapl(user);
+
+		const submitButton = screen.getByRole("button", { name: /^generate$/i });
+		await user.click(submitButton);
+
+		await screen.findByText(/Detected quota mismatch, refresh session and retry/i);
+		expect(onRequireLogin).toHaveBeenCalled();
+
+		mockSearchSymbols.mockRestore();
+		mockGenerateReport.mockRestore();
+	});
+
+	it("should show quota error on quota_exceeded error code", async () => {
+		const user = userEvent.setup();
+		const onRequireLogin = vi.fn();
+
+		const mockSearchSymbols = vi.spyOn(apiModule, "searchSymbols");
+		mockSearchSymbols.mockResolvedValue(baseSearchResult);
+
+		const mockGenerateReport = vi.spyOn(apiModule, "generateReport");
+		const quotaError = new Error("Quota exceeded") as Error & { code?: string; statusCode?: number };
+		quotaError.code = "quota_exceeded";
+		quotaError.statusCode = 429;
+		mockGenerateReport.mockRejectedValueOnce(quotaError);
+
+		renderGenerator({ auth: defaultAuth, onRequireLogin });
+
+		await typeAndSelectAapl(user);
+
+		const submitButton = screen.getByRole("button", { name: /^generate$/i });
+		await user.click(submitButton);
+
+		await screen.findByText(/You've reached your quota limit/i);
+		expect(onRequireLogin).not.toHaveBeenCalled();
+
+		mockSearchSymbols.mockRestore();
+		mockGenerateReport.mockRestore();
+	});
+
+	it("should show generic error on quota_fetch_failed error code", async () => {
+		const user = userEvent.setup();
+		const onRequireLogin = vi.fn();
+
+		const mockSearchSymbols = vi.spyOn(apiModule, "searchSymbols");
+		mockSearchSymbols.mockResolvedValue(baseSearchResult);
+
+		const mockGenerateReport = vi.spyOn(apiModule, "generateReport");
+		const fetchError = new Error("Failed to fetch quota information") as Error & { code?: string };
+		fetchError.code = "quota_fetch_failed";
+		mockGenerateReport.mockRejectedValueOnce(fetchError);
+
+		renderGenerator({ auth: defaultAuth, onRequireLogin });
+
+		await typeAndSelectAapl(user);
+
+		const submitButton = screen.getByRole("button", { name: /^generate$/i });
+		await user.click(submitButton);
+
+		await screen.findByText(/Failed to fetch quota information/i);
+
+		mockSearchSymbols.mockRestore();
+		mockGenerateReport.mockRestore();
+	});
 });
