@@ -59,7 +59,19 @@ SET delta = credits_amount
 WHERE delta IS NULL;
 
 -- 4. Drop and recreate v_user_quota to include user_id and correct field name
-DROP MATERIALIZED VIEW IF EXISTS public.v_user_quota;
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_matviews WHERE schemaname = 'public' AND matviewname = 'v_user_quota'
+  ) THEN
+    EXECUTE 'DROP MATERIALIZED VIEW public.v_user_quota';
+  ELSIF EXISTS (
+    SELECT 1 FROM pg_views WHERE schemaname = 'public' AND viewname = 'v_user_quota'
+  ) THEN
+    EXECUTE 'DROP VIEW public.v_user_quota';
+  END IF;
+END;
+$$;
 
 CREATE MATERIALIZED VIEW public.v_user_quota AS
 SELECT

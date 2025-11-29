@@ -1,9 +1,14 @@
+export const runtime = "nodejs";
+
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient, createServiceRoleClient, uploadToStorage } from "@/lib/supabase/server";
 import { consumeReportCredit, writeReportAudit } from "@/lib/services/quota";
 import { DEFAULT_LANGUAGE, type Language } from "@/lib/i18n-config";
 
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
+const OPENROUTER_EMBEDDING_MODEL =
+  process.env.OPENROUTER_EMBEDDING_MODEL || "text-embedding-3-small";
+const EMBEDDING_DIMENSION = 1536;
 
 // Note: These are read at runtime to allow test env override
 const getEnvVars = () => ({
@@ -12,6 +17,7 @@ const getEnvVars = () => ({
   OPENROUTER_MODEL: process.env.OPENROUTER_MODEL || "openai/gpt-5.1",
   HELICONE_API_KEY: process.env.HELICONE_API_KEY,
   HELICONE_MODEL: process.env.HELICONE_MODEL || "gpt-4o-mini",
+  SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
 });
 
 const toneDirectives = {
@@ -80,7 +86,103 @@ function sanitizeReportContent(content: string, language: Language) {
         sanitized = sanitized.replace(pattern, replacement);
     }
 
-    return `${langConfig.disclaimer}\n\n${sanitized}`.trim();
+  return `${langConfig.disclaimer}\n\n${sanitized}`.trim();
+}
+
+function chunkReport(markdown: string, maxChars = 3500, overlap = 400) {
+  const paragraphs = markdown.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  const chunks: string[] = [];
+  let current = "";
+
+  for (const para of paragraphs) {
+    if ((current + "\n\n" + para).length > maxChars) {
+      if (current) {
+        chunks.push(current.trim());
+        const tail = current.slice(-overlap);
+        current = tail + "\n\n" + para;
+      } else {
+        chunks.push(para);
+        current = "";
+      }
+    } else {
+      current = current ? `${current}\n\n${para}` : para;
+    }
+  }
+  if (current) chunks.push(current.trim());
+  return chunks;
+}
+
+async function embedText(input: string, apiKey: string) {
+  const res = await fetch("https://openrouter.ai/api/v1/embeddings", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "HTTP-Referer": process.env.OPENROUTER_SITE_URL || "http://localhost:3000",
+      "X-Title": process.env.OPENROUTER_APP_NAME || "investor-ai",
+    },
+    body: JSON.stringify({
+      model: OPENROUTER_EMBEDDING_MODEL,
+      input,
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Embedding request failed: ${res.status} ${errText}`);
+  }
+
+  const data = await res.json();
+  const embedding = data?.data?.[0]?.embedding;
+  if (!embedding || !Array.isArray(embedding) || embedding.length !== EMBEDDING_DIMENSION) {
+    throw new Error("Invalid embedding response");
+  }
+  return embedding;
+}
+
+async function writeEmbeddingsBackground({
+  reportRunId,
+  report,
+  language,
+  tone,
+  apiKey,
+}: {
+  reportRunId: string | null;
+  report: string;
+  language: Language;
+  tone: string;
+  apiKey: string;
+}) {
+  if (!reportRunId || !apiKey) return;
+  try {
+    const serviceClient = createServiceRoleClient();
+    const chunks = chunkReport(report);
+
+    const rows = [];
+    for (let i = 0; i < chunks.length; i += 1) {
+      const chunk = chunks[i];
+      try {
+        const embedding = await embedText(chunk, apiKey);
+        rows.push({
+          report_run_id: reportRunId,
+          chunk_index: i,
+          embedding,
+          lang: language,
+          tone,
+        });
+      } catch (err) {
+        console.warn(`Embedding chunk ${i} failed:`, err);
+      }
+    }
+
+    if (rows.length === 0) return;
+
+    await serviceClient
+      .from("reports_embeddings")
+      .upsert(rows, { onConflict: "report_run_id,chunk_index" });
+  } catch (err) {
+    console.warn("Embedding background write failed:", err);
+  }
 }
 
 async function fetchJson(url: string) {
@@ -595,12 +697,21 @@ ${JSON.stringify(companyData, null, 2)}
           }
         }
 
-        const response = NextResponse.json({
-          symbol,
-          report,
-          companyData,
-          remainingQuota: remainingCredits,
+        // Fire-and-forget embeddings (does not block response)
+        void writeEmbeddingsBackground({
           reportRunId,
+          report,
+          language,
+          tone: toneKeyRaw,
+          apiKey: env.OPENROUTER_API_KEY || "",
+        });
+
+        const response = NextResponse.json({
+            symbol,
+            report,
+            companyData,
+            remainingQuota: remainingCredits,
+            reportRunId,
         });
 
         // Apply collected cookies to response

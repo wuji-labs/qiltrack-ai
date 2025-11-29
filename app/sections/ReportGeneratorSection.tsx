@@ -7,9 +7,9 @@ import { saveAs } from "file-saver";
 
 import { ProgressBar } from "@/app/components/ProgressBar";
 import { type ProgressState } from "@/hooks/useProgress";
-import { generateReport, searchSymbols } from "@/lib/services/api";
+import { fetchSimilarReports, generateReport, searchSymbols } from "@/lib/services/api";
 import type { Language } from "@/lib/i18n-config";
-import type { ReportResponse, ReportTone, SearchResult } from "@/types/report";
+import type { ReportResponse, ReportTone, SearchResult, SimilarReport } from "@/types/report";
 
 type ToneOption = {
 	id: ReportTone;
@@ -92,6 +92,8 @@ export function ReportGeneratorSection({
 	const [loading, setLoading] = useState(false);
 	const [errorState, setErrorState] = useState<ErrorState | null>(null);
 	const [reportData, setReportData] = useState<ReportResponse | null>(null);
+	const [similarReports, setSimilarReports] = useState<SimilarReport[]>([]);
+	const [loadingSimilar, setLoadingSimilar] = useState(false);
 	const [exportingDocx, setExportingDocx] = useState(false);
 	const [lastReportTone, setLastReportTone] = useState<ReportTone>("baseline");
 	const [placeholderVariant, setPlaceholderVariant] = useState<PlaceholderVariant>("xs");
@@ -137,6 +139,28 @@ export function ReportGeneratorSection({
 		() => t(placeholderKeyByVariant[placeholderVariant]),
 		[placeholderVariant, t]
 	);
+
+	const loadSimilar = async (runId?: string, toneForReport?: ReportTone) => {
+		if (!runId) {
+			setSimilarReports([]);
+			return;
+		}
+		setLoadingSimilar(true);
+		try {
+			const { similar } = await fetchSimilarReports({
+				runId,
+				lang: language,
+				tone: toneForReport,
+				limit: 4,
+			});
+			setSimilarReports(similar ?? []);
+		} catch (err) {
+			console.warn("similar reports fetch failed:", err);
+			setSimilarReports([]);
+		} finally {
+			setLoadingSimilar(false);
+		}
+	};
 
 	useEffect(() => {
 		if (suppressNextSearchRef.current) {
@@ -298,12 +322,14 @@ export function ReportGeneratorSection({
 		setLoading(true);
 		setErrorState(null);
 		setReportData(null);
+		setSimilarReports([]);
 		progress.start(t("generator.progress.init"));
 
 		try {
 			const data = await generateReport({ symbol: raw, lang: language, tone: selectedTone });
 			await progress.complete(t("generator.progress.done"));
 			setReportData(data);
+			void loadSimilar(data.reportRunId, selectedTone);
 			await auth.refreshSession();
 			if (auth.refreshQuota) {
 				await auth.refreshQuota();
@@ -831,6 +857,58 @@ export function ReportGeneratorSection({
 							{JSON.stringify(reportData.companyData, null, 2)}
 						</pre>
 					</details>
+
+					{reportData.reportRunId && (
+						<div className="space-y-3 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/60 p-4">
+							<div className="flex items-center justify-between gap-3">
+								<p className="text-sm uppercase tracking-[0.26em] text-subtle">
+									Similar reports
+								</p>
+								{loadingSimilar && (
+									<span className="inline-flex items-center gap-2 text-xs text-subtle">
+										<span className="h-2 w-2 rounded-full bg-[var(--accent-emerald)] animate-pulse" />
+										Loading
+									</span>
+								)}
+							</div>
+							{!loadingSimilar && similarReports.length === 0 && (
+								<p className="text-sm text-subtle">No similar reports yet.</p>
+							)}
+							{(loadingSimilar || similarReports.length > 0) && (
+								<div className="grid gap-2 sm:grid-cols-2">
+									{loadingSimilar &&
+										[0, 1, 2].map((skeleton) => (
+											<div
+												key={`similar-skeleton-${skeleton}`}
+												className="rounded-xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 p-3 space-y-2"
+											>
+												<div className="h-4 w-1/3 rounded bg-[var(--bg-base)]/70 animate-pulse" />
+												<div className="h-3 w-2/3 rounded bg-[var(--bg-base)]/60 animate-pulse" />
+											</div>
+										))}
+									{!loadingSimilar &&
+										similarReports.map((item) => (
+											<div
+												key={item.report_run_id}
+												className="rounded-xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 p-3"
+											>
+												<div className="flex items-center justify-between gap-2">
+													<p className="text-base font-semibold text-[var(--color-foreground)]">
+														{item.symbol}
+													</p>
+													<span className="text-xs text-subtle">
+														{new Date(item.created_at).toLocaleDateString()}
+													</span>
+												</div>
+												<p className="text-sm text-subtle">
+													Similarity {(item.similarity * 100).toFixed(1)}%
+												</p>
+											</div>
+										))}
+								</div>
+							)}
+						</div>
+					)}
 				</div>
 			) : (
 				<div className="relative overflow-hidden rounded-3xl p-5 sm:p-6 space-y-4 bg-[var(--bg-layer)]/85 border border-[var(--stroke-soft)] shadow-[0_18px_60px_rgba(0,0,0,0.32)]">
