@@ -59,7 +59,7 @@ describe("API services", () => {
 		const data = await fetchCredits();
 		expect(fetchMock).toHaveBeenCalledWith("/api/report/credits");
 		expect(data.credits.remaining_credits).toBe(10);
-		expect(data.source).toBe("v_user_quota");
+		expect(data.source).toBe("report_credits");
 	});
 
 	it("fetchCredits throws unauthorized error with code", async () => {
