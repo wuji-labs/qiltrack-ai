@@ -245,6 +245,21 @@ export default function AccountPage() {
 						</div>
 					</div>
 
+					<div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+						<div className="space-y-1">
+							<p className="text-sm font-semibold text-[var(--color-foreground)]">Report history</p>
+							<p className="text-sm text-subtle">
+								{t("account.page.saveHistory")}
+							</p>
+						</div>
+						<Link
+							href="/account/history"
+							className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-[var(--accent-emerald)] hover:text-[var(--color-foreground)]"
+						>
+							View history
+						</Link>
+					</div>
+
 					<div className="flex flex-wrap gap-3">
 						<Link
 							href="/"

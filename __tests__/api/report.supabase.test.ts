@@ -13,6 +13,22 @@ vi.mock("@/lib/services/quota", () => ({
   writeReportAudit: vi.fn(),
 }));
 
+vi.mock("@/lib/observability/langfuse", () => ({
+  getLangfuseClient: vi.fn(() => null),
+}));
+
+// Mock langfuse dependency to avoid requiring external package
+vi.mock(
+  "langfuse",
+  () => ({
+    Langfuse: vi.fn(() => ({
+      track: vi.fn(),
+      flush: vi.fn(),
+    })),
+  }),
+  { virtual: true }
+);
+
 // Mock global fetch for Finnhub/LLM
 const mockFetch = vi.fn();
 global.fetch = mockFetch;

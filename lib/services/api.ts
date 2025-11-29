@@ -1,5 +1,14 @@
 import type { Language } from "@/lib/i18n-config";
-import type { ReportResponse, ReportTone, SearchResult, SimilarReport } from "@/types/report";
+import type {
+	AdminReportPostPayload,
+	AdminUploadResult,
+	ReportPostResponse,
+	ReportPostsResponse,
+	ReportResponse,
+	ReportTone,
+	SearchResult,
+	SimilarReport,
+} from "@/types/report";
 
 type FetchReportParams = {
 	symbol: string;
@@ -18,6 +27,11 @@ type HistoryResponse = {
 		symbol: string;
 		created_at: string;
 		status: string;
+		markdown_path?: string | null;
+		docx_path?: string | null;
+		markdown_signed_url?: string | null;
+		docx_signed_url?: string | null;
+		mode?: string | null;
 	}>;
 	pagination: {
 		page: number;
@@ -127,4 +141,92 @@ export async function fetchSimilarReports(params: {
 
 	const res = await fetch(`/api/report/similar?${search.toString()}`);
 	return handleJson<{ similar: SimilarReport[] }>(res, "Failed to fetch similar reports");
+}
+
+type ReportPostsQuery = {
+	page?: number;
+	limit?: number;
+	tag?: string;
+	theme?: string;
+	lang?: string;
+	query?: string;
+	status?: string;
+};
+
+/**
+ * Fetch curated report posts list (paginated)
+ */
+export async function fetchReportPosts(
+	params: ReportPostsQuery = {}
+): Promise<ReportPostsResponse> {
+	const search = new URLSearchParams();
+	if (params.page) search.set("page", String(params.page));
+	if (params.limit) search.set("limit", String(params.limit));
+	if (params.tag) search.set("tag", params.tag);
+	if (params.theme) search.set("theme", params.theme);
+	if (params.lang) search.set("lang", params.lang);
+	if (params.query) search.set("q", params.query);
+	if (params.status) search.set("status", params.status);
+
+	const res = await fetch(`/api/report/posts?${search.toString()}`);
+	return handleJson<ReportPostsResponse>(res, "Failed to fetch report posts");
+}
+
+/**
+ * Fetch a single curated report post by slug
+ */
+export async function fetchReportPost(slug: string): Promise<ReportPostResponse> {
+	const res = await fetch(`/api/report/posts/${encodeURIComponent(slug)}`);
+	return handleJson<ReportPostResponse>(res, "Failed to fetch report post");
+}
+
+/**
+ * Admin: create a report post
+ */
+export async function createAdminReportPost(
+	payload: Required<Pick<AdminReportPostPayload, "title" | "slug">> &
+		Omit<AdminReportPostPayload, "title" | "slug">
+): Promise<ReportPostResponse> {
+	const res = await fetch("/api/admin/report/posts", {
+		method: "POST",
+		headers: { "content-type": "application/json" },
+		body: JSON.stringify(payload),
+	});
+	return handleJson<ReportPostResponse>(res, "Failed to create report post");
+}
+
+/**
+ * Admin: update a report post by id or slug
+ */
+export async function updateAdminReportPost(
+	payload: AdminReportPostPayload
+): Promise<ReportPostResponse> {
+	const res = await fetch("/api/admin/report/posts", {
+		method: "PATCH",
+		headers: { "content-type": "application/json" },
+		body: JSON.stringify(payload),
+	});
+	return handleJson<ReportPostResponse>(res, "Failed to update report post");
+}
+
+/**
+ * Admin: upload an asset to Storage and record upload
+ */
+export async function uploadAdminAsset(
+	file: File,
+	options?: { userId?: string; title?: string; note?: string; version?: number; status?: string }
+): Promise<AdminUploadResult> {
+	const form = new FormData();
+	form.append("file", file);
+	if (options?.userId) form.append("userId", options.userId);
+	if (options?.title) form.append("title", options.title);
+	if (options?.note) form.append("note", options.note);
+	if (options?.version) form.append("version", String(options.version));
+	if (options?.status) form.append("status", options.status);
+
+	const res = await fetch("/api/admin/report/upload", {
+		method: "POST",
+		body: form,
+	});
+	return handleJson<AdminUploadResult>(res, "Failed to upload asset");
 }

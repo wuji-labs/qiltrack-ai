@@ -1,64 +1,49 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { headers } from "next/headers";
 import ClientReportContent from "./ClientReportContent";
-import { getAllReports } from "@/lib/content/reportHub";
+import {
+	findSeedReportBySlug,
+	mapApiPostToCard,
+} from "@/lib/content/reportHub";
+import type { ReportCard, ReportPost } from "@/types/report";
 
-// Force dynamic rendering so slug is read from the incoming request (SSG was producing empty params).
+// Force dynamic rendering so we always resolve the latest slug + SSR data
 export const dynamic = "force-dynamic";
 
 type Props = {
 	params: { slug: string };
 };
 
-const matchReport = async (slugRaw: string | string[] | undefined) => {
-	let raw = Array.isArray(slugRaw) ? slugRaw.join("/") : slugRaw || "";
-
-	if (!raw) {
-		const h = await headers();
-		raw =
-			h.get("x-pathname")?.split("/").filter(Boolean).pop() ||
-			h.get("x-matched-path")?.split("/").filter(Boolean).pop() ||
-			h.get("x-invoke-path")?.split("/").filter(Boolean).pop() ||
-			h.get("x-request-path")?.split("/").filter(Boolean).pop() ||
-			"";
-	}
-
-	const slug = decodeURIComponent(raw).trim().toLowerCase();
-	const reports = getAllReports();
-	const match = reports.find((item) => {
-		const symbolMatch = (item.symbol || "").toLowerCase() === slug;
-		const urlSlug = (item.url || "").split("/").filter(Boolean).pop();
-		const urlMatch = (urlSlug || "").toLowerCase() === slug;
-		return symbolMatch || urlMatch;
-	});
-
-	if (process.env.DEBUG_REPORTS === "true") {
-		// Log helpful diagnostics in dev/ops without exposing in UI
-		 
-		const h = await headers();
-		console.log("[reports][slug]", {
-			slugRaw,
-			extracted: raw,
-			slug,
-			match: match?.symbol,
-			symbols: reports.map((r) => r.symbol),
-			headers: {
-				"x-pathname": h.get("x-pathname"),
-				"x-matched-path": h.get("x-matched-path"),
-				"x-invoke-path": h.get("x-invoke-path"),
-				"x-request-path": h.get("x-request-path"),
-				host: h.get("host"),
-				all: Object.fromEntries((await headers()).entries()),
-			},
+async function fetchReportFromApi(slug: string): Promise<ReportCard | null> {
+	try {
+		const res = await fetch(`/api/report/posts/${encodeURIComponent(slug)}`, {
+			cache: "no-store",
 		});
+
+	if (res.status === 404) return null;
+	if (!res.ok) {
+		console.error("Failed to fetch report post", res.status, await res.text());
+		return null;
 	}
 
-	return match;
-};
+	const data = (await res.json()) as { post?: ReportPost };
+	if (!data?.post) return null;
+	return mapApiPostToCard(data.post);
+} catch (err) {
+	console.error("Error fetching report post detail", err);
+	return null;
+}
+}
+
+async function resolveReport(slugRaw: string): Promise<ReportCard | null> {
+	const slug = decodeURIComponent(slugRaw).toLowerCase();
+	const apiReport = await fetchReportFromApi(slug);
+	if (apiReport) return apiReport;
+	return findSeedReportBySlug(slug) ?? null;
+}
 
 export async function generateMetadata({ params }: Props) {
-	const report = await matchReport(params.slug);
+	const report = await resolveReport(params.slug);
 	if (!report) return { title: "Report not found" };
 	return {
 		title: report.title,
@@ -67,7 +52,7 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function ReportDetailPage({ params }: Props) {
-	const report = await matchReport(params.slug);
+	const report = await resolveReport(params.slug);
 	if (!report) return notFound();
 
 	return (
@@ -77,12 +62,15 @@ export default async function ReportDetailPage({ params }: Props) {
 					href="/reports"
 					className="inline-flex items-center gap-2 text-sm text-[var(--accent-emerald)] hover:underline"
 				>
-					← 返回报告
+					鈫?杩斿洖鎶ュ憡
 				</Link>
 				<ClientReportContent report={report} />
 				<div className="text-center">
-					<Link href="/" className="rounded-full border border-[var(--stroke-soft)] px-5 py-3 text-sm font-semibold text-[var(--accent-emerald)]">
-						返回首页
+					<Link
+						href="/"
+						className="rounded-full border border-[var(--stroke-soft)] px-5 py-3 text-sm font-semibold text-[var(--accent-emerald)]"
+					>
+						杩斿洖棣栭〉
 					</Link>
 				</div>
 			</div>
