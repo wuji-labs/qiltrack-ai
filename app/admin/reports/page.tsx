@@ -50,8 +50,9 @@ export default function AdminReportsPage() {
 		const loadProfile = async () => {
 			if (!isAuthenticated || loading) return;
 			const profile = await getUserProfile();
-			if (!cancelled) {
-				setRole((profile?.role as Role) ?? null);
+			if (!cancelled && profile) {
+				const userRole = (profile as any).role as Role;
+				setRole(userRole ?? null);
 			}
 		};
 		void loadProfile();
