@@ -442,16 +442,53 @@ export default function Home() {
 											<Link
 												key={report.symbol}
 												href={report.url}
-												className="rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-4 flex flex-col gap-3 transition-all duration-200 ease-out hover:border-[var(--stroke-glow)]/70 hover:shadow-[0_12px_32px_rgba(0,0,0,0.28)] hover:-translate-y-1"
+												className="rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-4 flex flex-col gap-4 transition-all duration-200 ease-out hover:border-[var(--stroke-glow)]/70 hover:shadow-[0_12px_32px_rgba(0,0,0,0.28)] hover:-translate-y-1"
 											>
-												<div className="flex items-center justify-between">
-													<div>
-														<p className="text-sm uppercase tracking-[0.3em] text-subtle">{report.theme}</p>
-														<h3 className="text-lg font-semibold text-[var(--color-foreground)]">{report.symbol}</h3>
+												<div
+													className="relative overflow-hidden rounded-2xl border border-[var(--stroke-soft)]/80 aspect-[16/9] bg-cover bg-center shadow-[0_10px_28px_rgba(0,0,0,0.2)]"
+													style={{
+														backgroundImage: report.cover,
+														backgroundSize: "cover",
+														backgroundPosition: "center",
+														backgroundRepeat: "no-repeat",
+													}}
+												>
+													<div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/30 to-transparent" aria-hidden />
+													<div className="relative flex items-start justify-between p-3 text-white">
+														<div className="space-y-1">
+															<p className="text-[11px] uppercase tracking-[0.24em] text-emerald-100/90">{report.theme}</p>
+															<p className="text-lg font-semibold leading-tight">{report.symbol}</p>
+														</div>
+														<span className="rounded-full border border-white/30 bg-white/15 px-2.5 py-1 text-xs backdrop-blur">
+															{report.readTime}
+														</span>
 													</div>
-													<span className="text-sm rounded-full border border-emerald-400/50 text-emerald-200 px-2 py-0.5">{report.readTime}</span>
 												</div>
-												<p className={`text-sm leading-relaxed ${strongSubtleText}`}>{report.snippet}</p>
+
+												<div className="space-y-2">
+													<p
+														className="text-base font-semibold text-[var(--color-foreground)] leading-snug"
+														style={{
+															display: "-webkit-box",
+															WebkitLineClamp: 2,
+															WebkitBoxOrient: "vertical",
+															overflow: "hidden",
+														}}
+													>
+														{report.title}
+													</p>
+													<p
+														className={`text-sm leading-relaxed ${strongSubtleText}`}
+														style={{
+															display: "-webkit-box",
+															WebkitLineClamp: 2,
+															WebkitBoxOrient: "vertical",
+															overflow: "hidden",
+														}}
+													>
+														{report.snippet}
+													</p>
+												</div>
 												<div className="flex flex-wrap gap-1 text-xs text-subtle">
 													{report.tags.map((tag) => (
 														<span key={`${report.symbol}-${tag}`} className="rounded-full border border-[var(--stroke-soft)] px-2 py-0.5">
