@@ -10,7 +10,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from "recharts";
 import type { CompanyData } from "@/types/report";
 
@@ -19,7 +18,15 @@ type ChartProps = {
 };
 
 // Custom tooltip styling
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  payload?: Array<{ value: string | number }>;
+  label?: string;
+}) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-[var(--bg-base)] border border-[var(--stroke-soft)] rounded-lg p-3 shadow-lg backdrop-blur-sm">

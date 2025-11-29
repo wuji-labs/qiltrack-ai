@@ -235,7 +235,7 @@ describe("API: /api/report - Supabase Integration", () => {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({
-              data: { remaining_credits: 0 },
+              data: { credits_available: 0 },
               error: null,
             }),
           }),

@@ -59,7 +59,7 @@ export async function getAuthContext(
 
   return {
     userId: session.user.id,
-    role: (profile as any)?.role ?? null,
+    role: (profile as { role?: Database["public"]["Tables"]["profiles"]["Row"]["role"] })?.role ?? null,
   };
 }
 

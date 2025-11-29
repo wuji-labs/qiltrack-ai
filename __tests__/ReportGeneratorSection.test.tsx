@@ -304,7 +304,12 @@ describe("ReportGeneratorSection", () => {
 		mockGenerateReport.mockResolvedValueOnce({
 			symbol: "AAPL",
 			report: "# Test Report\nContent",
-			companyData: { profile: { name: "Apple" } },
+			companyData: {
+				profile: { name: "Apple" },
+				quote: {},
+				metrics: {},
+				recentNews: [],
+			},
 		} as unknown as Awaited<ReturnType<typeof apiModule.generateReport>>);
 
 		renderGenerator({

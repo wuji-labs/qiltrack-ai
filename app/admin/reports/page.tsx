@@ -51,7 +51,7 @@ export default function AdminReportsPage() {
 			if (!isAuthenticated || loading) return;
 			const profile = await getUserProfile();
 			if (!cancelled && profile) {
-				const userRole = (profile as any).role as Role;
+				const userRole = (profile as { role?: Role }).role;
 				setRole(userRole ?? null);
 			}
 		};

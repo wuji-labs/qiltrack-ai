@@ -84,7 +84,7 @@ describe("lib/services/quota", () => {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({
-          data: { remaining_credits: 10 },
+          data: { credits_available: 10 },
           error: null,
         }),
       };
