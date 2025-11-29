@@ -18,8 +18,14 @@ import type { Database } from "@/types/database";
  * Note: @supabase/ssr automatically discovers the session cookie names.
  * We provide a simple pass-through cookie interface without hardcoding names.
  */
+type CookieGetter = (name: string) => { value: string } | undefined;
+type CookieStore = {
+  getAll: () => Array<{ name: string; value: string }>;
+  get?: (name: string) => { value: string } | undefined;
+};
+
 export function createServerClient(
-  cookieGetter: (name: string) => { value: string } | undefined,
+  cookieSource: CookieStore | CookieGetter,
   cookieSetter?: (cookiesToSet: Array<{ name: string; value: string; options?: unknown }>) => void
 ) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -36,33 +42,42 @@ export function createServerClient(
     );
   }
 
-  // @supabase/ssr createServerClient handles cookies via getAll/setAll
-  // getAll: retrieves session cookies from request (names determined by Supabase)
-  // setAll: returns updated cookies to be set in response
+  const isStore = typeof cookieSource === "object" && cookieSource !== null && "getAll" in cookieSource;
+  const cookieStore = isStore ? (cookieSource as CookieStore) : null;
+  const cookieGetter = isStore ? undefined : (cookieSource as CookieGetter);
+
+  // Collect all cookies from request; fall back to a minimal list if only getter is provided
+  const getAllCookies = () => {
+    if (cookieStore) {
+      return cookieStore.getAll().map(({ name, value }) => ({ name, value }));
+    }
+
+    const commonNames = [
+      "sb-auth-token",
+      "sb-session",
+      "sb_auth_token",
+      "sb_session",
+    ];
+    const cookieList: Array<{ name: string; value: string }> = [];
+    for (const name of commonNames) {
+      const cookie = cookieGetter?.(name);
+      if (cookie?.value) {
+        cookieList.push({ name, value: cookie.value });
+      }
+    }
+    return cookieList;
+  };
+
   return createServerClientBase<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      getAll() {
-        // Return all cookies from the request
-        // This is a simple array interface - @supabase/ssr will query what it needs
-        const cookieList: Array<{ name: string; value: string }> = [];
-
-        // Common Supabase session cookie names - but don't restrict to only these
-        // @supabase/ssr will query for specific names via getAll pattern
-        const commonNames = [
-          "sb-auth-token",
-          "sb-session",
-          "sb_auth_token",
-          "sb_session",
-        ];
-
-        for (const name of commonNames) {
-          const cookie = cookieGetter(name);
-          if (cookie?.value) {
-            cookieList.push({ name, value: cookie.value });
-          }
+      getAll: getAllCookies,
+      get(name: string) {
+        if (cookieStore && typeof cookieStore.get === "function") {
+          const cookie = cookieStore.get(name);
+          return cookie ? { name, value: cookie.value } : undefined;
         }
-
-        return cookieList;
+        const found = getAllCookies().find((cookie) => cookie.name === name);
+        return found ? { name: found.name, value: found.value } : undefined;
       },
       setAll(cookiesToSet) {
         // Pass updated cookies to response handler if provided
@@ -112,7 +127,7 @@ export async function uploadToStorage(
   client: ReturnType<typeof createServiceRoleClient>,
   bucket: string,
   path: string,
-  data: string | Blob
+  data: string | Blob | Buffer
 ) {
   const { error: uploadError } = await client.storage
     .from(bucket)

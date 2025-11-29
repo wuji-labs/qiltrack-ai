@@ -40,7 +40,7 @@ describe("lib/supabase/server", () => {
 
       try {
         createServerClient({
-          get: () => undefined,
+          getAll: () => [],
         });
         expect.fail("Should have thrown");
       } catch (err) {
@@ -57,7 +57,7 @@ describe("lib/supabase/server", () => {
 
       try {
         createServerClient({
-          get: () => undefined,
+          getAll: () => [],
         });
         expect.fail("Should have thrown");
       } catch (err) {
@@ -73,7 +73,7 @@ describe("lib/supabase/server", () => {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "test-key";
 
       const client = createServerClient({
-        get: () => undefined,
+        getAll: () => [],
       });
 
       expect(client).toBeDefined();

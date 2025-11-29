@@ -7,15 +7,9 @@ export async function GET(request: NextRequest) {
     const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
 
     // Get Supabase server client with cookie handling
-    const supabase = createServerClient(
-      (name: string) => {
-        const cookieValue = request.cookies.get(name)?.value;
-        return cookieValue ? { value: cookieValue } : undefined;
-      },
-      (cookies) => {
-        responseCookies.push(...cookies);
-      }
-    );
+    const supabase = createServerClient(request.cookies, (cookies) => {
+      responseCookies.push(...cookies);
+    });
 
     // Get user session
     const {

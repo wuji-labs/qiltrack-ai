@@ -229,15 +229,9 @@ export async function GET(request: NextRequest) {
     const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
 
     // Get Supabase server client with cookie handling
-    const supabase = createServerClient(
-      (name: string) => {
-        const cookieValue = request.cookies.get(name)?.value;
-        return cookieValue ? { value: cookieValue } : undefined;
-      },
-      (cookies) => {
-        responseCookies.push(...cookies);
-      }
-    );
+    const supabase = createServerClient(request.cookies, (cookies) => {
+      responseCookies.push(...cookies);
+    });
 
     let userId: string | null = null;
 
@@ -613,7 +607,7 @@ ${JSON.stringify(companyData, null, 2)}
 
               // Upload Markdown to Storage in test mode
               const bucketName = process.env.SUPABASE_STORAGE_REPORT_BUCKET || "report-assets";
-              const markdownPath = `${userId}/${reportRunId}.md`;
+              const markdownPath = `${userId}/${reportRunId}/document.md`;
 
               try {
                 const serviceRoleClient = createServiceRoleClient();
@@ -684,7 +678,7 @@ ${JSON.stringify(companyData, null, 2)}
 
             // Upload Markdown to Storage
             const bucketName = process.env.SUPABASE_STORAGE_REPORT_BUCKET || "report-assets";
-            const markdownPath = `${userId}/${reportRunId}.md`;
+            const markdownPath = `${userId}/${reportRunId}/document.md`;
 
             try {
               const serviceRoleClient = createServiceRoleClient();

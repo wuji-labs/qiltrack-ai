@@ -3,6 +3,11 @@ import { createServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
   try {
+    const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
+    const supabase = createServerClient(request.cookies, (cookies) => {
+      responseCookies.push(...cookies);
+    });
+
     // Check for test bypass (same as /api/report)
     const testToken = process.env.TEST_REPORT_TOKEN || "local-test-token";
     const tokenFromHeader = request.headers.get("x-test-token");
@@ -12,12 +17,6 @@ export async function GET(request: NextRequest) {
     let userId: string | null = null;
 
     if (!isTestBypass) {
-      // Get Supabase server client
-      const supabase = createServerClient((name: string) => {
-        const cookieValue = request.cookies.get(name)?.value;
-        return cookieValue ? { value: cookieValue } : undefined;
-      });
-
       // Get user session
       const {
         data: { session },
@@ -25,7 +24,9 @@ export async function GET(request: NextRequest) {
       } = await supabase.auth.getSession();
 
       if (sessionError || !session?.user?.id) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        const response = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));
+        return response;
       }
 
       userId = session.user.id;
@@ -33,12 +34,6 @@ export async function GET(request: NextRequest) {
       // Test mode: use test user ID
       userId = "00000000-0000-0000-0000-000000000001";
     }
-
-    // Get Supabase server client for quota query
-    const supabase = createServerClient((name: string) => {
-      const cookieValue = request.cookies.get(name)?.value;
-      return cookieValue ? { value: cookieValue } : undefined;
-    });
 
     // Query v_user_quota view for real-time remaining credits
     // This view is synced with report_credits table via fn_consume_report_credit
@@ -56,21 +51,23 @@ export async function GET(request: NextRequest) {
 
       if (quotaError) {
         console.error("Failed to fetch quota:", quotaError);
-        return NextResponse.json(
-          { error: "Failed to fetch quota information" },
-          { status: 500 }
-        );
+        const response = NextResponse.json({ error: "Failed to fetch quota information" }, { status: 500 });
+        responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));
+        return response;
       }
 
       quotaData = data;
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       userId,
       credits: {
         remaining_credits: quotaData?.remaining_credits ?? 0,
       },
     });
+
+    responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));
+    return response;
   } catch (err) {
     console.error("Credits API error:", err);
     return NextResponse.json(
