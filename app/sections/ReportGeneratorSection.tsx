@@ -10,6 +10,8 @@ import { type ProgressState } from "@/hooks/useProgress";
 import { fetchSimilarReports, generateReport, searchSymbols } from "@/lib/services/api";
 import type { Language } from "@/lib/i18n-config";
 import type { ReportResponse, ReportTone, SearchResult, SimilarReport } from "@/types/report";
+import KpiCard from "@/components/KpiCard";
+import { PricePerformanceChart, ValuationMetricsChart, NewsTimelineWidget } from "@/components/ReportCharts";
 
 type ToneOption = {
 	id: ReportTone;
@@ -233,7 +235,7 @@ export function ReportGeneratorSection({
 			void node;
 			return (
 				<h1
-					className="text-2xl font-bold mt-6 mb-3 text-emerald-300 border-b border-[var(--stroke-soft)] pb-2"
+					className="text-3xl sm:text-4xl font-bold mt-8 mb-6 text-[var(--accent-emerald)] border-b-2 border-[var(--accent-emerald)]/30 pb-3"
 					{...props}
 				/>
 			);
@@ -241,42 +243,54 @@ export function ReportGeneratorSection({
 		h2: ({ node, ...props }) => {
 			void node;
 			return (
-				<h2 className="text-xl font-semibold mt-5 mb-2 text-[var(--color-foreground)]" {...props} />
+				<h2 className="text-2xl font-semibold mt-8 mb-4 text-[var(--color-foreground)] border-l-4 border-[var(--accent-emerald)] pl-4" {...props} />
 			);
 		},
 		h3: ({ node, ...props }) => {
 			void node;
 			return (
-				<h3 className="text-lg font-semibold mt-4 mb-2 text-[var(--color-foreground)]" {...props} />
+				<h3 className="text-xl font-semibold mt-6 mb-3 text-[var(--text-dim)]" {...props} />
 			);
 		},
 		p: ({ node, ...props }) => {
 			void node;
-			return <p className="leading-relaxed text-[13px] sm:text-[14px] mb-2" {...props} />;
+			return <p className="leading-relaxed text-[14px] sm:text-[16px] mb-4 text-[var(--text-subtle)]" {...props} />;
 		},
 		li: ({ node, ...props }) => {
 			void node;
 			return (
-				<li className="leading-relaxed text-[13px] sm:text-[14px] mb-1 list-disc ml-5" {...props} />
+				<li className="leading-relaxed text-[14px] sm:text-[16px] mb-2 flex items-start gap-3">
+					<span className="text-[var(--accent-emerald)] mt-1">•</span>
+					<span {...props} />
+				</li>
 			);
 		},
 		strong: ({ node, ...props }) => {
 			void node;
-			return <strong className="font-semibold text-[var(--color-foreground)]" {...props} />;
+			return <strong className="font-semibold text-[var(--accent-emerald)]" {...props} />;
 		},
 		ul: ({ node, ...props }) => {
 			void node;
-			return <ul className="mb-2" {...props} />;
+			return <ul className="mb-4 space-y-1 list-none" {...props} />;
 		},
 		ol: ({ node, ...props }) => {
 			void node;
-			return <ol className="mb-2 list-decimal ml-5" {...props} />;
+			return <ol className="mb-4 space-y-2 list-decimal ml-6" {...props} />;
 		},
 		code: ({ node, ...props }) => {
 			void node;
 			return (
 				<code
-					className="px-1 py-0.5 rounded bg-[var(--bg-layer)]/80 text-[12px] text-emerald-200"
+					className="px-2 py-1 rounded-md bg-[var(--bg-layer)]/80 border border-[var(--stroke-soft)] text-[13px] text-emerald-200 font-mono"
+					{...props}
+				/>
+			);
+		},
+		blockquote: ({ node, ...props }) => {
+			void node;
+			return (
+				<blockquote
+					className="border-l-4 border-[var(--accent-emerald)]/50 pl-4 pr-4 py-2 my-4 italic text-[var(--text-dim)] bg-[var(--bg-layer)]/50 rounded-r-lg"
 					{...props}
 				/>
 			);
@@ -862,7 +876,95 @@ export function ReportGeneratorSection({
 						</div>
 					</div>
 
-					<div ref={reportContentRef} className="text-base sm:text-lg leading-relaxed text-dim">
+					{/* KPI Dashboard */}
+					<div className="space-y-4">
+						<h2 className="text-xl font-semibold uppercase tracking-wider text-[var(--color-foreground)] mb-4">
+							Key Metrics
+						</h2>
+						<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+							<KpiCard
+								label="Market Cap"
+								value={reportData.companyData.profile.marketCapitalization
+									? `$${(reportData.companyData.profile.marketCapitalization / 1000).toFixed(1)}B`
+									: "N/A"}
+								icon="💼"
+								tone="neutral"
+							/>
+							<KpiCard
+								label="P/E Ratio"
+								value={reportData.companyData.metrics.peTTM?.toFixed(2) ?? "N/A"}
+								icon="📊"
+								tone={
+									reportData.companyData.metrics.peTTM
+										? reportData.companyData.metrics.peTTM > 30
+											? "warning"
+											: reportData.companyData.metrics.peTTM < 15
+												? "positive"
+												: "neutral"
+										: "neutral"
+								}
+								helper="TTM"
+							/>
+							<KpiCard
+								label="Current Price"
+								value={reportData.companyData.quote.current
+									? `$${reportData.companyData.quote.current.toFixed(2)}`
+									: "N/A"}
+								icon="💰"
+								tone={
+									reportData.companyData.quote.change
+										? reportData.companyData.quote.change > 0
+											? "positive"
+											: "negative"
+										: "neutral"
+								}
+								trend={
+									reportData.companyData.quote.change
+										? reportData.companyData.quote.change > 0
+											? "up"
+											: reportData.companyData.quote.change < 0
+												? "down"
+												: "flat"
+										: undefined
+								}
+								helper={reportData.companyData.quote.changePercent
+									? `${reportData.companyData.quote.changePercent > 0 ? '+' : ''}${reportData.companyData.quote.changePercent.toFixed(2)}%`
+									: undefined}
+							/>
+							<KpiCard
+								label="ROE"
+								value={reportData.companyData.metrics.roeTTM
+									? `${reportData.companyData.metrics.roeTTM.toFixed(2)}%`
+									: "N/A"}
+								icon="📈"
+								tone={
+									reportData.companyData.metrics.roeTTM
+										? reportData.companyData.metrics.roeTTM > 15
+											? "positive"
+											: reportData.companyData.metrics.roeTTM > 10
+												? "neutral"
+												: "warning"
+										: "neutral"
+								}
+								helper="Return on Equity"
+							/>
+						</div>
+					</div>
+
+					{/* Charts Section */}
+					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+						<PricePerformanceChart companyData={reportData.companyData} />
+						<ValuationMetricsChart companyData={reportData.companyData} />
+					</div>
+
+					{/* News Timeline */}
+					{reportData.companyData.recentNews && reportData.companyData.recentNews.length > 0 && (
+						<div className="mt-6">
+							<NewsTimelineWidget companyData={reportData.companyData} />
+						</div>
+					)}
+
+					<div ref={reportContentRef} className="text-base sm:text-lg leading-relaxed text-dim mt-8">
 						<ReactMarkdown components={markdownComponents}>{reportData.report}</ReactMarkdown>
 					</div>
 

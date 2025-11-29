@@ -6,10 +6,11 @@ const COVER_SIGN_TTL = 60 * 30; // 30 minutes
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   const context = initSupabase(_request);
-  const slug = decodeURIComponent(params.slug);
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
 
   try {
     const { role } = await getAuthContext(context);
