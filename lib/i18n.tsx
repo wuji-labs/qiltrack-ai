@@ -638,7 +638,7 @@ const translations: Record<string, TranslationEntry> = {
 		"ja": " 米国ティッカーや社名を入力（例: NVDA / TSLA）",
 		"ko": " 미국 티커나 회사명을 입력하세요 (예: NVDA / TSLA)",
 		"zh-Hant": "請輸入美股代號或公司名，例如 NVDA / TSLA",
-		"zh-Hans": "请输入美股代码或公司名，例如 NVDA / TSLA",
+		"zh-Hans": "请输入美股代码或公司名，例如 NVDA / Apple",
 	},
 	"generator.submit": {
 		"en": "Generate AI report",
