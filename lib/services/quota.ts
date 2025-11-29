@@ -47,9 +47,12 @@ export async function consumeReportCredit(
       };
     }
 
+    // RPC returns an array, take the first result
+    const result = Array.isArray(data) ? data[0] : data;
+
     return {
       success: true,
-      remainingCredits: data?.remaining_credits ?? 0,
+      remainingCredits: result?.remaining_credits ?? 0,
       mode: "production",
     };
   } catch (err) {
@@ -63,7 +66,7 @@ export async function consumeReportCredit(
 
 /**
  * Get current user's remaining credits without consuming
- * Reads from v_user_quota view for consistency with RPC function
+ * Reads from report_credits table for consistency with RPC function
  * @param userId User ID from Supabase auth
  */
 export async function getRemainingCredits(userId: string): Promise<number> {
@@ -71,8 +74,8 @@ export async function getRemainingCredits(userId: string): Promise<number> {
     const supabase = createServiceRoleClient();
 
     const { data, error } = await supabase
-      .from("v_user_quota")
-      .select("remaining_credits")
+      .from("report_credits")
+      .select("credits_available")
       .eq("user_id", userId)
       .single();
 
@@ -81,7 +84,7 @@ export async function getRemainingCredits(userId: string): Promise<number> {
       return 0;
     }
 
-    return data.remaining_credits ?? 0;
+    return data.credits_available ?? 0;
   } catch (err) {
     console.error("Quota fetch error:", err);
     return 0;

@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import type { Database } from "@/types/database";
 
 export async function GET(request: NextRequest) {
   try {
-    const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
-    const supabase = createServerClient(request.cookies, (cookies) => {
-      responseCookies.push(...cookies);
-    });
-
     // Check for test bypass (same as /api/report)
     const testToken = process.env.TEST_REPORT_TOKEN || "local-test-token";
     const tokenFromHeader = request.headers.get("x-test-token");
@@ -17,7 +14,12 @@ export async function GET(request: NextRequest) {
     let userId: string | null = null;
 
     if (!isTestBypass) {
-      // Get user session
+      // Get user session using the same approach as auth callback
+      const cookieStore = await cookies();
+      const supabase = createRouteHandlerClient<Database>({
+        cookies: () => cookieStore,
+      });
+
       const {
         data: { session },
         error: sessionError,
@@ -25,57 +27,52 @@ export async function GET(request: NextRequest) {
 
       if (sessionError || !session?.user?.id) {
         console.warn(`[UNAUTHORIZED_SESSION] error: ${sessionError?.message || 'no session'}`);
-        const response = NextResponse.json(
+        return NextResponse.json(
           { error: "Unauthorized", code: "unauthorized" },
           { status: 401 }
         );
-        responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));
-        return response;
       }
 
       userId = session.user.id;
-    } else {
-      // Test mode: use test user ID
-      userId = "00000000-0000-0000-0000-000000000001";
-    }
 
-    // Query v_user_quota view for real-time remaining credits
-    // This view is synced with report_credits table via fn_consume_report_credit
-    let quotaData;
+      // Query report_credits table for real-time remaining credits
+      const cookieStoreForQuery = await cookies();
+      const supabaseForQuery = createRouteHandlerClient<Database>({
+        cookies: () => cookieStoreForQuery,
+      });
 
-    if (isTestBypass) {
-      // Test mode: return mock quota
-      quotaData = { remaining_credits: 999 };
-    } else {
-      const { data, error: quotaError } = await supabase
-        .from("v_user_quota")
-        .select("remaining_credits")
+      const { data, error: quotaError } = await supabaseForQuery
+        .from("report_credits")
+        .select("credits_available")
         .eq("user_id", userId)
         .single();
 
       if (quotaError) {
         console.warn(`[QUOTA_FETCH_FAILED] user_id: ${userId}, error: ${quotaError.message}`);
-        const response = NextResponse.json(
+        return NextResponse.json(
           { error: "Failed to fetch quota information", code: "quota_fetch_failed" },
           { status: 500 }
         );
-        responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));
-        return response;
       }
 
-      quotaData = data;
+      return NextResponse.json({
+        userId,
+        credits: {
+          remaining_credits: data?.credits_available ?? 0,
+        },
+        source: "report_credits",
+      });
+    } else {
+      // Test mode: return mock quota
+      userId = "00000000-0000-0000-0000-000000000001";
+      return NextResponse.json({
+        userId,
+        credits: {
+          remaining_credits: 999,
+        },
+        source: "report_credits",
+      });
     }
-
-    const response = NextResponse.json({
-      userId,
-      credits: {
-        remaining_credits: quotaData?.remaining_credits ?? 0,
-      },
-      source: "v_user_quota",
-    });
-
-    responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));
-    return response;
   } catch (err) {
     console.error("Credits API error:", err);
     return NextResponse.json(

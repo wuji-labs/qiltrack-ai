@@ -258,8 +258,8 @@ export async function GET(request: NextRequest) {
 
       // Check quota before attempting to generate
       const { data: quotaData, error: quotaError } = await supabase
-        .from("v_user_quota")
-        .select("remaining_credits")
+        .from("report_credits")
+        .select("credits_available")
         .eq("user_id", userId)
         .single();
 
@@ -275,8 +275,8 @@ export async function GET(request: NextRequest) {
         return response;
       }
 
-      if (!quotaData || quotaData.remaining_credits <= 0) {
-        console.info(`[QUOTA_EXHAUSTED] user_id: ${userId}, remaining: ${quotaData?.remaining_credits ?? 0}`);
+      if (!quotaData || quotaData.credits_available <= 0) {
+        console.info(`[QUOTA_EXHAUSTED] user_id: ${userId}, remaining: ${quotaData?.credits_available ?? 0}`);
         const response = NextResponse.json(
           { error: "Quota exceeded", code: "quota_exceeded" },
           { status: 429 }

@@ -49,7 +49,9 @@ export function createServerClient(
   // Collect all cookies from request; fall back to a minimal list if only getter is provided
   const getAllCookies = () => {
     if (cookieStore) {
-      return cookieStore.getAll().map(({ name, value }) => ({ name, value }));
+      const allCookies = cookieStore.getAll().map(({ name, value }) => ({ name, value }));
+      console.log("[DEBUG createServerClient] getAllCookies returned:", allCookies.length, "cookies");
+      return allCookies;
     }
 
     const commonNames = [
@@ -65,6 +67,7 @@ export function createServerClient(
         cookieList.push({ name, value: cookie.value });
       }
     }
+    console.log("[DEBUG createServerClient] getAllCookies (fallback) returned:", cookieList.length, "cookies");
     return cookieList;
   };
 

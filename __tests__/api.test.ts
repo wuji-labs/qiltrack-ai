@@ -51,7 +51,7 @@ describe("API services", () => {
 			json: async () => ({
 				userId: "test-user",
 				credits: { remaining_credits: 10 },
-				source: "v_user_quota",
+				source: "report_credits",
 			}),
 		});
 		vi.stubGlobal("fetch", fetchMock);
