@@ -1,5 +1,5 @@
 import type { Language } from "@/lib/i18n-config";
-import type { ReportResponse, ReportTone, SearchResult } from "@/types/report";
+import type { ReportResponse, ReportTone, SearchResult, SimilarReport } from "@/types/report";
 
 type FetchReportParams = {
 	symbol: string;
@@ -112,4 +112,19 @@ export async function fetchReportHistory(
 export async function fetchCredits(): Promise<CreditsResponse> {
 	const res = await fetch("/api/report/credits");
 	return handleJson<CreditsResponse>(res, "Failed to fetch credits");
+}
+
+export async function fetchSimilarReports(params: {
+	runId: string;
+	lang?: Language;
+	tone?: ReportTone;
+	limit?: number;
+}): Promise<{ similar: SimilarReport[] }> {
+	const search = new URLSearchParams({ runId: params.runId });
+	if (params.lang) search.set("lang", params.lang);
+	if (params.tone) search.set("tone", params.tone);
+	if (params.limit) search.set("limit", String(params.limit));
+
+	const res = await fetch(`/api/report/similar?${search.toString()}`);
+	return handleJson<{ similar: SimilarReport[] }>(res, "Failed to fetch similar reports");
 }

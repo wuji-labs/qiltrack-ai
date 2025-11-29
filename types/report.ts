@@ -63,6 +63,7 @@ export type ReportResponse = {
 	report: string;
 	companyData: CompanyData;
 	remainingQuota?: number;
+	reportRunId?: string;
 };
 
 export type SearchResult = {
@@ -86,4 +87,11 @@ export type ReportSummary = {
 	cover: string;
 	readTime: string;
 	body: string[];
+};
+
+export type SimilarReport = {
+	report_run_id: string;
+	symbol: string;
+	created_at: string;
+	similarity: number;
 };
