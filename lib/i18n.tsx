@@ -1743,6 +1743,13 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hant": "返回報告目錄",
 		"zh-Hans": "返回报告目录",
 	},
+	"reports.detail.home": {
+		"en": "Back to home",
+		"ja": "ホームに戻る",
+		"ko": "홈으로 돌아가기",
+		"zh-Hant": "返回首頁",
+		"zh-Hans": "返回首页",
+	},
 	"reports.detail.readTime": {
 		"en": "read",
 		"ja": "読了",
