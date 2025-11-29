@@ -180,20 +180,24 @@ export default function Home() {
 	const progress = useProgress();
 	const [selectedTone, setSelectedTone] = useState<ReportTone>("baseline");
 	const [remainingQuota, setRemainingQuota] = useState(0);
+	const [quotaLoaded, setQuotaLoaded] = useState(false);
 
 	// Fetch remaining credits on mount and when authenticated
 	useEffect(() => {
 		const loadCredits = async () => {
 			if (!isAuthenticated) {
 				setRemainingQuota(0);
+				setQuotaLoaded(true);
 				return;
 			}
 			try {
 				const creditsData = await fetchCredits();
 				setRemainingQuota(creditsData.credits?.remaining_credits ?? 0);
+				setQuotaLoaded(true);
 			} catch (err) {
 				console.error("Failed to load credits:", err);
 				setRemainingQuota(0);
+				setQuotaLoaded(true);
 			}
 		};
 
@@ -259,11 +263,13 @@ export default function Home() {
 
 	const planLabel = user?.user_metadata?.plan && user?.user_metadata?.plan !== "free" ? user?.user_metadata?.plan : t("quota.plan.free");
 
-	// Refresh quota from API
+	// Refresh quota from API and refresh session
 	const refreshQuota = async () => {
 		try {
+			await refreshSession();
 			const creditsData = await fetchCredits();
 			setRemainingQuota(creditsData.credits?.remaining_credits ?? 0);
+			setQuotaLoaded(true);
 		} catch (err) {
 			console.error("Failed to refresh credits:", err);
 		}
@@ -346,6 +352,7 @@ export default function Home() {
 										auth={{
 											isAuthenticated: isAuthenticated,
 											remainingQuota: remainingQuota,
+											quotaLoaded: quotaLoaded,
 											planLabel,
 											userEmail: user?.email,
 											refreshSession: refreshSession,

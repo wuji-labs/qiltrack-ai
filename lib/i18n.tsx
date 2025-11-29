@@ -2961,6 +2961,20 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hant": "無法取得額度資訊，請重試。",
 		"zh-Hans": "无法获取额度信息，请重试。",
 	},
+	"quota.status.mismatch": {
+		"en": "Detected quota mismatch, refresh session and retry",
+		"ja": "額度の不一致が検出されました。セッションを更新して再試行してください。",
+		"ko": "쿼터 불일치가 감지되었습니다. 세션을 새로 고치고 다시 시도하세요.",
+		"zh-Hant": "檢測到配額未同步，請刷新會話後重試",
+		"zh-Hans": "检测到配额未同步，请刷新会话后重试",
+	},
+	"quota.status.refreshing": {
+		"en": "Refreshing session and quota...",
+		"ja": "セッションと額度を同期中...",
+		"ko": "세션과 쿼터를 새로 고치는 중...",
+		"zh-Hant": "正在同步會話與額度...",
+		"zh-Hans": "正在同步会话与额度...",
+	},
 } as const satisfies Record<string, TranslationEntry>;
 
 export type TranslationKey = keyof typeof translations;

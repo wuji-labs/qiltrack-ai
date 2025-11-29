@@ -24,7 +24,11 @@ export async function GET(request: NextRequest) {
       } = await supabase.auth.getSession();
 
       if (sessionError || !session?.user?.id) {
-        const response = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        console.warn(`[UNAUTHORIZED_SESSION] error: ${sessionError?.message || 'no session'}`);
+        const response = NextResponse.json(
+          { error: "Unauthorized", code: "unauthorized" },
+          { status: 401 }
+        );
         responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));
         return response;
       }
@@ -50,8 +54,11 @@ export async function GET(request: NextRequest) {
         .single();
 
       if (quotaError) {
-        console.error("Failed to fetch quota:", quotaError);
-        const response = NextResponse.json({ error: "Failed to fetch quota information" }, { status: 500 });
+        console.warn(`[QUOTA_FETCH_FAILED] user_id: ${userId}, error: ${quotaError.message}`);
+        const response = NextResponse.json(
+          { error: "Failed to fetch quota information", code: "quota_fetch_failed" },
+          { status: 500 }
+        );
         responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));
         return response;
       }
@@ -64,6 +71,7 @@ export async function GET(request: NextRequest) {
       credits: {
         remaining_credits: quotaData?.remaining_credits ?? 0,
       },
+      source: "v_user_quota",
     });
 
     responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));

@@ -336,15 +336,30 @@ export function ReportGeneratorSection({
 			}
 		} catch (err) {
 			console.error("调用接口异常:", err);
-			const message = err instanceof Error ? err.message : t("error.submit.generic");
-			const normalized = (message || "").toLowerCase();
-			if (normalized.includes("unauthorized")) {
-				setErrorState({ type: "unauthorized", message: t("quota.error.unauthorized") });
+			const error = err instanceof Error ? err : { message: "", code: undefined };
+			const message = error.message || t("error.submit.generic");
+			const errorCode = (error as { code?: string; statusCode?: number }).code;
+			const statusCode = (error as { code?: string; statusCode?: number }).statusCode;
+
+			// Handle error codes from API
+			if (errorCode === "unauthorized" || statusCode === 401) {
+				setErrorState({ type: "unauthorized", message: t("quota.status.mismatch") });
 				onRequireLogin();
-			} else if (normalized.includes("quota exceeded") || normalized.includes("429")) {
+			} else if (errorCode === "quota_exceeded" || statusCode === 429) {
 				setErrorState({ type: "quota", message: t("generator.alert.quota") });
+			} else if (errorCode === "quota_fetch_failed") {
+				setErrorState({ type: "generic", message: t("quota.error.generic") });
 			} else {
-				setErrorState({ type: "generic", message });
+				// Fallback to string matching for other cases
+				const normalized = (message || "").toLowerCase();
+				if (normalized.includes("unauthorized")) {
+					setErrorState({ type: "unauthorized", message: t("quota.status.mismatch") });
+					onRequireLogin();
+				} else if (normalized.includes("quota exceeded") || normalized.includes("429")) {
+					setErrorState({ type: "quota", message: t("generator.alert.quota") });
+				} else {
+					setErrorState({ type: "generic", message });
+				}
 			}
 			progress.fail(message);
 		} finally {
