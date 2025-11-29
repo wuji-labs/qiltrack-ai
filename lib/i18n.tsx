@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { createContext, startTransition, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
@@ -631,7 +631,7 @@ const translations: Record<string, TranslationEntry> = {
 		"ja": " ティッカー/社名を入力（例: NVDA / TSLA）",
 		"ko": " 티커/회사명을 입력하세요 (예: NVDA / TSLA)",
 		"zh-Hant": "請輸入代號/公司，例如 NVDA / TSLA",
-		"zh-Hans": "请输入代码/公司，例如 NVDA / TSLA",
+		"zh-Hans": "请输入代码/公司，例如 NVDA / Apple",
 	},
 	"generator.input.placeholder.md": {
 		"en": " Enter a US ticker or company, e.g. NVDA / TSLA",
