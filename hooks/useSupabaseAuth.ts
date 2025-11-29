@@ -3,7 +3,38 @@
 import { useCallback, useEffect, useState } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import type { Session, User } from "@supabase/auth-helpers-nextjs";
+
 import type { Database } from "@/types/database";
+
+type AuthResult =
+  | { success: true }
+  | { success: false; error?: string; status?: number; code?: "cooldown" | "invalid_email" };
+
+const AUTH_CALLBACK_PATH = "/api/auth/callback";
+
+function mapAuthError(error: unknown): AuthResult {
+  if (!error) return { success: false };
+  if (typeof error === "object" && error !== null && "message" in error) {
+    const status =
+      typeof (error as { status?: number }).status === "number"
+        ? (error as { status?: number }).status
+        : undefined;
+    const message = String((error as { message?: string }).message ?? "Unknown error");
+    const normalizedMessage = message.toLowerCase();
+    return {
+      success: false,
+      error: message,
+      status,
+      code:
+        status === 429
+          ? "cooldown"
+          : normalizedMessage.includes("invalid email")
+            ? "invalid_email"
+            : undefined,
+    };
+  }
+  return { success: false, error: String(error) };
+}
 
 export function useSupabaseAuth() {
   const supabase = createClientComponentClient<Database>();
@@ -12,7 +43,6 @@ export function useSupabaseAuth() {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Fetch initial session
   useEffect(() => {
     const getSession = async () => {
       try {
@@ -41,30 +71,22 @@ export function useSupabaseAuth() {
 
     getSession();
 
-    // 监听认证状态变化
-    const { data } = supabase.auth.onAuthStateChange(
-      (_event, currentSession) => {
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-        setIsAuthenticated(!!currentSession);
-      }
-    );
+    const { data } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+      setIsAuthenticated(!!currentSession);
+    });
 
     return () => {
       data?.subscription.unsubscribe();
     };
   }, [supabase]);
 
-  // Get user profile
   const getUserProfile = useCallback(async () => {
     if (!user) return null;
 
     try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
+      const { data, error } = await supabase.from("profiles").select("*").eq("id", user.id).single();
 
       if (error) {
         console.error("获取用户资料失败:", error);
@@ -78,78 +100,75 @@ export function useSupabaseAuth() {
     }
   }, [user, supabase]);
 
-  // Get report credits
   const getReportCredits = useCallback(async () => {
     if (!user) return null;
 
     try {
-      const { data, error } = await supabase
-        .from("report_credits")
-        .select("*")
-        .eq("user_id", user.id)
-        .single();
+      const { data, error } = await supabase.from("report_credits").select("*").eq("user_id", user.id).single();
 
       if (error && error.code !== "PGRST116") {
-        console.error("获取报告积分失败:", error);
+        console.error("获取额度失败:", error);
         return null;
       }
 
       return data;
     } catch (err) {
-      console.error("积分查询异常:", err);
+      console.error("额度查询异常:", err);
       return null;
     }
   }, [user, supabase]);
 
-  // Sign in with email
   const signInWithEmail = useCallback(
-    async (email: string) => {
+    async (email: string): Promise<AuthResult> => {
+      const trimmedEmail = email.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
+        return { success: false, code: "invalid_email" };
+      }
+
       try {
         const { error } = await supabase.auth.signInWithOtp({
-          email,
+          email: trimmedEmail,
           options: {
-            emailRedirectTo: `${window.location.origin}/api/auth/callback`,
+            emailRedirectTo: `${window.location.origin}${AUTH_CALLBACK_PATH}`,
           },
         });
 
         if (error) {
-          throw new Error(error.message);
+          return mapAuthError(error);
         }
 
         return { success: true };
       } catch (err) {
-        console.error("邮件登录失败:", err);
-        return { success: false, error: String(err) };
+        console.error("邮箱登录失败:", err);
+        return mapAuthError(err);
       }
     },
     [supabase]
   );
 
-  // Sign in with OAuth provider
   const signInWithProvider = useCallback(
-    async (provider: "google" | "microsoft" | "apple") => {
+    async (provider: "google"): Promise<AuthResult> => {
       try {
         const { error } = await supabase.auth.signInWithOAuth({
           provider,
           options: {
-            redirectTo: `${window.location.origin}/api/auth/callback`,
+            redirectTo: `${window.location.origin}${AUTH_CALLBACK_PATH}`,
           },
         });
 
         if (error) {
-          throw new Error(error.message);
+          return mapAuthError(error);
         }
 
         return { success: true };
       } catch (err) {
         console.error("OAuth 登录失败:", err);
-        return { success: false, error: String(err) };
+        return mapAuthError(err);
       }
     },
     [supabase]
   );
 
-  // Sign out
   const signOut = useCallback(async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -163,12 +182,11 @@ export function useSupabaseAuth() {
       setIsAuthenticated(false);
       return { success: true };
     } catch (err) {
-      console.error("登出失败:", err);
+      console.error("退出登录失败:", err);
       return { success: false, error: String(err) };
     }
   }, [supabase]);
 
-  // Refresh session
   const refreshSession = useCallback(async () => {
     try {
       const {
