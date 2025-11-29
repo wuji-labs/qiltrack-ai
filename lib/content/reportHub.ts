@@ -1,4 +1,4 @@
-import type { ReportSummary } from "@/types/report";
+import type { ReportCard, ReportPost, ReportSummary } from "@/types/report";
 
 /**
  * Featured reports data source - shared between home page and /reports
@@ -147,4 +147,130 @@ export async function fetchReportSummaries(options?: { limit?: number; offset?: 
 	// Future: can be replaced with Supabase/API call
 	const { limit = 3 } = options || {};
 	return getFeaturedReports(limit);
+}
+
+function normalizeBody(body: ReportPost["body"] | ReportSummary["body"]): string[] {
+	if (Array.isArray(body)) {
+		return body.filter(Boolean).map((paragraph) => String(paragraph));
+	}
+	if (typeof body === "string") {
+		return body
+			.split(/\n{2,}/)
+			.map((item) => item.trim())
+			.filter(Boolean);
+	}
+	return [];
+}
+
+function computeReadTime(body: string[]): string {
+	const words = body.join(" ").split(/\s+/).filter(Boolean).length;
+	const minutes = Math.max(2, Math.ceil(words / 180));
+	return `${minutes} min`;
+}
+
+function fallbackCover(slug: string) {
+	const safe = slug || "report";
+	return `linear-gradient(135deg, rgba(20,20,20,0.6), rgba(60,120,90,0.6)), url('/reports/covers/${encodeURIComponent(safe)}.webp')`;
+}
+
+function formatCover(cover: string | null | undefined, slug: string) {
+	if (!cover) return fallbackCover(slug);
+	if (cover.startsWith("url(") || cover.startsWith("linear-gradient")) return cover;
+	if (/^https?:\/\//.test(cover)) return `url('${cover}')`;
+
+	const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+	if (supabaseUrl) {
+		return `url('${supabaseUrl}/storage/v1/object/public/report-assets/${cover}')`;
+	}
+	return fallbackCover(slug);
+}
+
+function normalizeSlugFromUrl(url?: string) {
+	if (!url) return "";
+	const parts = url.split("/").filter(Boolean);
+	return parts[parts.length - 1] || "";
+}
+
+function slugify(value: string) {
+	return value
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-+|-+$/g, "") || "report";
+}
+
+export function mapSummaryToCard(summary: ReportSummary): ReportCard {
+	const slugFromUrl = normalizeSlugFromUrl(summary.url);
+	const slug = slugify(slugFromUrl || summary.symbol || summary.title);
+	const body = normalizeBody(summary.body);
+	const readTime = summary.readTime || computeReadTime(body);
+
+	return {
+		id: summary.symbol,
+		slug,
+		title: summary.title,
+		snippet: summary.snippet,
+		date: summary.date,
+		author: summary.author,
+		theme: summary.theme,
+		tags: summary.tags || [],
+		cover: formatCover(summary.cover, slug),
+		readTime,
+		body: body.length ? body : [summary.snippet],
+		lang: "en",
+		status: "published",
+		version: 1,
+	};
+}
+
+export function mapApiPostToCard(post: ReportPost): ReportCard {
+	const slug = slugify(
+		post.slug ||
+			normalizeSlugFromUrl((post as unknown as { url?: string }).url) ||
+			post.title ||
+			"report"
+	);
+	const body = normalizeBody(post.body);
+	const summary = (post.summary || body[0] || "").trim();
+	const date =
+		(post as unknown as { published_at?: string }).published_at ||
+		(post.publishedAt as string | undefined) ||
+		(post as unknown as { created_at?: string }).created_at ||
+		post.createdAt ||
+		new Date().toISOString();
+
+	const bodyForReadTime = body.length ? body : summary ? [summary] : [];
+
+	return {
+		id: post.id,
+		slug,
+		title: post.title || "Untitled report",
+		snippet: summary || "No summary provided yet.",
+		date,
+		author: post.author || "Investor AI Team",
+		theme: post.theme || "General",
+		tags: post.tags || [],
+		cover: formatCover(post.cover, slug),
+		readTime: computeReadTime(bodyForReadTime),
+		body: body.length ? body : bodyForReadTime.length ? bodyForReadTime : ["Report content coming soon."],
+		lang: post.lang ?? null,
+		status: post.status ?? null,
+		version: post.version ?? null,
+	};
+}
+
+export function getSeedReportCards(): ReportCard[] {
+	return reportData.map(mapSummaryToCard);
+}
+
+export function findSeedReportBySlug(slug: string): ReportCard | undefined {
+	const normalized = slugify(slug);
+	return getSeedReportCards().find((item) => item.slug === normalized || item.id === normalized);
+}
+
+export function listSeedCategories(): string[] {
+	const themes = new Set<string>();
+	getSeedReportCards().forEach((item) => {
+		if (item.theme) themes.add(item.theme);
+	});
+	return Array.from(themes);
 }

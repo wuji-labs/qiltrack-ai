@@ -3,17 +3,39 @@ import { NextRequest } from "next/server";
 import { GET } from "@/app/api/report/history/route";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+let mockServiceClient: {
+  storage: {
+    from: ReturnType<typeof vi.fn>;
+  };
+};
+
 vi.mock("@/lib/supabase/server", () => ({
   createServerClient: vi.fn(),
+  createServiceRoleClient: vi.fn(() => mockServiceClient),
 }));
 
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
 
 describe("API: /api/report/history - RLS Filtering", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.NEXT_PUBLIC_SUPABASE_URL = "http://localhost:54321";
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "test-anon-key";
+
+    mockServiceClient = {
+      storage: {
+        from: vi.fn(() => ({
+          createSignedUrl: vi.fn().mockResolvedValue({
+            data: { signedUrl: "https://example.com/signed" },
+            error: null,
+          }),
+        })),
+      },
+    };
+
+    vi.mocked(createServiceRoleClient).mockReturnValue(
+      mockServiceClient as unknown as SupabaseClient
+    );
   });
 
   afterEach(() => {

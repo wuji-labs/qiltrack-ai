@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n";
-import { type ReportCard } from "../data";
+import type { ReportCard } from "@/types/report";
 
 type Props = {
 	report: ReportCard;
