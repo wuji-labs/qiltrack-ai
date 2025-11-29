@@ -20,6 +20,19 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Compatibility: align existing hosted profiles table with expected columns
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS display_name TEXT,
+  ADD COLUMN IF NOT EXISTS avatar_url TEXT,
+  ADD COLUMN IF NOT EXISTS plan TEXT DEFAULT 'free',
+  ADD COLUMN IF NOT EXISTS quota_limit INT DEFAULT 1,
+  ADD COLUMN IF NOT EXISTS reports_used INT DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT,
+  ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT,
+  ADD COLUMN IF NOT EXISTS last_report_at TIMESTAMP WITH TIME ZONE,
+  ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+
 -- Report templates table
 CREATE TABLE IF NOT EXISTS public.report_templates (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -50,6 +63,14 @@ CREATE TABLE IF NOT EXISTS public.report_credits (
   UNIQUE(user_id)
 );
 
+-- Compatibility: align existing report_credits table with expected columns
+ALTER TABLE public.report_credits
+  ADD COLUMN IF NOT EXISTS credits_available INT DEFAULT 5,
+  ADD COLUMN IF NOT EXISTS credits_used INT DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS last_reset TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+
 -- Report generation history
 CREATE TABLE IF NOT EXISTS public.report_runs (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -69,6 +90,23 @@ CREATE TABLE IF NOT EXISTS public.report_runs (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Compatibility: align existing report_runs table with expected columns
+ALTER TABLE public.report_runs
+  ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES public.profiles(id),
+  ADD COLUMN IF NOT EXISTS template_id UUID REFERENCES public.report_templates(id),
+  ADD COLUMN IF NOT EXISTS symbol TEXT,
+  ADD COLUMN IF NOT EXISTS tone TEXT,
+  ADD COLUMN IF NOT EXISTS language TEXT DEFAULT 'en',
+  ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'processing',
+  ADD COLUMN IF NOT EXISTS model TEXT,
+  ADD COLUMN IF NOT EXISTS company_snapshot JSONB,
+  ADD COLUMN IF NOT EXISTS duration_ms INT,
+  ADD COLUMN IF NOT EXISTS error TEXT,
+  ADD COLUMN IF NOT EXISTS markdown_path TEXT,
+  ADD COLUMN IF NOT EXISTS docx_path TEXT,
+  ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+
 -- Report documents summary (for quick listing)
 CREATE TABLE IF NOT EXISTS public.report_documents (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -78,6 +116,14 @@ CREATE TABLE IF NOT EXISTS public.report_documents (
   docx_summary TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Compatibility: align existing report_documents table with expected columns
+ALTER TABLE public.report_documents
+  ADD COLUMN IF NOT EXISTS run_id UUID REFERENCES public.report_runs(id) ON DELETE CASCADE,
+  ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  ADD COLUMN IF NOT EXISTS markdown_summary TEXT,
+  ADD COLUMN IF NOT EXISTS docx_summary TEXT,
+  ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
 
 -- Publications table
 CREATE TABLE IF NOT EXISTS public.publications (
@@ -175,6 +221,12 @@ CREATE TABLE IF NOT EXISTS public.report_credit_events (
   reason TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Compatibility: align existing report_credit_events table with expected columns
+ALTER TABLE public.report_credit_events
+  ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS delta INT,
+  ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
 
 -- RPC Function: Initialize profile (called on signup)
 CREATE OR REPLACE FUNCTION fn_initialize_profile(p_user_id UUID, p_email TEXT)
