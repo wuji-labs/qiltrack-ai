@@ -393,7 +393,7 @@ export async function POST(request: NextRequest) {
           <View style={styles.coverStats}>
             <View style={styles.statPill}>
               <Text style={styles.statLabel}>Market Cap</Text>
-              <Text style={styles.statValue}>{formatMarketCap(blueprint.marketCap as any)}</Text>
+              <Text style={styles.statValue}>{formatMarketCap(blueprint.marketCap as number | undefined)}</Text>
             </View>
             <View style={styles.statPill}>
               <Text style={styles.statLabel}>Industry</Text>
@@ -465,7 +465,7 @@ export async function POST(request: NextRequest) {
           <Text style={styles.sectionTitle}>Valuation & Profitability</Text>
           <View style={styles.grid}>{buildMetricCards(blueprint.valuation)}</View>
           {valImage ? (
-            <Image src={toDataUri(valImage)} style={[styles.chartImage, { height: 220 }]} />
+            <Image src={toDataUri(valImage)} style={[styles.chartImage, { height: 220 }]} alt="Valuation chart" />
           ) : (
             <Text style={styles.bodyText}>Charts unavailable due to limited valuation data.</Text>
           )}
@@ -484,7 +484,7 @@ export async function POST(request: NextRequest) {
             </View>
           </View>
           {perfImage ? (
-            <Image src={toDataUri(perfImage)} style={[styles.chartImage, { height: 220 }]} />
+            <Image src={toDataUri(perfImage)} style={[styles.chartImage, { height: 220 }]} alt="Performance chart" />
           ) : (
             <Text style={styles.bodyText}>Charts unavailable due to missing price history.</Text>
           )}
