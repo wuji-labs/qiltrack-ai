@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient, createServiceRoleClient, uploadToStorage } from "@/lib/supabase/server";
 import { consumeReportCredit, writeReportAudit } from "@/lib/services/quota";
 import { DEFAULT_LANGUAGE, type Language } from "@/lib/i18n-config";
+import { getLangfuseClient } from "@/lib/observability/langfuse";
 
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
 const OPENROUTER_EMBEDDING_MODEL =
@@ -209,12 +210,20 @@ function formatDate(date: Date): string {
 export async function GET(request: NextRequest) {
     // Read env vars at runtime to allow test override
     const env = getEnvVars();
+    const langfuse = getLangfuseClient();
+    const trace = langfuse?.trace({
+      name: "api.report.generate",
+      metadata: { isTest: false },
+    });
 
     // Check for test bypass
     const testToken = process.env.TEST_REPORT_TOKEN || "local-test-token";
     const tokenFromHeader = request.headers.get("x-test-token");
     const tokenFromQuery = new URL(request.url).searchParams.get("testToken");
     const isTestBypass = Boolean(testToken && (tokenFromHeader === testToken || tokenFromQuery === testToken));
+    if (trace && isTestBypass) {
+      trace.update({ metadata: { isTest: true } });
+    }
 
     // Collect response cookies from Supabase
     const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
@@ -338,6 +347,11 @@ export async function GET(request: NextRequest) {
         )}&from=${fromDate}&to=${toDate}&token=${env.FINNHUB_API_KEY}`;
 
 
+        const finnhubSpan = trace?.span({
+          name: "finnhub.fetch",
+          input: { symbol, profileUrl, quoteUrl, metricsUrl, newsUrl },
+        });
+
         const [profile, quote, metricsRaw, recentNews] = await Promise.all([
             fetchJson(profileUrl),
             fetchJson(quoteUrl),
@@ -345,7 +359,14 @@ export async function GET(request: NextRequest) {
             fetchJson(newsUrl), // <-- 新增新闻拉取
         ]);
 
-        const metric = (metricsRaw && metricsRaw.metric) || {};
+        finnhubSpan?.end({
+          output: {
+            profileOk: Boolean(profile?.ticker),
+            metricsKeys: Object.keys(metricsRaw?.metric ?? {}).length,
+            newsCount: Array.isArray(recentNews) ? recentNews.length : 0,
+          },
+        });
+const metric = (metricsRaw && metricsRaw.metric) || {};
 
         const companyData = {
             symbol,
@@ -536,12 +557,22 @@ ${JSON.stringify(companyData, null, 2)}
             return res.json();
         }
 
+        const llmSpan = trace?.span({
+          name: "llm.generate",
+          metadata: { provider: env.HELICONE_API_KEY ? "helicone" : "openrouter", model: env.OPENROUTER_MODEL },
+        });
+
         const data =
             (await callHelicone()) ??
             (await callOpenRouter()) ??
             null;
 
+        llmSpan?.end({
+          output: { hasData: Boolean(data?.choices?.[0]?.message?.content) },
+        });
+
         if (!data) {
+            trace?.end({ error: "llm_generation_failed" });
             const response = NextResponse.json(
                 { error: "Failed to generate report via Helicone/OpenRouter" },
                 { status: 500 }
@@ -609,6 +640,7 @@ ${JSON.stringify(companyData, null, 2)}
           }
 
           await writeReportAudit(userId, symbol, "test", "success");
+          trace?.end({ output: { reportRunId } });
           remainingCredits = 999; // Mock remaining
         } else {
           try {
@@ -625,6 +657,10 @@ ${JSON.stringify(companyData, null, 2)}
               return response;
             }
             remainingCredits = consumeResult.remainingCredits || 0;
+
+            trace?.update({
+              metadata: { symbol, language, tone: toneKeyRaw, model: env.OPENROUTER_MODEL },
+            });
 
             // Record report run
             const { data: runData, error: runError } = await supabase
@@ -643,6 +679,8 @@ ${JSON.stringify(companyData, null, 2)}
             }
 
             reportRunId = runData.id;
+
+            const storageSpan = trace?.span({ name: "supabase.storage.upload" });
 
             // Upload Markdown to Storage
             const bucketName = process.env.SUPABASE_STORAGE_REPORT_BUCKET || "report-assets";
@@ -681,11 +719,14 @@ ${JSON.stringify(companyData, null, 2)}
               document_type: "markdown",
               storage_path: markdownPath,
             });
+            storageSpan?.end({ output: { bucketName, path: markdownPath } });
 
             await writeReportAudit(userId, symbol, "production", "success");
+            trace?.end({ output: { reportRunId } });
           } catch (err) {
             await writeReportAudit(userId, symbol, "production", "failed");
             console.error("Supabase report error:", err);
+            trace?.end({ error: err instanceof Error ? err.message : "unknown" });
             const response = NextResponse.json(
               { error: `Report generation error: ${err instanceof Error ? err.message : "Unknown error"}` },
               { status: 500 }
@@ -722,6 +763,7 @@ ${JSON.stringify(companyData, null, 2)}
         return response;
     } catch (err) {
         console.error("Error generating report:", err);
+        trace?.end({ error: err instanceof Error ? err.message : "unknown" });
         const response = NextResponse.json(
             { error: `Failed to generate report: ${err instanceof Error ? err.message : 'Unknown error'}` },
             { status: 500 }
