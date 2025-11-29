@@ -23,6 +23,7 @@
     "esbuild": "^0.27.0",
     "file-saver": "^2.0.5",
     "jspdf": "^3.0.3",
+    "langfuse": "^2.0.0",
     "next": "16.0.3",
     "nodemailer": "^7.0.10",
     "openai": "^6.9.0",
