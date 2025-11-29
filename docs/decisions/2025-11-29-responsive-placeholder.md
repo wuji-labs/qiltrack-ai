@@ -1,32 +1,10 @@
-# Snapshot：生成器占位文案响应式（2025-11-29）
-## 背景
-- 当前问题：移动端输入框 placeholder 过长，易截断；希望在 640/768/1024/1280 四个断点上使用更短/完整的提示文案。
-- 影响范围：`app/sections/ReportGeneratorSection.tsx` 输入框 UI 与 i18n 文案；不改提交流程、校验规则、API。
-- 现状：单一 placeholder，Tailwind 布局在极窄屏幕上会溢出。
-
-## 设计目标
-1. 核心：根据视口宽度切换占位文案，覆盖 <640、≥640、≥768、≥1024 四档（≥1024 沿用原文）。
-2. 体验：小屏保持简短样例，桌面显示完整示例（NVDA / TSLA / Apple），不影响输入、聚焦与下拉行为。
-3. 技术：不新增依赖；仅在前端用 `window.innerWidth`；SSR 初始渲染安全；保持 aria-label、校验逻辑不变。
-
-## 技术约束
-- 技术栈：Next.js App Router（React 19）、Tailwind v4（`@theme inline`）。
-- 兼容性：桌面/平板/移动端输入、下拉、提交流程正常；resize 时占位文案及时刷新。
-- 安全/性能：无新增 API；监听 `resize` 时避免重复 setState。
-- 环境：无需新增 env；`npm run lint` / `npm test` 需可正常运行。
-
-## 文案 key
-- 新增：`generator.input.placeholder.xs` / `sm` / `md`；`>=1024` 复用现有 `generator.input.placeholder`。
-- 文案（zh-Hans）：<640 `请输入`；≥640 `请输入代码/公司，例如 NVDA / TSLA`；≥768 `请输入美股代码或公司名，例如 NVDA / TSLA`；≥1024 `请输入美股代码或公司名，例如：NVDA / TSLA / Apple`。其他语言沿用原有示例。
-- 语言：en / ja / ko / zh-Hant / zh-Hans 提供对等文案。
-
-## 工作拆解（G2）
-- 增加 breakpoint -> `placeholderVariant` 映射与 `resize` 监听，计算 `placeholderText` 并应用到输入框。
-- 在 i18n 中补齐三档断点文案 key，保留原 key 为 ≥1024。
-- 手动自测：<640、640-767、768-1023、≥1024 占位符切换；搜索/选择/提交/错误提示不回归。
-- （可选）如时间允许跑 `npm run lint` / `npm test`。
-
-## 测试 / 验收
-- 功能：不同视口下 placeholder 文案与预期匹配；输入/自动补全/提交/错误提示正常；登录/配额逻辑未受影响。
-- 兼容：窗口 resize 后占位文案更新；SSR 不报错。
-- 通用：`npm run lint`、`npm test` 通过（如执行）。
+﻿# Snapshot锛氱敓鎴愬櫒鍗犱綅鏂囨鍝嶅簲寮忥紙2025-11-29锛?## 鑳屾櫙
+- 褰撳墠闂锛氱Щ鍔ㄧ杈撳叆妗?placeholder 杩囬暱锛屾槗鎴柇锛涘笇鏈涘湪 640/768/1024/1280 鍥涗釜鏂偣涓婁娇鐢ㄦ洿鐭?瀹屾暣鐨勬彁绀烘枃妗堛€?- 褰卞搷鑼冨洿锛歚app/sections/ReportGeneratorSection.tsx` 杈撳叆妗?UI 涓?i18n 鏂囨锛涗笉鏀规彁浜ゆ祦绋嬨€佹牎楠岃鍒欍€丄PI銆?- 鐜扮姸锛氬崟涓€ placeholder锛孴ailwind 甯冨眬鍦ㄦ瀬绐勫睆骞曚笂浼氭孩鍑恒€?
+## 璁捐鐩爣
+1. 鏍稿績锛氭牴鎹鍙ｅ搴﹀垏鎹㈠崰浣嶆枃妗堬紝瑕嗙洊 <640銆佲墺640銆佲墺768銆佲墺1024 鍥涙。锛堚墺1024 娌跨敤鍘熸枃锛夈€?2. 浣撻獙锛氬皬灞忎繚鎸佺畝鐭牱渚嬶紝妗岄潰鏄剧ず瀹屾暣绀轰緥锛圢VDA / TSLA / Apple锛夛紝涓嶅奖鍝嶈緭鍏ャ€佽仛鐒︿笌涓嬫媺琛屼负銆?3. 鎶€鏈細涓嶆柊澧炰緷璧栵紱浠呭湪鍓嶇鐢?`window.innerWidth`锛汼SR 鍒濆娓叉煋瀹夊叏锛涗繚鎸?aria-label銆佹牎楠岄€昏緫涓嶅彉銆?
+## 鎶€鏈害鏉?- 鎶€鏈爤锛歂ext.js App Router锛圧eact 19锛夈€乀ailwind v4锛坄@theme inline`锛夈€?- 鍏煎鎬э細妗岄潰/骞虫澘/绉诲姩绔緭鍏ャ€佷笅鎷夈€佹彁浜ゆ祦绋嬫甯革紱resize 鏃跺崰浣嶆枃妗堝強鏃跺埛鏂般€?- 瀹夊叏/鎬ц兘锛氭棤鏂板 API锛涚洃鍚?`resize` 鏃堕伩鍏嶉噸澶?setState銆?- 鐜锛氭棤闇€鏂板 env锛沗npm run lint` / `npm test` 闇€鍙甯歌繍琛屻€?
+## 鏂囨 key
+- 鏂板锛歚generator.input.placeholder.xs` / `sm` / `md`锛沗>=1024` 澶嶇敤鐜版湁 `generator.input.placeholder`銆?- 鏂囨锛坺h-Hans锛夛細<640 `璇疯緭鍏锛涒墺640 `璇疯緭鍏ヤ唬鐮?鍏徃锛屼緥濡?NVDA / Apple`锛涒墺768 `璇疯緭鍏ョ編鑲′唬鐮佹垨鍏徃鍚嶏紝渚嬪 NVDA / Apple`锛涒墺1024 `璇疯緭鍏ョ編鑲′唬鐮佹垨鍏徃鍚嶏紝渚嬪锛歂VDA / TSLA / Apple`銆傚叾浠栬瑷€娌跨敤鍘熸湁绀轰緥銆?- 璇█锛歟n / ja / ko / zh-Hant / zh-Hans 鎻愪緵瀵圭瓑鏂囨銆?
+## 宸ヤ綔鎷嗚В锛圙2锛?- 澧炲姞 breakpoint -> `placeholderVariant` 鏄犲皠涓?`resize` 鐩戝惉锛岃绠?`placeholderText` 骞跺簲鐢ㄥ埌杈撳叆妗嗐€?- 鍦?i18n 涓ˉ榻愪笁妗ｆ柇鐐规枃妗?key锛屼繚鐣欏師 key 涓?鈮?024銆?- 鎵嬪姩鑷祴锛?640銆?40-767銆?68-1023銆佲墺1024 鍗犱綅绗﹀垏鎹紱鎼滅储/閫夋嫨/鎻愪氦/閿欒鎻愮ず涓嶅洖褰掋€?- 锛堝彲閫夛級濡傛椂闂村厑璁歌窇 `npm run lint` / `npm test`銆?
+## 娴嬭瘯 / 楠屾敹
+- 鍔熻兘锛氫笉鍚岃鍙ｄ笅 placeholder 鏂囨涓庨鏈熷尮閰嶏紱杈撳叆/鑷姩琛ュ叏/鎻愪氦/閿欒鎻愮ず姝ｅ父锛涚櫥褰?閰嶉閫昏緫鏈彈褰卞搷銆?- 鍏煎锛氱獥鍙?resize 鍚庡崰浣嶆枃妗堟洿鏂帮紱SSR 涓嶆姤閿欍€?- 閫氱敤锛歚npm run lint`銆乣npm test` 閫氳繃锛堝鎵ц锛夈€?
