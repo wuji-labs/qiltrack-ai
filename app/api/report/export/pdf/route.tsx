@@ -334,7 +334,7 @@ export async function POST(request: NextRequest) {
         resolvedCompany = ((runData as { company_snapshot?: CompanyData; symbol?: string }).company_snapshot as CompanyData) || undefined;
       } else if ((runData as { company_snapshot?: CompanyData; symbol?: string })?.symbol) {
         resolvedCompany = {
-          symbol: (runData as { company_snapshot?: CompanyData; symbol?: string }).symbol,
+          symbol: (runData as { company_snapshot?: CompanyData; symbol?: string }).symbol!,
           profile: {},
           quote: {},
           metrics: {},
@@ -507,7 +507,7 @@ export async function POST(request: NextRequest) {
 
   let pdfBuffer: Buffer;
   try {
-    pdfBuffer = await pdf(doc).toBuffer();
+    pdfBuffer = (await pdf(doc).toBuffer()) as Buffer;
   } catch (err) {
     console.error("PDF render failed:", err);
     return respond({ error: "PDF generation failed", fallback: "docx" }, 500);

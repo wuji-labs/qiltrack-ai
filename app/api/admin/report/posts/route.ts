@@ -156,7 +156,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     let tags: string[] | undefined;
-    let status: "draft" | "published" = (existing as { status: "draft" | "published" })?.status ?? "draft";
+    let status: "draft" | "published" = (existing as any)?.status ?? "draft";
     try {
       tags = payload.tags ? ensureArray(payload.tags) : undefined;
       status = payload.status ? validateStatus(payload.status) : status;
@@ -169,9 +169,9 @@ export async function PATCH(request: NextRequest) {
       return context.applyCookies(response);
     }
     const nextVersion =
-      payload.version ?? (existing.version ?? 1) + 1;
+      payload.version ?? ((existing as any).version ?? 1) + 1;
 
-    let publishedAt = existing.published_at;
+    let publishedAt = (existing as any).published_at;
     if (status === "published" && !publishedAt) {
       publishedAt = payload.publishedAt || new Date().toISOString();
     } else if (status === "draft") {
@@ -181,14 +181,14 @@ export async function PATCH(request: NextRequest) {
     }
 
     const updatePayload = {
-      title: payload.title ?? existing.title,
-      slug: payload.slug ?? existing.slug,
-      summary: payload.summary ?? existing.summary,
-      body: payload.body ?? existing.body,
-      cover: payload.cover ?? existing.cover,
-      theme: payload.theme ?? existing.theme,
-      tags: tags ?? existing.tags ?? [],
-      lang: payload.lang ?? existing.lang ?? "en",
+      title: payload.title ?? (existing as any).title,
+      slug: payload.slug ?? (existing as any).slug,
+      summary: payload.summary ?? (existing as any).summary,
+      body: payload.body ?? (existing as any).body,
+      cover: payload.cover ?? (existing as any).cover,
+      theme: payload.theme ?? (existing as any).theme,
+      tags: tags ?? (existing as any).tags ?? [],
+      lang: payload.lang ?? (existing as any).lang ?? "en",
       status,
       version: nextVersion,
       published_at: publishedAt,

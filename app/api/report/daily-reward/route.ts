@@ -41,9 +41,9 @@ export async function POST(request: NextRequest) {
     }
 
     const response = NextResponse.json({
-      success: (data as Array<{ success: boolean; message: string; remaining_credits: number }>)?.[0]?.success ?? false,
-      message: (data as Array<{ success: boolean; message: string; remaining_credits: number }>)?.[0]?.message ?? "Unknown error",
-      remainingCredits: (data as Array<{ success: boolean; message: string; remaining_credits: number }>)?.[0]?.remaining_credits ?? 0,
+      success: (data as any)?.[0]?.success ?? false,
+      message: (data as any)?.[0]?.message ?? "Unknown error",
+      remainingCredits: (data as any)?.[0]?.remaining_credits ?? 0,
     });
 
     responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));

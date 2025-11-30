@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     const { data: reports, error: queryError, count } = await supabase
       .from("report_runs")
       .select("id, symbol, created_at, status, markdown_path, docx_path, mode", { count: "exact" })
-      .eq("user_id", userId)
+      .eq("user_id", userId as never)
       .order("created_at", { ascending: false })
       .range(offset, offset + pageSize - 1);
 
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
       const mapWithSignedUrls = async () => {
         if (!reports?.length) return [];
         return Promise.all(
-          reports.map(async (report) => {
+          reports.map(async (report: any) => {
             const docxSigned =
               report.docx_path
                 ? await serviceClient.storage
