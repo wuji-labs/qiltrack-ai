@@ -25,8 +25,7 @@ vi.mock(
       track: vi.fn(),
       flush: vi.fn(),
     })),
-  }),
-  { virtual: true }
+  })
 );
 
 // Mock global fetch for Finnhub/LLM
@@ -59,7 +58,7 @@ describe("API: /api/report - Supabase Integration", () => {
           error: null,
         }),
       },
-    } as unknown as SupabaseClient;
+    } as any;
 
     vi.mocked(createServerClient).mockImplementation(() => {
       // Don't call the setter
@@ -103,33 +102,31 @@ describe("API: /api/report - Supabase Integration", () => {
     });
 
     // Create flexible mock that handles different query chains
-    const createChainableMock = (dataToReturn: unknown = null) => {
-      const chain: {
-        select: ReturnType<typeof vi.fn>;
-        insert: ReturnType<typeof vi.fn>;
-        delete: ReturnType<typeof vi.fn>;
-        eq: ReturnType<typeof vi.fn>;
-        single: ReturnType<typeof vi.fn>;
-        [key: string]: unknown;
-      } = {
-        select: vi.fn().mockReturnValue(chain),
-        insert: vi.fn().mockReturnValue(chain),
-        delete: vi.fn().mockReturnValue(chain),
-        eq: vi.fn().mockReturnValue(chain),
+    const createChainableMock = (dataToReturn: unknown = null): any => {
+      const chain: any = {
+        select: vi.fn(),
+        insert: vi.fn(),
+        delete: vi.fn(),
+        eq: vi.fn(),
         single: vi.fn().mockResolvedValue({
           data: dataToReturn || { id: "run-test-123" },
           error: null,
         }),
       };
+      chain.select.mockReturnValue(chain);
+      chain.insert.mockReturnValue(chain);
+      chain.delete.mockReturnValue(chain);
+      chain.eq.mockReturnValue(chain);
+
       // Make chain awaitable
       chain[Symbol.toStringTag] = "Promise";
-      (chain as { then?: (onFulfilled: (val: unknown) => unknown) => Promise<unknown> }).then = (onFulfilled: (val: unknown) => unknown) => {
+      chain.then = (onFulfilled: (val: unknown) => unknown) => {
         return Promise.resolve({
           data: null,
           error: null,
         }).then(onFulfilled);
       };
-      (chain as { catch?: (onRejected: (val: unknown) => unknown) => Promise<unknown> }).catch = (onRejected: (val: unknown) => unknown) => {
+      chain.catch = (onRejected: (val: unknown) => unknown) => {
         return Promise.resolve({
           data: null,
           error: null,
@@ -156,7 +153,7 @@ describe("API: /api/report - Supabase Integration", () => {
         }),
       },
       from: vi.fn().mockImplementation(() => createMockFrom()),
-    } as unknown as SupabaseClient;
+    } as any;
 
     vi.mocked(createServerClient).mockImplementation((cookieGetter, cookieSetter) => {
       // Simulate calling the setter with empty array
@@ -165,7 +162,7 @@ describe("API: /api/report - Supabase Integration", () => {
       }
       return mockSupabaseClient;
     });
-    vi.mocked(createServiceRoleClient).mockReturnValue({} as unknown as SupabaseClient);
+    vi.mocked(createServiceRoleClient).mockReturnValue({} as any);
     vi.mocked(uploadToStorage).mockResolvedValue("https://signed.url");
     vi.mocked(writeReportAudit).mockResolvedValue(undefined);
 
@@ -206,7 +203,7 @@ describe("API: /api/report - Supabase Integration", () => {
           }),
         }),
       }),
-    } as unknown as SupabaseClient;
+    } as any;
 
     vi.mocked(createServerClient).mockImplementation(() => {
       // Don't call the setter
@@ -241,7 +238,7 @@ describe("API: /api/report - Supabase Integration", () => {
           }),
         }),
       }),
-    } as unknown as SupabaseClient;
+    } as any;
 
     vi.mocked(createServerClient).mockImplementation(() => {
       // Don't call the setter
