@@ -178,7 +178,7 @@ export function useSupabaseAuth() {
         setOauthProviders(
           identities.map((identity) => ({
             provider: identity.provider,
-            connected_at: identity.created_at,
+            connected_at: identity.created_at ?? new Date().toISOString(),
           }))
         );
 
