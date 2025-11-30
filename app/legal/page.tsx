@@ -66,10 +66,15 @@ export default function LegalPage() {
           <p>
             如对上述条款或政策有疑问，请邮件 <a className="text-emerald-300" href="mailto:legal@investor.ai">legal@investor.ai</a> 与我们联系。
           </p>
-          <Link href="/" prefetch={false} className="inline-flex items-center gap-2 text-emerald-300 underline">
-            <span aria-hidden>↩</span>
-            <span>返回首页</span>
-          </Link>
+          <div className="inline-flex flex-wrap items-center gap-2 text-emerald-300 text-xs">
+            <span aria-hidden className="text-sm opacity-80">
+              ↩
+            </span>
+            <Link href="/" prefetch={false} className="underline underline-offset-2">
+              返回首页
+            </Link>
+            <span className="text-slate-400">investor-ai.com</span>
+          </div>
         </div>
       </div>
     </main>
