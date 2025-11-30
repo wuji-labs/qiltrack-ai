@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
         version: payload.version ?? 1,
         author_id: auth.userId,
         published_at: publishedAt,
-      })
+      } as never)
       .select("*")
       .single();
 
@@ -144,7 +144,7 @@ export async function PATCH(request: NextRequest) {
     const { data: existing, error: fetchError } = await context.supabase
       .from("report_posts")
       .select("*")
-      .eq(identifier.column, identifier.value)
+      .eq(identifier.column, identifier.value as never)
       .single();
 
     if (fetchError || !existing) {
@@ -156,7 +156,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     let tags: string[] | undefined;
-    let status: "draft" | "published" = existing.status as "draft" | "published";
+    let status: "draft" | "published" = (existing as { status: "draft" | "published" })?.status ?? "draft";
     try {
       tags = payload.tags ? ensureArray(payload.tags) : undefined;
       status = payload.status ? validateStatus(payload.status) : status;
@@ -196,8 +196,8 @@ export async function PATCH(request: NextRequest) {
 
     const { data, error } = await context.supabase
       .from("report_posts")
-      .update(updatePayload)
-      .eq(identifier.column, identifier.value)
+      .update(updatePayload as never)
+      .eq(identifier.column, identifier.value as never)
       .select("*")
       .single();
 

@@ -26,9 +26,9 @@ export async function POST(request: NextRequest) {
     const userId = session.user.id;
 
     // Call fn_claim_daily_reward function
-    const { data, error } = await supabase.rpc("fn_claim_daily_reward", {
+    const { data, error } = await supabase.rpc("fn_claim_daily_reward" as never, {
       p_user_id: userId,
-    });
+    } as never);
 
     if (error) {
       console.warn(`[DAILY_REWARD_ERROR] user_id: ${userId}, error: ${error.message}`);
@@ -41,9 +41,9 @@ export async function POST(request: NextRequest) {
     }
 
     const response = NextResponse.json({
-      success: data?.[0]?.success ?? false,
-      message: data?.[0]?.message ?? "Unknown error",
-      remainingCredits: data?.[0]?.remaining_credits ?? 0,
+      success: (data as Array<{ success: boolean; message: string; remaining_credits: number }>)?.[0]?.success ?? false,
+      message: (data as Array<{ success: boolean; message: string; remaining_credits: number }>)?.[0]?.message ?? "Unknown error",
+      remainingCredits: (data as Array<{ success: boolean; message: string; remaining_credits: number }>)?.[0]?.remaining_credits ?? 0,
     });
 
     responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));
