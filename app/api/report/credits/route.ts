@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       // Get user session using the same approach as auth callback
       const cookieStore = await cookies();
       const supabase = createRouteHandlerClient<Database>({
-        cookies: () => cookieStore,
+        cookies: async () => cookieStore,
       });
 
       const {
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       // Query report_credits table for real-time remaining credits
       const cookieStoreForQuery = await cookies();
       const supabaseForQuery = createRouteHandlerClient<Database>({
-        cookies: () => cookieStoreForQuery,
+        cookies: async () => cookieStoreForQuery,
       });
 
       const { data, error: quotaError } = await supabaseForQuery

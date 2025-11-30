@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   if (code) {
     const cookieStore = await cookies();
     const supabase = createRouteHandlerClient<Database>({
-      cookies: () => cookieStore,
+      cookies: async () => cookieStore,
     });
 
     try {
