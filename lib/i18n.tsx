@@ -1946,6 +1946,20 @@ const translations: Record<string, TranslationEntry> = {
 		"zh-Hant": "已寄出，60 秒內請查收信箱。",
 		"zh-Hans": "已发送，请在 60 秒内查收邮箱。",
 	},
+	"auth.email.useEmail": {
+		"en": "Use email instead",
+		"ja": "メールでログイン",
+		"ko": "이메일 사용",
+		"zh-Hant": "使用郵箱登入",
+		"zh-Hans": "使用邮箱登录",
+	},
+	"auth.email.cancel": {
+		"en": "Cancel",
+		"ja": "キャンセル",
+		"ko": "취소",
+		"zh-Hant": "取消",
+		"zh-Hans": "取消",
+	},
 	"auth.email.localHint": {
 		"en": "Local mode: open Inbucket to read the magic link.",
 		"ja": "ローカルモード: Inbucket でマジックリンクを確認してください。",
