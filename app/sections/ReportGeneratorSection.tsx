@@ -10,8 +10,9 @@ import { type ProgressState } from "@/hooks/useProgress";
 import { fetchSimilarReports, generateReport, searchSymbols } from "@/lib/services/api";
 import type { Language } from "@/lib/i18n-config";
 import type { ReportResponse, ReportTone, SearchResult, SimilarReport } from "@/types/report";
-import KpiCard from "@/components/KpiCard";
-import { PricePerformanceChart, ValuationMetricsChart, NewsTimelineWidget } from "@/components/ReportCharts";
+// TODO: These components are not yet implemented
+// import KpiCard from "@/components/KpiCard";
+// import { PricePerformanceChart, ValuationMetricsChart, NewsTimelineWidget } from "@/components/ReportCharts";
 
 type ToneOption = {
 	id: ReportTone;
@@ -877,6 +878,7 @@ export function ReportGeneratorSection({
 					</div>
 
 					{/* KPI Dashboard */}
+					{/* TODO: Uncomment when KpiCard component is implemented
 					<div className="space-y-4">
 						<h2 className="text-xl font-semibold uppercase tracking-wider text-[var(--color-foreground)] mb-4">
 							Key Metrics
@@ -950,19 +952,24 @@ export function ReportGeneratorSection({
 							/>
 						</div>
 					</div>
+					*/}
 
 					{/* Charts Section */}
+					{/* TODO: Uncomment when chart components are implemented
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
 						<PricePerformanceChart companyData={reportData.companyData} />
 						<ValuationMetricsChart companyData={reportData.companyData} />
 					</div>
+					*/}
 
 					{/* News Timeline */}
+					{/* TODO: Uncomment when NewsTimelineWidget component is implemented
 					{reportData.companyData.recentNews && reportData.companyData.recentNews.length > 0 && (
 						<div className="mt-6">
 							<NewsTimelineWidget companyData={reportData.companyData} />
 						</div>
 					)}
+					*/}
 
 					<div ref={reportContentRef} className="text-base sm:text-lg leading-relaxed text-dim mt-8">
 						<ReactMarkdown components={markdownComponents}>{reportData.report}</ReactMarkdown>

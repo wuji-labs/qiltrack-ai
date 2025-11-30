@@ -8,7 +8,8 @@ function getClient() {
   const publicKey = process.env.LANGFUSE_PUBLIC_KEY;
   const secretKey = process.env.LANGFUSE_SECRET_KEY;
   const host = process.env.LANGFUSE_HOST;
-  const samplingRate = Number(process.env.LANGFUSE_SAMPLING_RATE || "1");
+  // Note: sampling configuration is not supported in current Langfuse version
+  // const samplingRate = Number(process.env.LANGFUSE_SAMPLING_RATE || "1");
 
   if (!publicKey || !secretKey || !host) return null;
 
@@ -17,7 +18,7 @@ function getClient() {
       publicKey,
       secretKey,
       baseUrl: host,
-      sampling: isNaN(samplingRate) ? 1 : samplingRate,
+      // sampling: isNaN(samplingRate) ? 1 : samplingRate, // Not supported
     });
   } catch (err) {
     console.warn("Langfuse init failed:", err);

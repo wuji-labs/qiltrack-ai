@@ -73,16 +73,10 @@ export function createServerClient(
 
   return createServerClientBase<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      getAll: getAllCookies,
-      get(name: string) {
-        if (cookieStore && typeof cookieStore.get === "function") {
-          const cookie = cookieStore.get(name);
-          return cookie ? { name, value: cookie.value } : undefined;
-        }
-        const found = getAllCookies().find((cookie) => cookie.name === name);
-        return found ? { name: found.name, value: found.value } : undefined;
+      getAll() {
+        return getAllCookies();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet: Array<{ name: string; value: string; options?: unknown }>) {
         // Pass updated cookies to response handler if provided
         if (cookieSetter) {
           cookieSetter(cookiesToSet);
