@@ -133,7 +133,7 @@ export async function renderChartPng(
           display: true,
           text: chart.title,
           color: "#e9f7ff",
-          font: { size: 16, weight: "600" },
+          font: { size: 16, weight: 600 },
         },
       },
       scales: {

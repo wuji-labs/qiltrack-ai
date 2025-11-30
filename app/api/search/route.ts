@@ -2,6 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
 
+function buildFallbackResponse(query: string, description: string, source: string) {
+  return NextResponse.json({
+    query,
+    results: [
+      {
+        symbol: query.toUpperCase(),
+        description,
+        displaySymbol: query.toUpperCase(),
+        type: source,
+      },
+    ],
+  });
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get("q")?.trim();

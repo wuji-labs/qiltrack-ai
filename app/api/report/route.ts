@@ -615,12 +615,12 @@ ${JSON.stringify(companyData, null, 2)}
                 symbol,
                 status: "completed",
                 mode: "test",
-              })
+              } as never)
               .select("id")
               .single();
 
             if (!runError && runData) {
-              reportRunId = runData.id;
+              reportRunId = (runData as any).id;
 
               // Upload Markdown to Storage in test mode
               const bucketName = process.env.SUPABASE_STORAGE_REPORT_BUCKET || "report-assets";
@@ -644,7 +644,7 @@ ${JSON.stringify(companyData, null, 2)}
                 report_run_id: reportRunId,
                 document_type: "markdown",
                 storage_path: markdownPath,
-              });
+              } as never);
             }
           } catch (err) {
             console.warn("Test mode report run creation failed:", err);
@@ -681,7 +681,7 @@ ${JSON.stringify(companyData, null, 2)}
                 symbol,
                 status: "completed",
                 mode: "production",
-              })
+              } as never)
               .select("id")
               .single();
 
@@ -689,7 +689,7 @@ ${JSON.stringify(companyData, null, 2)}
               throw new Error(`Failed to create report run: ${runError?.message}`);
             }
 
-            reportRunId = runData.id;
+            reportRunId = (runData as any).id;
 
             const storageSpan = trace?.span({ name: "supabase.storage.upload" });
 
@@ -712,7 +712,7 @@ ${JSON.stringify(companyData, null, 2)}
               await supabase
                 .from("report_runs")
                 .delete()
-                .eq("id", reportRunId);
+                .eq("id" as never, reportRunId as never);
 
               const response = NextResponse.json(
                 { error: `Storage upload failed: ${storageError instanceof Error ? storageError.message : "Unknown error"}` },
@@ -729,7 +729,7 @@ ${JSON.stringify(companyData, null, 2)}
               report_run_id: reportRunId,
               document_type: "markdown",
               storage_path: markdownPath,
-            });
+            } as never);
             storageSpan?.end({ output: { bucketName, path: markdownPath } });
 
             await writeReportAudit(userId, symbol, "production", "success");

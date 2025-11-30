@@ -55,7 +55,7 @@ export default function ReportsPage() {
 	});
 	const gridRef = useRef<HTMLDivElement>(null);
 
-	useVisibilityStagger(gridRef, {
+	useVisibilityStagger(gridRef as React.RefObject<HTMLElement>, {
 		itemSelector: "[data-stagger-item]",
 		threshold: 0.1,
 		deps: [pageIndex, selectedCategory, reports],

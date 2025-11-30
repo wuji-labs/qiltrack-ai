@@ -21,11 +21,11 @@ export async function GET(
       .select(
         "id, title, slug, summary, body, cover, theme, tags, lang, status, version, author_id, published_at, created_at, updated_at"
       )
-      .eq("slug", slug)
+      .eq("slug" as never, slug)
       .limit(1);
 
     if (!isAdmin) {
-      query = query.eq("status", "published");
+      query = query.eq("status" as never, "published");
     }
 
     const { data, error } = await query.single();
@@ -37,7 +37,7 @@ export async function GET(
       return context.applyCookies(response);
     }
 
-    const postWithCover = await signCover(data);
+    const postWithCover = await signCover(data as any);
 
     const response = NextResponse.json({ post: postWithCover });
     return context.applyCookies(response);

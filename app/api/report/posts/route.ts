@@ -35,17 +35,17 @@ export async function GET(request: NextRequest) {
       );
 
     if (isAdmin && statusFilter) {
-      query = query.eq("status", statusFilter);
+      query = query.eq("status" as never, statusFilter);
     } else if (!isAdmin) {
-      query = query.eq("status", "published");
+      query = query.eq("status" as never, "published");
     }
 
     if (lang) {
-      query = query.eq("lang", lang);
+      query = query.eq("lang" as never, lang);
     }
 
     if (theme) {
-      query = query.eq("theme", theme);
+      query = query.eq("theme" as never, theme);
     }
 
     if (tag) {
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
       return context.applyCookies(response);
     }
 
-    const postsWithCover = await attachSignedCover(data ?? []);
+    const postsWithCover = await attachSignedCover(data as any ?? []);
 
     const response = NextResponse.json({
       posts: postsWithCover,
