@@ -267,8 +267,8 @@ export async function POST(request: NextRequest) {
   let profileIsAnnual = false;
   let profilePlan = "";
   try {
-    const { data: profile } = await supabase.from("profiles").select("plan, subscription_type").eq("id", userId).single();
-    profilePlan = (profile?.subscription_type || profile?.plan || "").toLowerCase();
+    const { data: profile } = await supabase.from("profiles").select("plan, subscription_type").eq("id", userId as never).single();
+    profilePlan = ((profile as { subscription_type?: string; plan?: string })?.subscription_type || (profile as { subscription_type?: string; plan?: string })?.plan || "").toLowerCase();
     profileIsAnnual = profilePlan === "annual";
 
     if (clientPlanLabel === "annual" && !profileIsAnnual) {
@@ -328,13 +328,13 @@ export async function POST(request: NextRequest) {
       const { data: runData } = await supabase
         .from("report_runs")
         .select("company_snapshot, symbol")
-        .eq("id", reportRunId)
+        .eq("id", reportRunId as never)
         .single();
-      if (runData?.company_snapshot) {
-        resolvedCompany = (runData.company_snapshot as CompanyData) || undefined;
-      } else if (runData?.symbol) {
+      if ((runData as { company_snapshot?: CompanyData; symbol?: string })?.company_snapshot) {
+        resolvedCompany = ((runData as { company_snapshot?: CompanyData; symbol?: string }).company_snapshot as CompanyData) || undefined;
+      } else if ((runData as { company_snapshot?: CompanyData; symbol?: string })?.symbol) {
         resolvedCompany = {
-          symbol: runData.symbol,
+          symbol: (runData as { company_snapshot?: CompanyData; symbol?: string }).symbol,
           profile: {},
           quote: {},
           metrics: {},
@@ -465,7 +465,7 @@ export async function POST(request: NextRequest) {
           <Text style={styles.sectionTitle}>Valuation & Profitability</Text>
           <View style={styles.grid}>{buildMetricCards(blueprint.valuation)}</View>
           {valImage ? (
-            <Image src={toDataUri(valImage)} style={[styles.chartImage, { height: 220 }]} alt="Valuation chart" />
+            <Image src={toDataUri(valImage)} style={[styles.chartImage, { height: 220 }]} />
           ) : (
             <Text style={styles.bodyText}>Charts unavailable due to limited valuation data.</Text>
           )}
@@ -484,7 +484,7 @@ export async function POST(request: NextRequest) {
             </View>
           </View>
           {perfImage ? (
-            <Image src={toDataUri(perfImage)} style={[styles.chartImage, { height: 220 }]} alt="Performance chart" />
+            <Image src={toDataUri(perfImage)} style={[styles.chartImage, { height: 220 }]} />
           ) : (
             <Text style={styles.bodyText}>Charts unavailable due to missing price history.</Text>
           )}
