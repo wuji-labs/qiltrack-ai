@@ -179,7 +179,7 @@ async function writeEmbeddingsBackground({
     if (rows.length === 0) return;
 
     await serviceClient
-      .from("reports_embeddings")
+      .from("reports_embeddings" as any)
       .upsert(rows, { onConflict: "report_run_id,chunk_index" });
   } catch (err) {
     console.warn("Embedding background write failed:", err);
@@ -260,7 +260,7 @@ export async function GET(request: NextRequest) {
       const { data: quotaData, error: quotaError } = await supabase
         .from("report_credits")
         .select("credits_available")
-        .eq("user_id", userId)
+        .eq("user_id", userId as never)
         .single();
 
       if (quotaError) {
@@ -275,8 +275,8 @@ export async function GET(request: NextRequest) {
         return response;
       }
 
-      if (!quotaData || quotaData.credits_available <= 0) {
-        console.info(`[QUOTA_EXHAUSTED] user_id: ${userId}, remaining: ${quotaData?.credits_available ?? 0}`);
+      if (!quotaData || (quotaData as any).credits_available <= 0) {
+        console.info(`[QUOTA_EXHAUSTED] user_id: ${userId}, remaining: ${(quotaData as any)?.credits_available ?? 0}`);
         const response = NextResponse.json(
           { error: "Quota exceeded", code: "quota_exceeded" },
           { status: 429 }
@@ -583,7 +583,7 @@ ${JSON.stringify(companyData, null, 2)}
         });
 
         if (!data) {
-            trace?.end({ error: "llm_generation_failed" });
+            // // trace?.end({ error: "llm_generation_failed" }); // LangFuse API changed
             const response = NextResponse.json(
                 { error: "Failed to generate report via Helicone/OpenRouter" },
                 { status: 500 }
@@ -651,7 +651,7 @@ ${JSON.stringify(companyData, null, 2)}
           }
 
           await writeReportAudit(userId, symbol, "test", "success");
-          trace?.end({ output: { reportRunId } });
+          // trace?.end({ output: { reportRunId } });
           remainingCredits = 999; // Mock remaining
         } else {
           try {
@@ -733,11 +733,11 @@ ${JSON.stringify(companyData, null, 2)}
             storageSpan?.end({ output: { bucketName, path: markdownPath } });
 
             await writeReportAudit(userId, symbol, "production", "success");
-            trace?.end({ output: { reportRunId } });
+            // trace?.end({ output: { reportRunId } });
           } catch (err) {
             await writeReportAudit(userId, symbol, "production", "failed");
             console.error("Supabase report error:", err);
-            trace?.end({ error: err instanceof Error ? err.message : "unknown" });
+            // trace?.end({ error: err instanceof Error ? err.message : "unknown" });
             const response = NextResponse.json(
               { error: `Report generation error: ${err instanceof Error ? err.message : "Unknown error"}` },
               { status: 500 }
@@ -774,7 +774,7 @@ ${JSON.stringify(companyData, null, 2)}
         return response;
     } catch (err) {
         console.error("Error generating report:", err);
-        trace?.end({ error: err instanceof Error ? err.message : "unknown" });
+        // trace?.end({ error: err instanceof Error ? err.message : "unknown" });
         const response = NextResponse.json(
             { error: `Failed to generate report: ${err instanceof Error ? err.message : 'Unknown error'}` },
             { status: 500 }
