@@ -10,8 +10,7 @@ import { type ProgressState } from "@/hooks/useProgress";
 import { fetchSimilarReports, generateReport, searchSymbols } from "@/lib/services/api";
 import type { Language } from "@/lib/i18n-config";
 import type { ReportResponse, ReportTone, SearchResult, SimilarReport } from "@/types/report";
-// TODO: These components are not yet implemented
-// import KpiCard from "@/components/KpiCard";
+import KpiCard from "@/components/KpiCard";
 // import { PricePerformanceChart, ValuationMetricsChart, NewsTimelineWidget } from "@/components/ReportCharts";
 
 type ToneOption = {
@@ -878,7 +877,6 @@ export function ReportGeneratorSection({
 					</div>
 
 					{/* KPI Dashboard */}
-					{/* TODO: Uncomment when KpiCard component is implemented
 					<div className="space-y-4">
 						<h2 className="text-xl font-semibold uppercase tracking-wider text-[var(--color-foreground)] mb-4">
 							Key Metrics
@@ -952,7 +950,6 @@ export function ReportGeneratorSection({
 							/>
 						</div>
 					</div>
-					*/}
 
 					{/* Charts Section */}
 					{/* TODO: Uncomment when chart components are implemented
