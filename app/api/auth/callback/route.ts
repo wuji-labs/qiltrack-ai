@@ -6,6 +6,7 @@ import type { Database } from "@/types/database";
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
+  const type = requestUrl.searchParams.get("type");
 
   if (code) {
     const cookieStore = await cookies();
@@ -39,6 +40,11 @@ export async function GET(request: NextRequest) {
           console.error("Failed to initialize profile:", rpcError);
           // Don't fail the login, just log the error
         }
+      }
+
+      // If this is a password recovery callback, redirect to change password page
+      if (type === "recovery") {
+        return NextResponse.redirect(new URL("/account/change-password", requestUrl.origin));
       }
 
       return NextResponse.redirect(new URL("/", requestUrl.origin));
