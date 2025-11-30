@@ -1,90 +1,59 @@
-"use client";
+type Tone = "positive" | "negative" | "warning" | "neutral";
+
+type Trend = "up" | "down" | "flat";
 
 type KpiCardProps = {
-  label: string;
-  value: string | number | null | undefined;
-  icon?: string;
-  tone?: "positive" | "negative" | "neutral" | "warning";
-  trend?: "up" | "down" | "flat";
-  helper?: string;
+	label: string;
+	value: string;
+	icon?: string;
+	helper?: string;
+	tone?: Tone;
+	trend?: Trend;
 };
 
-const toneColors = {
-  positive: "border-[#5be0b0]/30 bg-[#5be0b0]/5",
-  negative: "border-red-400/30 bg-red-400/5",
-  warning: "border-yellow-400/30 bg-yellow-400/5",
-  neutral: "border-[var(--stroke-soft)] bg-[var(--bg-layer)]",
+const toneClasses: Record<Tone, string> = {
+	positive: "border-emerald-300/50 bg-emerald-500/5 text-emerald-50",
+	negative: "border-rose-300/50 bg-rose-500/5 text-rose-50",
+	warning: "border-amber-300/60 bg-amber-500/5 text-amber-50",
+	neutral: "border-[var(--stroke-soft)] bg-[var(--bg-layer)] text-[var(--color-foreground)]",
 };
 
-const toneTextColors = {
-  positive: "text-[#5be0b0]",
-  negative: "text-red-400",
-  warning: "text-yellow-400",
-  neutral: "text-[var(--color-foreground)]",
+const toneAccent: Record<Tone, string> = {
+	positive: "text-emerald-300",
+	negative: "text-rose-300",
+	warning: "text-amber-300",
+	neutral: "text-subtle",
 };
 
-const trendIcons = {
-  up: "↗",
-  down: "↘",
-  flat: "→",
+const trendIcon: Record<Trend, string> = {
+	up: "↑",
+	down: "↓",
+	flat: "→",
 };
 
-export default function KpiCard({
-  label,
-  value,
-  icon,
-  tone = "neutral",
-  trend,
-  helper,
-}: KpiCardProps) {
-  const displayValue = value ?? "N/A";
-  const isNumeric = typeof value === "number";
-
-  return (
-    <div
-      className={`
-        relative overflow-hidden rounded-2xl border p-5
-        backdrop-blur-sm transition-all duration-300
-        hover:border-[var(--accent-emerald)]/40 hover:shadow-lg
-        ${toneColors[tone]}
-      `}
-    >
-      {/* Background gradient */}
-      <div className="absolute inset-0 opacity-30 pointer-events-none">
-        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[var(--accent-emerald)]/20 to-transparent rounded-full blur-2xl" />
-      </div>
-
-      <div className="relative z-10">
-        {/* Header with icon and trend */}
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-2">
-            {icon && <span className="text-2xl">{icon}</span>}
-            <span className="text-xs uppercase tracking-wider text-[var(--text-subtle)] font-medium">
-              {label}
-            </span>
-          </div>
-          {trend && (
-            <span className={`text-lg ${toneTextColors[tone]}`}>
-              {trendIcons[trend]}
-            </span>
-          )}
-        </div>
-
-        {/* Value */}
-        <div className={`text-3xl font-bold mb-1 ${toneTextColors[tone]}`}>
-          {isNumeric && typeof value === "number"
-            ? value.toLocaleString("en-US", {
-                maximumFractionDigits: 2,
-                minimumFractionDigits: 0,
-              })
-            : displayValue}
-        </div>
-
-        {/* Helper text */}
-        {helper && (
-          <p className="text-xs text-[var(--text-dim)] mt-2">{helper}</p>
-        )}
-      </div>
-    </div>
-  );
+export default function KpiCard({ label, value, icon, helper, tone = "neutral", trend }: KpiCardProps) {
+	const borderClasses = toneClasses[tone] ?? toneClasses.neutral;
+	const accentClasses = toneAccent[tone] ?? toneAccent.neutral;
+	return (
+		<div
+			className={`rounded-xl border px-3.5 py-3 shadow-[0_10px_28px_rgba(0,0,0,0.18)] ${borderClasses}`}
+			aria-label={label}
+		>
+			<div className="flex items-start justify-between gap-2">
+				<div className="space-y-1">
+					<p className="text-xs uppercase tracking-[0.18em] text-subtle">{label}</p>
+					<div className="flex items-baseline gap-2">
+						<span className="text-xl font-semibold">{value}</span>
+						{trend && <span className={`text-xs font-semibold ${accentClasses}`}>{trendIcon[trend]}</span>}
+					</div>
+				</div>
+				{icon && (
+					<span className="text-lg" aria-hidden>
+						{icon}
+					</span>
+				)}
+			</div>
+			{helper && <p className={`mt-2 text-xs ${accentClasses}`}>{helper}</p>}
+		</div>
+	);
 }
