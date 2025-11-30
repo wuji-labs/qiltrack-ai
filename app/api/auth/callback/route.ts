@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         const { error: rpcError } = await supabase.rpc("fn_initialize_profile", {
           p_user_id: user.id,
           p_email: user.email,
-        });
+        } as never);
 
         if (rpcError) {
           console.error("Failed to initialize profile:", rpcError);

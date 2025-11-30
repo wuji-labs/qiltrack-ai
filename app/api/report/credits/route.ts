@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       const { data, error: quotaError } = await supabaseForQuery
         .from("report_credits")
         .select("credits_available")
-        .eq("user_id", userId)
+        .eq("user_id", userId as never)
         .single();
 
       if (quotaError) {
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         userId,
         credits: {
-          remaining_credits: data?.credits_available ?? 0,
+          remaining_credits: (data as { credits_available: number })?.credits_available ?? 0,
         },
         source: "report_credits",
       });
