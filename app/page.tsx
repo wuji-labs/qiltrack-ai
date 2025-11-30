@@ -182,7 +182,7 @@ export default function Home() {
 	const [remainingQuota, setRemainingQuota] = useState(0);
 	const [quotaLoaded, setQuotaLoaded] = useState(false);
 
-	// Fetch remaining credits on mount and when authenticated
+	// Fetch remaining credits on mount and when authenticated, with auto-refresh
 	useEffect(() => {
 		const loadCredits = async () => {
 			if (!isAuthenticated) {
@@ -201,7 +201,14 @@ export default function Home() {
 			}
 		};
 
+		// Fetch immediately
 		loadCredits();
+
+		// Auto-refresh every 30 seconds to keep quota in sync
+		const interval = setInterval(loadCredits, 30000);
+
+		// Cleanup interval on unmount
+		return () => clearInterval(interval);
 	}, [isAuthenticated]);
 
 	const isDark = true;
