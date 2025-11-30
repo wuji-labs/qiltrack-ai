@@ -323,7 +323,7 @@ export default function Home() {
 						language={language as Language}
 						setLanguage={setLanguage}
 						planLabel={planLabel}
-						userEmail={user?.email}
+						userEmail={user?.email ?? null}
 						userImage={user?.user_metadata?.avatar_url}
 						isAuthenticated={isAuthenticated}
 						onPrimaryCta={handlePrimaryCta}
@@ -354,9 +354,13 @@ export default function Home() {
 											remainingQuota: remainingQuota,
 											quotaLoaded: quotaLoaded,
 											planLabel,
-											userEmail: user?.email,
-											refreshSession: refreshSession,
-											refreshQuota: refreshQuota,
+											userEmail: user?.email ?? null,
+											refreshSession: async () => {
+												await refreshSession();
+											},
+											refreshQuota: async () => {
+												await refreshQuota();
+											},
 										}}
 										progress={progress}
 										onRequireLogin={() => router.push("/login")}

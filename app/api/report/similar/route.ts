@@ -53,13 +53,13 @@ export async function GET(request: NextRequest) {
 
   const serviceRoleClient = createServiceRoleClient();
 
-  const { data, error } = await serviceRoleClient.rpc("match_reports_embeddings", {
+  const { data, error } = await serviceRoleClient.rpc("match_reports_embeddings" as never, {
     p_user_id: userId,
     p_query_run_id: runId,
     p_lang: lang || null,
     p_tone: tone || null,
     p_match_count: limit,
-  });
+  } as never);
 
   if (error) {
     console.error("similar reports rpc error:", error);

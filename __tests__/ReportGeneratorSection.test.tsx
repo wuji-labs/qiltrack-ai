@@ -104,6 +104,7 @@ const defaultAuth = {
 const createProgress = () => ({
 	progress: 0,
 	currentStep: 0,
+	status: "idle" as const,
 	text: null,
 	start: vi.fn(),
 	complete: vi.fn().mockResolvedValue(undefined),

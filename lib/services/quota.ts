@@ -107,13 +107,14 @@ export async function writeReportAudit(
     await supabase.from("report_credit_events").insert({
       user_id: userId,
       event_type: "report_generated",
+      credits_amount: 0, // Audit log, no credit deduction
       metadata: {
         symbol,
         mode,
         status,
         timestamp: new Date().toISOString(),
       },
-    });
+    } as never);
   } catch (err) {
     console.error("Failed to write audit log:", err);
     // Don't throw - audit logging failure shouldn't break report generation

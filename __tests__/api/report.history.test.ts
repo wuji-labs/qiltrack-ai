@@ -52,7 +52,8 @@ describe("API: /api/report/history - RLS Filtering", () => {
       },
     };
 
-    vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as unknown as SupabaseClient);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as any);
 
     const request = new NextRequest("http://localhost:3000/api/report/history", {
       method: "GET",
@@ -105,7 +106,8 @@ describe("API: /api/report/history - RLS Filtering", () => {
       }),
     };
 
-    vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as unknown as SupabaseClient);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as any);
 
     const request = new NextRequest("http://localhost:3000/api/report/history", {
       method: "GET",
@@ -156,7 +158,8 @@ describe("API: /api/report/history - RLS Filtering", () => {
       }),
     };
 
-    vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as unknown as SupabaseClient);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as any);
 
     const request = new NextRequest(
       "http://localhost:3000/api/report/history?page=2&limit=10",
@@ -200,7 +203,8 @@ describe("API: /api/report/history - RLS Filtering", () => {
       }),
     };
 
-    vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as unknown as SupabaseClient);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as any);
 
     const request = new NextRequest("http://localhost:3000/api/report/history", {
       method: "GET",
@@ -241,7 +245,8 @@ describe("API: /api/report/history - RLS Filtering", () => {
       }),
     };
 
-    vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as unknown as SupabaseClient);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as any);
 
     const request = new NextRequest("http://localhost:3000/api/report/history", {
       method: "GET",
@@ -281,7 +286,8 @@ describe("API: /api/report/history - RLS Filtering", () => {
       }),
     };
 
-    vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as unknown as SupabaseClient);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as any);
 
     const request = new NextRequest("http://localhost:3000/api/report/history", {
       method: "GET",
@@ -319,7 +325,8 @@ describe("API: /api/report/history - RLS Filtering", () => {
       }),
     };
 
-    vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as unknown as SupabaseClient);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as any);
 
     // Test with invalid page (should default to 1)
     const request = new NextRequest(

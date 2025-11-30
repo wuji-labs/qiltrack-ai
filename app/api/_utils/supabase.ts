@@ -53,8 +53,7 @@ export async function getAuthContext(
   const { data: profile } = await context.supabase
     .from("profiles")
     .select("id, role")
-    // @ts-expect-error - Supabase type inference issue with user.id in Next.js 16
-    .eq("id", session.user.id)
+    .eq("id" as never, session.user.id)
     .maybeSingle();
 
   return {
