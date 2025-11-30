@@ -58,6 +58,7 @@ describe("API: /api/report - Supabase Integration", () => {
           error: null,
         }),
       },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     vi.mocked(createServerClient).mockImplementation(() => {
@@ -102,7 +103,9 @@ describe("API: /api/report - Supabase Integration", () => {
     });
 
     // Create flexible mock that handles different query chains
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const createChainableMock = (dataToReturn: unknown = null): any => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const chain: any = {
         select: vi.fn(),
         insert: vi.fn(),
@@ -153,6 +156,7 @@ describe("API: /api/report - Supabase Integration", () => {
         }),
       },
       from: vi.fn().mockImplementation(() => createMockFrom()),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     vi.mocked(createServerClient).mockImplementation((cookieGetter, cookieSetter) => {
@@ -162,6 +166,7 @@ describe("API: /api/report - Supabase Integration", () => {
       }
       return mockSupabaseClient;
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(createServiceRoleClient).mockReturnValue({} as any);
     vi.mocked(uploadToStorage).mockResolvedValue("https://signed.url");
     vi.mocked(writeReportAudit).mockResolvedValue(undefined);
@@ -203,6 +208,7 @@ describe("API: /api/report - Supabase Integration", () => {
           }),
         }),
       }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     vi.mocked(createServerClient).mockImplementation(() => {
@@ -238,6 +244,7 @@ describe("API: /api/report - Supabase Integration", () => {
           }),
         }),
       }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     vi.mocked(createServerClient).mockImplementation(() => {

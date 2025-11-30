@@ -179,6 +179,7 @@ async function writeEmbeddingsBackground({
     if (rows.length === 0) return;
 
     await serviceClient
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .from("reports_embeddings" as any)
       .upsert(rows, { onConflict: "report_run_id,chunk_index" });
   } catch (err) {
@@ -275,7 +276,9 @@ export async function GET(request: NextRequest) {
         return response;
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (!quotaData || (quotaData as any).credits_available <= 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         console.info(`[QUOTA_EXHAUSTED] user_id: ${userId}, remaining: ${(quotaData as any)?.credits_available ?? 0}`);
         const response = NextResponse.json(
           { error: "Quota exceeded", code: "quota_exceeded" },
@@ -620,6 +623,7 @@ ${JSON.stringify(companyData, null, 2)}
               .single();
 
             if (!runError && runData) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               reportRunId = (runData as any).id;
 
               // Upload Markdown to Storage in test mode
@@ -689,6 +693,7 @@ ${JSON.stringify(companyData, null, 2)}
               throw new Error(`Failed to create report run: ${runError?.message}`);
             }
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             reportRunId = (runData as any).id;
 
             const storageSpan = trace?.span({ name: "supabase.storage.upload" });

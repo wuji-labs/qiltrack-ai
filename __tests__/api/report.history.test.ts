@@ -52,6 +52,7 @@ describe("API: /api/report/history - RLS Filtering", () => {
       },
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as any);
 
     const request = new NextRequest("http://localhost:3000/api/report/history", {
@@ -105,6 +106,7 @@ describe("API: /api/report/history - RLS Filtering", () => {
       }),
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as any);
 
     const request = new NextRequest("http://localhost:3000/api/report/history", {
@@ -156,6 +158,7 @@ describe("API: /api/report/history - RLS Filtering", () => {
       }),
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as any);
 
     const request = new NextRequest(
@@ -200,6 +203,7 @@ describe("API: /api/report/history - RLS Filtering", () => {
       }),
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as any);
 
     const request = new NextRequest("http://localhost:3000/api/report/history", {
@@ -241,6 +245,7 @@ describe("API: /api/report/history - RLS Filtering", () => {
       }),
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as any);
 
     const request = new NextRequest("http://localhost:3000/api/report/history", {
@@ -281,6 +286,7 @@ describe("API: /api/report/history - RLS Filtering", () => {
       }),
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as any);
 
     const request = new NextRequest("http://localhost:3000/api/report/history", {
@@ -319,6 +325,7 @@ describe("API: /api/report/history - RLS Filtering", () => {
       }),
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(createServerClient).mockReturnValue(mockSupabaseClient as any);
 
     // Test with invalid page (should default to 1)

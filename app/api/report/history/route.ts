@@ -62,6 +62,7 @@ export async function GET(request: NextRequest) {
       const mapWithSignedUrls = async () => {
         if (!reports?.length) return [];
         return Promise.all(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           reports.map(async (report: any) => {
             const docxSigned =
               report.docx_path

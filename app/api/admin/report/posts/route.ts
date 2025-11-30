@@ -156,6 +156,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     let tags: string[] | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let status: "draft" | "published" = (existing as any)?.status ?? "draft";
     try {
       tags = payload.tags ? ensureArray(payload.tags) : undefined;
@@ -169,8 +170,10 @@ export async function PATCH(request: NextRequest) {
       return context.applyCookies(response);
     }
     const nextVersion =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       payload.version ?? ((existing as any).version ?? 1) + 1;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let publishedAt = (existing as any).published_at;
     if (status === "published" && !publishedAt) {
       publishedAt = payload.publishedAt || new Date().toISOString();
@@ -181,13 +184,21 @@ export async function PATCH(request: NextRequest) {
     }
 
     const updatePayload = {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       title: payload.title ?? (existing as any).title,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       slug: payload.slug ?? (existing as any).slug,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       summary: payload.summary ?? (existing as any).summary,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       body: payload.body ?? (existing as any).body,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cover: payload.cover ?? (existing as any).cover,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       theme: payload.theme ?? (existing as any).theme,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       tags: tags ?? (existing as any).tags ?? [],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       lang: payload.lang ?? (existing as any).lang ?? "en",
       status,
       version: nextVersion,

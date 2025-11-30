@@ -69,6 +69,7 @@ export async function GET(request: NextRequest) {
       return context.applyCookies(response);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const postsWithCover = await attachSignedCover(data as any ?? []);
 
     const response = NextResponse.json({

@@ -41,8 +41,11 @@ export async function POST(request: NextRequest) {
     }
 
     const response = NextResponse.json({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       success: (data as any)?.[0]?.success ?? false,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       message: (data as any)?.[0]?.message ?? "Unknown error",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       remainingCredits: (data as any)?.[0]?.remaining_credits ?? 0,
     });
 
