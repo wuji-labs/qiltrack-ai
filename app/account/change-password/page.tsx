@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useLanguage } from "@/lib/i18n";
 
 export default function ChangePasswordPage() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const { isAuthenticated, authMethod, oauthProviders } = useSupabaseAuth();
 	const { t } = useLanguage();
 
@@ -18,12 +19,15 @@ export default function ChangePasswordPage() {
 	const [success, setSuccess] = useState(false);
 	const [loading, setLoading] = useState(false);
 
-	// Redirect if not authenticated
+	// Check if this is a password recovery flow (has code parameter)
+	const isPasswordRecovery = searchParams.get("code") !== null;
+
+	// Redirect if not authenticated (unless it's password recovery)
 	useEffect(() => {
-		if (!isAuthenticated) {
+		if (!isAuthenticated && !isPasswordRecovery) {
 			router.push("/login");
 		}
-	}, [isAuthenticated, router]);
+	}, [isAuthenticated, isPasswordRecovery, router]);
 
 	// Check if user uses OAuth (no password to change)
 	const isOAuthUser = authMethod === "oauth" && oauthProviders.length > 0;
@@ -33,7 +37,60 @@ export default function ChangePasswordPage() {
 		setError("");
 		setSuccess(false);
 
-		// Validation
+		// Validation for password recovery (no current password needed)
+		if (isPasswordRecovery) {
+			if (!newPassword || !confirmPassword) {
+				setError(t("password.error.allFieldsRequired") || "All fields are required");
+				return;
+			}
+
+			if (newPassword.length < 8) {
+				setError(t("password.error.tooShort") || "New password must be at least 8 characters");
+				return;
+			}
+
+			if (newPassword !== confirmPassword) {
+				setError(t("password.error.mismatch") || "New passwords do not match");
+				return;
+			}
+
+			setLoading(true);
+
+			try {
+				const response = await fetch("/api/auth/change-password", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						newPassword,
+						isRecovery: true,
+					}),
+				});
+
+				const data = await response.json();
+
+				if (!response.ok) {
+					setError(data.error || t("password.error.failed") || "Failed to change password");
+					return;
+				}
+
+				setSuccess(true);
+				setNewPassword("");
+				setConfirmPassword("");
+
+				// Redirect to login page after 2 seconds
+				setTimeout(() => {
+					router.push("/login");
+				}, 2000);
+			} catch (err) {
+				console.error("Password reset error:", err);
+				setError(t("password.error.network") || "Network error. Please try again.");
+			} finally {
+				setLoading(false);
+			}
+			return;
+		}
+
+		// Normal password change (requires current password)
 		if (!currentPassword || !newPassword || !confirmPassword) {
 			setError(t("password.error.allFieldsRequired") || "All fields are required");
 			return;
@@ -85,7 +142,7 @@ export default function ChangePasswordPage() {
 		}
 	};
 
-	if (!isAuthenticated) {
+	if (!isAuthenticated && !isPasswordRecovery) {
 		return null;
 	}
 
@@ -152,22 +209,24 @@ export default function ChangePasswordPage() {
 								</div>
 							)}
 
-							{/* Current Password */}
-							<div className="space-y-2">
-								<label htmlFor="current-password" className="block text-sm font-medium text-[var(--color-foreground)]">
-									{t("password.currentPassword") || "Current Password"}
-								</label>
-								<input
-									id="current-password"
-									type="password"
-									value={currentPassword}
-									onChange={(e) => setCurrentPassword(e.target.value)}
-									className="w-full rounded-lg border border-[var(--stroke-soft)] bg-[var(--bg-surface)] px-4 py-2.5 text-[var(--color-foreground)] placeholder:text-[var(--color-muted)] focus:border-[var(--accent-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/20"
-									placeholder="Enter your current password"
-									disabled={loading}
-									autoComplete="current-password"
-								/>
-							</div>
+							{/* Current Password - Only show for logged-in users changing password */}
+							{!isPasswordRecovery && (
+								<div className="space-y-2">
+									<label htmlFor="current-password" className="block text-sm font-medium text-[var(--color-foreground)]">
+										{t("password.currentPassword") || "Current Password"}
+									</label>
+									<input
+										id="current-password"
+										type="password"
+										value={currentPassword}
+										onChange={(e) => setCurrentPassword(e.target.value)}
+										className="w-full rounded-lg border border-[var(--stroke-soft)] bg-[var(--bg-surface)] px-4 py-2.5 text-[var(--color-foreground)] placeholder:text-[var(--color-muted)] focus:border-[var(--accent-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/20"
+										placeholder="Enter your current password"
+										disabled={loading}
+										autoComplete="current-password"
+									/>
+								</div>
+							)}
 
 							{/* New Password */}
 							<div className="space-y-2">
