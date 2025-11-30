@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
       // If this is a password recovery callback, redirect to change password page
       if (type === "recovery") {
-        return NextResponse.redirect(new URL("/account/change-password", requestUrl.origin));
+        return NextResponse.redirect(new URL("/account/change-password?type=recovery", requestUrl.origin));
       }
 
       return NextResponse.redirect(new URL("/", requestUrl.origin));

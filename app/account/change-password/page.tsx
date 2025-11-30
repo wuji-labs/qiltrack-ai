@@ -19,8 +19,10 @@ export default function ChangePasswordPage() {
 	const [success, setSuccess] = useState(false);
 	const [loading, setLoading] = useState(false);
 
-	// Check if this is a password recovery flow (has code parameter)
-	const isPasswordRecovery = searchParams.get("code") !== null;
+	// Check if this is a password recovery flow
+	// User is in recovery mode if they have a "type=recovery" parameter
+	// (passed from callback route after successful code exchange)
+	const isPasswordRecovery = searchParams.get("type") === "recovery";
 
 	// Redirect if not authenticated (unless it's password recovery)
 	useEffect(() => {
@@ -147,23 +149,48 @@ export default function ChangePasswordPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)] flex items-center justify-center px-4 py-10">
+		<div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 flex items-center justify-center px-4 py-10">
 			<div className="w-full max-w-md space-y-6">
-				{/* Header */}
-				<div className="text-center space-y-2">
-					<h1 className="text-3xl font-bold text-[var(--color-foreground)]">
-						{t("password.title") || "Change Password"}
+				{/* Logo */}
+				<div className="text-center space-y-3">
+					<div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-slate-800/60 font-bold tracking-[0.16em] text-emerald-200 shadow-lg">
+						IA
+					</div>
+					<h1 className="text-2xl font-semibold">
+						{isPasswordRecovery
+							? t("auth.resetPassword.title") || "Reset Password"
+							: t("password.title") || "Change Password"}
 					</h1>
-					<p className="text-sm text-[var(--color-muted)]">
-						{t("password.subtitle") || "Update your account password"}
+					<p className="text-sm text-slate-400">
+						{isPasswordRecovery
+							? t("auth.resetPassword.subtitle") || "Set your new password"
+							: t("password.subtitle") || "Update your account password"}
 					</p>
 				</div>
 
+				{/* Success/Error Banner */}
+				{(success || error) && (
+					<div
+						className={`rounded-2xl border px-4 py-3 text-sm ${
+							success
+								? "border-emerald-400/40 bg-emerald-400/10 text-emerald-100"
+								: "border-amber-500/50 bg-amber-500/10 text-amber-100"
+						}`}
+						role="status"
+					>
+						{success ? (
+							<>✓ {t("password.success") || "Password changed successfully! Redirecting..."}</>
+						) : (
+							error
+						)}
+					</div>
+				)}
+
 				{/* OAuth User Notice */}
-				{isOAuthUser && (
-					<div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 space-y-3">
+				{isOAuthUser && !isPasswordRecovery && (
+					<div className="rounded-3xl border border-slate-800 bg-slate-900/80 backdrop-blur-xl shadow-[0_20px_80px_rgba(0,0,0,0.6)] p-6 space-y-4">
 						<div className="flex items-start gap-3">
-							<div className="text-blue-400 mt-0.5">
+							<div className="text-emerald-400 mt-0.5">
 								<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
 									<path
 										fillRule="evenodd"
@@ -172,47 +199,33 @@ export default function ChangePasswordPage() {
 									/>
 								</svg>
 							</div>
-							<div className="flex-1 space-y-1">
-								<h3 className="font-semibold text-blue-200">
+							<div className="flex-1 space-y-2">
+								<h3 className="font-semibold text-slate-100">
 									{t("password.oauth.title") || "OAuth Account"}
 								</h3>
-								<p className="text-sm text-blue-300/90">
+								<p className="text-sm text-slate-400">
 									{t("password.oauth.message") ||
-										`You're signed in with ${oauthProviders.join(", ")}. OAuth accounts don't have passwords. Your password is managed by your provider.`}
+										`You're signed in with ${oauthProviders.map((p) => p.provider).join(", ")}. OAuth accounts don't have passwords.`}
 								</p>
 							</div>
 						</div>
 						<Link
 							href="/account"
-							className="inline-flex items-center gap-1 text-sm text-blue-300 hover:text-blue-200 transition-colors"
+							className="inline-flex items-center gap-1 text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
 						>
 							← {t("password.oauth.backToAccount") || "Back to Account"}
 						</Link>
 					</div>
 				)}
 
-				{/* Password Change Form (only for password users) */}
+				{/* Password Change Form */}
 				{!isOAuthUser && (
 					<form onSubmit={handleSubmit} className="space-y-4">
-						<div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-6 space-y-4 shadow-xl">
-							{/* Success Message */}
-							{success && (
-								<div className="rounded-lg border border-green-500/30 bg-green-500/10 p-3 text-sm text-green-300">
-									✓ {t("password.success") || "Password changed successfully! Redirecting..."}
-								</div>
-							)}
-
-							{/* Error Message */}
-							{error && (
-								<div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
-									{error}
-								</div>
-							)}
-
+						<div className="rounded-3xl border border-slate-800 bg-slate-900/80 backdrop-blur-xl shadow-[0_20px_80px_rgba(0,0,0,0.6)] p-6 space-y-4">
 							{/* Current Password - Only show for logged-in users changing password */}
 							{!isPasswordRecovery && (
 								<div className="space-y-2">
-									<label htmlFor="current-password" className="block text-sm font-medium text-[var(--color-foreground)]">
+									<label htmlFor="current-password" className="block text-sm font-medium text-slate-300">
 										{t("password.currentPassword") || "Current Password"}
 									</label>
 									<input
@@ -220,8 +233,8 @@ export default function ChangePasswordPage() {
 										type="password"
 										value={currentPassword}
 										onChange={(e) => setCurrentPassword(e.target.value)}
-										className="w-full rounded-lg border border-[var(--stroke-soft)] bg-[var(--bg-surface)] px-4 py-2.5 text-[var(--color-foreground)] placeholder:text-[var(--color-muted)] focus:border-[var(--accent-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/20"
-										placeholder="Enter your current password"
+										className="w-full rounded-xl border border-slate-800 bg-slate-800/50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/60 focus:border-emerald-400"
+										placeholder="••••••••"
 										disabled={loading}
 										autoComplete="current-password"
 									/>
@@ -230,7 +243,7 @@ export default function ChangePasswordPage() {
 
 							{/* New Password */}
 							<div className="space-y-2">
-								<label htmlFor="new-password" className="block text-sm font-medium text-[var(--color-foreground)]">
+								<label htmlFor="new-password" className="block text-sm font-medium text-slate-300">
 									{t("password.newPassword") || "New Password"}
 								</label>
 								<input
@@ -238,20 +251,19 @@ export default function ChangePasswordPage() {
 									type="password"
 									value={newPassword}
 									onChange={(e) => setNewPassword(e.target.value)}
-									className="w-full rounded-lg border border-[var(--stroke-soft)] bg-[var(--bg-surface)] px-4 py-2.5 text-[var(--color-foreground)] placeholder:text-[var(--color-muted)] focus:border-[var(--accent-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/20"
-									placeholder="Enter your new password (min 8 characters)"
+									className="w-full rounded-xl border border-slate-800 bg-slate-800/50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/60 focus:border-emerald-400"
+									placeholder="••••••••"
 									disabled={loading}
 									autoComplete="new-password"
-									minLength={8}
 								/>
-								<p className="text-xs text-[var(--color-muted)]">
-									{t("password.hint") || "Must be at least 8 characters"}
+								<p className="text-xs text-slate-500">
+									{t("password.hint") || "At least 8 characters"}
 								</p>
 							</div>
 
-							{/* Confirm New Password */}
+							{/* Confirm Password */}
 							<div className="space-y-2">
-								<label htmlFor="confirm-password" className="block text-sm font-medium text-[var(--color-foreground)]">
+								<label htmlFor="confirm-password" className="block text-sm font-medium text-slate-300">
 									{t("password.confirmPassword") || "Confirm New Password"}
 								</label>
 								<input
@@ -259,8 +271,8 @@ export default function ChangePasswordPage() {
 									type="password"
 									value={confirmPassword}
 									onChange={(e) => setConfirmPassword(e.target.value)}
-									className="w-full rounded-lg border border-[var(--stroke-soft)] bg-[var(--bg-surface)] px-4 py-2.5 text-[var(--color-foreground)] placeholder:text-[var(--color-muted)] focus:border-[var(--accent-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/20"
-									placeholder="Confirm your new password"
+									className="w-full rounded-xl border border-slate-800 bg-slate-800/50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/60 focus:border-emerald-400"
+									placeholder="••••••••"
 									disabled={loading}
 									autoComplete="new-password"
 								/>
@@ -270,23 +282,40 @@ export default function ChangePasswordPage() {
 							<button
 								type="submit"
 								disabled={loading}
-								className="w-full rounded-lg bg-[var(--accent-primary)] px-4 py-3 font-semibold text-white hover:bg-[var(--accent-primary)]/90 focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+								className={`w-full rounded-xl bg-emerald-500 px-4 py-3 text-base font-semibold text-white hover:bg-emerald-600 transition-colors ${
+									loading ? "opacity-60 cursor-not-allowed" : ""
+								}`}
 							>
-								{loading ? (t("password.changing") || "Changing Password...") : (t("password.changeButton") || "Change Password")}
+								{loading
+									? t("auth.form.loading") || "Updating..."
+									: isPasswordRecovery
+										? t("auth.resetPassword.submit") || "Reset Password"
+										: t("password.submit") || "Update Password"}
 							</button>
-						</div>
 
-						{/* Cancel Link */}
-						<div className="text-center">
-							<Link
-								href="/account"
-								className="text-sm text-[var(--color-muted)] hover:text-[var(--color-foreground)] transition-colors"
-							>
-								← {t("password.cancel") || "Cancel"}
-							</Link>
+							{/* Back Link */}
+							<div className="text-center">
+								<Link
+									href={isPasswordRecovery ? "/login" : "/account"}
+									className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+								>
+									← {isPasswordRecovery ? t("auth.backToLogin") || "Back to Login" : t("password.backToAccount") || "Back to Account"}
+								</Link>
+							</div>
 						</div>
 					</form>
 				)}
+
+				{/* Footer */}
+				<p className="text-xs text-slate-500 text-center">
+					<Link className="text-emerald-300 hover:underline" href="/legal/privacy">
+						Privacy Policy
+					</Link>
+					{" • "}
+					<Link className="text-emerald-300 hover:underline" href="/legal/terms">
+						Terms of Service
+					</Link>
+				</p>
 			</div>
 		</div>
 	);

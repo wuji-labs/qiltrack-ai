@@ -309,7 +309,7 @@ export function useSupabaseAuth() {
 
       try {
         const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
-          redirectTo: `${window.location.origin}/account/reset-password`,
+          redirectTo: `${window.location.origin}/api/auth/callback`,
         });
 
         if (error) {
