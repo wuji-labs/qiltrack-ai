@@ -10,9 +10,9 @@ import { type ProgressState } from "@/hooks/useProgress";
 import { fetchSimilarReports, generateReport, searchSymbols } from "@/lib/services/api";
 import type { Language } from "@/lib/i18n-config";
 import type { ReportResponse, ReportTone, SearchResult, SimilarReport } from "@/types/report";
-// TODO: These components are not yet implemented
-// import KpiCard from "@/components/KpiCard";
-// import { PricePerformanceChart, ValuationMetricsChart, NewsTimelineWidget } from "@/components/ReportCharts";
+	// TODO: These components are not yet implemented
+	import { PricePerformanceChart, ValuationMetricsChart, NewsTimelineWidget } from "@/app/components/ReportCharts";
+	import KpiCard from "@/app/components/KpiCard";
 
 type ToneOption = {
 	id: ReportTone;
@@ -98,6 +98,7 @@ export function ReportGeneratorSection({
 	const [similarReports, setSimilarReports] = useState<SimilarReport[]>([]);
 	const [loadingSimilar, setLoadingSimilar] = useState(false);
 	const [exportingDocx, setExportingDocx] = useState(false);
+	const [exportingPdf, setExportingPdf] = useState(false);
 	const [lastReportTone, setLastReportTone] = useState<ReportTone>("baseline");
 	const [placeholderVariant, setPlaceholderVariant] = useState<PlaceholderVariant>("xs");
 	const reportContentRef = useRef<HTMLDivElement>(null);
@@ -530,6 +531,72 @@ export function ReportGeneratorSection({
 		}
 	};
 
+	const handleExportPdf = async () => {
+		if (!reportData) {
+			alert(t("alert.export.missing"));
+			return;
+		}
+		if (!auth.isAuthenticated && !canBypassAuth) {
+			setErrorState({ type: "unauthorized", message: t("generator.alert.unregistered") });
+			onRequireLogin();
+			return;
+		}
+
+		setExportingPdf(true);
+		try {
+			const response = await fetch("/api/report/export/pdf", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					reportRunId: reportData.reportRunId,
+					report: reportData.report,
+					companyData: reportData.companyData,
+					symbol: reportData.symbol,
+					tone: lastReportTone,
+					planLabel: auth.planLabel,
+				}),
+			});
+
+			const data = (await response.json().catch(() => ({}))) as {
+				downloadUrl?: string;
+				pdfBase64?: string;
+				error?: string;
+				code?: string;
+			};
+
+			if (!response.ok) {
+				if (data?.code === "plan_required") {
+					alert(t("report.pdf.error.plan"));
+				} else {
+					alert(data?.error || t("alert.export.error"));
+				}
+				return;
+			}
+
+			if (data.downloadUrl) {
+				window.open(data.downloadUrl, "_blank", "noopener,noreferrer");
+				return;
+			}
+
+			if (data.pdfBase64) {
+				const link = document.createElement("a");
+				link.href = `data:application/pdf;base64,${data.pdfBase64}`;
+				link.download = `Investor-AI_Report_${reportData.symbol}.pdf`;
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+				return;
+			}
+
+			alert(t("alert.export.error"));
+		} catch (err) {
+			console.error("PDF export failed:", err);
+			alert(t("alert.export.error"));
+		} finally {
+			setExportingPdf(false);
+		}
+	};
+
 	const handleRefreshQuota = async () => {
 		try {
 			if (auth.refreshQuota) {
@@ -873,6 +940,14 @@ export function ReportGeneratorSection({
 								>
 									{exportingDocx ? t("report.action.exporting") : t("report.action.export")}
 								</button>
+								<button
+									type="button"
+									onClick={handleExportPdf}
+									disabled={exportingPdf}
+									className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-base text-dim transition hover:border-emerald-300 hover:text-[var(--color-foreground)] disabled:opacity-50 disabled:cursor-not-allowed"
+								>
+									{exportingPdf ? t("report.action.exporting") : t("report.pdf.cta")}
+								</button>
 							</div>
 						</div>
 					</div>
@@ -954,22 +1029,92 @@ export function ReportGeneratorSection({
 					</div>
 					*/}
 
+					<div className="space-y-4">
+						<h2 className="text-xl font-semibold uppercase tracking-wider text-[var(--color-foreground)] mb-4">
+							Key Metrics
+						</h2>
+						<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+							<KpiCard
+								label="Market Cap"
+								value={reportData.companyData.profile.marketCapitalization
+									? `$${(reportData.companyData.profile.marketCapitalization / 1000).toFixed(1)}B`
+									: "N/A"}
+								icon="💰"
+								tone="neutral"
+							/>
+							<KpiCard
+								label="P/E Ratio"
+								value={reportData.companyData.metrics.peTTM?.toFixed(2) ?? "N/A"}
+								icon="📊"
+								tone={
+									reportData.companyData.metrics.peTTM
+										? reportData.companyData.metrics.peTTM > 30
+											? "warning"
+											: reportData.companyData.metrics.peTTM < 15
+												? "positive"
+												: "neutral"
+										: "neutral"
+								}
+								helper="TTM"
+							/>
+							<KpiCard
+								label="Current Price"
+								value={reportData.companyData.quote.current
+									? `$${reportData.companyData.quote.current.toFixed(2)}`
+									: "N/A"}
+								icon="💹"
+								tone={
+									reportData.companyData.quote.change
+										? reportData.companyData.quote.change > 0
+											? "positive"
+											: "negative"
+										: "neutral"
+								}
+								trend={
+									reportData.companyData.quote.change
+										? reportData.companyData.quote.change > 0
+											? "up"
+											: reportData.companyData.quote.change < 0
+												? "down"
+												: "flat"
+										: undefined
+								}
+								helper={reportData.companyData.quote.changePercent
+									? `${reportData.companyData.quote.changePercent > 0 ? "+" : ""}${reportData.companyData.quote.changePercent.toFixed(2)}%`
+									: undefined}
+							/>
+							<KpiCard
+								label="ROE"
+								value={reportData.companyData.metrics.roeTTM
+									? `${reportData.companyData.metrics.roeTTM.toFixed(2)}%`
+									: "N/A"}
+								icon="📈"
+								tone={
+									reportData.companyData.metrics.roeTTM
+										? reportData.companyData.metrics.roeTTM > 15
+											? "positive"
+											: reportData.companyData.metrics.roeTTM > 10
+												? "neutral"
+												: "warning"
+										: "neutral"
+								}
+								helper="Return on Equity"
+							/>
+						</div>
+					</div>
+
 					{/* Charts Section */}
-					{/* TODO: Uncomment when chart components are implemented
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
 						<PricePerformanceChart companyData={reportData.companyData} />
 						<ValuationMetricsChart companyData={reportData.companyData} />
 					</div>
-					*/}
 
 					{/* News Timeline */}
-					{/* TODO: Uncomment when NewsTimelineWidget component is implemented
 					{reportData.companyData.recentNews && reportData.companyData.recentNews.length > 0 && (
 						<div className="mt-6">
 							<NewsTimelineWidget companyData={reportData.companyData} />
 						</div>
 					)}
-					*/}
 
 					<div ref={reportContentRef} className="text-base sm:text-lg leading-relaxed text-dim mt-8">
 						<ReactMarkdown components={markdownComponents}>{reportData.report}</ReactMarkdown>
