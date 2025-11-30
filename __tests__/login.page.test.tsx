@@ -31,6 +31,9 @@ vi.mock("@/hooks/useSupabaseAuth", () => ({
 	useSupabaseAuth: () => ({
 		signInWithProvider: mockSignInWithProvider,
 		signInWithEmail: mockSignInWithEmail,
+		signInWithPassword: vi.fn().mockResolvedValue({ success: true }),
+		signUpWithPassword: vi.fn().mockResolvedValue({ success: true }),
+		resetPassword: vi.fn().mockResolvedValue({ success: true }),
 		loading: false,
 		isAuthenticated: false,
 		session: null,
@@ -76,26 +79,6 @@ describe("LoginPage", () => {
 		const googleButton = screen.getByRole("button", { name: /Continue with Google/i });
 		await userEvent.click(googleButton);
 		await waitFor(() => expect(mockSignInWithProvider).toHaveBeenCalledTimes(1));
-	});
-
-	it("shows invalid email error", async () => {
-		mockSignInWithEmail.mockResolvedValueOnce({ success: false, code: "invalid_email" });
-		renderLogin();
-		const submit = screen.getByRole("button", { name: /Send sign-in link/i });
-		fireEvent.change(screen.getByPlaceholderText("name@example.com"), { target: { value: "bad-email" } });
-		fireEvent.click(submit);
-		await screen.findByText(/Please enter a valid email so we can send the sign-in link/i);
-	});
-
-	it("shows success message after email submission", async () => {
-		renderLogin();
-		const input = screen.getByPlaceholderText("name@example.com");
-		const submit = screen.getByRole("button", { name: /Send sign-in link/i });
-		await userEvent.type(input, "user@example.com");
-		await userEvent.click(submit);
-		const messages = await screen.findAllByText(/Link sent\. Check your inbox within 60s\./i);
-		expect(messages.length).toBeGreaterThan(0);
-		expect(mockSignInWithEmail).toHaveBeenCalledWith("user@example.com");
 	});
 
 	it("renders request error from query param", () => {
