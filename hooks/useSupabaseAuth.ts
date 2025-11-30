@@ -25,7 +25,7 @@ export interface AuthProviderInfo {
 
 type AuthResult =
   | { success: true }
-  | { success: false; error?: string; status?: number; code?: "cooldown" | "invalid_email" };
+  | { success: false; error?: string; status?: number; code?: "cooldown" | "invalid_email" | "invalid_credentials" | "user_already_exists" };
 
 const AUTH_CALLBACK_PATH = "/api/auth/callback";
 
@@ -237,6 +237,94 @@ export function useSupabaseAuth() {
     [supabase]
   );
 
+  const signInWithPassword = useCallback(
+    async (email: string, password: string): Promise<AuthResult> => {
+      const trimmedEmail = email.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
+        return { success: false, code: "invalid_email" };
+      }
+
+      try {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: trimmedEmail,
+          password,
+        });
+
+        if (error) {
+          const normalizedMessage = error.message.toLowerCase();
+          if (normalizedMessage.includes("invalid") || normalizedMessage.includes("credentials")) {
+            return { success: false, error: error.message, code: "invalid_credentials" };
+          }
+          return mapAuthError(error);
+        }
+
+        return { success: true };
+      } catch (err) {
+        console.error("密码登录失败:", err);
+        return mapAuthError(err);
+      }
+    },
+    [supabase]
+  );
+
+  const signUpWithPassword = useCallback(
+    async (email: string, password: string): Promise<AuthResult> => {
+      const trimmedEmail = email.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
+        return { success: false, code: "invalid_email" };
+      }
+
+      try {
+        const { error } = await supabase.auth.signUp({
+          email: trimmedEmail,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}${AUTH_CALLBACK_PATH}`,
+          },
+        });
+
+        if (error) {
+          const normalizedMessage = error.message.toLowerCase();
+          if (normalizedMessage.includes("already") || normalizedMessage.includes("exists")) {
+            return { success: false, error: error.message, code: "user_already_exists" };
+          }
+          return mapAuthError(error);
+        }
+
+        return { success: true };
+      } catch (err) {
+        console.error("注册失败:", err);
+        return mapAuthError(err);
+      }
+    },
+    [supabase]
+  );
+
+  const resetPassword = useCallback(
+    async (email: string): Promise<AuthResult> => {
+      const trimmedEmail = email.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
+        return { success: false, code: "invalid_email" };
+      }
+
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
+          redirectTo: `${window.location.origin}/account/reset-password`,
+        });
+
+        if (error) {
+          return mapAuthError(error);
+        }
+
+        return { success: true };
+      } catch (err) {
+        console.error("密码重置失败:", err);
+        return mapAuthError(err);
+      }
+    },
+    [supabase]
+  );
+
   const signInWithProvider = useCallback(
     async (provider: "google"): Promise<AuthResult> => {
       try {
@@ -311,6 +399,9 @@ export function useSupabaseAuth() {
     getAuthMethod,
     // Authentication functions
     signInWithEmail,
+    signInWithPassword,
+    signUpWithPassword,
+    resetPassword,
     signInWithProvider,
     signOut,
     refreshSession,

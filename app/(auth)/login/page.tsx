@@ -9,6 +9,7 @@ import { useLanguage } from "@/lib/i18n";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 type EmailStatus = "idle" | "loading" | "sent" | "error" | "cooldown";
+type AuthView = "signin" | "signup" | "magic-link" | "reset-password";
 
 function isLocalSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
@@ -34,15 +35,16 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const requestError = searchParams.get("error");
+  const view = (searchParams.get("view") || "signin") as AuthView;
 
   const [pendingGoogle, setPendingGoogle] = useState(false);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [emailStatus, setEmailStatus] = useState<EmailStatus>("idle");
-  const [showMagicLinkForm, setShowMagicLinkForm] = useState(false);
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(
     null
   );
-  const { signInWithProvider, signInWithEmail, loading, isAuthenticated } = useSupabaseAuth();
+  const { signInWithProvider, signInWithEmail, signInWithPassword, signUpWithPassword, resetPassword, loading, isAuthenticated } = useSupabaseAuth();
 
   const banner = useMemo(() => {
     if (message) return message;
@@ -54,7 +56,7 @@ function LoginContent() {
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      router.replace("/account");
+      router.replace("/");
     }
   }, [isAuthenticated, loading, router]);
 
@@ -79,10 +81,58 @@ function LoginContent() {
     setPendingGoogle(false);
   };
 
-  const handleEmailSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handlePasswordSignIn = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage(null);
     setEmailStatus("loading");
+
+    const result = await signInWithPassword(email, password);
+    if (!result.success) {
+      setEmailStatus("error");
+      setMessage({
+        type: "error",
+        text: result.code === "invalid_credentials"
+          ? t("auth.error.invalidCredentials")
+          : t("auth.error.generic")
+      });
+      return;
+    }
+
+    router.push("/");
+  };
+
+  const handleSignUp = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setMessage(null);
+    setEmailStatus("loading");
+
+    if (password.length < 8) {
+      setEmailStatus("error");
+      setMessage({ type: "error", text: t("auth.error.passwordTooShort") });
+      return;
+    }
+
+    const result = await signUpWithPassword(email, password);
+    if (!result.success) {
+      setEmailStatus("error");
+      setMessage({
+        type: "error",
+        text: result.code === "user_already_exists"
+          ? t("auth.error.userExists")
+          : t("auth.error.generic")
+      });
+      return;
+    }
+
+    setEmailStatus("sent");
+    setMessage({ type: "success", text: t("auth.email.confirmEmail") });
+  };
+
+  const handleMagicLink = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setMessage(null);
+    setEmailStatus("loading");
+
     const result = await signInWithEmail(email);
     if (!result.success) {
       if (result.code === "invalid_email") {
@@ -104,14 +154,30 @@ function LoginContent() {
     setMessage({ type: "success", text: t("auth.email.sent") });
   };
 
+  const handleResetPassword = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setMessage(null);
+    setEmailStatus("loading");
+
+    const result = await resetPassword(email);
+    if (!result.success) {
+      setEmailStatus("error");
+      setMessage({ type: "error", text: t("auth.error.generic") });
+      return;
+    }
+
+    setEmailStatus("sent");
+    setMessage({ type: "success", text: t("auth.resetPassword.emailSent") });
+  };
+
   const emailDisabled = emailStatus === "loading" || emailStatus === "sent" || emailStatus === "cooldown";
   const localSupabase = isLocalSupabase();
+  const isSignInView = view === "signin" || view === "magic-link" || view === "reset-password";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 flex items-center justify-center px-4 py-10">
-      {/* 居中单卡片布局 */}
       <div className="w-full max-w-md space-y-6">
-        {/* Logo + Title */}
+        {/* Logo */}
         <div className="text-center space-y-3">
           <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-slate-800/60 font-bold tracking-[0.16em] text-emerald-200 shadow-lg">
             IA
@@ -135,74 +201,192 @@ function LoginContent() {
         )}
 
         {/* Main Card */}
-        <div className="rounded-3xl border border-slate-800 bg-slate-900/80 backdrop-blur-xl shadow-[0_20px_80px_rgba(0,0,0,0.6)] p-6 space-y-4">
+        <div className="rounded-3xl border border-slate-800 bg-slate-900/80 backdrop-blur-xl shadow-[0_20px_80px_rgba(0,0,0,0.6)] p-6 space-y-6">
+          {/* Tab Navigation - Only show for signin/signup, not for magic-link or reset-password */}
+          {(view === "signin" || view === "signup") && (
+            <div className="flex gap-2 border-b border-slate-800">
+              <Link
+                href="/login?view=signin"
+                className={`flex-1 py-3 text-center font-semibold transition-colors relative ${
+                  view === "signin"
+                    ? "text-emerald-400"
+                    : "text-slate-400 hover:text-slate-300"
+                }`}
+              >
+                {view === "signin" && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-400" />
+                )}
+                {t("auth.tabs.login")}
+              </Link>
+              <Link
+                href="/login?view=signup"
+                className={`flex-1 py-3 text-center font-semibold transition-colors relative ${
+                  view === "signup"
+                    ? "text-emerald-400"
+                    : "text-slate-400 hover:text-slate-300"
+                }`}
+              >
+                {view === "signup" && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-400" />
+                )}
+                {t("auth.tabs.signup")}
+              </Link>
+            </div>
+          )}
 
-          {/* Google OAuth - 主要登录方式 */}
-          <button
-            type="button"
-            onClick={handleProvider}
-            disabled={pendingGoogle}
-            className={`w-full inline-flex items-center justify-center gap-3 rounded-2xl bg-white text-slate-900 px-4 py-3 text-base font-semibold shadow-lg hover:shadow-xl transition-shadow ${
-              pendingGoogle ? "opacity-70 cursor-not-allowed" : ""
-            }`}
-          >
-            <Image src="/providers/google.svg" alt="google" width={22} height={22} priority />
-            <span>{t("auth.provider.google")}</span>
-          </button>
-
-          {/* Divider */}
-          <div className="text-xs text-slate-500 flex items-center gap-2">
-            <span className="flex-1 h-px bg-slate-800" />
-            {t("auth.modal.or")}
-            <span className="flex-1 h-px bg-slate-800" />
-          </div>
-
-          {/* Magic Link Toggle/Form */}
-          {!showMagicLinkForm ? (
-            <button
-              type="button"
-              onClick={() => setShowMagicLinkForm(true)}
-              className="w-full rounded-2xl border border-slate-800 bg-transparent px-4 py-3 text-sm text-slate-300 hover:text-slate-100 hover:border-slate-700 transition"
-            >
-              {t("auth.email.useEmail")}
-            </button>
-          ) : (
-            <form onSubmit={handleEmailSubmit} className="space-y-3" noValidate>
-              <input
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder={t("auth.email.placeholder")}
-                className="w-full rounded-2xl border border-slate-800 bg-transparent px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
-                required
-                autoFocus
-              />
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMagicLinkForm(false);
-                    setEmailStatus("idle");
-                    setMessage(null);
-                  }}
-                  className="flex-1 rounded-2xl border border-slate-800 px-4 py-2.5 text-sm text-slate-400 hover:text-slate-200 transition"
-                >
-                  {t("auth.email.cancel")}
-                </button>
-                <button
-                  type="submit"
-                  disabled={emailDisabled}
-                  className={`flex-1 rounded-2xl bg-emerald-400 text-slate-950 px-4 py-2.5 text-sm font-semibold hover:opacity-90 transition ${
-                    emailDisabled ? "opacity-60 cursor-not-allowed" : ""
-                  }`}
-                >
-                  {emailStatus === "loading"
-                    ? t("auth.form.loading")
-                    : emailStatus === "sent"
-                      ? t("auth.email.sent")
-                      : t("auth.email.send")}
-                </button>
+          {/* Sign In Form (Password) */}
+          {view === "signin" && (
+            <form onSubmit={handlePasswordSignIn} className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="email" className="block text-sm font-medium text-slate-300">
+                  {t("auth.signin.email")}
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  className="w-full rounded-xl border border-slate-800 bg-slate-800/50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/60 focus:border-emerald-400"
+                  required
+                  autoComplete="email"
+                />
               </div>
+
+              <div className="space-y-2">
+                <label htmlFor="password" className="block text-sm font-medium text-slate-300">
+                  {t("auth.signin.password")}
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-xl border border-slate-800 bg-slate-800/50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/60 focus:border-emerald-400"
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={emailDisabled}
+                className={`w-full rounded-xl bg-emerald-500 px-4 py-3 text-base font-semibold text-white hover:bg-emerald-600 transition-colors ${
+                  emailDisabled ? "opacity-60 cursor-not-allowed" : ""
+                }`}
+              >
+                {emailStatus === "loading" ? t("auth.form.loading") : t("auth.signin.submit")}
+              </button>
+
+              <div className="flex justify-center gap-4 text-sm">
+                <Link
+                  href="/login?view=reset-password"
+                  className="text-emerald-400 hover:text-emerald-300 transition-colors"
+                >
+                  {t("auth.signin.forgotPassword")}
+                </Link>
+                <Link
+                  href="/login?view=magic-link"
+                  className="text-emerald-400 hover:text-emerald-300 transition-colors"
+                >
+                  {t("auth.signin.magicLink")}
+                </Link>
+              </div>
+            </form>
+          )}
+
+          {/* Sign Up Form */}
+          {view === "signup" && (
+            <form onSubmit={handleSignUp} className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="signup-email" className="block text-sm font-medium text-slate-300">
+                  {t("auth.signup.email")}
+                </label>
+                <input
+                  id="signup-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  className="w-full rounded-xl border border-slate-800 bg-slate-800/50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/60 focus:border-emerald-400"
+                  required
+                  autoComplete="email"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="signup-password" className="block text-sm font-medium text-slate-300">
+                  {t("auth.signup.password")}
+                </label>
+                <input
+                  id="signup-password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-xl border border-slate-800 bg-slate-800/50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/60 focus:border-emerald-400"
+                  required
+                  autoComplete="new-password"
+                  minLength={8}
+                />
+                <p className="text-xs text-slate-500">{t("auth.signup.passwordHint")}</p>
+              </div>
+
+              <button
+                type="submit"
+                disabled={emailDisabled}
+                className={`w-full rounded-xl bg-emerald-500 px-4 py-3 text-base font-semibold text-white hover:bg-emerald-600 transition-colors ${
+                  emailDisabled ? "opacity-60 cursor-not-allowed" : ""
+                }`}
+              >
+                {emailStatus === "loading" ? t("auth.form.loading") : t("auth.signup.submit")}
+              </button>
+            </form>
+          )}
+
+          {/* Magic Link Form */}
+          {view === "magic-link" && (
+            <form onSubmit={handleMagicLink} className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="magic-email" className="block text-sm font-medium text-slate-300">
+                  {t("auth.magicLink.email")}
+                </label>
+                <input
+                  id="magic-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  className="w-full rounded-xl border border-slate-800 bg-slate-800/50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/60 focus:border-emerald-400"
+                  required
+                  autoComplete="email"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={emailDisabled}
+                className={`w-full rounded-xl bg-emerald-500 px-4 py-3 text-base font-semibold text-white hover:bg-emerald-600 transition-colors ${
+                  emailDisabled ? "opacity-60 cursor-not-allowed" : ""
+                }`}
+              >
+                {emailStatus === "loading"
+                  ? t("auth.form.loading")
+                  : emailStatus === "sent"
+                    ? t("auth.email.sent")
+                    : t("auth.magicLink.submit")}
+              </button>
+
+              <div className="text-center">
+                <Link
+                  href="/login?view=signin"
+                  className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+                >
+                  {t("auth.magicLink.backToPassword")}
+                </Link>
+              </div>
+
               {localSupabase && (
                 <p className="text-xs text-emerald-100">
                   {t("auth.email.localHint")}{" "}
@@ -218,18 +402,105 @@ function LoginContent() {
               )}
             </form>
           )}
+
+          {/* Reset Password Form */}
+          {view === "reset-password" && (
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <p className="text-sm text-slate-400">
+                {t("auth.resetPassword.description")}
+              </p>
+
+              <div className="space-y-2">
+                <label htmlFor="reset-email" className="block text-sm font-medium text-slate-300">
+                  {t("auth.resetPassword.email")}
+                </label>
+                <input
+                  id="reset-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  className="w-full rounded-xl border border-slate-800 bg-slate-800/50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/60 focus:border-emerald-400"
+                  required
+                  autoComplete="email"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={emailDisabled}
+                className={`w-full rounded-xl bg-emerald-500 px-4 py-3 text-base font-semibold text-white hover:bg-emerald-600 transition-colors ${
+                  emailDisabled ? "opacity-60 cursor-not-allowed" : ""
+                }`}
+              >
+                {emailStatus === "loading"
+                  ? t("auth.form.loading")
+                  : emailStatus === "sent"
+                    ? t("auth.email.sent")
+                    : t("auth.resetPassword.submit")}
+              </button>
+
+              <div className="text-center">
+                <Link
+                  href="/login?view=signin"
+                  className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+                >
+                  {t("auth.resetPassword.backToSignin")}
+                </Link>
+              </div>
+            </form>
+          )}
+
+          {/* OAuth Buttons - Show for signin, signup, and magic-link, but not reset-password */}
+          {view !== "reset-password" && (
+            <>
+              <div className="text-xs text-slate-500 flex items-center gap-2">
+                <span className="flex-1 h-px bg-slate-800" />
+                {t("auth.modal.or")}
+                <span className="flex-1 h-px bg-slate-800" />
+              </div>
+
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={handleProvider}
+                  disabled={pendingGoogle}
+                  className={`w-full inline-flex items-center justify-center gap-3 rounded-xl bg-white text-slate-900 px-4 py-3 text-base font-semibold shadow-lg hover:shadow-xl hover:bg-slate-50 transition-all ${
+                    pendingGoogle ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
+                >
+                  <Image src="/providers/google.svg" alt="google" width={22} height={22} priority />
+                  <span>{t("auth.provider.google")}</span>
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Footer Links */}
         <p className="text-xs text-slate-500 text-center">
-          {t("auth.footer.prefix")}{" "}
-          <Link href="/legal/terms" className="text-emerald-300 hover:underline">
-            {t("auth.footer.terms")}
-          </Link>{" "}
-          {t("auth.footer.connector")}{" "}
-          <Link href="/legal/privacy" className="text-emerald-300 hover:underline">
-            {t("auth.footer.privacy")}
-          </Link>
+          {view === "signup" ? (
+            <>
+              {t("auth.signup.agreement")}{" "}
+              <Link href="/legal/terms" className="text-emerald-300 hover:underline">
+                {t("auth.footer.terms")}
+              </Link>{" "}
+              {t("auth.footer.connector")}{" "}
+              <Link href="/legal/privacy" className="text-emerald-300 hover:underline">
+                {t("auth.footer.privacy")}
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/legal/privacy" className="text-emerald-300 hover:underline">
+                {t("auth.footer.privacy")}
+              </Link>
+              {" • "}
+              <Link href="/legal/terms" className="text-emerald-300 hover:underline">
+                {t("auth.footer.terms")}
+              </Link>
+            </>
+          )}
         </p>
       </div>
     </div>
