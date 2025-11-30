@@ -38,6 +38,7 @@ function LoginContent() {
   const [pendingGoogle, setPendingGoogle] = useState(false);
   const [email, setEmail] = useState("");
   const [emailStatus, setEmailStatus] = useState<EmailStatus>("idle");
+  const [showMagicLinkForm, setShowMagicLinkForm] = useState(false);
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(
     null
   );
@@ -108,101 +109,102 @@ function LoginContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-5xl grid gap-10 lg:grid-cols-[1.1fr_1fr] items-center">
-        <div className="space-y-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-400/10 px-3 py-1 text-emerald-100 text-sm font-medium">
-            <span className="h-2 w-2 rounded-full bg-emerald-300 animate-pulse" />
-            {t("auth.badge.supabase")}
+      {/* 居中单卡片布局 */}
+      <div className="w-full max-w-md space-y-6">
+        {/* Logo + Title */}
+        <div className="text-center space-y-3">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-slate-800/60 font-bold tracking-[0.16em] text-emerald-200 shadow-lg">
+            IA
           </div>
-          <div className="space-y-4">
-            <h1 className="text-3xl md:text-4xl font-semibold leading-tight">{t("auth.hero.title")}</h1>
-            <p className="text-lg text-slate-300">{t("auth.hero.subtitle")}</p>
-            <div className="flex items-center gap-3 text-sm text-slate-400">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800/60 font-bold tracking-[0.16em] text-emerald-200 shadow-inner">
-                IA
-              </div>
-              <div className="flex-1 rounded-xl border border-slate-800 bg-slate-900/70 px-4 py-3 shadow-inner">
-                <p className="font-medium text-slate-100">{t("auth.provider.google")}</p>
-                <p className="text-xs text-slate-400">{t("auth.provider.google.hint")}</p>
-              </div>
-            </div>
-          </div>
+          <h1 className="text-2xl font-semibold">{t("auth.hero.title")}</h1>
+          <p className="text-sm text-slate-400">{t("auth.hero.subtitle")}</p>
         </div>
 
-        <div className="w-full rounded-3xl border border-slate-800 bg-slate-900/80 backdrop-blur-xl shadow-[0_20px_80px_rgba(0,0,0,0.6)] p-8 space-y-6">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.28em] text-slate-500">{t("auth.badge.supabase")}</p>
-                <h2 className="text-xl font-semibold mt-1">{t("auth.hero.title")}</h2>
-              </div>
-              <span className="rounded-full bg-emerald-400/15 text-emerald-100 px-3 py-1 text-xs font-semibold">
-                {t("auth.hero.subtitle")}
-              </span>
-            </div>
+        {/* Error/Success Banner */}
+        {banner && (
+          <div
+            className={`rounded-2xl border px-4 py-3 text-sm ${
+              banner.type === "error"
+                ? "border-amber-500/50 bg-amber-500/10 text-amber-100"
+                : "border-emerald-400/40 bg-emerald-400/10 text-emerald-100"
+            }`}
+            role="status"
+          >
+            {banner.text}
+          </div>
+        )}
 
-            {banner && (
-              <div
-                className={`rounded-2xl border px-4 py-3 text-base ${
-                  banner.type === "error"
-                    ? "border-amber-500/50 bg-amber-500/10 text-amber-100"
-                    : "border-emerald-400/40 bg-emerald-400/10 text-emerald-100"
-                }`}
-                role="status"
-              >
-                {banner.text}
-              </div>
-            )}
+        {/* Main Card */}
+        <div className="rounded-3xl border border-slate-800 bg-slate-900/80 backdrop-blur-xl shadow-[0_20px_80px_rgba(0,0,0,0.6)] p-6 space-y-4">
+
+          {/* Google OAuth - 主要登录方式 */}
+          <button
+            type="button"
+            onClick={handleProvider}
+            disabled={pendingGoogle}
+            className={`w-full inline-flex items-center justify-center gap-3 rounded-2xl bg-white text-slate-900 px-4 py-3 text-base font-semibold shadow-lg hover:shadow-xl transition-shadow ${
+              pendingGoogle ? "opacity-70 cursor-not-allowed" : ""
+            }`}
+          >
+            <Image src="/providers/google.svg" alt="google" width={22} height={22} priority />
+            <span>{t("auth.provider.google")}</span>
+          </button>
+
+          {/* Divider */}
+          <div className="text-xs text-slate-500 flex items-center gap-2">
+            <span className="flex-1 h-px bg-slate-800" />
+            {t("auth.modal.or")}
+            <span className="flex-1 h-px bg-slate-800" />
           </div>
 
-          <div className="space-y-4">
+          {/* Magic Link Toggle/Form */}
+          {!showMagicLinkForm ? (
             <button
               type="button"
-              onClick={handleProvider}
-              disabled={pendingGoogle}
-              className={`w-full inline-flex items-center justify-center gap-3 rounded-2xl bg-white text-slate-900 px-4 py-3 text-base font-semibold shadow-lg shadow-emerald-500/10 transition transform ${
-                pendingGoogle ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-0.5 hover:shadow-emerald-400/30"
-              }`}
+              onClick={() => setShowMagicLinkForm(true)}
+              className="w-full rounded-2xl border border-slate-800 bg-transparent px-4 py-3 text-sm text-slate-300 hover:text-slate-100 hover:border-slate-700 transition"
             >
-              <Image src="/providers/google.svg" alt="google" width={22} height={22} priority={false} />
-              <span>{t("auth.provider.google")}</span>
+              {t("auth.email.useEmail")}
             </button>
-
-            <div className="text-sm text-slate-500 flex items-center gap-2">
-              <span className="flex-1 h-px bg-slate-800" />
-              {t("auth.modal.or")}
-              <span className="flex-1 h-px bg-slate-800" />
-            </div>
-
+          ) : (
             <form onSubmit={handleEmailSubmit} className="space-y-3" noValidate>
-              <label className="text-sm text-slate-300 block">
-                <span className="font-medium">{t("auth.email.title")}</span>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder={t("auth.email.placeholder")}
-                  className="mt-2 w-full rounded-2xl border border-slate-800 bg-transparent px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
-                  required
-                />
-              </label>
-              <button
-                type="submit"
-                disabled={emailDisabled}
-                className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-400 text-slate-950 py-3 text-base font-semibold transition-opacity ${
-                  emailDisabled ? "opacity-60 cursor-not-allowed" : "hover:opacity-90"
-                }`}
-              >
-                {emailStatus === "loading"
-                  ? t("auth.form.loading")
-                  : emailStatus === "sent"
-                    ? t("auth.email.sent")
-                    : emailStatus === "cooldown"
-                      ? t("auth.error.cooldown")
+              <input
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder={t("auth.email.placeholder")}
+                className="w-full rounded-2xl border border-slate-800 bg-transparent px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+                required
+                autoFocus
+              />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMagicLinkForm(false);
+                    setEmailStatus("idle");
+                    setMessage(null);
+                  }}
+                  className="flex-1 rounded-2xl border border-slate-800 px-4 py-2.5 text-sm text-slate-400 hover:text-slate-200 transition"
+                >
+                  {t("auth.email.cancel")}
+                </button>
+                <button
+                  type="submit"
+                  disabled={emailDisabled}
+                  className={`flex-1 rounded-2xl bg-emerald-400 text-slate-950 px-4 py-2.5 text-sm font-semibold hover:opacity-90 transition ${
+                    emailDisabled ? "opacity-60 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {emailStatus === "loading"
+                    ? t("auth.form.loading")
+                    : emailStatus === "sent"
+                      ? t("auth.email.sent")
                       : t("auth.email.send")}
-              </button>
-              {localSupabase ? (
-                <p className="text-sm text-emerald-100">
+                </button>
+              </div>
+              {localSupabase && (
+                <p className="text-xs text-emerald-100">
                   {t("auth.email.localHint")}{" "}
                   <Link
                     href="http://127.0.0.1:54324"
@@ -213,23 +215,22 @@ function LoginContent() {
                     Inbucket
                   </Link>
                 </p>
-              ) : (
-                <p className="text-sm text-slate-400">{t("auth.email.hostedHint")}</p>
               )}
             </form>
-          </div>
-
-          <p className="text-sm text-slate-500 text-center">
-            {t("auth.footer.prefix")}{" "}
-            <Link href="/legal/terms" className="text-emerald-300 hover:underline">
-              {t("auth.footer.terms")}
-            </Link>{" "}
-            {t("auth.footer.connector")}{" "}
-            <Link href="/legal/privacy" className="text-emerald-300 hover:underline">
-              {t("auth.footer.privacy")}
-            </Link>
-          </p>
+          )}
         </div>
+
+        {/* Footer Links */}
+        <p className="text-xs text-slate-500 text-center">
+          {t("auth.footer.prefix")}{" "}
+          <Link href="/legal/terms" className="text-emerald-300 hover:underline">
+            {t("auth.footer.terms")}
+          </Link>{" "}
+          {t("auth.footer.connector")}{" "}
+          <Link href="/legal/privacy" className="text-emerald-300 hover:underline">
+            {t("auth.footer.privacy")}
+          </Link>
+        </p>
       </div>
     </div>
   );

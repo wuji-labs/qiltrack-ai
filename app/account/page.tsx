@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -16,7 +17,7 @@ type Preferences = {
 
 export default function AccountPage() {
 	const router = useRouter();
-	const { isAuthenticated, user, getReportCredits, signOut } = useSupabaseAuth();
+	const { isAuthenticated, user, authMethod, oauthProviders, getReportCredits, signOut } = useSupabaseAuth();
 	const { language, setLanguage, t } = useLanguage();
 	const [prefs, setPrefs] = useState<Preferences>({
 		language,
@@ -187,6 +188,84 @@ export default function AccountPage() {
 							/>
 							<p className="text-xs text-subtle">{t("account.page.timezoneNote")}</p>
 						</div>
+					</div>
+
+					{/* Authentication Methods Section */}
+					<div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 space-y-3">
+						<p className="text-sm text-subtle">{t("account.page.authMethodsLabel")}</p>
+
+						{/* OAuth Provider - Google */}
+						{authMethod === "oauth" && oauthProviders.length > 0 && (
+							<div className="space-y-2">
+								{oauthProviders.map((provider) => (
+									<div
+										key={provider.provider}
+										className="flex items-center gap-3 rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-3 py-2"
+									>
+										<Image
+											src={`/providers/${provider.provider}.svg`}
+											alt={provider.provider}
+											width={20}
+											height={20}
+										/>
+										<div className="flex-1">
+											<p className="text-sm font-medium text-emerald-100">
+												{t(`account.page.provider.${provider.provider}`)}
+											</p>
+											<p className="text-xs text-emerald-200/70">
+												{t("account.page.provider.connected")}
+											</p>
+										</div>
+										<span className="text-xs text-emerald-300 font-semibold">
+											{t("account.page.provider.active")}
+										</span>
+									</div>
+								))}
+
+								{/* Password Not Required Notice */}
+								<div className="rounded-xl border border-slate-700 bg-slate-800/50 px-3 py-2">
+									<p className="text-sm text-slate-300">
+										{t("account.page.oauth.passwordNotRequired")}
+									</p>
+									<p className="text-xs text-slate-400 mt-1">
+										{t("account.page.oauth.passwordHint")}
+									</p>
+								</div>
+							</div>
+						)}
+
+						{/* Magic Link User */}
+						{authMethod === "magic_link" && (
+							<div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2">
+								<p className="text-sm font-medium text-amber-100">
+									{t("account.page.magicLink.title")}
+								</p>
+								<p className="text-xs text-amber-200/70 mt-1">
+									{t("account.page.magicLink.description")}
+								</p>
+							</div>
+						)}
+
+						{/* Password User */}
+						{authMethod === "password" && (
+							<div className="rounded-xl border border-slate-700 bg-slate-800/50 px-3 py-2">
+								<p className="text-sm font-medium text-slate-200">
+									{t("account.page.password.title")}
+								</p>
+								<p className="text-xs text-slate-400 mt-1">
+									{t("account.page.password.description")}
+								</p>
+							</div>
+						)}
+
+						{/* Unknown Auth Method */}
+						{authMethod === "unknown" && (
+							<div className="rounded-xl border border-slate-700 bg-slate-800/50 px-3 py-2">
+								<p className="text-sm text-slate-400">
+									{t("account.page.auth.detecting")}
+								</p>
+							</div>
+						)}
 					</div>
 
 					<div className="grid gap-4 sm:grid-cols-2">
