@@ -62,7 +62,7 @@ describe("useSupabaseAuth", () => {
 			error: { message: "rate limited", status: 429 },
 		});
 		const { result } = renderHook(() => useSupabaseAuth());
-		let response;
+		let response: any;
 		await act(async () => {
 			response = await result.current.signInWithEmail("user@example.com");
 		});
@@ -72,7 +72,7 @@ describe("useSupabaseAuth", () => {
 
 	it("blocks invalid email before calling supabase", async () => {
 		const { result } = renderHook(() => useSupabaseAuth());
-		let response;
+		let response: any;
 		await act(async () => {
 			response = await result.current.signInWithEmail("not-an-email");
 		});

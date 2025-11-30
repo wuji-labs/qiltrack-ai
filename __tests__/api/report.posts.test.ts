@@ -65,7 +65,7 @@ describe("Report posts APIs", () => {
     const request = new NextRequest("http://localhost/api/report/posts/missing", {
       method: "GET",
     });
-    const response = await getReportPost(request, { params: { slug: "missing" } });
+    const response = await getReportPost(request, { params: Promise.resolve({ slug: "missing" }) });
 
     expect(response.status).toBe(404);
     expect(queryChain.eq).toHaveBeenCalledWith("slug", "missing");
