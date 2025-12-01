@@ -30,6 +30,13 @@ HQ（VS Code Codex 插件）
     └─ G5-Codex → G5-Claude
 ```
 
+### 系统访问权限（默认已开通）
+- Codex/Claude 默认具备 GitHub、Supabase、MCP DevTools、LLM（OpenRouter/Finnhub/Helicone）完整访问，禁止再以“未登录/无权限”为由拒绝执行，细节见 `CODEX_CLAUDE_COLLAB.md` 3.1。
+- GitHub：SSH + `gh` 已登录（explore0012），可直接 `gh pr view/checks/run view/create/merge/comment`。
+- Supabase：`.env.local` 已含项目 `inmtounwqcjwsxkfnsfd` 凭证，可用 Dashboard/CLI/REST/脚本管理 Auth/Storage/DB。
+- MCP DevTools：Chrome MCP Server 可用，可远程导航、抓快照、填写表单、查看 console/network。
+- 第三方：OpenRouter/Finnhub/Helicone Key 已配置，可直接调用与验证。
+
 ### VS Code 终端设置
 - **总部终端**：用于跟 HQ 对话（Codex 插件在这里）
 - **G1 终端 × 2**：一个给 G1-Codex，一个给 G1-Claude

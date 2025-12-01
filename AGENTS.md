@@ -3,6 +3,13 @@
 ## Codex–Claude Collaboration Protocol
 **⚠️ 每次会话开始时，Codex 和 Claude 都必须先读取 `CODEX_CLAUDE_COLLAB.md` 以了解协作流程、职责边界和质量门槛。** 需要速查时可使用 `docs/guides/codex-claude-quickstart.md`，但以主文档为准。
 
+### 系统访问权限摘要
+- Codex/Claude 默认具备 GitHub/Supabase/DevTools/LLM 等完整访问，**禁止以“无权限/未登录”为由拒绝执行**，细则见 `CODEX_CLAUDE_COLLAB.md` 3.1。
+- GitHub：SSH + `gh` 已登录（explore0012），可 `gh pr view/checks/run view/create/merge/comment` 直接操作 PR/CI。
+- Supabase：`.env.local` 已含项目 `inmtounwqcjwsxkfnsfd` 全量凭证，可用 Dashboard/CLI/REST/脚本管理 Auth/Storage/DB。
+- MCP DevTools：Chrome MCP Server 可用，可远程导航页面、填写表单、查看 console/network。
+- 第三方：OpenRouter/Finnhub/Helicone Key 已配置，可直接调用与验证。
+
 ## Worktree 快速命令
 ```powershell
 # 新建工作区（首次）

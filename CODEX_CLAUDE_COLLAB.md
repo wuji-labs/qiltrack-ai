@@ -36,6 +36,48 @@
 - 测试优先：Codex 定验收，Claude 编码成测试或脚本。
 - 可追溯：决策写入 `docs/` 或 issue 记录，避免口头漂移。
 
+### 3.1 系统访问权限声明
+
+**Claude 拥有完整的基础设施访问权限，不得以“无权限”为由拒绝执行任务。**
+
+#### GitHub 访问
+- **已授权**：SSH 密钥已配置（explore0012），`gh` CLI 已登录
+- **可执行操作**：
+  - 查看 PR 状态和 CI 结果：`gh pr view <number>`
+  - 查看 CI 运行日志：`gh run view <run-id> --log`
+  - 列出 PR 的所有 checks：`gh pr checks <number>`
+  - 创建和管理 PR：`gh pr create/merge/comment`
+- 🚫 **禁止借口**：“无法查看 GitHub PR CI 状态”、“没有权限访问 GitHub”
+
+#### Supabase 访问
+- **已授权**：完整凭证位于 `.env.local`（已加载到环境变量）
+  - `NEXT_PUBLIC_SUPABASE_URL`: https://inmtounwqcjwsxkfnsfd.supabase.co
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: sb_publishable_hT6o-oVeTgfmMeWbP7fwaA_ZtBQEeGV
+  - `SUPABASE_SERVICE_ROLE_KEY`: sb_secret_icUWGnicz6KtLXUS2sjSXg_onZWKkzP
+  - `SUPABASE_DB_URL`: postgresql://postgres:z/uHvR#5Bc-+gXB@db.inmtounwqcjwsxkfnsfd.supabase.co:5432/postgres
+- **可执行操作**：
+  - 通过 `supabase` CLI 链接和管理项目（已链接 `inmtounwqcjwsxkfnsfd`）
+  - 直接查询数据库：使用 Supabase REST API + service role key
+  - 管理 Auth 配置：运行 `scripts/update-supabase-redirect-urls.js`
+  - 查看和修改 Storage buckets、Functions、Database schemas
+- **配置脚本**：`scripts/update-supabase-redirect-urls.js`（需 `SUPABASE_ACCESS_TOKEN`）
+- 🚫 **禁止借口**：“无法访问 Supabase 后台”、“没有登录 Supabase”、“无权限修改 Auth 配置”
+
+#### 浏览器 DevTools 访问（Chrome MCP Server）
+- **已启用**：MCP Chrome DevTools Server 可用
+- **可执行操作**：
+  - 导航到本地开发页面（localhost:3000-3005）
+  - 获取页面快照：`mcp__chrome-devtools__take_snapshot`
+  - 点击和填写表单：`mcp__chrome-devtools__click`, `mcp__chrome-devtools__fill`
+  - 查看控制台日志：`mcp__chrome-devtools__list_console_messages`
+  - 查看网络请求：`mcp__chrome-devtools__list_network_requests`
+- 🚫 **禁止借口**：“无法测试网页”、“无法查看浏览器控制台”
+
+#### 第三方服务访问
+- **OpenRouter API**: 已配置 `OPENROUTER_API_KEY`
+- **Finnhub API**: 已配置 `FINNHUB_API_KEY`
+- **Helicone**: 已配置 `HELICONE_API_KEY`
+
 ## 4. 协作流程
 1) **Context Sync**：Codex 汇总上下文 + 发布 Architecture Snapshot；Claude 确认依赖/提疑问。  
 2) **Design & Breakdown**：Codex 给组件/数据流/测试矩阵；Claude 输出实施清单。  

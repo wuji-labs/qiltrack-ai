@@ -16,6 +16,13 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 
 **速查版**：[Codex-Claude 快速入门](docs/guides/codex-claude-quickstart.md)
 
+### 系统访问权限（默认开启）
+- Codex/Claude 默认具备 GitHub、Supabase、MCP DevTools、LLM（OpenRouter/Finnhub/Helicone）完整访问，禁止再以“未登录/无权限”为由拒绝执行，细则见 `CODEX_CLAUDE_COLLAB.md` 3.1。
+- GitHub：SSH + `gh` 已登录（explore0012），可直接 `gh pr view/checks/run view/create/merge/comment`。
+- Supabase：`.env.local` 已含项目 `inmtounwqcjwsxkfnsfd` 凭证，可用 Dashboard/CLI/REST/脚本管理 Auth/Storage/DB。
+- MCP DevTools：Chrome MCP Server 可用，可远程导航、抓快照、填写表单、查看 console/network。
+- 第三方：OpenRouter/Finnhub/Helicone Key 已配置，可直接调用与验证。
+
 ---
 
 ## 🎯 核心能力
