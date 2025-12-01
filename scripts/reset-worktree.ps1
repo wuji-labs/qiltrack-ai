@@ -107,6 +107,19 @@ if ($DryRun) {
   # Re-set sparse-checkout folders to ensure they are checked out
   $folders = @("app", "docs", "hooks", "lib", "supabase", "types", "__tests__", "scripts", "public")
   Invoke-GitLocal -RepoRoot $targetPath -GitArgs (@("sparse-checkout", "set") + $folders)
+
+  # Fix BOM issue that can occur after sparse-checkout
+  $packageJsonPath = Join-Path $targetPath "package.json"
+  if (Test-Path $packageJsonPath) {
+    $bytes = [System.IO.File]::ReadAllBytes($packageJsonPath)
+    if ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
+      Write-Host "Removing BOM from package.json..." -ForegroundColor Yellow
+      $content = [System.IO.File]::ReadAllText($packageJsonPath)
+      $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+      [System.IO.File]::WriteAllText($packageJsonPath, $content, $utf8NoBom)
+    }
+  }
+
   Write-Host "Done." -ForegroundColor Green
 }
 
