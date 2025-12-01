@@ -1,4 +1,58 @@
-# Worktree Reset 与环境变量管理
+# Worktree Port & Environment Management
+
+## 🚨 重要：每个 Worktree 必须固定端口
+
+### 问题
+Next.js 的 `next dev` 会自动选择可用端口（3000 → 3001 → 3002...），导致：
+- **邮件链接跳转错乱**：g2 邮件跳到 g1，g1 邮件跳到 g2
+- **Session 混乱**：不同 worktree 的认证相互干扰
+
+### 解决方案：固定端口
+
+#### 方法 1：使用脚本（推荐）
+
+```powershell
+# 为每个 worktree 设置固定端口
+.\scripts\set-worktree-port.ps1 -Name g1 -Port 3001
+.\scripts\set-worktree-port.ps1 -Name g2 -Port 3002
+.\scripts\set-worktree-port.ps1 -Name g3 -Port 3003
+.\scripts\set-worktree-port.ps1 -Name g4 -Port 3004
+```
+
+#### 方法 2：手动修改
+
+编辑每个 worktree 的 `package.json`：
+
+```json
+// D:\Projects\investor-ai-g1\package.json
+{
+  "scripts": {
+    "dev": "next dev -p 3001"  // ← 固定 3001
+  }
+}
+
+// D:\Projects\investor-ai-g2\package.json
+{
+  "scripts": {
+    "dev": "next dev -p 3002"  // ← 固定 3002
+  }
+}
+```
+
+#### 端口分配建议
+
+| Worktree | 端口 | 说明 |
+|----------|------|------|
+| 总部 (main) | 3000 | 总部 HQ |
+| g1 | 3001 | Group 1 |
+| g2 | 3002 | Group 2 |
+| g3 | 3003 | Group 3 |
+| g4 | 3004 | Group 4 |
+| g5 | 3005 | Group 5 |
+
+---
+
+## Reset Worktree 与环境变量管理
 
 ## 问题
 `scripts/reset-worktree.ps1` 会从总部（`D:\Projects\investor-ai`）复制 `.env.local` 到各 worktree，可能覆盖本地配置。
