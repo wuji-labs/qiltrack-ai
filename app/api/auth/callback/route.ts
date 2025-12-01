@@ -6,6 +6,36 @@ import type { Database } from "@/types/database";
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
+  const type = requestUrl.searchParams.get("type");
+
+  // For password recovery, keep the hash fragment (access_token/refresh_token) by forwarding via client-side redirect.
+  // A server 302 would drop the hash, so we return a tiny HTML that preserves it.
+  if (type === "recovery") {
+    const html = `
+      <!doctype html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>Password recovery</title>
+          <script>
+            (function() {
+              var search = window.location.search || "";
+              var hash = window.location.hash || "";
+              var target = "/account/reset-password" + search + hash;
+              window.location.replace(target);
+            })();
+          </script>
+        </head>
+        <body style="background:#020617;color:#e2e8f0;font-family:Inter,system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+          <div>Redirecting to reset password...</div>
+        </body>
+      </html>
+    `;
+    return new NextResponse(html, {
+      status: 200,
+      headers: { "Content-Type": "text/html; charset=utf-8" },
+    });
+  }
 
   if (code) {
     const cookieStore = await cookies();
@@ -39,6 +69,11 @@ export async function GET(request: NextRequest) {
           console.error("Failed to initialize profile:", rpcError);
           // Don't fail the login, just log the error
         }
+      }
+
+      // If this is a password recovery callback, redirect to change password page
+      if (type === "recovery") {
+        return NextResponse.redirect(new URL("/account/change-password?type=recovery", requestUrl.origin));
       }
 
       return NextResponse.redirect(new URL("/", requestUrl.origin));

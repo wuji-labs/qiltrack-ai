@@ -140,12 +140,57 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 8,
   },
+  kpiGrid: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
   metricCard: {
     width: "48%",
     padding: 10,
     borderRadius: 10,
     backgroundColor: "#0c1016",
     border: "1 solid #161a22",
+  },
+  kpiCard: {
+    width: "48%",
+    padding: 10,
+    borderRadius: 12,
+    backgroundColor: "#0e1724",
+    border: "1 solid #1c2a3b",
+  },
+  kpiHeader: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 6,
+  },
+  kpiLabel: {
+    fontSize: 9,
+    color: "#9fb1c5",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  kpiIcon: {
+    fontSize: 10,
+    color: "#5be0b0",
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: 10,
+    backgroundColor: "#123026",
+    border: "1 solid #1e3a2f",
+  },
+  kpiValue: {
+    fontSize: 16,
+    fontWeight: 700,
+    color: "#e6f4ff",
+  },
+  kpiHelper: {
+    fontSize: 9,
+    color: "#9fb1c5",
+    marginTop: 2,
   },
   metricLabel: {
     fontSize: 9,
@@ -381,6 +426,32 @@ export async function POST(request: NextRequest) {
     return `$${(value / 1000).toFixed(1)}B`;
   };
 
+  const buildKpiMetrics = (company: CompanyData) => {
+    const price = company.quote.current;
+    const changePct = company.quote.changePercent;
+    const roe = company.metrics.roeTTM;
+    return [
+      { label: "Market Cap", value: formatMarketCap(company.profile.marketCapitalization), icon: "MC" },
+      {
+        label: "P/E (TTM)",
+        value: company.metrics.peTTM !== undefined && company.metrics.peTTM !== null ? `${company.metrics.peTTM.toFixed(2)}x` : "N/A",
+        icon: "PE",
+      },
+      {
+        label: "Price",
+        value: price !== undefined && price !== null ? `$${price.toFixed(2)}` : "N/A",
+        helper: changePct !== undefined && changePct !== null ? `${changePct > 0 ? "+" : ""}${changePct.toFixed(2)}%` : undefined,
+        icon: changePct !== undefined && changePct !== null ? (changePct >= 0 ? "▲" : "▼") : "$",
+      },
+      {
+        label: "ROE",
+        value: roe !== undefined && roe !== null ? `${roe.toFixed(2)}%` : "N/A",
+        helper: "Return on Equity",
+        icon: "ROE",
+      },
+    ];
+  };
+
   const doc = (
     <Document>
       {/* Cover Page */}
@@ -441,6 +512,22 @@ export async function POST(request: NextRequest) {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Company Snapshot</Text>
           <View style={styles.grid}>{buildMetricCards(blueprint.profile)}</View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Key Metrics</Text>
+          <View style={styles.kpiGrid}>
+            {buildKpiMetrics(resolvedCompany).map((kpi) => (
+              <View key={kpi.label} style={styles.kpiCard}>
+                <View style={styles.kpiHeader}>
+                  <Text style={styles.kpiLabel}>{kpi.label}</Text>
+                  {kpi.icon ? <Text style={styles.kpiIcon}>{kpi.icon}</Text> : null}
+                </View>
+                <Text style={styles.kpiValue}>{kpi.value}</Text>
+                {kpi.helper ? <Text style={styles.kpiHelper}>{kpi.helper}</Text> : null}
+              </View>
+            ))}
+          </View>
         </View>
 
         {/* News Timeline */}

@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
 		// Parse request body
 		const body = await request.json().catch(() => null);
-		if (!body || !body.currentPassword || !body.newPassword) {
+		if (!body || !body.newPassword) {
 			const response = NextResponse.json(
 				{ error: "Missing required fields", code: "invalid_payload" },
 				{ status: 400 }
@@ -38,7 +38,19 @@ export async function POST(request: NextRequest) {
 			return response;
 		}
 
-		const { currentPassword, newPassword } = body;
+		const { currentPassword, newPassword, isRecovery } = body;
+
+		// If not recovery mode, current password is required
+		if (!isRecovery && !currentPassword) {
+			const response = NextResponse.json(
+				{ error: "Current password is required", code: "invalid_payload" },
+				{ status: 400 }
+			);
+			responseCookies.forEach(({ name, value }) =>
+				response.headers.append("Set-Cookie", `${name}=${value}`)
+			);
+			return response;
+		}
 
 		// Validate new password length
 		if (newPassword.length < 8) {
@@ -52,36 +64,39 @@ export async function POST(request: NextRequest) {
 			return response;
 		}
 
-		// Get user email to verify current password
-		const userEmail = session.user.email;
-		if (!userEmail) {
-			const response = NextResponse.json(
-				{ error: "User email not found", code: "user_email_missing" },
-				{ status: 400 }
-			);
-			responseCookies.forEach(({ name, value }) =>
-				response.headers.append("Set-Cookie", `${name}=${value}`)
-			);
-			return response;
-		}
+		// Only verify current password if not in recovery mode
+		if (!isRecovery) {
+			// Get user email to verify current password
+			const userEmail = session.user.email;
+			if (!userEmail) {
+				const response = NextResponse.json(
+					{ error: "User email not found", code: "user_email_missing" },
+					{ status: 400 }
+				);
+				responseCookies.forEach(({ name, value }) =>
+					response.headers.append("Set-Cookie", `${name}=${value}`)
+				);
+				return response;
+			}
 
-		// Verify current password by attempting to sign in
-		// This is the recommended way to verify password in Supabase
-		const { error: verifyError } = await supabase.auth.signInWithPassword({
-			email: userEmail,
-			password: currentPassword,
-		});
+			// Verify current password by attempting to sign in
+			// This is the recommended way to verify password in Supabase
+			const { error: verifyError } = await supabase.auth.signInWithPassword({
+				email: userEmail,
+				password: currentPassword,
+			});
 
-		if (verifyError) {
-			console.warn(`[PASSWORD_VERIFY_FAILED] user_id: ${session.user.id}, error: ${verifyError.message}`);
-			const response = NextResponse.json(
-				{ error: "Current password is incorrect", code: "invalid_current_password" },
-				{ status: 401 }
-			);
-			responseCookies.forEach(({ name, value }) =>
-				response.headers.append("Set-Cookie", `${name}=${value}`)
-			);
-			return response;
+			if (verifyError) {
+				console.warn(`[PASSWORD_VERIFY_FAILED] user_id: ${session.user.id}, error: ${verifyError.message}`);
+				const response = NextResponse.json(
+					{ error: "Current password is incorrect", code: "invalid_current_password" },
+					{ status: 401 }
+				);
+				responseCookies.forEach(({ name, value }) =>
+					response.headers.append("Set-Cookie", `${name}=${value}`)
+				);
+				return response;
+			}
 		}
 
 		// Update password
