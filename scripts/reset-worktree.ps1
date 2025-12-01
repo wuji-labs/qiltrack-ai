@@ -3,6 +3,11 @@
 # Usage: .\scripts\reset-worktree.ps1 -Name g1
 #        .\scripts\reset-worktree.ps1 -Name g1 -SkipNpmCi
 #        .\scripts\reset-worktree.ps1 -Name g1 -DryRun
+#
+# ⚠️ IMPORTANT: This script includes BOM removal after git operations
+# DO NOT remove Remove-BOMFromFile function or its calls!
+# See docs/troubleshooting/bom-issue.md for details.
+# This fix was added after multiple iterations to solve recurring BOM issues.
 
 [CmdletBinding()]
 param(
@@ -51,6 +56,12 @@ function Get-WorktreePort {
 
 function Remove-BOMFromFile {
   param([string]$FilePath)
+
+  # ⚠️ DO NOT REMOVE THIS FUNCTION!
+  # Git operations on Windows (reset --hard, sparse-checkout) can inject UTF-8 BOM
+  # into package.json, causing "Error parsing package.json file" errors.
+  # This function is called after git reset and sparse-checkout to prevent the issue.
+  # See docs/troubleshooting/bom-issue.md for full explanation.
 
   if (-not (Test-Path $FilePath)) {
     return
