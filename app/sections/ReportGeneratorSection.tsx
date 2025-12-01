@@ -7,7 +7,7 @@ import { saveAs } from "file-saver";
 
 import { ProgressBar } from "@/app/components/ProgressBar";
 import { type ProgressState } from "@/hooks/useProgress";
-import { fetchSimilarReports, generateReport, searchSymbols } from "@/lib/services/api";
+import { fetchSimilarReports, fetchReportAvailability, generateReport, searchSymbols } from "@/lib/services/api";
 import type { Language } from "@/lib/i18n-config";
 import type { ReportResponse, ReportTone, SearchResult, SimilarReport } from "@/types/report";
 	// TODO: These components are not yet implemented
@@ -101,6 +101,9 @@ export function ReportGeneratorSection({
 	const [exportingPdf, setExportingPdf] = useState(false);
 	const [lastReportTone, setLastReportTone] = useState<ReportTone>("baseline");
 	const [placeholderVariant, setPlaceholderVariant] = useState<PlaceholderVariant>("xs");
+	const [showReuseDialog, setShowReuseDialog] = useState(false);
+	const [reuseRunId, setReuseRunId] = useState<string | null>(null);
+	const [pendingSymbol, setPendingSymbol] = useState<string | null>(null);
 	const reportContentRef = useRef<HTMLDivElement>(null);
 	const testToken = process.env.NEXT_PUBLIC_TEST_REPORT_TOKEN;
 	const canBypassAuth = Boolean(testToken);
@@ -299,7 +302,7 @@ export function ReportGeneratorSection({
 		},
 	};
 
-	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: FormEvent<HTMLFormElement>, forceRegenerate: boolean = false) => {
 		e.preventDefault();
 		const raw = inputValue.trim().toUpperCase();
 		if (!raw) {
@@ -334,6 +337,26 @@ export function ReportGeneratorSection({
 			return;
 		}
 
+		// Check for reusable report if not forcing regenerate
+		if (!forceRegenerate) {
+			try {
+				const availability = await fetchReportAvailability({
+					symbol: raw,
+					lang: language,
+					mode: "production",
+				});
+				if (availability.reusable && availability.reusable_run_id) {
+					setPendingSymbol(raw);
+					setReuseRunId(availability.reusable_run_id);
+					setShowReuseDialog(true);
+					return;
+				}
+			} catch (err) {
+				console.warn("Availability check failed, proceeding with generation", err);
+			}
+		}
+
+		// Proceed with generation
 		setLastReportTone(selectedTone);
 		setLoading(true);
 		setErrorState(null);
@@ -381,6 +404,16 @@ export function ReportGeneratorSection({
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	const handleViewHistory = () => {
+		setShowReuseDialog(false);
+		window.location.assign("/reports#my-reports");
+	};
+
+	const handleRegenerate = (e: React.FormEvent<HTMLFormElement>) => {
+		setShowReuseDialog(false);
+		handleSubmit(e, true);
 	};
 
 	const handleCopyRichText = async () => {
@@ -866,6 +899,42 @@ export function ReportGeneratorSection({
 					</div>
 				</div>
 			</form>
+
+			{showReuseDialog && (
+				<dialog open className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+					<div className="relative mx-4 max-w-md rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/95 p-6 shadow-[0_26px_90px_rgba(0,0,0,0.5)]">
+						<h3 className="text-xl font-semibold text-[var(--color-foreground)]">
+							{t("reports.reuse.title")}
+						</h3>
+						<p className="mt-2 text-sm text-dim">
+							{t("reports.reuse.sub")}
+						</p>
+						<div className="mt-6 flex flex-col gap-3">
+							<button
+								type="button"
+								onClick={handleViewHistory}
+								className="rounded-full bg-[var(--accent-emerald)] px-5 py-2.5 text-sm font-semibold text-slate-950 hover:bg-[var(--accent-emerald)]/90"
+							>
+								{t("reports.reuse.viewHistory")}
+							</button>
+							<button
+								type="button"
+								onClick={(e) => handleRegenerate(e as React.FormEvent<HTMLFormElement>)}
+								className="rounded-full border border-[var(--stroke-soft)] px-5 py-2.5 text-sm text-dim hover:text-[var(--color-foreground)]"
+							>
+								{t("reports.reuse.regenerate")}
+							</button>
+							<button
+								type="button"
+								onClick={() => setShowReuseDialog(false)}
+								className="text-xs text-subtle hover:text-dim"
+							>
+								Cancel
+							</button>
+						</div>
+					</div>
+				</dialog>
+			)}
 
 			{renderError()}
 

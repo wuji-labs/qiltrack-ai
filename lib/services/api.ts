@@ -254,3 +254,68 @@ export async function uploadAdminAsset(
 	});
 	return handleJson<AdminUploadResult>(res, "Failed to upload asset");
 }
+
+/**
+ * Check if a report can be reused within 7 days
+ */
+export async function fetchReportAvailability(params: {
+	symbol: string;
+	lang?: Language;
+	mode?: string;
+}): Promise<{ reusable: boolean; reusable_run_id?: string }> {
+	const search = new URLSearchParams({ symbol: params.symbol });
+	if (params.lang) search.set("lang", params.lang);
+	if (params.mode) search.set("mode", params.mode);
+
+	const res = await fetch(`/api/report/availability?${search.toString()}`);
+	return handleJson<{ reusable: boolean; reusable_run_id?: string }>(
+		res,
+		"Failed to check report availability"
+	);
+}
+
+/**
+ * Fetch popular/featured reports
+ */
+export async function fetchPopularReports(params?: {
+	limit?: number;
+	lang?: Language;
+	mode?: string;
+}): Promise<{
+	reports: Array<{
+		report_run_id: string;
+		symbol: string;
+		created_at: string;
+		featured_at?: string;
+	}>;
+}> {
+	const search = new URLSearchParams();
+	if (params?.limit) search.set("limit", String(params.limit));
+	if (params?.lang) search.set("lang", params.lang);
+	if (params?.mode) search.set("mode", params.mode);
+
+	const res = await fetch(`/api/report/popular?${search.toString()}`);
+	return handleJson<{
+		reports: Array<{
+			report_run_id: string;
+			symbol: string;
+			created_at: string;
+			featured_at?: string;
+		}>;
+	}>(res, "Failed to fetch popular reports");
+}
+
+/**
+ * Admin: bulk unfeature reports older than specified days
+ */
+export async function bulkUnfeatureReports(params?: {
+	olderThanDays?: number;
+}): Promise<{ unfeaturedCount: number }> {
+	const search = new URLSearchParams();
+	if (params?.olderThanDays) search.set("olderThanDays", String(params.olderThanDays));
+
+	const res = await fetch(`/api/admin/runs/unfeature-bulk?${search.toString()}`, {
+		method: "POST",
+	});
+	return handleJson<{ unfeaturedCount: number }>(res, "Failed to bulk unfeature reports");
+}
