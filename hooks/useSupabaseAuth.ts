@@ -27,6 +27,20 @@ type AuthResult =
   | { success: true }
   | { success: false; error?: string; status?: number; code?: "cooldown" | "invalid_email" | "invalid_credentials" | "user_already_exists" };
 
+/**
+ * Get the base URL for auth redirects
+ * Priority: 1) NEXT_PUBLIC_SITE_URL env, 2) Current window origin
+ * This supports multi-worktree development where each runs on different port
+ */
+function getAuthRedirectBase(): string {
+  if (typeof window === "undefined") {
+    // SSR fallback
+    return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  }
+  // Use env if explicitly set, otherwise use current origin (handles dynamic ports)
+  return process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+}
+
 const AUTH_CALLBACK_PATH = "/api/auth/callback";
 
 function mapAuthError(error: unknown): AuthResult {
@@ -220,7 +234,7 @@ export function useSupabaseAuth() {
         const { error } = await supabase.auth.signInWithOtp({
           email: trimmedEmail,
           options: {
-            emailRedirectTo: `${window.location.origin}${AUTH_CALLBACK_PATH}`,
+            emailRedirectTo: `${getAuthRedirectBase()}${AUTH_CALLBACK_PATH}`,
           },
         });
 
@@ -279,7 +293,7 @@ export function useSupabaseAuth() {
           email: trimmedEmail,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}${AUTH_CALLBACK_PATH}`,
+            emailRedirectTo: `${getAuthRedirectBase()}${AUTH_CALLBACK_PATH}`,
           },
         });
 
@@ -309,7 +323,7 @@ export function useSupabaseAuth() {
 
       try {
         const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
-          redirectTo: `${window.location.origin}/account/reset-password`,
+          redirectTo: `${getAuthRedirectBase()}/account/reset-password`,
         });
 
         if (error) {
@@ -331,7 +345,7 @@ export function useSupabaseAuth() {
         const { error } = await supabase.auth.signInWithOAuth({
           provider,
           options: {
-            redirectTo: `${window.location.origin}${AUTH_CALLBACK_PATH}`,
+            redirectTo: `${getAuthRedirectBase()}${AUTH_CALLBACK_PATH}`,
           },
         });
 

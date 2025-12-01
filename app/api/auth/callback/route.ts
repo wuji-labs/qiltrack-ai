@@ -7,10 +7,24 @@ export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const type = requestUrl.searchParams.get("type");
+  const tokenHash = requestUrl.searchParams.get("token_hash");
 
+  // Log callback invocation for debugging
+  console.log("[AUTH] Callback invoked:", {
+    hasCode: !!code,
+    type,
+    hasTokenHash: !!tokenHash,
+    url: requestUrl.toString(),
+  });
+
+  // Detect password recovery: MUST have BOTH type=recovery AND token_hash
+  // Magic links and signup confirmations may have token_hash without type=recovery
   // For password recovery, keep the hash fragment (access_token/refresh_token) by forwarding via client-side redirect.
   // A server 302 would drop the hash, so we return a tiny HTML that preserves it.
-  if (type === "recovery") {
+  const isRecovery = type === "recovery" && tokenHash !== null;
+
+  if (isRecovery) {
+    console.log("[AUTH] Recovery flow detected, preserving hash");
     const html = `
       <!doctype html>
       <html>
@@ -47,11 +61,13 @@ export async function GET(request: NextRequest) {
       const { error } = await supabase.auth.exchangeCodeForSession(code);
 
       if (error) {
-        console.error("Code exchange failed:", error);
+        console.error("[AUTH] Code exchange failed:", error);
         return NextResponse.redirect(
           new URL("/login?error=auth_code_exchange_failed", requestUrl.origin)
         );
       }
+
+      console.log("[AUTH] Code exchange successful");
 
       // Get current authenticated user
       const {
@@ -59,31 +75,42 @@ export async function GET(request: NextRequest) {
       } = await supabase.auth.getUser();
 
       if (user && user.email) {
+        console.log("[AUTH] Initializing profile for user:", user.id);
         // Call RPC to initialize profile and credits atomically
-        const { error: rpcError } = await supabase.rpc("fn_initialize_profile", {
-          p_user_id: user.id,
-          p_email: user.email,
-        } as never);
+        try {
+          const { error: rpcError } = await supabase.rpc("fn_initialize_profile", {
+            p_user_id: user.id,
+            p_email: user.email,
+          } as never);
 
-        if (rpcError) {
-          console.error("Failed to initialize profile:", rpcError);
-          // Don't fail the login, just log the error
+          if (rpcError) {
+            console.error("[AUTH] Failed to initialize profile:", rpcError);
+            // Don't fail the login, just log the error
+          } else {
+            console.log("[AUTH] Profile initialized successfully");
+          }
+        } catch (err) {
+          console.error("[AUTH] Exception calling fn_initialize_profile:", err);
+          // Don't fail the login
         }
       }
 
       // If this is a password recovery callback, redirect to change password page
       if (type === "recovery") {
+        console.log("[AUTH] Redirecting to change password page");
         return NextResponse.redirect(new URL("/account/change-password?type=recovery", requestUrl.origin));
       }
 
+      console.log("[AUTH] Redirecting to homepage");
       return NextResponse.redirect(new URL("/", requestUrl.origin));
     } catch (error) {
-      console.error("Session exchange error:", error);
+      console.error("[AUTH] Session exchange error:", error);
       return NextResponse.redirect(
         new URL("/login?error=session_exchange_error", requestUrl.origin)
       );
     }
   }
 
+  console.log("[AUTH] No code provided, redirecting to login");
   return NextResponse.redirect(new URL("/login?error=no_code", requestUrl.origin));
 }
