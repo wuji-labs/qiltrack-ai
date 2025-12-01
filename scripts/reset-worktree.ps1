@@ -183,11 +183,18 @@ if ($DryRun) {
 } else {
   Invoke-GitLocal -RepoRoot $targetPath -GitArgs @("clean", "-fd", "-e", "node_modules", "-e", ".next")
 
-  # Clean .next cache to prevent BOM-related issues
+  # Clean .next and node_modules/.cache to prevent BOM-related build issues
   $nextCache = Join-Path $targetPath ".next"
+  $npmCache = Join-Path $targetPath "node_modules/.cache"
+
   if (Test-Path $nextCache) {
     Write-Host "  Removing .next cache..." -ForegroundColor Yellow
     Remove-Item -Recurse -Force $nextCache -ErrorAction SilentlyContinue
+  }
+
+  if (Test-Path $npmCache) {
+    Write-Host "  Removing node_modules/.cache..." -ForegroundColor Yellow
+    Remove-Item -Recurse -Force $npmCache -ErrorAction SilentlyContinue
   }
 
   Write-Host "Done." -ForegroundColor Green
