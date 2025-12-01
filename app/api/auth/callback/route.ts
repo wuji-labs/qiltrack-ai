@@ -52,9 +52,9 @@ export async function GET(request: NextRequest) {
   }
 
   if (code) {
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     const supabase = createRouteHandlerClient<Database>({
-      cookies: async () => cookieStore,
+      cookies: () => cookieStore,
     });
 
     try {

@@ -11,7 +11,7 @@ param(
   [string]$SharedEnvFile = ".env.shared",
   [string]$ExampleEnvFile = ".env.local.example",
 
-  [string[]]$Folders = @("app", "docs", "hooks", "lib", "supabase", "types", "__tests__", "scripts"),
+  [string[]]$Folders = @("app", "docs", "hooks", "lib", "supabase", "types", "__tests__", "scripts", "public"),
 
   [switch]$DryRun
 )

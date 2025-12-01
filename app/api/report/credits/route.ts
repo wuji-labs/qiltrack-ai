@@ -15,9 +15,9 @@ export async function GET(request: NextRequest) {
 
     if (!isTestBypass) {
       // Get user session using the same approach as auth callback
-      const cookieStore = await cookies();
+      const cookieStore = cookies();
       const supabase = createRouteHandlerClient<Database>({
-        cookies: async () => cookieStore,
+        cookies: () => cookieStore,
       });
 
       const {
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       } = await supabase.auth.getSession();
 
       if (sessionError || !session?.user?.id) {
-        console.warn(`[UNAUTHORIZED_SESSION] error: ${sessionError?.message || 'no session'}`);
+        console.warn(`[UNAUTHORIZED_SESSION] error: ${sessionError?.message || "no session"}`);
         return NextResponse.json(
           { error: "Unauthorized", code: "unauthorized" },
           { status: 401 }
@@ -36,12 +36,7 @@ export async function GET(request: NextRequest) {
       userId = session.user.id;
 
       // Query report_credits table for real-time remaining credits
-      const cookieStoreForQuery = await cookies();
-      const supabaseForQuery = createRouteHandlerClient<Database>({
-        cookies: async () => cookieStoreForQuery,
-      });
-
-      const { data, error: quotaError } = await supabaseForQuery
+      const { data, error: quotaError } = await supabase
         .from("report_credits")
         .select("credits_available")
         .eq("user_id", userId as never)

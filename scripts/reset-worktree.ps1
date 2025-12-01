@@ -85,7 +85,7 @@ if ($DryRun) {
   Write-Host "[dry-run] git sparse-checkout set app docs hooks lib supabase types __tests__ scripts"
 } else {
   # Re-set sparse-checkout folders to ensure they are checked out
-  $folders = @("app", "docs", "hooks", "lib", "supabase", "types", "__tests__", "scripts")
+  $folders = @("app", "docs", "hooks", "lib", "supabase", "types", "__tests__", "scripts", "public")
   Invoke-GitLocal -RepoRoot $targetPath -GitArgs (@("sparse-checkout", "set") + $folders)
   Write-Host "Done." -ForegroundColor Green
 }

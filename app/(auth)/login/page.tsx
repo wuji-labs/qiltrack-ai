@@ -146,7 +146,7 @@ function LoginContent() {
         return;
       }
       setEmailStatus("error");
-      setMessage({ type: "error", text: t("auth.error.generic") });
+      setMessage({ type: "error", text: result.error || t("auth.error.generic") });
       return;
     }
 

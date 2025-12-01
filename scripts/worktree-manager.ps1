@@ -4,7 +4,7 @@ param(
   [string]$Command,
   [string]$Name,
   [string]$Branch,
-  [string[]]$Folders = @("app", "docs", "hooks", "lib", "supabase", "types", "__tests__", "scripts")
+  [string[]]$Folders = @("app", "docs", "hooks", "lib", "supabase", "types", "__tests__", "scripts", "public")
 )
 
 function Resolve-RepoRoot {
