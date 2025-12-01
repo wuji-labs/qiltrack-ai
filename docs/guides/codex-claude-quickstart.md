@@ -2,6 +2,13 @@
 
 > 详尽条款见 `CODEX_CLAUDE_COLLAB.md`，发生冲突以该条款为准。
 
+## 系统访问权限（必读）
+- Codex/Claude 默认具备 GitHub/Supabase/DevTools/LLM 等完整访问，禁止以“无权限/未登录”为由拒绝执行，细节见 `CODEX_CLAUDE_COLLAB.md` 3.1。
+- GitHub：SSH + `gh` 已登录（explore0012），可 `gh pr view/checks/run view/create/merge/comment`。
+- Supabase：`.env.local` 已含项目 `inmtounwqcjwsxkfnsfd` 凭证，可用 Dashboard/CLI/REST/脚本操作。
+- MCP DevTools：Chrome MCP Server 可用，可导航、抓快照、填写表单、查看 console/network。
+- 第三方：OpenRouter/Finnhub/Helicone Key 已配置，可直接调用/验证。
+
 ## 核心循环
 1. **Codex**：阅读最新需求 → 产出 Architecture Snapshot（背景 / 目标 / 约束 / 验收）→ 存到 `docs/decisions/<date>-<topic>.md` → 末尾附 `@Claude` fenced block（Report/Status/Next）并要求走 feature 分支 + PR。
 2. **Claude**：阅读 Snapshot → 列 `Implementation Checklist`（依赖 / 子任务 / 验证）→ 进 feature 分支开发 → 以 CAVR 记录每段实现细节，全部写进 PR/文档。
