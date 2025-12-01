@@ -1,9 +1,9 @@
-﻿{
+{
   "name": "investor-ai",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -11,7 +11,7 @@
     "test:ci": "cross-env CI=true vitest --environment jsdom --pool=forks run",
     "helicone:sync-models": "node scripts/update-helicone-models.js",
     "env:check": "node scripts/check-env.js",
-    "pr:ready": "npm run lint && npm run test && echo '鉁?浠ｇ爜宸插噯澶囧ソ鎻愪氦 PR'"
+    "pr:ready": "npm run lint && npm run test && echo '✅代码已准备好提交 PR'"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
