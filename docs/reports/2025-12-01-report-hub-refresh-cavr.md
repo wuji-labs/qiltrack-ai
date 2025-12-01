@@ -77,6 +77,163 @@ npm run lint
 2. **API 测试**: 使用 Postman/curl 测试各接口（需先创建管理员账号）
 3. **集成测试**: 待前端实现后，编写端到端测试
 
+## 手动验证清单（优先级）
+
+由于新增 API 暂无自动化测试，合并前必须完成以下手动验证：
+
+### 🔴 **高优先级：复用逻辑**（阻断级）
+
+**测试场景**：
+1. **同用户 + 同 mode + 7 天内**：
+   ```bash
+   # 生成报告后，7天内再次查询同symbol+mode
+   curl -H "Cookie: session..." "http://localhost:3000/api/report/availability?symbol=AAPL&mode=production&lang=en"
+   # 预期：返回 reusable_run_id 和 is_own_report=true
+   ```
+
+2. **跨用户 + 同 mode + 7 天内**：
+   ```bash
+   # 用户A生成AAPL报告后，用户B查询
+   curl -H "Cookie: session_user_B..." "http://localhost:3000/api/report/availability?symbol=AAPL&mode=production"
+   # 预期：返回 reusable_run_id 和 is_own_report=false
+   ```
+
+3. **同 symbol + 不同 mode**（关键Bug验证）：
+   ```bash
+   # 用户生成 mode=baseline 报告后，查询 mode=production
+   curl -H "Cookie: session..." "http://localhost:3000/api/report/availability?symbol=AAPL&mode=production"
+   # 预期：返回 reusable_run_id=null（不可跨mode复用）
+   ```
+
+4. **7 天外**：
+   ```bash
+   # 查询8天前的报告
+   # 预期：返回 reusable_run_id=null
+   ```
+
+5. **fn_find_reusable_report 函数直接测试**：
+   ```sql
+   -- 在 Supabase SQL Editor 执行
+   SELECT * FROM fn_find_reusable_report('AAPL', 'en', 'production');
+   -- 验证：仅返回 mode='production' 的 run，不返回其他 mode
+   ```
+
+**阻断条件**：
+- ⛔ 跨 mode 能够复用（如 baseline 报告被 production 模式命中）
+- ⛔ 7 天外的报告被复用
+- ⛔ fn_find_reusable_report 未按 mode 过滤
+
+### 🟡 **中优先级：管理员权限/RLS**
+
+**测试场景**：
+1. **管理员访问 admin 接口**：
+   ```bash
+   # 使用 admin@investor.ai 或 plan='admin' 账号
+   curl -H "Cookie: admin_session..." "http://localhost:3000/api/admin/runs?page=1&limit=5"
+   # 预期：200，返回所有用户的 runs
+
+   # 标记热门
+   curl -X POST -H "Cookie: admin_session..." "http://localhost:3000/api/admin/runs/{run_id}/feature"
+   # 预期：200，is_featured 设为 true
+   ```
+
+2. **非管理员访问 admin 接口**：
+   ```bash
+   # 使用普通用户账号
+   curl -H "Cookie: user_session..." "http://localhost:3000/api/admin/runs"
+   # 预期：403 Forbidden
+   ```
+
+3. **history 接口 RLS**：
+   ```bash
+   # 用户A查询自己的历史
+   curl -H "Cookie: session_A..." "http://localhost:3000/api/report/history"
+   # 预期：仅返回用户A的 runs，不包含其他用户数据
+   ```
+
+4. **availability 接口 RLS**：
+   ```bash
+   # 验证 availability 不泄露其他用户的私有报告
+   # 预期：仅能查看公开或自己的报告
+   ```
+
+**阻断条件**：
+- ⛔ 非 admin 可访问 `/api/admin/*` 并返回 200
+- ⛔ admin 被拒绝访问（返回 403）
+- ⛔ history 或 availability 返回其他用户的私有数据
+
+### 🟢 **低优先级：其他 API 功能**
+
+**测试场景**：
+1. **GET /api/report/popular**：
+   ```bash
+   curl "http://localhost:3000/api/report/popular?range=30&limit=10"
+   # 预期：返回 symbols 数组，每项包含 symbol, generation_count, latest_created_at
+   # 验证：按 generation_count DESC 排序
+   ```
+
+2. **GET /api/report/history 新增字段**：
+   ```bash
+   curl -H "Cookie: session..." "http://localhost:3000/api/report/history?page=1&limit=5"
+   # 预期：返回包含 pdf_signed_url, is_featured, reused_from_run_id, lang, mode
+   ```
+
+3. **批量下架**：
+   ```bash
+   curl -X POST -H "Cookie: admin_session..." \
+     -H "Content-Type: application/json" \
+     -d '{"older_than_days": 30}' \
+     "http://localhost:3000/api/admin/runs/unfeature-bulk"
+   # 预期：返回 affected_count
+   ```
+
+## 数据一致性验证
+
+1. **Migration 执行后检查**：
+   ```sql
+   -- 验证 mode backfill
+   SELECT COUNT(*) FROM report_runs WHERE mode IS NULL OR mode = '';
+   -- 预期：0（所有旧 run 都已 backfill 为 'production'）
+
+   -- 验证 audit_logs
+   SELECT * FROM audit_logs WHERE action = 'backfill_mode';
+   -- 预期：有记录，details 包含 migration 信息
+   ```
+
+2. **索引生效验证**：
+   ```sql
+   EXPLAIN ANALYZE
+   SELECT * FROM report_runs
+   WHERE symbol = 'AAPL'
+     AND COALESCE(lang, 'en') = 'en'
+     AND COALESCE(mode, 'production') = 'production'
+     AND created_at >= NOW() - INTERVAL '7 days';
+   -- 验证：使用了 idx_report_runs_reuse_lookup 索引
+   ```
+
+## 🚫 合并阻断条件
+
+如果以下任一条件不满足，**必须暂缓合并**：
+
+1. **Migration/Backfill 失败**：
+   - ⛔ Migration 在 staging 环境执行失败
+   - ⛔ Backfill 后仍有 mode=NULL 的 run
+   - ⛔ Audit logs 未记录 backfill 操作
+
+2. **复用逻辑失败**：
+   - ⛔ 跨 mode 可以复用（最严重bug）
+   - ⛔ 7 天外的报告被复用
+   - ⛔ fn_find_reusable_report 未使用 p_mode 参数
+
+3. **权限/RLS 失败**：
+   - ⛔ 普通用户可访问 admin 接口
+   - ⛔ Admin 无法访问（被 403）
+   - ⛔ history/availability 泄露其他用户数据
+
+4. **数据完整性问题**：
+   - ⛔ 索引未生效（EXPLAIN 显示全表扫描）
+   - ⛔ 新增字段无法正确返回
+
 ## Risks
 
 ### 高风险
@@ -115,12 +272,22 @@ npm run lint
 - **问题**：`npm run dev` 改成 `-p 3001`，与仓库文档/脚本默认 3000 不符
 - **修复**：✅ 还原为 `next dev`（默认 3000）
 
-### 3. 审查发现的其他风险
-已在上述 Risks 部分补充：
-- API 无自动化测试覆盖
-- 管理员校验安全性待加强
-- 历史数据 mode backfill 需求
-- history 接口新增字段未测试
+### 3. **关键Bug**: fn_find_reusable_report 未使用 mode 参数（已修复）
+- **问题**：函数接受 `p_mode` 参数但在 WHERE 子句中未使用，导致跨不同 mode 直接复用
+- **修复**：✅ 在 WHERE 子句添加 `AND COALESCE(report_runs.mode, 'production') = p_mode`
+- **影响**：确保复用逻辑正确按 mode 匹配，避免误复用不同 tone 的报告
+
+### 4. 历史数据 mode backfill（已实现）
+- **问题**：旧 run 的 mode 为 NULL/空串，会导致复用逻辑遗漏
+- **修复**：✅ 在 migration 中添加 backfill 语句和 audit_logs 记录
+- **验证**：见上述"手动验证清单"中的数据一致性验证
+
+### 5. 质量缺口与验证（已补充）
+已在"手动验证清单"部分补充：
+- ✅ 详细的 API 测试步骤（含优先级）
+- ✅ RLS/权限测试场景
+- ✅ 数据一致性验证 SQL
+- ✅ 明确的合并阻断条件
 
 ## Next Steps
 
