@@ -143,8 +143,25 @@ if ($DryRun) {
   $folders = @("app", "docs", "hooks", "lib", "supabase", "types", "__tests__", "scripts", "public")
   Invoke-GitLocal -RepoRoot $targetPath -GitArgs (@("sparse-checkout", "set") + $folders)
 
-  # Fix BOM issue that can occur after sparse-checkout
-  Remove-BOMFromFile -FilePath (Join-Path $targetPath "package.json")
+  # Fix BOM issue that can occur after sparse-checkout - CRITICAL!
+  $packageJsonPath = Join-Path $targetPath "package.json"
+  Remove-BOMFromFile -FilePath $packageJsonPath
+
+  # Also verify the file starts correctly
+  if (Test-Path $packageJsonPath) {
+    $bytes = [System.IO.File]::ReadAllBytes($packageJsonPath)
+    if ($bytes[0] -ne 0x7B) {
+      Write-Host "  WARNING: package.json doesn't start with '{', attempting deep fix..." -ForegroundColor Red
+      $content = [System.IO.File]::ReadAllText($packageJsonPath)
+      $content = $content -replace '^\s*[\x00-\x1F\x7F-\xFF]*', ''
+      if (-not $content.StartsWith('{')) {
+        $content = $content.Substring($content.IndexOf('{'))
+      }
+      $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+      [System.IO.File]::WriteAllText($packageJsonPath, $content, $utf8NoBom)
+      Write-Host "  Deep fix applied" -ForegroundColor Green
+    }
+  }
 
   Write-Host "Done." -ForegroundColor Green
 }
@@ -155,6 +172,14 @@ if ($DryRun) {
   Write-Host "[dry-run] git clean -fd -e node_modules -e .next"
 } else {
   Invoke-GitLocal -RepoRoot $targetPath -GitArgs @("clean", "-fd", "-e", "node_modules", "-e", ".next")
+
+  # Clean .next cache to prevent BOM-related issues
+  $nextCache = Join-Path $targetPath ".next"
+  if (Test-Path $nextCache) {
+    Write-Host "  Removing .next cache..." -ForegroundColor Yellow
+    Remove-Item -Recurse -Force $nextCache -ErrorAction SilentlyContinue
+  }
+
   Write-Host "Done." -ForegroundColor Green
 }
 
