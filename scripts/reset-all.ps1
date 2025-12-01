@@ -17,9 +17,9 @@ $ErrorActionPreference = "Stop"
 function Write-Step {
   param([string]$Message)
   Write-Host ""
-  Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+  Write-Host "============================================================" -ForegroundColor Cyan
   Write-Host "  $Message" -ForegroundColor Cyan
-  Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
+  Write-Host "============================================================" -ForegroundColor Cyan
   Write-Host ""
 }
 
@@ -32,19 +32,20 @@ function Remove-BOMFromFile {
 
   $bytes = [System.IO.File]::ReadAllBytes($FilePath)
   if ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
-    Write-Host "  🔧 Removing BOM from $(Split-Path $FilePath -Leaf)..." -ForegroundColor Yellow
+    Write-Host "  Removing BOM from $(Split-Path $FilePath -Leaf)..." -ForegroundColor Yellow
     $content = [System.IO.File]::ReadAllText($FilePath)
     $utf8NoBom = New-Object System.Text.UTF8Encoding $false
     [System.IO.File]::WriteAllText($FilePath, $content, $utf8NoBom)
-    Write-Host "  ✅ BOM removed" -ForegroundColor Green
+    Write-Host "  BOM removed" -ForegroundColor Green
   }
 }
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 
-Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Magenta
-Write-Host "║  Complete Repo Reset - Main + All Worktrees               ║" -ForegroundColor Magenta
-Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Magenta
+Write-Host ""
+Write-Host "============================================================" -ForegroundColor Magenta
+Write-Host "  Complete Repo Reset - Main + All Worktrees" -ForegroundColor Magenta
+Write-Host "============================================================" -ForegroundColor Magenta
 
 # ============================================================================
 # STEP 1: Reset main repository
@@ -53,7 +54,7 @@ Write-Step "STEP 1: Resetting main repository"
 
 Push-Location $repoRoot
 try {
-  Write-Host "📍 Location: $repoRoot" -ForegroundColor Gray
+  Write-Host "Location: $repoRoot" -ForegroundColor Gray
   Write-Host ""
 
   if ($DryRun) {
@@ -74,7 +75,7 @@ try {
     & git clean -fd
     if ($LASTEXITCODE -ne 0) { throw "git clean failed" }
 
-    Write-Host "✅ Main repo reset complete" -ForegroundColor Green
+    Write-Host "Main repo reset complete" -ForegroundColor Green
 
     # CRITICAL: Fix BOM in main repo immediately after git operations
     Write-Host ""
@@ -96,12 +97,12 @@ foreach ($worktree in $Worktrees) {
   $worktreePath = Join-Path (Split-Path $repoRoot -Parent) "investor-ai-$worktree"
 
   if (-not (Test-Path $worktreePath)) {
-    Write-Host "⏭️  Skipping $worktree (not found at $worktreePath)" -ForegroundColor Gray
+    Write-Host "Skipping $worktree (not found at $worktreePath)" -ForegroundColor Gray
     continue
   }
 
   Write-Host ""
-  Write-Host "🔄 Resetting worktree: $worktree" -ForegroundColor Cyan
+  Write-Host "Resetting worktree: $worktree" -ForegroundColor Cyan
 
   if ($DryRun) {
     Write-Host "[dry-run] Would execute: $resetScript -Name $worktree" -ForegroundColor Yellow
@@ -118,7 +119,7 @@ foreach ($worktree in $Worktrees) {
     if ($LASTEXITCODE -ne 0) {
       Write-Warning "Failed to reset worktree $worktree"
     } else {
-      Write-Host "✅ Worktree $worktree ready" -ForegroundColor Green
+      Write-Host "Worktree $worktree ready" -ForegroundColor Green
     }
   }
 }
@@ -127,9 +128,9 @@ foreach ($worktree in $Worktrees) {
 # Summary
 # ============================================================================
 Write-Host ""
-Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "║  ✅ All Reset Complete!                                    ║" -ForegroundColor Green
-Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host "============================================================" -ForegroundColor Green
+Write-Host "  All Reset Complete!" -ForegroundColor Green
+Write-Host "============================================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  1. cd D:\Projects\investor-ai-g1" -ForegroundColor Gray
@@ -140,7 +141,7 @@ foreach ($worktree in $Worktrees) {
   $worktreePath = Join-Path (Split-Path $repoRoot -Parent) "investor-ai-$worktree"
   if (Test-Path $worktreePath) {
     $port = 3000 + [int]$worktree.Substring(1)
-    Write-Host "  ✅ $worktree -> http://localhost:$port" -ForegroundColor Green
+    Write-Host "  $worktree -> http://localhost:$port" -ForegroundColor Green
   }
 }
 Write-Host ""
