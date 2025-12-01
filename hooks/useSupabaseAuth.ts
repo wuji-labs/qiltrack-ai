@@ -29,16 +29,21 @@ type AuthResult =
 
 /**
  * Get the base URL for auth redirects
- * Priority: 1) NEXT_PUBLIC_SITE_URL env, 2) Current window origin
- * This supports multi-worktree development where each runs on different port
+ * Priority: 1) NEXT_PUBLIC_AUTH_REDIRECT_URL, 2) NEXT_PUBLIC_SITE_URL, 3) NEXT_PUBLIC_VERCEL_URL, 4) runtime origin
+ * Supports multi-worktree with different ports and SSR fallback.
  */
 function getAuthRedirectBase(): string {
-  if (typeof window === "undefined") {
-    // SSR fallback
-    return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const base =
+    process.env.NEXT_PUBLIC_AUTH_REDIRECT_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.NEXT_PUBLIC_VERCEL_URL;
+  if (base) {
+    return base.replace(/\/$/, "");
   }
-  // Use env if explicitly set, otherwise use current origin (handles dynamic ports)
-  return process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+  if (typeof window === "undefined") {
+    return "http://localhost:3000";
+  }
+  return window.location.origin;
 }
 
 const AUTH_CALLBACK_PATH = "/api/auth/callback";
@@ -50,6 +55,7 @@ function mapAuthError(error: unknown): AuthResult {
       typeof (error as { status?: number }).status === "number"
         ? (error as { status?: number }).status
         : undefined;
+    const code = typeof (error as { code?: string }).code === "string" ? (error as { code?: string }).code : undefined;
     const message = String((error as { message?: string }).message ?? "Unknown error");
     const normalizedMessage = message.toLowerCase();
     return {
@@ -57,9 +63,12 @@ function mapAuthError(error: unknown): AuthResult {
       error: message,
       status,
       code:
-        status === 429
+        status === 429 || code === "over_request_rate_limit"
           ? "cooldown"
-          : normalizedMessage.includes("invalid email")
+          : code === "email_address_invalid" ||
+              normalizedMessage.includes("invalid email") ||
+              normalizedMessage.includes("email address") ||
+              normalizedMessage.includes("invalid or missing email")
             ? "invalid_email"
             : undefined,
     };
