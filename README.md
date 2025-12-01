@@ -28,9 +28,10 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 ## 🎯 核心能力
 - **模糊搜索**：输入英文公司名或股票代码，自动补全来自 `/api/search`。
 - **一键生成报告**：`/api/report` 汇总 Finnhub 数据并调度 OpenRouter，产出结构化分析。
-- **额度管控**：NextAuth 登录后默认配额 1 份，后端按用户表的 `quota` / `reportsUsed` 校验，401/429 会在前端提示。
+- **积分管控**：基于 Supabase 的统一积分系统，支持每日签到、管理员授予积分等功能。
 - **导出/复制**：富文本复制 + DOCX 导出，方便把报告当作正式投研底稿。
-- **扩展空间**：导航、FAQ、定价等锚点已搭好，后续可快速接入支付、历史报告等功能。
+- **Admin 面板**：基于 Refine 的管理后台，支持用户管理、积分管理、报告管理、审计日志等。
+- **扩展空间**：三层架构设计，便于未来拆分为微服务。
 
 ### 产品定位与合规声明
 - CodeX / Investor AI 仅提供"结构化信息整理"能力，帮助用户理解企业；**不提供投资建议、买卖指令或个性化判断**。
@@ -159,11 +160,39 @@ git push
 
 参考示例：[`.env.local.example`](./.env.local.example)
 
-## 目录结构
-- `app/`：App Router 入口，`layout.tsx` 包含导航与全局样式，`page.tsx` 为核心页面。
-- `app/api/`：`search`、`quote`、`report` 等 API 聚合 Finnhub/OpenRouter。
-- `public/`：静态资源。
-- `test-api.js`：用于单独验证 OpenAI/OpenRouter SDK。
+## 📁 目录结构
+
+### 三层架构
+```
+app/                          # 表现层 (Next.js App Router)
+├── api/                     # API Routes
+│   └── report/              # 报告生成 API (重构后仅 200 行)
+├── admin/                   # Admin 面板 (Refine)
+│   ├── users/              # 用户管理
+│   └── credits/            # 积分管理
+└── sections/               # 页面组件
+
+lib/                          # 业务逻辑层
+├── core/                    # 核心业务逻辑
+│   ├── reports/            # 报告生成、净化、持久化
+│   ├── credits/            # 积分管理、每日奖励
+│   ├── users/              # 用户管理
+│   └── errors.ts           # 统一错误处理
+├── services/                # 服务适配器
+│   ├── llm.ts              # LLM 服务 (Helicone/OpenRouter)
+│   ├── market-data.ts      # Finnhub API 封装
+│   └── storage.ts          # Supabase Storage 封装
+├── admin/                   # Refine 配置
+│   ├── data-provider.ts    # Supabase Data Provider
+│   └── auth-provider.ts    # 认证 Provider
+└── api/                     # API 工具
+    └── error-handler.ts    # 错误处理中间件
+
+supabase/migrations/         # 数据库迁移
+types/                       # TypeScript 类型定义
+```
+
+详见 [架构文档](docs/architecture/README.md)
 
 ## Supabase 部署（Hosted 实例）
 

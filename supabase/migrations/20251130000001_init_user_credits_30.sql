@@ -56,7 +56,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- 4. Create daily_rewards table to track daily credit claims
 CREATE TABLE IF NOT EXISTS public.daily_rewards (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE REFERENCES public.profiles(id) ON DELETE CASCADE,
   last_claimed TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   streak_count INT DEFAULT 1,

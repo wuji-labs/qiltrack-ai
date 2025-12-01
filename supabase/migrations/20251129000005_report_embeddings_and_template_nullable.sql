@@ -18,7 +18,7 @@ ALTER TABLE public.report_runs
 
 -- 3) Create embeddings table
 CREATE TABLE IF NOT EXISTS public.reports_embeddings (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   report_run_id UUID NOT NULL REFERENCES public.report_runs(id) ON DELETE CASCADE,
   chunk_index INT NOT NULL,
   embedding VECTOR(1536) NOT NULL,
