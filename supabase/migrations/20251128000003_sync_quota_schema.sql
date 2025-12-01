@@ -6,7 +6,7 @@
 
 -- 1. Ensure report_credits table exists with proper structure
 CREATE TABLE IF NOT EXISTS public.report_credits (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE REFERENCES public.profiles(id) ON DELETE CASCADE,
   credits_available INT DEFAULT 5,
   credits_used INT DEFAULT 0,

@@ -35,7 +35,7 @@ ALTER TABLE public.profiles
 
 -- Report templates table
 CREATE TABLE IF NOT EXISTS public.report_templates (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   description TEXT,
   category TEXT,
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS public.report_templates (
 
 -- User report credits
 CREATE TABLE IF NOT EXISTS public.report_credits (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   credits_available INT DEFAULT 5,
   credits_used INT DEFAULT 0,
@@ -73,7 +73,7 @@ ALTER TABLE public.report_credits
 
 -- Report generation history
 CREATE TABLE IF NOT EXISTS public.report_runs (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   template_id UUID NOT NULL REFERENCES public.report_templates(id),
   symbol TEXT,
@@ -109,7 +109,7 @@ ALTER TABLE public.report_runs
 
 -- Report documents summary (for quick listing)
 CREATE TABLE IF NOT EXISTS public.report_documents (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   run_id UUID NOT NULL REFERENCES public.report_runs(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   markdown_summary TEXT,
@@ -127,7 +127,7 @@ ALTER TABLE public.report_documents
 
 -- Publications table
 CREATE TABLE IF NOT EXISTS public.publications (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   description TEXT,
   url TEXT,
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS public.publications (
 
 -- Research topics table
 CREATE TABLE IF NOT EXISTS public.research_topics (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   description TEXT,
   content TEXT,
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS public.research_topics (
 
 -- FAQ entries (for content management)
 CREATE TABLE IF NOT EXISTS public.faq_entries (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   question TEXT NOT NULL,
   answer TEXT NOT NULL,
   category TEXT,
@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS public.faq_entries (
 
 -- Pricing plans (for content management)
 CREATE TABLE IF NOT EXISTS public.pricing_plans (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
   description TEXT,
@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS public.pricing_plans (
 
 -- Copy modules (for dynamic content like Hero, sections, etc)
 CREATE TABLE IF NOT EXISTS public.copy_modules (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   module_key TEXT UNIQUE NOT NULL,
   module_value JSONB,
   language TEXT DEFAULT 'en',
@@ -189,7 +189,7 @@ CREATE TABLE IF NOT EXISTS public.copy_modules (
 
 -- Billing subscriptions
 CREATE TABLE IF NOT EXISTS public.billing_subscriptions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   stripe_customer_id TEXT,
   stripe_subscription_id TEXT UNIQUE,
@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS public.billing_subscriptions (
 
 -- Audit logs
 CREATE TABLE IF NOT EXISTS public.audit_logs (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   action TEXT NOT NULL,
   resource_type TEXT,
@@ -214,7 +214,7 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
 
 -- Report credit events (for tracking consumption)
 CREATE TABLE IF NOT EXISTS public.report_credit_events (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   event_type TEXT NOT NULL,
   credits_amount INT NOT NULL,

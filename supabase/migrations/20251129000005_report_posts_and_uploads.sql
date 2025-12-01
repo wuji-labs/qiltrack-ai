@@ -2,6 +2,9 @@
 -- Purpose: Stage A backend: enable curated report posts, user uploads, and admin/editor roles
 -- Safety: Idempotent ALTER/CREATE with IF NOT EXISTS guards; no data drops
 
+-- Enable UUID extension if not already enabled
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- 1) Add role column to profiles (admin/editor/user)
 ALTER TABLE public.profiles
 ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'user';
@@ -24,7 +27,7 @@ WHERE role IS NULL OR role = '';
 
 -- 2) Create report_posts table for curated posts
 CREATE TABLE IF NOT EXISTS public.report_posts (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
   summary TEXT,
@@ -48,7 +51,7 @@ CREATE INDEX IF NOT EXISTS idx_report_posts_published_at ON public.report_posts(
 
 -- 3) Create user_report_uploads table for user-submitted reports
 CREATE TABLE IF NOT EXISTS public.user_report_uploads (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   note TEXT,
