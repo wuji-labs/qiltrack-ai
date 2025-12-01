@@ -68,11 +68,38 @@ function Remove-BOMFromFile {
   }
 
   $bytes = [System.IO.File]::ReadAllBytes($FilePath)
+  $needsFix = $false
+  $reason = ""
+
+  # Check 1: UTF-8 BOM (EF BB BF)
   if ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
-    Write-Host "  Removing BOM from $(Split-Path $FilePath -Leaf)..." -ForegroundColor Yellow
+    $needsFix = $true
+    $reason = "UTF-8 BOM detected"
+  }
+  # Check 2: File doesn't start with '{' (0x7B) for JSON
+  elseif ($bytes[0] -ne 0x7B) {
+    $needsFix = $true
+    $reason = "File doesn't start with '{' (starts with 0x$($bytes[0].ToString('X2')))"
+  }
+
+  if ($needsFix) {
+    Write-Host "  Removing BOM from $(Split-Path $FilePath -Leaf)... ($reason)" -ForegroundColor Yellow
     $content = [System.IO.File]::ReadAllText($FilePath)
+
+    # Remove any non-printable characters at start
+    $content = $content -replace '^\s*[\x00-\x1F\x7F-\xFF]*', ''
+
+    # Ensure content starts with '{'
+    if (-not $content.StartsWith('{')) {
+      $braceIndex = $content.IndexOf('{')
+      if ($braceIndex -gt 0) {
+        $content = $content.Substring($braceIndex)
+      }
+    }
+
     $utf8NoBom = New-Object System.Text.UTF8Encoding $false
     [System.IO.File]::WriteAllText($FilePath, $content, $utf8NoBom)
+    Write-Host "  BOM/corruption removed successfully" -ForegroundColor Green
   }
 }
 
@@ -143,25 +170,8 @@ if ($DryRun) {
   $folders = @("app", "docs", "hooks", "lib", "supabase", "types", "__tests__", "scripts", "public")
   Invoke-GitLocal -RepoRoot $targetPath -GitArgs (@("sparse-checkout", "set") + $folders)
 
-  # Fix BOM issue that can occur after sparse-checkout - CRITICAL!
-  $packageJsonPath = Join-Path $targetPath "package.json"
-  Remove-BOMFromFile -FilePath $packageJsonPath
-
-  # Also verify the file starts correctly
-  if (Test-Path $packageJsonPath) {
-    $bytes = [System.IO.File]::ReadAllBytes($packageJsonPath)
-    if ($bytes[0] -ne 0x7B) {
-      Write-Host "  WARNING: package.json doesn't start with '{', attempting deep fix..." -ForegroundColor Red
-      $content = [System.IO.File]::ReadAllText($packageJsonPath)
-      $content = $content -replace '^\s*[\x00-\x1F\x7F-\xFF]*', ''
-      if (-not $content.StartsWith('{')) {
-        $content = $content.Substring($content.IndexOf('{'))
-      }
-      $utf8NoBom = New-Object System.Text.UTF8Encoding $false
-      [System.IO.File]::WriteAllText($packageJsonPath, $content, $utf8NoBom)
-      Write-Host "  Deep fix applied" -ForegroundColor Green
-    }
-  }
+  # Fix BOM issue that can occur after sparse-checkout - uses enhanced Remove-BOMFromFile
+  Remove-BOMFromFile -FilePath (Join-Path $targetPath "package.json")
 
   Write-Host "Done." -ForegroundColor Green
 }
