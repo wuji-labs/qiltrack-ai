@@ -52,7 +52,23 @@
 | Unit Tests | ✅ Pass | 15 个测试全部通过 |
 | Token 解析逻辑 | ✅ Verified | 支持 code/token_hash/access+refresh token |
 | 缺参处理 | ✅ Verified | 提前返回 linkExpired 消息 |
-| 过期错误识别 | ✅ Enhanced | 增加 "invalid" 关键词检测 |
+| 过期错误识别 | ✅ Enhanced | 匹配 otp_expired/"expired"/"invalid or expired" |
+| 错误文案一致性 | ✅ Fixed | 副标题与正文使用相同 errorMessage |
+
+---
+
+## Code Review Fixes (2025-12-01)
+
+### Issue 1: Error message conflict
+**问题**: 错误态副标题固定显示 `auth.error.generic`，与正文 errorMessage 冲突
+**修复**: 副标题改为使用 `errorMessage` 变量 (app/account/reset-password/page.tsx:90)
+
+### Issue 2: Overly broad error matching
+**问题**: 所有包含 "invalid" 的错误都被归类为过期，可能误导用户
+**修复**: 收窄匹配条件为 Supabase 特定模式：
+- `otp_expired` code
+- message 包含 "expired"
+- message 包含 "invalid or expired"
 
 ---
 
