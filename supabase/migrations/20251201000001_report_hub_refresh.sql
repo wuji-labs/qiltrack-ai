@@ -84,6 +84,7 @@ BEGIN
   FROM public.report_runs
   WHERE report_runs.symbol = p_symbol
     AND COALESCE(report_runs.lang, 'en') = p_lang
+    AND COALESCE(report_runs.mode, 'production') = p_mode
     AND report_runs.status = 'completed'
     AND report_runs.created_at >= NOW() - INTERVAL '7 days'
   ORDER BY report_runs.created_at DESC
@@ -125,3 +126,20 @@ COMMENT ON COLUMN public.report_runs.pdf_path IS 'Storage path for PDF export';
 COMMENT ON COLUMN public.report_runs.content_md IS 'Markdown content of the report';
 COMMENT ON COLUMN public.report_runs.content_html IS 'HTML content of the report (optional)';
 COMMENT ON COLUMN public.report_runs.meta IS 'Additional metadata (tone, prompt, etc.)';
+
+-- Backfill existing runs with default mode to ensure reuse logic works correctly
+UPDATE public.report_runs
+SET mode = 'production'
+WHERE mode IS NULL OR mode = '';
+
+-- Log the backfill for tracking
+INSERT INTO public.audit_logs (action, resource_type, details, created_at)
+VALUES (
+  'backfill_mode',
+  'report_runs',
+  jsonb_build_object(
+    'description', 'Backfilled mode field for existing runs to production',
+    'migration', '20251201000001_report_hub_refresh'
+  ),
+  CURRENT_TIMESTAMP
+);
