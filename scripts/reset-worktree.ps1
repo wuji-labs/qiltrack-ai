@@ -30,6 +30,25 @@ function Get-WorktreePath {
   return (Join-Path $parent ("investor-ai-{0}" -f $sanitized))
 }
 
+function Get-WorktreePort {
+  param([string]$Name)
+
+  $map = @{
+    "g1" = 3001
+    "g2" = 3002
+    "g3" = 3003
+    "g4" = 3004
+    "g5" = 3005
+  }
+
+  $key = $Name.Trim().ToLower()
+  if ($map.ContainsKey($key)) {
+    return $map[$key]
+  }
+
+  return $null
+}
+
 function Invoke-GitLocal {
   param([string]$RepoRoot, [string[]]$GitArgs)
 
@@ -62,7 +81,7 @@ Write-Host "=== Resetting worktree: $targetPath ===" -ForegroundColor Cyan
 Write-Host ""
 
 # Step 1: git fetch origin
-Write-Host "[1/6] Fetching latest from origin..." -ForegroundColor Yellow
+Write-Host "[1/7] Fetching latest from origin..." -ForegroundColor Yellow
 if ($DryRun) {
   Write-Host "[dry-run] git fetch origin"
 } else {
@@ -71,7 +90,7 @@ if ($DryRun) {
 }
 
 # Step 2: git reset --hard origin/main
-Write-Host "[2/6] Resetting to origin/main..." -ForegroundColor Yellow
+Write-Host "[2/7] Resetting to origin/main..." -ForegroundColor Yellow
 if ($DryRun) {
   Write-Host "[dry-run] git reset --hard origin/main"
 } else {
@@ -80,7 +99,7 @@ if ($DryRun) {
 }
 
 # Step 3: Re-apply sparse-checkout to ensure all files are checked out
-Write-Host "[3/6] Re-applying sparse-checkout..." -ForegroundColor Yellow
+Write-Host "[3/7] Re-applying sparse-checkout..." -ForegroundColor Yellow
 # Include public so assets (e.g., provider logos) are available after reset
 if ($DryRun) {
   Write-Host "[dry-run] git sparse-checkout set app docs hooks lib supabase types __tests__ scripts public"
@@ -92,7 +111,7 @@ if ($DryRun) {
 }
 
 # Step 4: git clean -fd (keep node_modules and .next)
-Write-Host "[4/6] Cleaning untracked files (keeping node_modules, .next)..." -ForegroundColor Yellow
+Write-Host "[4/7] Cleaning untracked files (keeping node_modules, .next)..." -ForegroundColor Yellow
 if ($DryRun) {
   Write-Host "[dry-run] git clean -fd -e node_modules -e .next"
 } else {
@@ -101,7 +120,7 @@ if ($DryRun) {
 }
 
 # Step 5: Copy .env.local from root
-Write-Host "[5/6] Syncing .env.local from root..." -ForegroundColor Yellow
+Write-Host "[5/7] Syncing .env.local from root..." -ForegroundColor Yellow
 $sourceEnv = Join-Path $repoRoot ".env.local"
 $targetEnv = Join-Path $targetPath ".env.local"
 if ($DryRun) {
@@ -117,7 +136,7 @@ if ($DryRun) {
 
 # Step 6: npm ci (optional)
 if (-not $SkipNpmCi) {
-  Write-Host "[6/6] Checking if npm ci is needed..." -ForegroundColor Yellow
+  Write-Host "[6/7] Checking if npm ci is needed..." -ForegroundColor Yellow
 
   if ($DryRun) {
     Write-Host "[dry-run] would check package-lock.json changes and run npm ci if needed"
@@ -160,7 +179,29 @@ if (-not $SkipNpmCi) {
     }
   }
 } else {
-  Write-Host "[6/6] Skipping npm ci (--SkipNpmCi flag)" -ForegroundColor Yellow
+  Write-Host "[6/7] Skipping npm ci (--SkipNpmCi flag)" -ForegroundColor Yellow
+}
+
+Write-Host "[7/7] Setting dev port for worktree..." -ForegroundColor Yellow
+$port = Get-WorktreePort -Name $Name
+$setPortScript = Join-Path (Join-Path $repoRoot "scripts") "set-worktree-port.ps1"
+if ($DryRun) {
+  if ($port) {
+    Write-Host "[dry-run] would run $setPortScript -Name $Name -Port $port"
+  } else {
+    Write-Host "[dry-run] no mapped port for $Name, skipping."
+  }
+} else {
+  if ($port) {
+    try {
+      & $setPortScript -Name $Name -Port $port
+      Write-Host "Done. Set dev port to $port." -ForegroundColor Green
+    } catch {
+      Write-Warning ("Failed to set dev port for {0}: {1}" -f $Name, $_)
+    }
+  } else {
+    Write-Warning "No port mapping found for $Name, skipping dev port update."
+  }
 }
 
 Write-Host ""
