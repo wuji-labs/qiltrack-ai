@@ -62,7 +62,7 @@ Write-Host "=== Resetting worktree: $targetPath ===" -ForegroundColor Cyan
 Write-Host ""
 
 # Step 1: git fetch origin
-Write-Host "[1/4] Fetching latest from origin..." -ForegroundColor Yellow
+Write-Host "[1/6] Fetching latest from origin..." -ForegroundColor Yellow
 if ($DryRun) {
   Write-Host "[dry-run] git fetch origin"
 } else {
@@ -71,7 +71,7 @@ if ($DryRun) {
 }
 
 # Step 2: git reset --hard origin/main
-Write-Host "[2/5] Resetting to origin/main..." -ForegroundColor Yellow
+Write-Host "[2/6] Resetting to origin/main..." -ForegroundColor Yellow
 if ($DryRun) {
   Write-Host "[dry-run] git reset --hard origin/main"
 } else {
@@ -80,9 +80,10 @@ if ($DryRun) {
 }
 
 # Step 3: Re-apply sparse-checkout to ensure all files are checked out
-Write-Host "[3/5] Re-applying sparse-checkout..." -ForegroundColor Yellow
+Write-Host "[3/6] Re-applying sparse-checkout..." -ForegroundColor Yellow
+# Include public so assets (e.g., provider logos) are available after reset
 if ($DryRun) {
-  Write-Host "[dry-run] git sparse-checkout set app docs hooks lib supabase types __tests__ scripts"
+  Write-Host "[dry-run] git sparse-checkout set app docs hooks lib supabase types __tests__ scripts public"
 } else {
   # Re-set sparse-checkout folders to ensure they are checked out
   $folders = @("app", "docs", "hooks", "lib", "supabase", "types", "__tests__", "scripts", "public")
