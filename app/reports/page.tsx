@@ -304,7 +304,7 @@ export default function ReportsPage() {
 							{t("reports.page.hero.description")}
 						</p>
 						<div className="flex flex-wrap items-center justify-center gap-3 animate-fade-in-up" style={{ animationDelay: "240ms" }}>
-							<Link href="#popular" className="btn-gradient px-5 py-2 text-sm font-semibold motion-safe:hover:glow-pulse motion-safe:transition-transform motion-safe:hover:-translate-y-0.5">
+							<Link href="#popular" className="btn-gradient px-5 py-2 text-sm font-semibold motion-safe:transition-transform motion-safe:hover:-translate-y-0.5">
 								{t("reports.page.hero.cta")}
 							</Link>
 							<Link
@@ -313,7 +313,7 @@ export default function ReportsPage() {
 							>
 								{t("reports.page.hero.myReports")}
 							</Link>
-							<Link href="/" className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] transition-colors motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 motion-safe:hover:glow-pulse">
+							<Link href="/" className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] transition-colors motion-safe:transition-transform motion-safe:hover:-translate-y-0.5">
 								{t("reports.page.hero.backHome")}
 							</Link>
 						</div>
