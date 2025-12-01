@@ -283,6 +283,11 @@ if ($DryRun) {
   } else {
     Write-Warning "No port mapping found for $Name, skipping dev port update."
   }
+
+  # FINAL CHECK: Fix BOM one last time after ALL file operations
+  Write-Host ""
+  Write-Host "Final BOM check..." -ForegroundColor Yellow
+  Remove-BOMFromFile -FilePath (Join-Path $targetPath "package.json")
 }
 
 Write-Host ""
