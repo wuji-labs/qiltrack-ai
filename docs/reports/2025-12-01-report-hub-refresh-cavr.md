@@ -83,14 +83,44 @@ npm run lint
 - ⚠️ **前端未实现**：本 PR 仅包含后端基础设施，用户无法通过 UI 使用新功能
 - ⚠️ **Migration 依赖**：需在生产环境谨慎应用 migration，建议先在 staging 验证
 - ⚠️ **管理员账号创建**：需手动在 Supabase Dashboard 创建管理员账号（密码不入代码）
+- ⚠️ **API 无自动化测试**：所有新增 API（availability/popular/admin/*）均无测试覆盖，RLS/角色检查与复用路径尚未验证，建议补充 API tests 或至少手动验证
+- ⚠️ **管理员校验安全性**：当前依赖 `profiles.plan = 'admin'` 或 `email LIKE '%@investor.ai'`，但未对 plan 值/大小写做强校验，若 plan 值被误写可能导致权限漂移，建议限定枚举或集中常量管理
 
 ### 中风险
 - ⚠️ **复用逻辑未集成**：POST /api/report 尚未集成复用判定，需后续 PR 完成
 - ⚠️ **性能考虑**：热门排序聚合查询可能在大数据量下变慢，建议监控并考虑物化视图
+- ⚠️ **历史数据 mode 字段**：现有 report_runs 的 mode 字段可能为 NULL 或旧值，需要一次性 backfill 成 'production' 以确保复用逻辑正确命中。建议执行：
+  ```sql
+  UPDATE report_runs SET mode = 'production' WHERE mode IS NULL OR mode = '';
+  ```
+- ⚠️ **新增字段未测试**：history 接口新增 `pdf_signed_url`/`is_featured`/`reused_from_run_id` 但无前端消费或测试覆盖，可能导致字段空白/未使用无人验证
 
 ### 低风险
 - ✅ RLS 策略已覆盖管理员权限
 - ✅ i18n 文案已完整添加，前端可直接使用
+
+## Fixed Issues (Codex Review)
+
+根据 Codex 审查反馈，已修复以下问题：
+
+### 1. mode 默认值不一致（已修复）
+- **问题**：migration 中 mode 默认 'production'，但 RPC 函数和 availability 接口默认 'baseline'，导致现有 run 无法被复用命中
+- **修复**：
+  - ✅ `fn_find_reusable_report` 参数默认值改为 'production'
+  - ✅ `availability` 接口默认值改为 'production'
+  - ✅ 文档注释更新
+- **后续**：需要 backfill 现有 runs 的 mode 字段（见上述中风险 SQL）
+
+### 2. package.json dev 端口（已还原）
+- **问题**：`npm run dev` 改成 `-p 3001`，与仓库文档/脚本默认 3000 不符
+- **修复**：✅ 还原为 `next dev`（默认 3000）
+
+### 3. 审查发现的其他风险
+已在上述 Risks 部分补充：
+- API 无自动化测试覆盖
+- 管理员校验安全性待加强
+- 历史数据 mode backfill 需求
+- history 接口新增字段未测试
 
 ## Next Steps
 

@@ -64,7 +64,7 @@ $$ LANGUAGE plpgsql IMMUTABLE;
 CREATE OR REPLACE FUNCTION fn_find_reusable_report(
   p_symbol TEXT,
   p_lang TEXT DEFAULT 'en',
-  p_mode TEXT DEFAULT 'baseline'
+  p_mode TEXT DEFAULT 'production'
 )
 RETURNS TABLE(
   run_id UUID,

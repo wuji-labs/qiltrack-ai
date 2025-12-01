@@ -8,7 +8,7 @@ import { createServerClient } from "@/lib/supabase/server";
  * Query params:
  * - symbol: Stock symbol (required)
  * - lang: Language code (optional, default: 'en')
- * - mode: Report tone/mode (optional, default: 'baseline')
+ * - mode: Report tone/mode (optional, default: 'production')
  *
  * Returns:
  * - reusable_run_id: UUID of the reusable report (if found)
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const symbol = (searchParams.get("symbol") || "").toUpperCase().trim();
     const lang = searchParams.get("lang") || "en";
-    const mode = searchParams.get("mode") || "baseline";
+    const mode = searchParams.get("mode") || "production";
 
     if (!symbol) {
       const response = NextResponse.json(
