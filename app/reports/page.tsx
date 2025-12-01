@@ -72,6 +72,8 @@ export default function ReportsPage() {
 	const [showMyReports, setShowMyReports] = useState(false);
 	const [isAdmin, setIsAdmin] = useState(false);
 	const [bulkActionLoading, setBulkActionLoading] = useState(false);
+	const [showPaywall, setShowPaywall] = useState(false);
+	const [userPlan, setUserPlan] = useState<string | null>(null);
 	const gridRef = useRef<HTMLDivElement>(null);
 
 	useVisibilityStagger(gridRef as React.RefObject<HTMLElement>, {
@@ -100,10 +102,13 @@ export default function ReportsPage() {
 		const checkAdmin = async () => {
 			if (!auth.isAuthenticated) {
 				setIsAdmin(false);
+				setUserPlan(null);
 				return;
 			}
 			const profile = await auth.getUserProfile();
-			const isAdminPlan = profile?.plan === "admin";
+			const plan = profile?.plan || null;
+			setUserPlan(plan);
+			const isAdminPlan = plan === "admin";
 			const isAdminEmail = auth.user?.email?.endsWith("@investor.ai");
 			setIsAdmin(isAdminPlan || !!isAdminEmail);
 		};
@@ -265,6 +270,24 @@ export default function ReportsPage() {
 		return popularReports.some(s => s.toLowerCase() === slug);
 	};
 
+	const handleReportClick = (e: React.MouseEvent, slug: string, isPopular: boolean) => {
+		// Only apply paywall to popular reports
+		if (!isPopular) return;
+
+		// Allow admin and annual plan users
+		if (isAdmin || userPlan === 'annual') return;
+
+		// Block and show paywall
+		e.preventDefault();
+		if (!auth.isAuthenticated) {
+			// Not logged in - redirect to login
+			window.location.assign('/#generator');
+		} else {
+			// Logged in but not annual - show paywall
+			setShowPaywall(true);
+		}
+	};
+
 	return (
 		<main className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)]">
 			<div className="mx-auto max-w-6xl space-y-10 px-4 py-12 sm:px-6 lg:px-10">
@@ -330,7 +353,7 @@ export default function ReportsPage() {
 							>
 								{t("reports.sort.popular")}
 							</button>
-							{sortMode === "latest" && categories.map((category) => (
+							{categories.map((category) => (
 								<button
 									key={category}
 									type="button"
@@ -422,17 +445,20 @@ export default function ReportsPage() {
 					) : (
 						<>
 							<div className="grid gap-5 lg:grid-cols-2">
-								{pagedReports.slice(0, 2).map((report) => (
-									<Link
-										key={`${report.slug}-featured`}
-										href={`/reports/${report.slug}`}
-										className="group relative overflow-hidden rounded-[32px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-6 transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-2 group-hover:shadow-elevated"
-									>
-										{(sortMode === "popular" || isReportPopular(report.slug)) && (
-											<span className="absolute top-4 right-4 rounded-full bg-[var(--accent-emerald)]/20 border border-[var(--accent-emerald)]/50 px-3 py-1 text-xs font-semibold text-[var(--accent-emerald)]">
-												{t("reports.sort.popular")}
-											</span>
-										)}
+								{pagedReports.slice(0, 2).map((report) => {
+									const isPopular = sortMode === "popular" || isReportPopular(report.slug);
+									return (
+										<Link
+											key={`${report.slug}-featured`}
+											href={`/reports/${report.slug}`}
+											onClick={(e) => handleReportClick(e, report.slug, isPopular)}
+											className="group relative overflow-hidden rounded-[32px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-6 transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-2 group-hover:shadow-elevated"
+										>
+											{isPopular && (
+												<span className="absolute top-4 right-4 rounded-full bg-[var(--accent-emerald)]/20 border border-[var(--accent-emerald)]/50 px-3 py-1 text-xs font-semibold text-[var(--accent-emerald)]">
+													{t("reports.sort.popular")}
+												</span>
+											)}
 										<div className="relative mb-5 overflow-hidden rounded-[20px]">
 											<div
 												className="h-48 bg-[var(--bg-base)] transition-transform duration-300 ease-out group-hover:scale-104 group-hover:-translate-y-6px"
@@ -460,22 +486,26 @@ export default function ReportsPage() {
 											<span>{t("reports.card.readMore")}</span>
 										</div>
 									</Link>
-								))}
+								);
+								})}
 							</div>
 
 							<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" ref={gridRef}>
-								{pagedReports.slice(2).map((report) => (
+								{pagedReports.slice(2).map((report) => {
+								const isPopular = sortMode === "popular" || isReportPopular(report.slug);
+								return (
 									<Link
 										key={`${report.slug}-tile`}
 										data-stagger-item
 										href={`/reports/${report.slug}`}
+										onClick={(e) => handleReportClick(e, report.slug, isPopular)}
 										className="group flex flex-col overflow-hidden rounded-[24px] border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 shadow-[0_18px_50px_rgba(0,0,0,0.35)] transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(0,0,0,0.45)]"
 										style={{
 											opacity: "var(--item-opacity, 0)",
 											transform: "var(--item-transform, translateY(8px))",
 										}}
 									>
-										{(sortMode === "popular" || isReportPopular(report.slug)) && (
+										{isPopular && (
 											<span className="mb-2 self-start rounded-full bg-[var(--accent-emerald)]/20 border border-[var(--accent-emerald)]/50 px-2 py-0.5 text-[10px] font-semibold text-[var(--accent-emerald)]">
 												{t("reports.sort.popular")}
 											</span>
@@ -502,7 +532,8 @@ export default function ReportsPage() {
 											<span>{t("reports.card.readMore")}</span>
 										</div>
 									</Link>
-								))}
+								);
+								})}
 							</div>
 						</>
 					)}
@@ -609,6 +640,35 @@ export default function ReportsPage() {
 					)}
 				</section>
 			</div>
+
+			{showPaywall && (
+				<dialog open className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+					<div className="relative mx-4 max-w-md rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/95 p-6 shadow-[0_26px_90px_rgba(0,0,0,0.5)]">
+						<h3 className="text-xl font-semibold text-[var(--color-foreground)]">
+							{t("reports.paywall.premium")}
+						</h3>
+						<p className="mt-2 text-sm text-dim">
+							{t("reports.paywall.premium")}
+						</p>
+						<div className="mt-6 flex flex-col gap-3">
+							<button
+								type="button"
+								onClick={() => window.location.assign("/pricing#quota")}
+								className="rounded-full bg-[var(--accent-emerald)] px-5 py-2.5 text-sm font-semibold text-slate-950 hover:bg-[var(--accent-emerald)]/90"
+							>
+								{t("quota.action.upgrade")}
+							</button>
+							<button
+								type="button"
+								onClick={() => setShowPaywall(false)}
+								className="rounded-full border border-[var(--stroke-soft)] px-5 py-2.5 text-sm text-dim hover:text-[var(--color-foreground)]"
+							>
+								{t("quota.action.retry")}
+							</button>
+						</div>
+					</div>
+				</dialog>
+			)}
 		</main>
 	);
 }
