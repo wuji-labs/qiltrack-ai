@@ -104,6 +104,10 @@ if (-not (Test-Path $targetPath)) {
   throw "Worktree not found at $targetPath. Use prep-group.ps1 to create it first."
 }
 
+# CRITICAL: Fix BOM in main repo FIRST before copying to worktree
+Write-Host "=== Pre-check: Cleaning BOM in main repo ===" -ForegroundColor Cyan
+Remove-BOMFromFile -FilePath (Join-Path $repoRoot "package.json")
+
 Write-Host "=== Resetting worktree: $targetPath ===" -ForegroundColor Cyan
 Write-Host ""
 
