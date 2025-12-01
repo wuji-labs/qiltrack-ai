@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001",
+    "dev": "next dev -p 3002",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -11,6 +11,7 @@
     "test:ci": "cross-env CI=true vitest --environment jsdom --pool=forks run",
     "helicone:sync-models": "node scripts/update-helicone-models.js",
     "env:check": "node scripts/check-env.js",
+    "worktree:setup-port": "node scripts/setup-worktree-port.js",
     "pr:ready": "npm run lint && npm run test && echo '✅代码已准备好提交 PR'"
   },
   "dependencies": {

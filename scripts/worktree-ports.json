@@ -1,0 +1,15 @@
+{
+  "description": "Worktree port configuration - DO NOT commit port changes to package.json",
+  "ports": {
+    "main": 3000,
+    "g1/worktree": 3001,
+    "g2/worktree": 3002,
+    "g3/worktree": 3003,
+    "g4/worktree": 3004,
+    "g5/worktree": 3005
+  },
+  "instructions": {
+    "setup": "Each worktree should run 'npm run setup-port' after creation",
+    "note": "package.json in main branch should always use port 3000"
+  }
+}
