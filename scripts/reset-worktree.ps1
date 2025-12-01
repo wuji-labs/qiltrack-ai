@@ -49,6 +49,22 @@ function Get-WorktreePort {
   return $null
 }
 
+function Remove-BOMFromFile {
+  param([string]$FilePath)
+
+  if (-not (Test-Path $FilePath)) {
+    return
+  }
+
+  $bytes = [System.IO.File]::ReadAllBytes($FilePath)
+  if ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
+    Write-Host "  Removing BOM from $(Split-Path $FilePath -Leaf)..." -ForegroundColor Yellow
+    $content = [System.IO.File]::ReadAllText($FilePath)
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+    [System.IO.File]::WriteAllText($FilePath, $content, $utf8NoBom)
+  }
+}
+
 function Invoke-GitLocal {
   param([string]$RepoRoot, [string[]]$GitArgs)
 
@@ -95,6 +111,10 @@ if ($DryRun) {
   Write-Host "[dry-run] git reset --hard origin/main"
 } else {
   Invoke-GitLocal -RepoRoot $targetPath -GitArgs @("reset", "--hard", "origin/main")
+
+  # Fix BOM issue that can occur after git reset --hard
+  Remove-BOMFromFile -FilePath (Join-Path $targetPath "package.json")
+
   Write-Host "Done." -ForegroundColor Green
 }
 
@@ -109,16 +129,7 @@ if ($DryRun) {
   Invoke-GitLocal -RepoRoot $targetPath -GitArgs (@("sparse-checkout", "set") + $folders)
 
   # Fix BOM issue that can occur after sparse-checkout
-  $packageJsonPath = Join-Path $targetPath "package.json"
-  if (Test-Path $packageJsonPath) {
-    $bytes = [System.IO.File]::ReadAllBytes($packageJsonPath)
-    if ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
-      Write-Host "Removing BOM from package.json..." -ForegroundColor Yellow
-      $content = [System.IO.File]::ReadAllText($packageJsonPath)
-      $utf8NoBom = New-Object System.Text.UTF8Encoding $false
-      [System.IO.File]::WriteAllText($packageJsonPath, $content, $utf8NoBom)
-    }
-  }
+  Remove-BOMFromFile -FilePath (Join-Path $targetPath "package.json")
 
   Write-Host "Done." -ForegroundColor Green
 }
