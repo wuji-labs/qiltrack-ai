@@ -7,10 +7,14 @@ export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const type = requestUrl.searchParams.get("type");
+  const tokenHash = requestUrl.searchParams.get("token_hash");
 
+  // Detect password recovery: explicit type=recovery OR presence of token_hash (Supabase recovery links)
   // For password recovery, keep the hash fragment (access_token/refresh_token) by forwarding via client-side redirect.
   // A server 302 would drop the hash, so we return a tiny HTML that preserves it.
-  if (type === "recovery") {
+  const isRecovery = type === "recovery" || tokenHash !== null;
+
+  if (isRecovery) {
     const html = `
       <!doctype html>
       <html>
