@@ -44,18 +44,40 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 
 ## 开发指南
 
+### 🚀 每日工作流（推荐）
+
+```powershell
+# Step 1: 在主仓库更新代码
+cd D:\Projects\investor-ai
+git fetch origin
+git reset --hard origin/main
+
+# Step 2: 重置所有工作树（自动修复 BOM 问题）
+.\scripts\reset-worktrees-only.ps1
+
+# Step 3: 开始开发
+cd D:\Projects\investor-ai-g1
+npm run dev
+```
+
+⚠️ **重要**：请使用上述工作流，不要手动执行单个 git 命令。脚本已集成三重 BOM 清理，保证环境可用。
+
 ### Worktree 多组并行开发
 ```powershell
 # 新建工作区（首次）
 .\scripts\prep-group.ps1 -Name g1 -Branch g1/task-name
 
-# 每次新任务前重置
-.\scripts\reset-worktree.ps1 -Name g1
+# 每次新任务前重置（使用自动化脚本）
+git fetch origin
+git reset --hard origin/main
+.\scripts\reset-worktrees-only.ps1
 
 # 启动开发服务器（不同端口避免冲突）
-cd D:\Projects\investor-ai-g1 && npm run dev -- --port 3001
+cd D:\Projects\investor-ai-g1 && npm run dev
 ```
 详见 [Worktree 多组协作](docs/guides/worktree-multi-team.md)。
+
+⚠️ **避免手动 git 操作**：不要单独执行 `git reset`、`git sparse-checkout` 等命令，请使用 `reset-worktrees-only.ps1` 确保 BOM 问题不会出现。
 
 | 命令 | 说明 |
 | --- | --- |

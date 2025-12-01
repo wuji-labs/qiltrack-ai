@@ -48,30 +48,45 @@ BOM（Byte Order Mark）是文件开头的特殊字节序列：
 
 ## 解决方案
 
-### ✅ 自动修复（推荐）
+### ✅ 推荐工作流（完全自动化）
 
-`reset-worktree.ps1` 脚本已集成自动 BOM 清理：
-
-```powershell
-# 正常使用脚本，会自动处理 BOM
-.\scripts\reset-worktree.ps1 -Name g1
-```
-
-脚本在以下步骤后自动移除 BOM：
-- **Step 2/7**: `git reset --hard origin/main` 后
-- **Step 3/7**: `git sparse-checkout set` 后
-
-### 🔧 手动修复
-
-如果在主仓库或工作树中遇到 BOM 错误：
+**最简单的方式 - 一键重置所有：**
 
 ```powershell
-# 快速修复当前目录
-.\scripts\fix-bom.ps1
+# 在主仓库执行，自动完成所有步骤
+cd D:\Projects\investor-ai
+git fetch origin
+git reset --hard origin/main
+.\scripts\reset-worktrees-only.ps1
 
-# 或修复指定工作树
-.\scripts\fix-bom.ps1 -Path D:\Projects\investor-ai-g1
+# 然后开始工作
+cd D:\Projects\investor-ai-g1
+npm run dev  # ✅ 保证能运行！
 ```
+
+**为什么需要三重 BOM 清理？**
+
+经过多次测试发现，BOM 会在**三个时间点**被注入：
+1. ✅ `git reset --hard origin/main` 后 → 立即清理
+2. ✅ `git sparse-checkout set` 后 → 立即清理
+3. ✅ 所有文件操作完成后（包括 .env 复制、npm ci 等）→ **最终清理（关键！）**
+
+`reset-worktrees-only.ps1` 已经在这三个时间点都会自动清理，所以保证可用。
+
+### 🔧 应急修复
+
+如果遇到 BOM 错误（理论上不应该再出现）：
+
+```powershell
+# 在出问题的工作树执行
+D:\Projects\investor-ai\scripts\deep-clean-worktree.ps1
+```
+
+这个脚本会：
+- 停止运行中的 dev server
+- 删除 .next 和 node_modules/.cache
+- 深度修复 package.json
+- 验证 JSON 是否有效
 
 ### 📋 检查是否有 BOM
 
@@ -209,6 +224,21 @@ package.json -text
 |------|--------|------|
 | 2025-12-02 | `2100375` | 首次添加 BOM 自动清理（sparse-checkout 后） |
 | 2025-12-02 | `187fe48` | 增强修复：git reset --hard 后也清理 BOM |
+| 2025-12-02 | `c269789` | 关键发现：主仓库污染导致工作树继承 BOM |
+| 2025-12-02 | `3448d30` | 创建 deep-clean-worktree.ps1 应急工具 |
+| 2025-12-02 | `dae0bdb` | 增强 Remove-BOMFromFile：检测所有类型的损坏 |
+| 2025-12-02 | `3d266f4` | 清理 node_modules/.cache 防止缓存问题 |
+| 2025-12-02 | `948f5a7` | **最终修复**：在所有操作完成后最终检查 BOM（三重清理） |
+
+## 为什么这么复杂？
+
+经过多轮测试发现：
+
+1. **单点清理不够**：BOM 会在多个 git 操作后被注入
+2. **缓存问题**：npm/turbopack 会缓存损坏的 package.json 读取
+3. **操作顺序**：某些文件操作（如 npm ci）可能在清理后再次污染文件
+
+**最终方案**：三重防护（git 操作后两次 + 最终检查一次）+ 缓存清理
 
 ## 测试验证
 
