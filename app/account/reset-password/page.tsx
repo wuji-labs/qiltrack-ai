@@ -61,12 +61,13 @@ export default function ResetPasswordRedirect() {
 			} catch (err) {
 				console.error("Password recovery session error:", err);
 				setStatus("error");
-				// Prioritize expired link message for common expiration scenarios
+				// Prioritize expired link message for Supabase-specific expiration errors
 				const errObj = err as { code?: string; message?: string };
+				const msg = errObj?.message?.toLowerCase() || "";
 				const isExpired =
 					errObj?.code === "otp_expired" ||
-					errObj?.message?.toLowerCase().includes("expired") ||
-					errObj?.message?.toLowerCase().includes("invalid");
+					msg.includes("expired") ||
+					msg.includes("invalid or expired");
 				setErrorMessage(isExpired ? t("auth.resetPassword.linkExpired") : t("auth.error.generic"));
 			}
 		};
@@ -87,7 +88,7 @@ export default function ResetPasswordRedirect() {
           </h1>
           <p className="text-sm text-slate-400">
             {status === "error"
-              ? t("auth.error.generic")
+              ? errorMessage
               : t("auth.resetPassword.redirecting") || "Please wait while we redirect you..."}
           </p>
         </div>
