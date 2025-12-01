@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     // Query report history with RLS (automatically filtered by user_id via RLS)
     const { data: reports, error: queryError, count } = await supabase
       .from("report_runs")
-      .select("id, symbol, created_at, status, markdown_path, docx_path, mode", { count: "exact" })
+      .select("id, symbol, created_at, status, markdown_path, docx_path, pdf_path, mode, reused_from_run_id, is_featured, lang", { count: "exact" })
       .eq("user_id", userId as never)
       .order("created_at", { ascending: false })
       .range(offset, offset + pageSize - 1);
@@ -76,11 +76,18 @@ export async function GET(request: NextRequest) {
                     .from("report-assets")
                     .createSignedUrl(report.markdown_path, SIGNED_URL_TTL_SECONDS)
                 : null;
+            const pdfSigned =
+              report.pdf_path
+                ? await serviceClient.storage
+                    .from("report-assets")
+                    .createSignedUrl(report.pdf_path, SIGNED_URL_TTL_SECONDS)
+                : null;
 
             return {
               ...report,
               docx_signed_url: docxSigned?.data?.signedUrl ?? null,
               markdown_signed_url: markdownSigned?.data?.signedUrl ?? null,
+              pdf_signed_url: pdfSigned?.data?.signedUrl ?? null,
             };
           })
         );
