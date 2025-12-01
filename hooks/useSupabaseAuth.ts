@@ -217,10 +217,12 @@ export function useSupabaseAuth() {
       }
 
       try {
+        // Use NEXT_PUBLIC_SITE_URL if available, fallback to window.location.origin
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
         const { error } = await supabase.auth.signInWithOtp({
           email: trimmedEmail,
           options: {
-            emailRedirectTo: `${window.location.origin}${AUTH_CALLBACK_PATH}`,
+            emailRedirectTo: `${baseUrl}${AUTH_CALLBACK_PATH}`,
           },
         });
 
@@ -275,11 +277,13 @@ export function useSupabaseAuth() {
       }
 
       try {
+        // Use NEXT_PUBLIC_SITE_URL if available, fallback to window.location.origin
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
         const { error } = await supabase.auth.signUp({
           email: trimmedEmail,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}${AUTH_CALLBACK_PATH}`,
+            emailRedirectTo: `${baseUrl}${AUTH_CALLBACK_PATH}`,
           },
         });
 
@@ -308,8 +312,10 @@ export function useSupabaseAuth() {
       }
 
       try {
+        // Use NEXT_PUBLIC_SITE_URL if available, fallback to window.location.origin
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
         const { error } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
-          redirectTo: `${window.location.origin}/account/reset-password`,
+          redirectTo: `${baseUrl}/account/reset-password`,
         });
 
         if (error) {
@@ -328,10 +334,12 @@ export function useSupabaseAuth() {
   const signInWithProvider = useCallback(
     async (provider: "google"): Promise<AuthResult> => {
       try {
+        // Use NEXT_PUBLIC_SITE_URL if available, fallback to window.location.origin
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
         const { error } = await supabase.auth.signInWithOAuth({
           provider,
           options: {
-            redirectTo: `${window.location.origin}${AUTH_CALLBACK_PATH}`,
+            redirectTo: `${baseUrl}${AUTH_CALLBACK_PATH}`,
           },
         });
 
