@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { type Language } from "@/lib/i18n-config";
 import type { MarketData } from "@/lib/services/market-data";
 

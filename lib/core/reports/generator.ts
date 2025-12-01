@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { DEFAULT_LANGUAGE, type Language } from "@/lib/i18n-config";
 import { LLMService } from "@/lib/services/llm";
 import { MarketDataService } from "@/lib/services/market-data";

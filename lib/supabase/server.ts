@@ -4,7 +4,7 @@
  */
 
 import { createServerClient as createServerClientBase } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 
 /**
@@ -106,7 +106,7 @@ export function createServiceRoleClient() {
     );
   }
 
-  return createClient<Database>(supabaseUrl, serviceRoleKey, {
+  return createSupabaseClient<Database>(supabaseUrl, serviceRoleKey, {
     auth: {
       persistSession: false,
     },
@@ -157,4 +157,13 @@ export async function getUserIdFromRequest(
     data: { session },
   } = await supabase.auth.getSession();
   return session?.user?.id ?? null;
+}
+
+/**
+ * Create a Supabase client for use in business logic layer
+ * This function creates a service role client for internal operations
+ * Used by: CreditManager, ReportPersistence, DailyRewards
+ */
+export async function createClient() {
+  return createServiceRoleClient();
 }

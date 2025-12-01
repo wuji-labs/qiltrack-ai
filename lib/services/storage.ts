@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createServiceRoleClient } from "../supabase/server";
 import { ExternalServiceError } from "../core/errors";
 

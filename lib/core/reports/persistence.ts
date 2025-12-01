@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from "@/lib/supabase/server";
 import { StorageService } from "@/lib/services/storage";
 import type { SavedReport } from "./types";

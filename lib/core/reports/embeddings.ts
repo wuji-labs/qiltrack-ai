@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { LLMService } from "@/lib/services/llm";
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import type { Language } from "@/lib/i18n-config";

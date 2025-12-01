@@ -43,7 +43,7 @@ export default function CreditsPage() {
 
       if (error) throw error;
 
-      const formatted = data?.map((item: any) => ({
+      const formatted = data?.map((item) => ({
         user_id: item.user_id,
         email: item.profiles.email,
         display_name: item.profiles.display_name || item.profiles.full_name,
@@ -93,9 +93,9 @@ export default function CreditsPage() {
 
       // Refresh credits list
       await fetchCredits();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Failed to grant credits:", error);
-      alert(`Failed to grant credits: ${error.message}`);
+      alert(`Failed to grant credits: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setGrantingCredits(false);
     }

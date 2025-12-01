@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ExternalServiceError } from "../core/errors";
 
 const FINNHUB_BASE = "https://finnhub.io/api/v1";

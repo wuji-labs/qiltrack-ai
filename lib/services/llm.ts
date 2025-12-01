@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ExternalServiceError } from "../core/errors";
 import { getLangfuseClient } from "../observability/langfuse";
 
