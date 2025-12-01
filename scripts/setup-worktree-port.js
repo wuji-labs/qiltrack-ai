@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Setup worktree-specific port in package.json
+ * Setup worktree-specific port via .env.local
  * This script should be run in each worktree after creation
- * to set the correct dev port without committing to git
  */
 
 const fs = require('fs');
@@ -20,23 +19,30 @@ const port = portsConfig.ports[branch] || portsConfig.ports['main'];
 console.log(`📍 Current branch: ${branch}`);
 console.log(`🔌 Setting dev port to: ${port}`);
 
-// Read package.json
-const packageJsonPath = path.join(__dirname, '..', 'package.json');
-const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+// Create .env.local with PORT setting
+const envLocalPath = path.join(__dirname, '..', '.env.local');
+let envContent = '';
 
-// Update dev script
-packageJson.scripts.dev = `next dev -p ${port}`;
+// Read existing .env.local if it exists
+if (fs.existsSync(envLocalPath)) {
+  envContent = fs.readFileSync(envLocalPath, 'utf-8');
 
-// Write back to package.json
-fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
-
-console.log('✅ Port configured successfully!');
-console.log('⚠️  Note: This change is for local development only. Do NOT commit package.json port changes.');
-
-// Mark package.json as assumed unchanged (optional)
-try {
-  execSync('git update-index --skip-worktree package.json', { stdio: 'ignore' });
-  console.log('✅ Marked package.json to skip port changes in git');
-} catch (error) {
-  console.log('⚠️  Could not mark package.json as skip-worktree (not critical)');
+  // Remove existing PORT line
+  envContent = envContent
+    .split('\n')
+    .filter(line => !line.startsWith('PORT='))
+    .join('\n');
 }
+
+// Add PORT setting
+envContent = `PORT=${port}\n${envContent}`.trim() + '\n';
+
+// Write to .env.local
+fs.writeFileSync(envLocalPath, envContent);
+
+console.log('✅ Created/updated .env.local with PORT=' + port);
+console.log('⚠️  Note: .env.local is gitignored and won\'t be committed.');
+console.log('');
+console.log('Now run: npm run dev');
+console.log(`Server will start on http://localhost:${port}`);
+
