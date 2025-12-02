@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { batchGrantCredits, batchRevokeCredits } from "@/lib/admin/data-provider";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
@@ -29,6 +29,7 @@ const PLAN_CONFIGS = {
 };
 
 export default function UsersPage() {
+  const { supabase } = useSupabaseAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
@@ -79,7 +80,6 @@ export default function UsersPage() {
 
   async function fetchUsers() {
     setLoading(true);
-    const supabase = createClient();
 
     try {
       let query = supabase
@@ -208,7 +208,6 @@ export default function UsersPage() {
     }
 
     setProcessing(true);
-    const supabase = createClient();
 
     try {
       // 通过邮箱查找用户ID
@@ -253,8 +252,6 @@ export default function UsersPage() {
   }
 
   async function loadUserDetail(user: User) {
-    const supabase = createClient();
-
     try {
       // 获取用户积分信息
       const { data: credits } = await supabase
@@ -278,7 +275,6 @@ export default function UsersPage() {
     }
 
     setProcessing(true);
-    const supabase = createClient();
     const userIds = Array.from(selectedUsers);
 
     try {
