@@ -26,14 +26,14 @@ const requiredConfig: ConfigValidation[] = [
   {
     key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
     required: true,
-    validator: (v) => v.length > 100,
-    errorMessage: 'Anon key seems too short'
+    validator: (v) => v.startsWith('sb_') || v.length > 100,
+    errorMessage: 'Anon key must be a valid Supabase key (sb_... or JWT > 100 chars)'
   },
   {
     key: 'SUPABASE_SERVICE_ROLE_KEY',
     required: true,
-    validator: (v) => v.length > 100,
-    errorMessage: 'Service role key seems too short'
+    validator: (v) => v.startsWith('sb_') || v.length > 100,
+    errorMessage: 'Service role key must be a valid Supabase key (sb_... or JWT > 100 chars)'
   },
   {
     key: 'FINNHUB_API_KEY',
