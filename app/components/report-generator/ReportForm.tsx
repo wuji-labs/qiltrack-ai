@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { type SearchResult } from "@/types/report";
 import { type PlaceholderVariant } from "./types";
 import { reportQuerySchema } from "./validation";
@@ -39,6 +39,41 @@ export function ReportForm({
 }: ReportFormProps) {
   const visibleResults = searchResults.slice(0, maxVisibleResults);
   const [validationError, setValidationError] = useState<string>("");
+  const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!hasDropdown) {
+      setFocusedIndex(-1);
+    }
+  }, [hasDropdown]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!hasDropdown || visibleResults.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setFocusedIndex((prev) => (prev < visibleResults.length - 1 ? prev + 1 : prev));
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setFocusedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+        break;
+      case "Enter":
+        if (focusedIndex >= 0) {
+          e.preventDefault();
+          onSelectResult(visibleResults[focusedIndex].symbol);
+          setFocusedIndex(-1);
+        }
+        break;
+      case "Escape":
+        e.preventDefault();
+        setFocusedIndex(-1);
+        break;
+    }
+  };
 
   const handleInputChange = (value: string) => {
     onInputChange(value);
@@ -142,10 +177,12 @@ export function ReportForm({
                 </span>
                 <input
                   id="report-query-input"
+                  ref={inputRef}
                   type="text"
                   autoFocus
                   value={inputValue}
                   onChange={(event) => handleInputChange(event.target.value)}
+                  onKeyDown={handleKeyDown}
                   placeholder={placeholderText}
                   autoComplete="off"
                   spellCheck={false}
@@ -153,6 +190,12 @@ export function ReportForm({
                   autoCapitalize="none"
                   className="w-full bg-transparent pl-10 pr-24 py-2.5 text-base text-[var(--color-foreground)] placeholder:text-subtle focus:outline-none transition-shadow duration-200 ease-out"
                   aria-label={t("generator.input.label")}
+                  aria-invalid={!!validationError}
+                  aria-describedby={validationError ? "validation-error" : undefined}
+                  aria-expanded={hasDropdown}
+                  aria-controls={hasDropdown ? "search-results-dropdown" : undefined}
+                  aria-activedescendant={focusedIndex >= 0 ? `result-${focusedIndex}` : undefined}
+                  role="combobox"
                 />
                 <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-[11px] text-subtle">
                   <span className="rounded-full border border-[var(--accent-emerald)]/40 bg-[var(--accent-emerald)]/10 px-2.5 py-0.5 text-[var(--accent-emerald)]">
@@ -162,13 +205,18 @@ export function ReportForm({
               </div>
 
               {validationError && (
-                <div className="mt-2 px-4 py-2 rounded-xl border border-red-500/30 bg-red-500/10 text-sm text-red-400">
+                <div id="validation-error" role="alert" className="mt-2 px-4 py-2 rounded-xl border border-red-500/30 bg-red-500/10 text-sm text-red-400">
                   {validationError}
                 </div>
               )}
 
               {hasDropdown && (
-                <div className="mt-2 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/95 shadow-[0_18px_45px_rgba(0,0,0,0.32)] backdrop-blur">
+                <div
+                  id="search-results-dropdown"
+                  ref={dropdownRef}
+                  role="listbox"
+                  className="mt-2 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/95 shadow-[0_18px_45px_rgba(0,0,0,0.32)] backdrop-blur"
+                >
                   {searching && (
                     <div className="px-4 py-2 text-sm text-subtle">{t("generator.searching")}</div>
                   )}
@@ -178,12 +226,23 @@ export function ReportForm({
                     </div>
                   )}
                   {!searching &&
-                    visibleResults.map((item) => (
+                    visibleResults.map((item, index) => (
                       <button
                         type="button"
+                        id={`result-${index}`}
                         key={`${item.symbol}-${item.displaySymbol ?? item.description}`}
-                        onClick={() => onSelectResult(item.symbol)}
-                        className="w-full px-4 py-3 text-left text-sm hover:bg-[var(--bg-layer)] focus:outline-none focus-visible:bg-[var(--bg-layer)]"
+                        onClick={() => {
+                          onSelectResult(item.symbol);
+                          setFocusedIndex(-1);
+                        }}
+                        onMouseEnter={() => setFocusedIndex(index)}
+                        role="option"
+                        aria-selected={focusedIndex === index}
+                        className={`w-full px-4 py-3 text-left text-sm transition-colors ${
+                          focusedIndex === index
+                            ? "bg-[var(--bg-layer)] ring-2 ring-[var(--accent-emerald)]/30"
+                            : "hover:bg-[var(--bg-layer)]"
+                        } focus:outline-none focus-visible:bg-[var(--bg-layer)]`}
                       >
                         <p className="font-semibold text-[var(--color-foreground)]">
                           {item.symbol}
