@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import {
@@ -42,6 +42,7 @@ interface RecentActivity {
 }
 
 export default function AdminDashboard() {
+  const { supabase } = useSupabaseAuth();
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
     totalReports: 0,
@@ -59,8 +60,6 @@ export default function AdminDashboard() {
   }, []);
 
   async function fetchDashboardData() {
-    const supabase = createClient();
-
     try {
       // 获取基础统计数据
       const [usersResult, reportsResult, creditsResult, todayReportsResult] = await Promise.all([
@@ -114,7 +113,6 @@ export default function AdminDashboard() {
   }
 
   async function fetchTrendData() {
-    const supabase = createClient();
     const last7Days = [];
     const today = new Date();
 
@@ -162,8 +160,6 @@ export default function AdminDashboard() {
   }
 
   async function fetchRecentActivities() {
-    const supabase = createClient();
-
     const { data: recentRuns } = await supabase
       .from("report_runs")
       .select(
