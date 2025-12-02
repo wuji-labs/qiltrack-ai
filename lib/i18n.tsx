@@ -2039,11 +2039,11 @@ const translations: Record<string, TranslationEntry> = {
     "zh-Hans": "邮箱登录（测试版）",
   },
   "auth.hero.title": {
-    en: "Sign in to Investor AI",
-    ja: "Investor AI にサインイン",
-    ko: "Investor AI에 로그인",
-    "zh-Hant": "登入 Investor AI",
-    "zh-Hans": "登录 Investor AI",
+    en: "Investor AI",
+    ja: "Investor AI",
+    ko: "Investor AI",
+    "zh-Hant": "Investor AI",
+    "zh-Hans": "Investor AI",
   },
   "auth.hero.subtitle": {
     en: "Use Google or a one-time email link to get started quickly.",

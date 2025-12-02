@@ -187,12 +187,14 @@ function LoginContent() {
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md space-y-6">
         {/* Logo */}
-        <div className="text-center space-y-3">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-slate-800/60 font-bold tracking-[0.16em] text-emerald-200 shadow-lg">
-            IA
+        <div className="text-center space-y-6">
+          <div className="flex items-center justify-center gap-4">
+            <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl bg-slate-800/60 font-bold tracking-[0.16em] text-emerald-200 shadow-lg">
+              IA
+            </div>
+            <h1 className="text-3xl font-semibold tracking-tight">{t("auth.hero.title")}</h1>
           </div>
-          <h1 className="text-2xl font-semibold">{t("auth.hero.title")}</h1>
-          <p className="text-sm text-slate-400">{t("auth.hero.subtitle")}</p>
+          <p className="text-sm text-slate-400 max-w-sm mx-auto leading-relaxed">{t("auth.hero.subtitle")}</p>
         </div>
 
         {/* Error/Success Banner */}

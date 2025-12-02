@@ -18,14 +18,14 @@ const plans: Plan[] = [
     name: "Basic",
     price: "$9/月",
     credits: "50 积分 / 月",
-    description: "适合个人投资者的基础报告生成服务。",
+    description: "适合个人探索与周报输出，保留核心生成体验。",
   },
   {
     key: "pro",
     name: "Pro",
     price: "$29/月",
     credits: "200 积分 / 月",
-    description: "适合团队/高频使用场景,提供更多积分支持。",
+    description: "团队/高频使用场景，更多额度与优先支持。",
   },
 ];
 
@@ -54,7 +54,7 @@ export default function PricingPage() {
       window.location.href = data.url;
     } catch (error) {
       console.error("[Pricing] checkout error", error);
-      alert("创建订阅失败,请稍后重试。");
+      alert("订阅链接创建失败，请稍后重试。");
     } finally {
       setLoadingPlan(null);
     }
@@ -66,7 +66,7 @@ export default function PricingPage() {
         <p className="text-sm uppercase tracking-[0.32em] text-[var(--text-subtle)]">Pricing</p>
         <h1 className="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">选择合适的订阅</h1>
         <p className="mt-3 text-base text-[var(--text-subtle)]">
-          支持随时取消,通过 Stripe 安全管理。
+          支持随时升级或取消，结账由 Stripe 安全托管。
         </p>
       </header>
 
