@@ -16,7 +16,7 @@ import type { ReportResponse, SearchResult, SimilarReport } from "@/types/report
 import { type ReportGeneratorProps, type ErrorState, type PlaceholderVariant } from "./types";
 import { ReportForm } from "./ReportForm";
 import { ErrorAlert } from "./ErrorAlert";
-import { LoadingState } from "./LoadingState";
+import { ReportSkeleton } from "./Skeleton";
 import { ReportResult } from "./ReportResult";
 import { ReuseDialog } from "./ReuseDialog";
 import { CreditsDisplay } from "./CreditsDisplay";
@@ -626,12 +626,7 @@ export function ReportGeneratorSection({
           t={t}
         />
 
-        <LoadingState
-          loading={loading}
-          progressStageLabel={progressStageLabel}
-          selectedToneTitle={selectedToneTitle}
-          t={t}
-        />
+        {loading && <ReportSkeleton />}
 
         <ReportResult
           reportData={reportData}

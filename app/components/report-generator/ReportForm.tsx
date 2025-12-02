@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { type SearchResult } from "@/types/report";
 import { type PlaceholderVariant } from "./types";
+import { reportQuerySchema } from "./validation";
 
 type ReportFormProps = {
   inputValue: string;
@@ -36,10 +38,33 @@ export function ReportForm({
   quotaInfo,
 }: ReportFormProps) {
   const visibleResults = searchResults.slice(0, maxVisibleResults);
+  const [validationError, setValidationError] = useState<string>("");
+
+  const handleInputChange = (value: string) => {
+    onInputChange(value);
+    // 实时验证
+    const result = reportQuerySchema.safeParse({ query: value });
+    if (!result.success && value.length > 0) {
+      setValidationError(result.error.issues[0].message);
+    } else {
+      setValidationError("");
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const result = reportQuerySchema.safeParse({ query: inputValue });
+    if (!result.success) {
+      setValidationError(result.error.issues[0].message);
+      return;
+    }
+    setValidationError("");
+    onSubmit(e);
+  };
 
   return (
     <form
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit}
       className="relative overflow-hidden space-y-5 rounded-[28px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-4 sm:p-6 shadow-[0_20px_70px_rgba(0,0,0,0.34)]"
     >
       <div className="pointer-events-none absolute inset-0">
@@ -120,7 +145,7 @@ export function ReportForm({
                   type="text"
                   autoFocus
                   value={inputValue}
-                  onChange={(event) => onInputChange(event.target.value)}
+                  onChange={(event) => handleInputChange(event.target.value)}
                   placeholder={placeholderText}
                   autoComplete="off"
                   spellCheck={false}
@@ -135,6 +160,12 @@ export function ReportForm({
                   </span>
                 </div>
               </div>
+
+              {validationError && (
+                <div className="mt-2 px-4 py-2 rounded-xl border border-red-500/30 bg-red-500/10 text-sm text-red-400">
+                  {validationError}
+                </div>
+              )}
 
               {hasDropdown && (
                 <div className="mt-2 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/95 shadow-[0_18px_45px_rgba(0,0,0,0.32)] backdrop-blur">
@@ -171,7 +202,7 @@ export function ReportForm({
           <button
             type="submit"
             className="relative overflow-hidden rounded-full bg-gradient-to-r from-[var(--accent-emerald)] via-emerald-300 to-cyan-300 px-8 sm:px-12 py-4 text-base sm:text-lg font-semibold text-slate-950 shadow-[0_22px_50px_rgba(91,224,176,0.35)] transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_26px_60px_rgba(91,224,176,0.45)] active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-emerald)]/60 disabled:opacity-40 disabled:cursor-not-allowed"
-            disabled={loading}
+            disabled={loading || !!validationError}
           >
             <span
               className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.35),rgba(255,255,255,0))] opacity-70"
