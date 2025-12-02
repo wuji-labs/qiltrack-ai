@@ -9,11 +9,6 @@ vi.mock("@/lib/supabase/server", () => ({
   uploadToStorage: vi.fn(),
 }));
 
-vi.mock("@/lib/services/quota", () => ({
-  consumeReportCredit: vi.fn(),
-  writeReportAudit: vi.fn(),
-}));
-
 vi.mock("@/lib/observability/langfuse", () => ({
   getLangfuseClient: vi.fn(() => null),
 }));
@@ -35,7 +30,6 @@ global.fetch = mockFetch;
 
 import { GET } from "@/app/api/report/route";
 import { createServerClient, createClient, createServiceRoleClient, uploadToStorage } from "@/lib/supabase/server";
-import { writeReportAudit } from "@/lib/services/quota";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 describe("API: /api/report - Supabase Integration", () => {
@@ -200,7 +194,7 @@ describe("API: /api/report - Supabase Integration", () => {
     // Mock createServiceRoleClient for StorageService
     vi.mocked(createServiceRoleClient).mockReturnValue(mockSupabaseClient);
     vi.mocked(uploadToStorage).mockResolvedValue("https://signed.url");
-    vi.mocked(writeReportAudit).mockResolvedValue(undefined);
+    // Note: writeReportAudit removed - audit logging now handled by CreditManager RPC
 
     const request = new NextRequest(
       "http://localhost:3000/api/report?symbol=AAPL&testToken=test-token",

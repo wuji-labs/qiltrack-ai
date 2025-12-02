@@ -47,7 +47,8 @@ export default function CreditsPage() {
 
       if (error) throw error;
 
-      const formatted = data?.map((item) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const formatted = data?.map((item: any) => ({
         user_id: item.user_id,
         email: item.profiles.email,
         display_name: item.profiles.display_name || item.profiles.full_name,

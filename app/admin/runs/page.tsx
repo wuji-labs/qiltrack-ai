@@ -60,7 +60,8 @@ export default function ReportRunsPage() {
 
       if (error) throw error;
 
-      setRuns(data || []);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setRuns(data as any || []);
       setTotalCount(count || 0);
     } catch (error) {
       console.error("Failed to fetch report runs:", error);
