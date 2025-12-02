@@ -193,7 +193,7 @@ export default function AdminDashboard() {
       .limit(10);
 
     if (recentRuns) {
-      const activities: RecentActivity[] = recentRuns.map((run: any) => ({
+      const activities: RecentActivity[] = recentRuns.map((run: ReportRun) => ({
         id: run.id,
         type: run.status === "completed" ? "success" : "warning",
         user_email: run.profiles?.email || "未知用户",

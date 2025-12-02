@@ -89,10 +89,10 @@ export async function POST(request: Request) {
       success: true,
       user: userData.user,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Create user API error:", error);
     return NextResponse.json(
-      { error: error.message || "创建用户失败" },
+      { error: error instanceof Error ? error.message : "创建用户失败" },
       { status: 500 }
     );
   }
