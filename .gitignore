@@ -108,3 +108,8 @@ scripts/*admin*.js
 scripts/*direct*.js
 scripts/manual-*.sql
 
+# Database backups (should not be committed to git)
+backups/
+*.sql
+*.sql.gz
+
