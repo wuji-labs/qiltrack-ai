@@ -10,7 +10,6 @@ interface User {
   id: string;
   email: string;
   display_name: string | null;
-  name: string | null;
   role: string | null;
   plan: string | null;
   created_at: string | null;
@@ -18,8 +17,8 @@ interface User {
 }
 
 interface UserCredits {
-  credits_available: number;
-  credits_used: number;
+  credits_available: number | null;
+  credits_used: number | null;
 }
 
 const PLAN_CONFIGS = {
@@ -58,6 +57,7 @@ export default function UsersPage() {
   // 修改密码
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordEmail, setPasswordEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   // 用户详情
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -67,6 +67,8 @@ export default function UsersPage() {
   // 批量操作
   const [showBatchModal, setShowBatchModal] = useState(false);
   const [batchAction, setBatchAction] = useState<"grant" | "revoke" | "role" | "plan">("grant");
+  const [batchRole, setBatchRole] = useState<string>("user");
+  const [batchPlan, setBatchPlan] = useState<string>("free");
   const [processing, setProcessing] = useState(false);
 
   const pageSize = 10;
@@ -82,7 +84,7 @@ export default function UsersPage() {
     try {
       let query = supabase
         .from("profiles")
-        .select("*", { count: "exact" })
+        .select("id, email, display_name, role, plan, created_at, avatar_url", { count: "exact" })
         .order("created_at", { ascending: false })
         .range((page - 1) * pageSize, page * pageSize - 1);
 
@@ -91,11 +93,11 @@ export default function UsersPage() {
       }
 
       if (roleFilter !== "all") {
-        query = query.eq("role", roleFilter);
+        query = query.eq("role", roleFilter as "admin" | "editor" | "user");
       }
 
       if (planFilter !== "all") {
-        query = query.eq("plan", planFilter);
+        query = query.eq("plan", planFilter as "free" | "basic" | "pro" | "enterprise");
       }
 
       const { data, count, error } = await query;
@@ -174,7 +176,7 @@ export default function UsersPage() {
         body: JSON.stringify({
           userId: editingUser.id,
           display_name: editingUser.display_name,
-          full_name: editingUser.name,
+          full_name: editingUser.display_name,
           role: editingUser.role,
           plan: editingUser.plan,
         }),
@@ -284,7 +286,7 @@ export default function UsersPage() {
         case "role":
           await supabase
             .from("profiles")
-            .update({ role: value, updated_at: new Date().toISOString() })
+            .update({ role: value as "admin" | "editor" | "user", updated_at: new Date().toISOString() })
             .in("id", userIds);
           alert(`成功修改 ${userIds.length} 个用户的角色`);
           break;
@@ -293,7 +295,7 @@ export default function UsersPage() {
           await supabase
             .from("profiles")
             .update({
-              plan: value,
+              plan: value as "free" | "basic" | "pro" | "enterprise",
               updated_at: new Date().toISOString(),
             })
             .in("id", userIds);
@@ -539,7 +541,7 @@ export default function UsersPage() {
                         {user.email}
                       </td>
                       <td className="px-4 py-3 text-sm text-dim">
-                        {user.display_name || user.name || "-"}
+                        {user.display_name || "-"}
                       </td>
                       <td className="px-4 py-3">
                         <span
@@ -748,8 +750,8 @@ export default function UsersPage() {
             />
             <InputField
               label="全名"
-              value={editingUser.name || ""}
-              onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
+              value={editingUser.display_name || ""}
+              onChange={(e) => setEditingUser({ ...editingUser, display_name: e.target.value })}
             />
             <SelectField
               label="角色"
@@ -843,9 +845,7 @@ export default function UsersPage() {
         >
           <div className="space-y-3">
             <DetailRow label="用户ID" value={detailUser.id} />
-            <DetailRow label="邮箱" value={detailUser.email} />
             <DetailRow label="显示名称" value={detailUser.display_name || "-"} />
-            <DetailRow label="全名" value={detailUser.name || "-"} />
             <DetailRow
               label="角色"
               value={
@@ -859,8 +859,8 @@ export default function UsersPage() {
             />
             {userCredits && (
               <>
-                <DetailRow label="可用积分" value={userCredits.credits_available.toString()} />
-                <DetailRow label="已用积分" value={userCredits.credits_used.toString()} />
+                <DetailRow label="可用积分" value={(userCredits.credits_available ?? 0).toString()} />
+                <DetailRow label="已用积分" value={(userCredits.credits_used ?? 0).toString()} />
               </>
             )}
             <DetailRow

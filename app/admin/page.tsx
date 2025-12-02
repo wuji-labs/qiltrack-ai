@@ -179,12 +179,12 @@ export default function AdminDashboard() {
       .limit(10);
 
     if (recentRuns) {
-      const activities: RecentActivity[] = recentRuns.map((run: { id: string; status: string; symbol?: string; created_at: string; profiles?: { email?: string } }) => ({
+      const activities: RecentActivity[] = recentRuns.map((run: { id: string; status: string | null; symbol?: string | null; created_at: string | null; profiles?: { email?: string } | null }) => ({
         id: run.id,
         type: run.status === "completed" ? "success" : "warning",
         user_email: run.profiles?.email || "未知用户",
         description: `生成了 ${run.symbol || "未知"} 的投资报告`,
-        created_at: run.created_at,
+        created_at: run.created_at || new Date().toISOString(),
       }));
 
       setRecentActivities(activities);

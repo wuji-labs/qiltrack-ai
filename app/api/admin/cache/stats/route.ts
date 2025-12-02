@@ -39,7 +39,7 @@ export async function GET() {
       .eq('id', user.id)
       .single();
 
-    if (!profile || !['admin', 'superadmin'].includes(profile.role)) {
+    if (!profile || !profile.role || !['admin', 'superadmin'].includes(profile.role)) {
       return NextResponse.json(
         { success: false, error: 'Forbidden: Admin access required' },
         { status: 403 }
@@ -112,7 +112,7 @@ export async function DELETE() {
       .eq('id', user.id)
       .single();
 
-    if (!profile || !['admin', 'superadmin'].includes(profile.role)) {
+    if (!profile || !profile.role || !['admin', 'superadmin'].includes(profile.role)) {
       return NextResponse.json(
         { success: false, error: 'Forbidden: Admin access required' },
         { status: 403 }

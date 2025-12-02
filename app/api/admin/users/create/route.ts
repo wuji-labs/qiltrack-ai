@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { getAuthContextFromRequest, isAdmin } from "@/app/api/_utils/supabase";
+import { validatePassword } from "@/lib/auth/password-validator";
 
 // 服务端Supabase客户端(使用Service Role Key)
 const supabaseAdmin = createClient(
@@ -15,8 +17,18 @@ const supabaseAdmin = createClient(
 
 export async function POST(request: Request) {
   try {
+    // 1. Verify authentication and authorization
+    const { userId: adminUserId, role } = await getAuthContextFromRequest(request);
+
+    if (!adminUserId || !isAdmin(role)) {
+      return NextResponse.json(
+        { error: "Forbidden: Admin access required" },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
-    const { email, password, display_name, full_name, role, plan, initial_credits } = body;
+    const { email, password, display_name, full_name, role: newUserRole, plan, initial_credits } = body;
 
     // 验证必填字段
     if (!email || !password) {
@@ -26,14 +38,16 @@ export async function POST(request: Request) {
       );
     }
 
-    if (password.length < 6) {
+    // 验证密码强度
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
       return NextResponse.json(
-        { error: "密码至少6位" },
+        { error: passwordValidation.errors.join(', ') },
         { status: 400 }
       );
     }
 
-    // 1. 创建用户
+    // 2. 创建用户
     const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
@@ -52,13 +66,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. 更新profiles表
+    // 3. 更新profiles表
     const { error: profileError } = await supabaseAdmin
       .from("profiles")
       .update({
         display_name: display_name || null,
         name: full_name || null,
-        role: role || "user",
+        role: newUserRole || "user",
         plan: plan || "free",
         updated_at: new Date().toISOString(),
       })
@@ -69,7 +83,7 @@ export async function POST(request: Request) {
       // 不抛出错误,因为用户已创建
     }
 
-    // 3. 初始化积分 (使用 report_credits 表)
+    // 4. 初始化积分 (使用 report_credits 表)
     // 根据 plan 确定初始积分: free=30, basic=50, pro=200, enterprise=999
     const planCredits: Record<string, number> = {
       free: 30,
@@ -91,6 +105,22 @@ export async function POST(request: Request) {
       console.error("Credits init error:", creditsError);
       // 不抛出错误,因为用户已创建
     }
+
+    // 5. Log admin action
+    await supabaseAdmin
+      .from("audit_logs")
+      .insert({
+        user_id: adminUserId,
+        action: "user_create",
+        resource_type: "profiles",
+        resource_id: userData.user.id,
+        details: {
+          email,
+          role: newUserRole || "user",
+          plan: plan || "free",
+          credits_granted: creditsToGrant,
+        },
+      });
 
     return NextResponse.json({
       success: true,

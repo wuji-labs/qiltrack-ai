@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceRoleClient, uploadToStorage } from "@/lib/supabase/server";
 import { getAuthContext, initSupabase } from "@/app/api/_utils/supabase";
+import { validateFile, sanitizeFilename } from "@/lib/api/file-validator";
 
 const MAX_UPLOAD_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -21,8 +22,19 @@ export async function POST(request: NextRequest) {
       return context.applyCookies(response);
     }
 
+    // Validate file size
     if (file.size > MAX_UPLOAD_SIZE) {
       const response = NextResponse.json({ error: "File too large (max 10MB)" }, { status: 400 });
+      return context.applyCookies(response);
+    }
+
+    // Validate file type, extension, and signature
+    const validationResult = await validateFile(file);
+    if (!validationResult.valid) {
+      const response = NextResponse.json(
+        { error: validationResult.error || "Invalid file" },
+        { status: 400 }
+      );
       return context.applyCookies(response);
     }
 
@@ -31,7 +43,7 @@ export async function POST(request: NextRequest) {
     const parsedVersion = Number.parseInt((formData.get("version") as string) || "", 10);
     const version = Number.isFinite(parsedVersion) ? parsedVersion : 1;
 
-    const sanitizedName = file.name.replace(/[^\w.\-]+/g, "-");
+    const sanitizedName = sanitizeFilename(file.name);
     const storagePath = `uploads/${userId}/${Date.now()}-${sanitizedName}`;
 
     const serviceClient = createServiceRoleClient();

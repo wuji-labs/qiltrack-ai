@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceRoleClient, uploadToStorage } from "@/lib/supabase/server";
 import { getAuthContext, initSupabase, isAdminOrEditor } from "@/app/api/_utils/supabase";
+import { validateFile, sanitizeFilename } from "@/lib/api/file-validator";
 
 const MAX_UPLOAD_SIZE = 20 * 1024 * 1024; // 20MB for admin assets
 const VALID_STATUSES = ["pending", "approved", "rejected"] as const;
@@ -22,8 +23,19 @@ export async function POST(request: NextRequest) {
       return context.applyCookies(response);
     }
 
+    // Validate file size
     if (file.size > MAX_UPLOAD_SIZE) {
       const response = NextResponse.json({ error: "File too large (max 20MB)" }, { status: 400 });
+      return context.applyCookies(response);
+    }
+
+    // Validate file type, extension, and signature
+    const validationResult = await validateFile(file);
+    if (!validationResult.valid) {
+      const response = NextResponse.json(
+        { error: validationResult.error || "Invalid file" },
+        { status: 400 }
+      );
       return context.applyCookies(response);
     }
 
@@ -37,7 +49,7 @@ export async function POST(request: NextRequest) {
       ? (statusValue as (typeof VALID_STATUSES)[number])
       : "approved";
 
-    const sanitizedName = file.name.replace(/[^\w.\-]+/g, "-");
+    const sanitizedName = sanitizeFilename(file.name);
     const storagePath = `admin-uploads/${targetUserId}/${Date.now()}-${sanitizedName}`;
 
     const serviceClient = createServiceRoleClient();
