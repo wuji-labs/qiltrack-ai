@@ -7,8 +7,10 @@ import { createServerClient } from "@/lib/supabase/server";
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id: runId } = await params;
+
   try {
     const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
 
@@ -57,8 +59,6 @@ export async function POST(
       });
       return response;
     }
-
-    const runId = params.id;
 
     // Update the report to remove featured status
     const { error: updateError } = await supabase

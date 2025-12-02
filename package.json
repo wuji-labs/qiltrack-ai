@@ -16,7 +16,6 @@
     "pr:ready": "npm run lint && npm run test && echo '✅代码已准备好提交 PR'"
   },
   "dependencies": {
-    "@prisma/client": "^6.19.0",
     "@react-pdf/renderer": "^4.3.1",
     "@refinedev/core": "^5.0.6",
     "@refinedev/nextjs-router": "^7.0.4",
@@ -37,7 +36,6 @@
     "nodemailer": "^7.0.10",
     "openai": "^6.9.0",
     "pdf-lib": "^1.17.1",
-    "prisma": "^6.19.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-markdown": "^10.1.0",

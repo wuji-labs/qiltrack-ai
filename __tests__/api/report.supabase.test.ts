@@ -9,11 +9,6 @@ vi.mock("@/lib/supabase/server", () => ({
   uploadToStorage: vi.fn(),
 }));
 
-vi.mock("@/lib/services/quota", () => ({
-  consumeReportCredit: vi.fn(),
-  writeReportAudit: vi.fn(),
-}));
-
 vi.mock("@/lib/observability/langfuse", () => ({
   getLangfuseClient: vi.fn(() => null),
 }));
@@ -35,7 +30,6 @@ global.fetch = mockFetch;
 
 import { GET } from "@/app/api/report/route";
 import { createServerClient, createClient, createServiceRoleClient, uploadToStorage } from "@/lib/supabase/server";
-import { writeReportAudit } from "@/lib/services/quota";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 describe("API: /api/report - Supabase Integration", () => {

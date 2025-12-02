@@ -93,11 +93,13 @@ export default function UsersPage() {
       }
 
       if (roleFilter !== "all") {
-        query = query.eq("role", roleFilter);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        query = query.eq("role", roleFilter as any);
       }
 
       if (planFilter !== "all") {
-        query = query.eq("plan", planFilter);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        query = query.eq("plan", planFilter as any);
       }
 
       const { data, count, error } = await query;

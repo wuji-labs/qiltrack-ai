@@ -3,7 +3,6 @@ import { Document, Image, Page, StyleSheet, Text, View, pdf } from "@react-pdf/r
 
 import { createReportBlueprint } from "@/lib/report/blueprint";
 import { buildPerformanceChart, buildValuationChart, renderChartPng } from "@/lib/report/charts";
-import { writeReportAudit } from "@/lib/services/quota";
 import { createServerClient, createServiceRoleClient, uploadToStorage } from "@/lib/supabase/server";
 import type { CompanyData, ReportResponse, ReportTone } from "@/types/report";
 
@@ -613,12 +612,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (err) {
     console.error("PDF storage failed:", err);
-  }
-
-  try {
-    await writeReportAudit(userId, blueprint.symbol, "production", signedUrl ? "success" : "failed");
-  } catch (err) {
-    console.warn("Audit log failed:", err);
   }
 
   const durationMs = Date.now() - startedAt;
