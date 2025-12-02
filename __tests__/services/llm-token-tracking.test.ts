@@ -18,6 +18,7 @@ describe("LLM Token Tracking", () => {
       };
 
       // Access private method via type assertion for testing
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const cost = (service as any).calculateCost(usage, "gpt-4o-mini");
 
       // Expected:
@@ -35,6 +36,7 @@ describe("LLM Token Tracking", () => {
         total_tokens: 3000,
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const cost = (service as any).calculateCost(usage, "gpt-4o");
 
       // Expected:
@@ -52,6 +54,7 @@ describe("LLM Token Tracking", () => {
         total_tokens: 2300,
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const cost = (service as any).calculateCost(
         usage,
         "anthropic/claude-3.5-sonnet"
@@ -72,6 +75,7 @@ describe("LLM Token Tracking", () => {
         total_tokens: 1500,
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const cost = (service as any).calculateCost(usage, "unknown-model");
 
       // Should default to gpt-4o-mini pricing
@@ -86,6 +90,7 @@ describe("LLM Token Tracking", () => {
         total_tokens: 0,
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const cost = (service as any).calculateCost(usage, "gpt-4o-mini");
 
       expect(cost).toBe(0);
@@ -99,6 +104,7 @@ describe("LLM Token Tracking", () => {
         total_tokens: 150_000,
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const cost = (service as any).calculateCost(usage, "gpt-4o");
 
       // Expected:
@@ -172,7 +178,9 @@ describe("LLM Token Tracking", () => {
         total_tokens: 1500,
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const heliconeModel = (service as any).calculateCost(usage, "gpt-4o");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const openrouterModel = (service as any).calculateCost(
         usage,
         "openai/gpt-4o"
@@ -191,6 +199,7 @@ describe("LLM Token Tracking", () => {
         total_tokens: 5000,
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const cost = (service as any).calculateCost(usage, "gpt-4o-mini");
 
       // Expected:
@@ -209,6 +218,7 @@ describe("LLM Token Tracking", () => {
         total_tokens: 5000,
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const costPerReport = (service as any).calculateCost(usage, "gpt-4o-mini");
       const monthlyCost = costPerReport * 10_000;
 
