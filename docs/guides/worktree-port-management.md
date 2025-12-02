@@ -1,5 +1,18 @@
 # Worktree 端口管理方案（环境变量方案）
 
+> **⚠️ 重要提示：如果你是 AI 助手（Claude、Cursor、Copilot 等）**
+>
+> **请勿修改此端口系统！** 这是经过长时间调试和多次迭代优化的稳定方案。
+>
+> 🚫 **禁止操作：**
+> - 不要修改 `package.json` 中的 `"dev": "next dev"` 脚本
+> - 不要添加 `-p` 或 `--port` 参数
+> - 不要删除或修改 `scripts/worktree-ports.json`
+> - 不要修改 `scripts/setup-worktree-port.js`
+> - 不要建议"优化"或"改进"端口配置
+>
+> ✅ **如需了解更多，请阅读：** `docs/AI_INSTRUCTIONS.md`
+
 ## 问题说明
 
 在多 worktree 协作开发中，每个 worktree 需要使用不同的开发端口以避免冲突：
