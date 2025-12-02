@@ -10,7 +10,7 @@ interface User {
   id: string;
   email: string;
   display_name: string | null;
-  full_name: string | null;
+  full_name?: string | null; // Optional: not in database schema
   role: string | null;
   plan: string | null;
   quota_limit: number | null;
@@ -20,8 +20,8 @@ interface User {
 }
 
 interface UserCredits {
-  credits_available: number;
-  credits_used: number;
+  credits_available: number | null;
+  credits_used: number | null;
 }
 
 const PLAN_CONFIGS = {
@@ -60,6 +60,7 @@ export default function UsersPage() {
   // 修改密码
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordEmail, setPasswordEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   // 用户详情
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -106,7 +107,8 @@ export default function UsersPage() {
 
       if (error) throw error;
 
-      setUsers(data || []);
+      // Type assertion: database schema doesn't have full_name but UI expects it
+      setUsers((data || []) as User[]);
       setTotalCount(count || 0);
     } catch (error) {
       console.error("Failed to fetch users:", error);
@@ -287,9 +289,10 @@ export default function UsersPage() {
     try {
       switch (action) {
         case "role":
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await supabase
             .from("profiles")
-            .update({ role: value, updated_at: new Date().toISOString() })
+            .update({ role: value as any, updated_at: new Date().toISOString() })
             .in("id", userIds);
           alert(`成功修改 ${userIds.length} 个用户的角色`);
           break;
