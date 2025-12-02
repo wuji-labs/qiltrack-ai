@@ -25,7 +25,12 @@ export interface AuthProviderInfo {
 
 type AuthResult =
   | { success: true }
-  | { success: false; error?: string; status?: number; code?: "cooldown" | "invalid_email" | "invalid_credentials" | "user_already_exists" };
+  | {
+      success: false;
+      error?: string;
+      status?: number;
+      code?: "cooldown" | "invalid_email" | "invalid_credentials" | "user_already_exists";
+    };
 
 /**
  * Get the base URL for auth redirects
@@ -55,7 +60,10 @@ function mapAuthError(error: unknown): AuthResult {
       typeof (error as { status?: number }).status === "number"
         ? (error as { status?: number }).status
         : undefined;
-    const code = typeof (error as { code?: string }).code === "string" ? (error as { code?: string }).code : undefined;
+    const code =
+      typeof (error as { code?: string }).code === "string"
+        ? (error as { code?: string }).code
+        : undefined;
     const message = String((error as { message?: string }).message ?? "Unknown error");
     const normalizedMessage = message.toLowerCase();
     return {
@@ -141,7 +149,11 @@ export function useSupabaseAuth() {
     if (!user) return null;
 
     try {
-      const { data, error } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
 
       if (error) {
         console.error("获取用户资料失败:", error);
@@ -159,7 +171,11 @@ export function useSupabaseAuth() {
     if (!user) return null;
 
     try {
-      const { data, error } = await supabase.from("report_credits").select("*").eq("user_id", user.id).single();
+      const { data, error } = await supabase
+        .from("report_credits")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
 
       if (error && error.code !== "PGRST116") {
         console.error("获取额度失败:", error);
@@ -187,7 +203,8 @@ export function useSupabaseAuth() {
 
     try {
       // Step 1: Check for OAuth identities
-      const { data: identitiesData, error: identitiesError } = await supabase.auth.getUserIdentities();
+      const { data: identitiesData, error: identitiesError } =
+        await supabase.auth.getUserIdentities();
 
       if (identitiesError) {
         console.error("获取身份提供商失败:", identitiesError);

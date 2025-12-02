@@ -3,7 +3,13 @@ import { Document, Image, Page, StyleSheet, Text, View, pdf } from "@react-pdf/r
 
 import { createReportBlueprint } from "@/lib/report/blueprint";
 import { buildPerformanceChart, buildValuationChart, renderChartPng } from "@/lib/report/charts";
-import { createServerClient, createServiceRoleClient, uploadToStorage } from "@/lib/supabase/server";
+// TODO: Restore quota audit after refactoring
+// import { writeReportAudit } from "@/lib/services/quota";
+import {
+  createServerClient,
+  createServiceRoleClient,
+  uploadToStorage,
+} from "@/lib/supabase/server";
 import type { CompanyData, ReportResponse, ReportTone } from "@/types/report";
 
 const styles = StyleSheet.create({
@@ -283,7 +289,9 @@ export async function POST(request: NextRequest) {
 
   const respond = (body: Record<string, unknown>, status: number) => {
     const response = NextResponse.json(body, { status });
-    responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));
+    responseCookies.forEach(({ name, value }) =>
+      response.headers.append("Set-Cookie", `${name}=${value}`)
+    );
     return response;
   };
 
@@ -311,8 +319,16 @@ export async function POST(request: NextRequest) {
   let profileIsAnnual = false;
   let profilePlan = "";
   try {
-    const { data: profile } = await supabase.from("profiles").select("plan, subscription_type").eq("id", userId as never).single();
-    profilePlan = ((profile as { subscription_type?: string; plan?: string })?.subscription_type || (profile as { subscription_type?: string; plan?: string })?.plan || "").toLowerCase();
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("plan, subscription_type")
+      .eq("id", userId as never)
+      .single();
+    profilePlan = (
+      (profile as { subscription_type?: string; plan?: string })?.subscription_type ||
+      (profile as { subscription_type?: string; plan?: string })?.plan ||
+      ""
+    ).toLowerCase();
     profileIsAnnual = profilePlan === "annual";
 
     if (clientPlanLabel === "annual" && !profileIsAnnual) {
@@ -375,7 +391,9 @@ export async function POST(request: NextRequest) {
         .eq("id", reportRunId as never)
         .single();
       if ((runData as { company_snapshot?: CompanyData; symbol?: string })?.company_snapshot) {
-        resolvedCompany = ((runData as { company_snapshot?: CompanyData; symbol?: string }).company_snapshot as CompanyData) || undefined;
+        resolvedCompany =
+          ((runData as { company_snapshot?: CompanyData; symbol?: string })
+            .company_snapshot as CompanyData) || undefined;
       } else if ((runData as { company_snapshot?: CompanyData; symbol?: string })?.symbol) {
         resolvedCompany = {
           symbol: (runData as { company_snapshot?: CompanyData; symbol?: string }).symbol!,
@@ -430,16 +448,26 @@ export async function POST(request: NextRequest) {
     const changePct = company.quote.changePercent;
     const roe = company.metrics.roeTTM;
     return [
-      { label: "Market Cap", value: formatMarketCap(company.profile.marketCapitalization), icon: "MC" },
+      {
+        label: "Market Cap",
+        value: formatMarketCap(company.profile.marketCapitalization),
+        icon: "MC",
+      },
       {
         label: "P/E (TTM)",
-        value: company.metrics.peTTM !== undefined && company.metrics.peTTM !== null ? `${company.metrics.peTTM.toFixed(2)}x` : "N/A",
+        value:
+          company.metrics.peTTM !== undefined && company.metrics.peTTM !== null
+            ? `${company.metrics.peTTM.toFixed(2)}x`
+            : "N/A",
         icon: "PE",
       },
       {
         label: "Price",
         value: price !== undefined && price !== null ? `$${price.toFixed(2)}` : "N/A",
-        helper: changePct !== undefined && changePct !== null ? `${changePct > 0 ? "+" : ""}${changePct.toFixed(2)}%` : undefined,
+        helper:
+          changePct !== undefined && changePct !== null
+            ? `${changePct > 0 ? "+" : ""}${changePct.toFixed(2)}%`
+            : undefined,
         icon: changePct !== undefined && changePct !== null ? (changePct >= 0 ? "▲" : "▼") : "$",
       },
       {
@@ -463,7 +491,9 @@ export async function POST(request: NextRequest) {
           <View style={styles.coverStats}>
             <View style={styles.statPill}>
               <Text style={styles.statLabel}>Market Cap</Text>
-              <Text style={styles.statValue}>{formatMarketCap(blueprint.marketCap as number | undefined)}</Text>
+              <Text style={styles.statValue}>
+                {formatMarketCap(blueprint.marketCap as number | undefined)}
+              </Text>
             </View>
             <View style={styles.statPill}>
               <Text style={styles.statLabel}>Industry</Text>
@@ -489,7 +519,9 @@ export async function POST(request: NextRequest) {
           <Text style={styles.title}>
             {blueprint.companyName} ({blueprint.symbol})
           </Text>
-          <Text style={styles.subtitle}>Generated at {new Date(blueprint.generatedAt).toUTCString()}</Text>
+          <Text style={styles.subtitle}>
+            Generated at {new Date(blueprint.generatedAt).toUTCString()}
+          </Text>
           <View style={styles.badgeRow}>
             <Text style={styles.badge}>Annual Premium</Text>
             {blueprint.industry && <Text style={styles.badge}>{blueprint.industry}</Text>}
@@ -614,6 +646,18 @@ export async function POST(request: NextRequest) {
     console.error("PDF storage failed:", err);
   }
 
+  try {
+    // TODO: Restore quota audit after refactoring
+    // await writeReportAudit(
+    //   userId,
+    //   blueprint.symbol,
+    //   "production",
+    //   signedUrl ? "success" : "failed"
+    // );
+  } catch (err) {
+    console.warn("Audit log failed:", err);
+  }
+
   const durationMs = Date.now() - startedAt;
   const chartFailures = [perfImage, valImage].filter((img) => !img).length;
 
@@ -628,6 +672,8 @@ export async function POST(request: NextRequest) {
     storage_path: signedUrl ? pdfPath : null,
   });
 
-  responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));
+  responseCookies.forEach(({ name, value }) =>
+    response.headers.append("Set-Cookie", `${name}=${value}`)
+  );
   return response;
 }

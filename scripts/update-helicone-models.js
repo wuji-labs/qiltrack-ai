@@ -34,9 +34,7 @@ function fetchJson(url) {
           if (statusCode && statusCode >= 400) {
             res.resume();
             return reject(
-              new Error(
-                `Failed to fetch registry: ${statusCode} ${res.statusMessage}`
-              )
+              new Error(`Failed to fetch registry: ${statusCode} ${res.statusMessage}`)
             );
           }
 
@@ -66,16 +64,14 @@ function simplifyModels(models) {
       id: model.id,
       name: model.name,
       provider: model.author,
-      contextLength:
-        typeof model.contextLength === "number" ? model.contextLength : null,
+      contextLength: typeof model.contextLength === "number" ? model.contextLength : null,
       inputModalities: toArray(model.inputModalities),
       outputModalities: toArray(model.outputModalities),
       tags: toArray(model.tags),
     }))
     .filter((model) => Boolean(model.id))
     .sort((a, b) => {
-      const providerCmp =
-        (a.provider || "").localeCompare(b.provider || "", "en");
+      const providerCmp = (a.provider || "").localeCompare(b.provider || "", "en");
       if (providerCmp !== 0) return providerCmp;
       return a.id.localeCompare(b.id, "en");
     });

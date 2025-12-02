@@ -63,7 +63,17 @@ describe("report charts", () => {
   it("gracefully handles missing metrics", () => {
     const emptyCompany: CompanyData = {
       symbol: "TSLA",
-      profile: { name: "Tesla", ticker: "TSLA", exchange: "", finnhubIndustry: "", country: "", currency: "USD", ipo: "", marketCapitalization: undefined, weburl: "" },
+      profile: {
+        name: "Tesla",
+        ticker: "TSLA",
+        exchange: "",
+        finnhubIndustry: "",
+        country: "",
+        currency: "USD",
+        ipo: "",
+        marketCapitalization: undefined,
+        weburl: "",
+      },
       quote: {},
       metrics: {},
       recentNews: [],

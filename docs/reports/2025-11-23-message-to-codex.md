@@ -10,14 +10,14 @@
 
 ## 📋 修复完成清单
 
-| 问题 | 修复内容 | 验证 |
-|------|---------|------|
-| **Schema 不完整** | profiles 扩展字段 + 新表（report_documents, faq_entries, pricing_plans, copy_modules）+ v_user_quota 视图 + fn_initialize_profile RPC | ✅ |
-| **SDK 未安装** | @supabase/auth-helpers-nextjs + @supabase/ssr + @supabase/supabase-js | ✅ |
-| **登录页集成** | 使用 useSupabaseAuth（Email OTP + OAuth） | ✅ |
-| **账户页面** | useSupabaseAuth 集成 + 认证状态 + 配额显示 | ✅ |
-| **Callback 处理** | createRouteHandlerClient + fn_initialize_profile RPC | ✅ |
-| **NextAuth 残留** | 删除 [...nextauth]、useAuth.ts、package.json 依赖 | ✅ |
+| 问题              | 修复内容                                                                                                                              | 验证 |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| **Schema 不完整** | profiles 扩展字段 + 新表（report_documents, faq_entries, pricing_plans, copy_modules）+ v_user_quota 视图 + fn_initialize_profile RPC | ✅   |
+| **SDK 未安装**    | @supabase/auth-helpers-nextjs + @supabase/ssr + @supabase/supabase-js                                                                 | ✅   |
+| **登录页集成**    | 使用 useSupabaseAuth（Email OTP + OAuth）                                                                                             | ✅   |
+| **账户页面**      | useSupabaseAuth 集成 + 认证状态 + 配额显示                                                                                            | ✅   |
+| **Callback 处理** | createRouteHandlerClient + fn_initialize_profile RPC                                                                                  | ✅   |
+| **NextAuth 残留** | 删除 [...nextauth]、useAuth.ts、package.json 依赖                                                                                     | ✅   |
 
 ---
 
@@ -48,6 +48,7 @@
 **完整修复报告**：`docs/reports/2025-11-23-stage1-blocking-issues-fixed.md`
 
 包含：
+
 - 详细修复清单
 - 完整验证结果
 - 风险评估
@@ -58,12 +59,14 @@
 ## 🎯 需要 Codex 做的
 
 ### 1️⃣ **代码审查** (预计 15-20 min)
-   - [ ] 检查 Schema migration 完整性
-   - [ ] 验证 RLS 策略安全性
-   - [ ] 确认 types/database.ts 匹配 schema
-   - [ ] 审查 callback route 安全性
+
+- [ ] 检查 Schema migration 完整性
+- [ ] 验证 RLS 策略安全性
+- [ ] 确认 types/database.ts 匹配 schema
+- [ ] 审查 callback route 安全性
 
 ### 2️⃣ **本地验证** (预计 30-45 min)
+
 ```bash
 # 检出分支
 git checkout feat/supabase-integration
@@ -86,16 +89,18 @@ npm run dev
 ```
 
 ### 3️⃣ **决策 3 个待处理项**
-   - [ ] **OAuth 凭证配置**：现在配置还是延迟到 Stage 2？
-     > 建议：Stage 2（需要 OAuth 申请流程）
-   - [ ] **报告存储策略**：Storage + 签名 URL 够用吗？还是需要 CDN？
-     > 建议：现阶段用 Storage + 签名 URL，CDN 作为 Stage 3 性能优化
-   - [ ] **并发吞吐测试**：何时开始？用什么工具？
-     > 建议：Stage 2 完成后，k6 或 JMeter，1000 rps / 10 秒基准
+
+- [ ] **OAuth 凭证配置**：现在配置还是延迟到 Stage 2？
+  > 建议：Stage 2（需要 OAuth 申请流程）
+- [ ] **报告存储策略**：Storage + 签名 URL 够用吗？还是需要 CDN？
+  > 建议：现阶段用 Storage + 签名 URL，CDN 作为 Stage 3 性能优化
+- [ ] **并发吞吐测试**：何时开始？用什么工具？
+  > 建议：Stage 2 完成后，k6 或 JMeter，1000 rps / 10 秒基准
 
 ### 4️⃣ **如审查通过**
-   - [ ] Merge `feat/supabase-integration` → `main`
-   - [ ] 启动 Stage 2 PR（Report API RPC 集成）
+
+- [ ] Merge `feat/supabase-integration` → `main`
+- [ ] 启动 Stage 2 PR（Report API RPC 集成）
 
 ---
 
@@ -110,11 +115,11 @@ npm run dev
 
 ## 🚀 时间估算
 
-| 步骤 | 预计时间 |
-|------|---------|
-| 代码审查 | 15-20 min |
-| 本地验证 | 30-45 min |
-| 决策讨论 | 5-10 min |
+| 步骤     | 预计时间    |
+| -------- | ----------- |
+| 代码审查 | 15-20 min   |
+| 本地验证 | 30-45 min   |
+| 决策讨论 | 5-10 min    |
 | **总计** | **~1.5-2h** |
 
 ---
@@ -145,4 +150,4 @@ npm run dev
 
 ---
 
-*有任何问题，请直接指正或提出修改建议。*
+_有任何问题，请直接指正或提出修改建议。_

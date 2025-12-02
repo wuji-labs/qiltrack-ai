@@ -16,18 +16,18 @@
 
 ### 按症状查找
 
-| 症状 | 文档 | 优先级 |
-|------|------|--------|
-| package.json 无法解析 | [bom-issue.md](./bom-issue.md) | 🔥 高 |
-| npm install 失败 | [bom-issue.md](./bom-issue.md) | 🔥 高 |
-| git 操作后项目无法启动 | [bom-issue.md](./bom-issue.md) | 🔥 高 |
+| 症状                   | 文档                           | 优先级 |
+| ---------------------- | ------------------------------ | ------ |
+| package.json 无法解析  | [bom-issue.md](./bom-issue.md) | 🔥 高  |
+| npm install 失败       | [bom-issue.md](./bom-issue.md) | 🔥 高  |
+| git 操作后项目无法启动 | [bom-issue.md](./bom-issue.md) | 🔥 高  |
 
 ### 按工具查找
 
-| 工具 | 相关文档 |
-|------|----------|
-| Git | [bom-issue.md](./bom-issue.md) |
-| npm | [bom-issue.md](./bom-issue.md) |
+| 工具       | 相关文档                       |
+| ---------- | ------------------------------ |
+| Git        | [bom-issue.md](./bom-issue.md) |
+| npm        | [bom-issue.md](./bom-issue.md) |
 | PowerShell | [bom-issue.md](./bom-issue.md) |
 
 ## 给 AI 助手的重要提示
@@ -85,8 +85,8 @@
 
 ## 历史记录
 
-| 日期 | Commit | 说明 |
-|------|--------|------|
+| 日期   | Commit | 说明   |
+| ------ | ------ | ------ |
 | [日期] | [hash] | [说明] |
 ```
 

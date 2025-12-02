@@ -17,6 +17,7 @@
 **主要变更** (v2 修复版):
 
 #### A. 表与数据回填
+
 - ✅ 确保 `report_credits` 表存在（具有 `credits_available`, `credits_used` 等字段）
 - ✅ **修复**: 从 `report_credit_events` 表回填数据 - **正确聚合所有 delta**
   - `credits_available = quota_limit + SUM(all deltas)`（包括授予和扣除）
@@ -24,17 +25,20 @@
   - 确保反映 Hosted 环境完整的额度历史
 
 #### B. 视图与实时数据
+
 - ✅ 将 `v_user_quota` 从物化视图改为普通视图（实时数据）
 - ✅ 返回字段: `remaining_quota` → `remaining_credits`
 - ✅ 通过 LEFT JOIN 确保未有 report_credits 行的用户返回默认值 0
 
 #### C. 触发器与自动初始化
+
 - ✅ **新增**: 创建触发器 `tr_init_report_credits_on_profile_insert`
   - 在新用户创建时自动创建对应的 `report_credits` 行
   - 初始额度为 `profile.quota_limit` 或默认 5
   - 防止缺失数据的情况
 
 #### D. RPC 函数 - 多重载支持
+
 - ✅ **修复**: 保留两个函数重载以确保向后兼容:
   1. **主函数** `fn_consume_report_credit(p_user_id, p_symbol, p_metadata)`
      - 消费 1 个额度
@@ -46,10 +50,12 @@
      - 返回相同结构
 
 #### E. 索引与策略
+
 - ✅ 创建必要的索引以优化查询性能
 - ✅ 配置 RLS 策略确保数据安全
 
 **关键 SQL 操作**:
+
 ```sql
 -- 回填 report_credits 表（聚合所有事件）
 INSERT INTO public.report_credits (user_id, credits_available, credits_used, ...)
@@ -98,6 +104,7 @@ CREATE FUNCTION fn_consume_report_credit(
 #### a) `/api/report/credits` (app/api/report/credits/route.ts)
 
 **变更内容**:
+
 - 从 `report_credits` 表 → **从 `v_user_quota` 视图查询**
 - 字段: `credits_available` → **`remaining_credits`**
 - 返回结构: 简化为只返回 `remaining_credits`（一致性与视图定义）
@@ -156,6 +163,7 @@ return data.remaining_credits ?? 0;
 #### c) `/api/report` 路由
 
 **现有验证**:
+
 - ✅ 已在使用 `v_user_quota.remaining_credits` 进行配额检查（第 151-155 行）
 - ✅ 配额不足返回 429 状态码
 - ✅ 调用 `consumeReportCredit` 获取 `remainingCredits` 并返回给前端
@@ -192,6 +200,7 @@ Test Files  8 passed (8)
 ```
 
 **修复验证**:
+
 - ✅ 事件聚合算法验证：SUM(all deltas) 正确计算 remaining_credits
 - ✅ 数据回填正确性：credits_used 为负数 delta 的绝对值总和（非计数）
 - ✅ 触发器功能：新用户自动创建 report_credits 行
@@ -199,6 +208,7 @@ Test Files  8 passed (8)
 - ✅ 没有回归：所有现有测试继续通过
 
 特别注意:
+
 - `getRemainingCredits` 函数已测试，所有相关测试通过
 - 配额检查和消费逻辑验证成功
 - 前端集成测试通过（ReportGeneratorSection）
@@ -208,21 +218,25 @@ Test Files  8 passed (8)
 待执行的 Hosted 环境验证步骤:
 
 - [ ] 使用 Supabase CLI 链接 Hosted 项目
+
   ```bash
   npx supabase link --project-ref inmtounwqcjwsxkfnsfd
   ```
 
 - [ ] 应用迁移到 Hosted
+
   ```bash
   npx supabase db push
   ```
 
 - [ ] 生成/同步 TypeScript 类型
+
   ```bash
   npx supabase gen types typescript --linked --schema public > types/database.ts
   ```
 
 - [ ] SQL 验证脚本（在 Hosted 上执行）:
+
   ```sql
   -- 检查 report_credits 表
   SELECT * FROM report_credits LIMIT 5;
@@ -243,11 +257,11 @@ Test Files  8 passed (8)
 
 ## 文件变更总结
 
-| 文件 | 变更类型 | 说明 |
-|------|---------|------|
-| `supabase/migrations/20251128000003_sync_quota_schema.sql` | 新增 | Schema 迁移文件 |
-| `app/api/report/credits/route.ts` | 修改 | 改为从 v_user_quota 查询 |
-| `lib/services/quota.ts` | 修改 | getRemainingCredits 改为从视图查询 |
+| 文件                                                       | 变更类型 | 说明                               |
+| ---------------------------------------------------------- | -------- | ---------------------------------- |
+| `supabase/migrations/20251128000003_sync_quota_schema.sql` | 新增     | Schema 迁移文件                    |
+| `app/api/report/credits/route.ts`                          | 修改     | 改为从 v_user_quota 查询           |
+| `lib/services/quota.ts`                                    | 修改     | getRemainingCredits 改为从视图查询 |
 
 ## 已完成的验收标准
 

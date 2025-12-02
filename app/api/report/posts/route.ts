@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const postsWithCover = await attachSignedCover(data as any ?? []);
+    const postsWithCover = await attachSignedCover((data as any) ?? []);
 
     const response = NextResponse.json({
       posts: postsWithCover,
@@ -85,10 +85,7 @@ export async function GET(request: NextRequest) {
     return context.applyCookies(response);
   } catch (err) {
     console.error("Error listing report posts:", err);
-    const response = NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    const response = NextResponse.json({ error: "Internal server error" }, { status: 500 });
     return context.applyCookies(response);
   }
 }

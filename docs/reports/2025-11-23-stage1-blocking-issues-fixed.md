@@ -7,6 +7,7 @@
 ### ✅ 已修复
 
 #### 1. **Schema Migration 完整性** ✅
+
 - **文件**: `supabase/migrations/20251123000001_init_schema.sql`
 - **修复内容**:
   - ✅ 扩展 profiles 表字段：`plan`, `quota_limit`, `reports_used`, `stripe_customer_id`, `stripe_subscription_id`, `last_report_at`
@@ -21,6 +22,7 @@
   - ✅ 完整的 RLS 策略（用户自服务 + service_role 后端操作）
 
 #### 2. **Supabase SDK 依赖** ✅
+
 - **文件**: `package.json`
 - **修复内容**:
   - ✅ 安装 `@supabase/auth-helpers-nextjs@^0.10.8`
@@ -29,6 +31,7 @@
   - ✅ 删除 `@next-auth/prisma-adapter`、`next-auth` 依赖
 
 #### 3. **TypeScript 类型定义** ✅
+
 - **文件**: `types/database.ts`
 - **修复内容**:
   - ✅ 更新所有表的 Row 类型以匹配新 schema
@@ -39,6 +42,7 @@
   - ✅ 新增 Views 定义：`v_user_quota`
 
 #### 4. **登录页面集成** ✅
+
 - **文件**: `app/(auth)/login/page.tsx`
 - **修复内容**:
   - ✅ 已使用 useSupabaseAuth hook（signInWithEmail, signInWithProvider）
@@ -47,6 +51,7 @@
   - 注：dev login 部分包含旧 NextAuth 代码，但与主流程分离
 
 #### 5. **账户页面集成** ✅
+
 - **文件**: `app/account/page.tsx`
 - **修复内容**:
   - ✅ 已集成 useSupabaseAuth（user, isAuthenticated, signOut, getReportCredits）
@@ -54,6 +59,7 @@
   - ✅ 配额显示已集成（点击刷新按钮获取最新数据）
 
 #### 6. **OAuth 回调处理** ✅
+
 - **文件**: `app/api/auth/callback/route.ts`
 - **修复内容**:
   - ✅ 替换 `createServerComponentClient` → `createRouteHandlerClient`（适用于 Route Handler）
@@ -61,6 +67,7 @@
   - ✅ 错误处理完整，失败不影响登录流
 
 #### 7. **NextAuth 清理** ✅
+
 - **删除的文件/目录**:
   - ✅ `app/api/auth/[...nextauth]/` 目录
   - ✅ `hooks/useAuth.ts` 旧 hook
@@ -69,6 +76,7 @@
   - ✅ `package.json` 删除 NextAuth 依赖
 
 #### 8. **.env.local.example 更新** ✅
+
 - **文件**: `.env.local.example`
 - **修复内容**:
   - ✅ 新增 Supabase 变量：
@@ -84,12 +92,14 @@
 ## ⚙️ 验证结果
 
 ### npm run lint
+
 ```
 ✅ 0 新错误
 ✅ 17 个预存警告（不相关）
 ```
 
 ### npm run test:ci
+
 ```
 ✅ Test Files: 2 passed (2)
 ✅ Total Tests: 5 passed (5)
@@ -98,6 +108,7 @@
 ```
 
 ### Supabase CLI
+
 ```
 $ npx supabase --version
 2.58.5
@@ -107,29 +118,31 @@ $ npx supabase --version
 
 ## 🎯 修复清单
 
-| 项目 | 状态 | 备注 |
-|------|------|------|
-| Schema 完整性 | ✅ | 所有表、字段、RPC、RLS 完整 |
-| SDK 依赖 | ✅ | 完整安装，NextAuth 已删除 |
-| Types 定义 | ✅ | 100% 匹配 schema |
-| 登录页 | ✅ | 使用 useSupabaseAuth |
-| 账户页 | ✅ | 使用 useSupabaseAuth |
-| 回调处理 | ✅ | 使用 createRouteHandlerClient + RPC |
-| NextAuth 清理 | ✅ | 删除所有残留文件和依赖 |
-| 环境变量示例 | ✅ | Supabase 变量完整 |
-| 测试 | ✅ | 5/5 通过，0 新错误 |
-| Git 提交 | ✅ | 已推送到 origin/feat/supabase-integration |
+| 项目          | 状态 | 备注                                      |
+| ------------- | ---- | ----------------------------------------- |
+| Schema 完整性 | ✅   | 所有表、字段、RPC、RLS 完整               |
+| SDK 依赖      | ✅   | 完整安装，NextAuth 已删除                 |
+| Types 定义    | ✅   | 100% 匹配 schema                          |
+| 登录页        | ✅   | 使用 useSupabaseAuth                      |
+| 账户页        | ✅   | 使用 useSupabaseAuth                      |
+| 回调处理      | ✅   | 使用 createRouteHandlerClient + RPC       |
+| NextAuth 清理 | ✅   | 删除所有残留文件和依赖                    |
+| 环境变量示例  | ✅   | Supabase 变量完整                         |
+| 测试          | ✅   | 5/5 通过，0 新错误                        |
+| Git 提交      | ✅   | 已推送到 origin/feat/supabase-integration |
 
 ---
 
 ## 📊 CAVR 总结
 
 ### Context（上下文）
+
 - **源头**: Codex 在 Stage 1 审查中指出的 6 个阻断问题
 - **范围**: 完整修复 Schema、依赖、页面集成、auth 处理
 - **时间**: 2025-11-23 23:00-23:26 UTC（26 分钟）
 
 ### Actions（执行的修复）
+
 1. ✅ 补充 Schema migration（profiles 扩展字段、新表、RPC、RLS）
 2. ✅ 更新 types/database.ts（所有新字段、函数签名、视图定义）
 3. ✅ 修复 callback route（createRouteHandlerClient、RPC 调用）
@@ -138,12 +151,14 @@ $ npx supabase --version
 6. ✅ 验证 lint/test/CLI 版本
 
 ### Verification（验证）
+
 - ✅ npm run lint: 0 新错误，17 预存警告
 - ✅ npm run test:ci: 5/5 测试通过 (100%)
 - ✅ npx supabase --version: 2.58.5
 - ✅ Git 提交：7e58b56（feat: complete Supabase integration Stage 1 blocking issues）
 
 ### Risks（风险和遗留项）
+
 1. **已解决**:
    - ✅ Schema 不完整 → 补充完整
    - ✅ NextAuth 残留 → 全部删除
@@ -160,12 +175,14 @@ $ npx supabase --version
 ## 🚀 下一步
 
 ### Codex 需要做
+
 1. **复审本次修复** (15-20 min)
    - 检查 Schema migration 完整性
    - 验证 callback route 安全性
    - 确认 types/database.ts 匹配
 
 2. **本地验证** (30-45 min)
+
    ```bash
    git checkout feat/supabase-integration
    npm install
@@ -186,6 +203,7 @@ $ npx supabase --version
    - 启动 PR #2 (Report API RPC 集成)
 
 ### Claude 待做
+
 - 🔄 根据 Codex 反馈修复（如有）
 - 📸 补充本地验证截图/录屏（可选）
 - 📝 启动 Stage 2 文档（Report API）
@@ -234,4 +252,4 @@ feat/supabase-integration 分支:
 
 ---
 
-*本报告采用 CAVR 规范编写，遵循 CODEX_CLAUDE_COLLAB.md 第 4-6 节标准。*
+_本报告采用 CAVR 规范编写，遵循 CODEX_CLAUDE_COLLAB.md 第 4-6 节标准。_

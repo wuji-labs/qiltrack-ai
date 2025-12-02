@@ -13,10 +13,13 @@ gh pr create \
 ## 手动创建（Web UI）
 
 ### 步骤 1: 打开 GitHub
+
 访问: https://github.com/explore0012/ai-report/compare/main...feat/supabase-deployment
 
 ### 步骤 2: 填写 PR 信息
+
 - **Title**:
+
   ```
   feat: Hosted Supabase deployment - schema alignment, CLI migration & verification
   ```
@@ -24,13 +27,16 @@ gh pr create \
 - **Description**: 复制 `PR_CONTENT.md` 的全部内容（或下方内容）
 
 ### 步骤 3: 创建 PR
+
 点击绿色 "Create pull request" 按钮
 
 ### 步骤 4: 等待 CI
+
 - GitHub Actions 自动运行 lint/test（应全部通过）
 - 显示 "All checks passed" 后可合并
 
 ### 步骤 5: 合并 PR
+
 - 点击 "Merge pull request"
 - 选择合并方式（推荐 "Create a merge commit"）
 - 确认合并
@@ -114,10 +120,9 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ## 快速参考
 
-| 内容 | 链接 |
-|------|------|
+| 内容     | 链接                                                                             |
+| -------- | -------------------------------------------------------------------------------- |
 | 对比查看 | https://github.com/explore0012/ai-report/compare/main...feat/supabase-deployment |
-| PR 内容 | 项目根目录 `PR_CONTENT.md` |
-| 技术文档 | `docs/reports/2025-11-24-supabase-deployment-cavr.md` |
-| 交接清单 | `FINAL_HANDOFF_CHECKLIST.md` |
-
+| PR 内容  | 项目根目录 `PR_CONTENT.md`                                                       |
+| 技术文档 | `docs/reports/2025-11-24-supabase-deployment-cavr.md`                            |
+| 交接清单 | `FINAL_HANDOFF_CHECKLIST.md`                                                     |

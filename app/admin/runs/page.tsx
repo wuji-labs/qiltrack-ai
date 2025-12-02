@@ -6,22 +6,23 @@ import { createClient } from "@/lib/supabase/client";
 interface ReportRun {
   id: string;
   user_id: string;
-  symbol: string;
-  tone?: string;
-  language?: string;
-  status: string;
-  model?: string;
-  duration_ms?: number;
-  error?: string;
-  markdown_path?: string;
-  docx_path?: string;
-  created_at: string;
-  updated_at: string;
+  template_id?: string;
+  symbol: string | null;
+  tone?: string | null;
+  language?: string | null;
+  status: string | null;
+  model?: string | null;
+  duration_ms?: number | null;
+  error?: string | null;
+  markdown_path?: string | null;
+  docx_path?: string | null;
+  created_at: string | null;
+  updated_at: string | null;
   profiles?: {
     email: string;
-    display_name?: string;
+    display_name?: string | null;
   };
-  company_snapshot?: Record<string, unknown>;
+  company_snapshot?: unknown;
 }
 
 export default function ReportRunsPage() {
@@ -45,10 +46,13 @@ export default function ReportRunsPage() {
     try {
       let query = supabase
         .from("report_runs")
-        .select(`
+        .select(
+          `
           *,
           profiles:user_id(email, display_name)
-        `, { count: "exact" })
+        `,
+          { count: "exact" }
+        )
         .order("created_at", { ascending: false })
         .range((page - 1) * pageSize, page * pageSize - 1);
 
@@ -70,11 +74,11 @@ export default function ReportRunsPage() {
     }
   }
 
-  const filteredRuns = runs.filter(run => {
+  const filteredRuns = runs.filter((run) => {
     if (!searchTerm) return true;
     const searchLower = searchTerm.toLowerCase();
     return (
-      run.symbol.toLowerCase().includes(searchLower) ||
+      run.symbol?.toLowerCase().includes(searchLower) ||
       run.profiles?.email.toLowerCase().includes(searchLower) ||
       run.profiles?.display_name?.toLowerCase().includes(searchLower)
     );
@@ -82,7 +86,7 @@ export default function ReportRunsPage() {
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  function getStatusColor(status: string) {
+  function getStatusColor(status: string | null) {
     switch (status) {
       case "completed":
         return "bg-green-100 text-green-800";
@@ -97,7 +101,7 @@ export default function ReportRunsPage() {
     }
   }
 
-  function formatDuration(ms?: number) {
+  function formatDuration(ms?: number | null) {
     if (!ms) return "-";
     if (ms < 1000) return `${ms}ms`;
     if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
@@ -108,9 +112,7 @@ export default function ReportRunsPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">生成记录</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          查看所有报告生成记录,包括成功和失败的记录
-        </p>
+        <p className="mt-2 text-sm text-gray-600">查看所有报告生成记录,包括成功和失败的记录</p>
       </div>
 
       {/* 统计概览 */}
@@ -122,19 +124,19 @@ export default function ReportRunsPage() {
         <div className="bg-white shadow rounded-lg p-4">
           <div className="text-sm text-gray-600">成功</div>
           <div className="text-2xl font-bold text-green-600">
-            {runs.filter(r => r.status === "completed").length}
+            {runs.filter((r) => r.status === "completed").length}
           </div>
         </div>
         <div className="bg-white shadow rounded-lg p-4">
           <div className="text-sm text-gray-600">失败</div>
           <div className="text-2xl font-bold text-red-600">
-            {runs.filter(r => r.status === "failed").length}
+            {runs.filter((r) => r.status === "failed").length}
           </div>
         </div>
         <div className="bg-white shadow rounded-lg p-4">
           <div className="text-sm text-gray-600">进行中</div>
           <div className="text-2xl font-bold text-blue-600">
-            {runs.filter(r => r.status === "running" || r.status === "pending").length}
+            {runs.filter((r) => r.status === "running" || r.status === "pending").length}
           </div>
         </div>
       </div>
@@ -220,9 +222,7 @@ export default function ReportRunsPage() {
                     filteredRuns.map((run) => (
                       <tr key={run.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
-                            {run.symbol}
-                          </div>
+                          <div className="text-sm font-medium text-gray-900">{run.symbol}</div>
                           <div className="text-xs text-gray-500">
                             {run.language || "en"} / {run.tone || "professional"}
                           </div>
@@ -249,7 +249,7 @@ export default function ReportRunsPage() {
                           {formatDuration(run.duration_ms)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(run.created_at).toLocaleString('zh-CN')}
+                          {run.created_at ? new Date(run.created_at).toLocaleString("zh-CN") : "-"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <button
@@ -288,9 +288,7 @@ export default function ReportRunsPage() {
                 <div>
                   <p className="text-sm text-gray-700">
                     显示第 <span className="font-medium">{(page - 1) * pageSize + 1}</span> 到{" "}
-                    <span className="font-medium">
-                      {Math.min(page * pageSize, totalCount)}
-                    </span>{" "}
+                    <span className="font-medium">{Math.min(page * pageSize, totalCount)}</span>{" "}
                     条,共 <span className="font-medium">{totalCount}</span> 条记录
                   </p>
                 </div>
@@ -336,7 +334,12 @@ export default function ReportRunsPage() {
                   className="text-gray-400 hover:text-gray-600"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -374,44 +377,55 @@ export default function ReportRunsPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">风格</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedRun.tone || "professional"}</p>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {selectedRun.tone || "professional"}
+                    </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">耗时</label>
-                    <p className="mt-1 text-sm text-gray-900">{formatDuration(selectedRun.duration_ms)}</p>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {formatDuration(selectedRun.duration_ms)}
+                    </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">创建时间</label>
                     <p className="mt-1 text-sm text-gray-900">
-                      {new Date(selectedRun.created_at).toLocaleString('zh-CN')}
+                      {selectedRun.created_at
+                        ? new Date(selectedRun.created_at).toLocaleString("zh-CN")
+                        : "-"}
                     </p>
                   </div>
                 </div>
 
                 {/* 文件路径 */}
-                {(selectedRun.markdown_path || selectedRun.docx_path) && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">生成文件</label>
-                    <div className="space-y-2">
-                      {selectedRun.markdown_path && (
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs text-gray-500">Markdown:</span>
-                          <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                            {selectedRun.markdown_path}
-                          </code>
-                        </div>
-                      )}
-                      {selectedRun.docx_path && (
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs text-gray-500">DOCX:</span>
-                          <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                            {selectedRun.docx_path}
-                          </code>
-                        </div>
-                      )}
+                {(() => {
+                  const hasFiles = Boolean(selectedRun.markdown_path) || Boolean(selectedRun.docx_path);
+                  if (!hasFiles) return null;
+
+                  return (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">生成文件</label>
+                      <div className="space-y-2">
+                        {selectedRun.markdown_path && (
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs text-gray-500">Markdown:</span>
+                            <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                              {String(selectedRun.markdown_path)}
+                            </code>
+                          </div>
+                        )}
+                        {selectedRun.docx_path && (
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs text-gray-500">DOCX:</span>
+                            <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                              {String(selectedRun.docx_path)}
+                            </code>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
 
                 {/* 错误信息 */}
                 {selectedRun.error && (
@@ -426,9 +440,11 @@ export default function ReportRunsPage() {
                 )}
 
                 {/* 公司快照数据 */}
-                {selectedRun.company_snapshot && (
+                {Boolean(selectedRun.company_snapshot) && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">公司快照数据</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      公司快照数据
+                    </label>
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 max-h-96 overflow-y-auto">
                       <pre className="text-xs text-gray-900">
                         {JSON.stringify(selectedRun.company_snapshot, null, 2)}

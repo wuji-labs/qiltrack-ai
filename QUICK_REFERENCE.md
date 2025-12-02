@@ -30,6 +30,7 @@ SUPABASE_SERVICE_ROLE_KEY=<paste-from-dashboard>
 ```
 
 验证：
+
 ```bash
 grep "PASTE_" .env.local  # 无输出 = 成功
 ```
@@ -50,6 +51,7 @@ npx supabase gen types typescript --linked --schema public > types/database.ts
 ```
 
 预期输出：
+
 ```
 ✓ Linked to remote project: inmtounwqcjwsxkfnsfd
 ✓ 20251123000001_init_schema.sql
@@ -85,6 +87,7 @@ npm run dev
 ```
 
 预期：
+
 ```
 ✓ ESLint: 0 errors
 ✓ Tests: 34/34 passing
@@ -125,13 +128,13 @@ git push origin feat/supabase-deployment
 
 ## ⚠️ 常见问题速查
 
-| 问题 | 解决 |
-|------|------|
-| `supabase: command not found` | `npm install -g supabase@latest` |
-| `Link failed: invalid token` | 检查凭证是否正确复制（无多余空格） |
-| `Migration already applied` | 正常，幂等性保证 |
-| `Type mismatch in types/database.ts` | 比对差异，确认无关键变更 |
-| `.env.local` 被 git 追踪 | 运行 `git rm --cached .env.local` |
+| 问题                                 | 解决                               |
+| ------------------------------------ | ---------------------------------- |
+| `supabase: command not found`        | `npm install -g supabase@latest`   |
+| `Link failed: invalid token`         | 检查凭证是否正确复制（无多余空格） |
+| `Migration already applied`          | 正常，幂等性保证                   |
+| `Type mismatch in types/database.ts` | 比对差异，确认无关键变更           |
+| `.env.local` 被 git 追踪             | 运行 `git rm --cached .env.local`  |
 
 ---
 
@@ -159,4 +162,3 @@ Deployment:   ⏸️ Ready after credentials
 ---
 
 **⏱️ 预计总耗时**: 30-45 分钟（凭证到位后）
-

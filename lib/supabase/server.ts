@@ -32,17 +32,14 @@ export function createServerClient(
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL in environment variables"
-    );
+    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL in environment variables");
   }
   if (!supabaseAnonKey) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_ANON_KEY in environment variables"
-    );
+    throw new Error("Missing NEXT_PUBLIC_SUPABASE_ANON_KEY in environment variables");
   }
 
-  const isStore = typeof cookieSource === "object" && cookieSource !== null && "getAll" in cookieSource;
+  const isStore =
+    typeof cookieSource === "object" && cookieSource !== null && "getAll" in cookieSource;
   const cookieStore = isStore ? (cookieSource as CookieStore) : null;
   const cookieGetter = isStore ? undefined : (cookieSource as CookieGetter);
 
@@ -50,16 +47,15 @@ export function createServerClient(
   const getAllCookies = () => {
     if (cookieStore) {
       const allCookies = cookieStore.getAll().map(({ name, value }) => ({ name, value }));
-      console.log("[DEBUG createServerClient] getAllCookies returned:", allCookies.length, "cookies");
+      console.log(
+        "[DEBUG createServerClient] getAllCookies returned:",
+        allCookies.length,
+        "cookies"
+      );
       return allCookies;
     }
 
-    const commonNames = [
-      "sb-auth-token",
-      "sb-session",
-      "sb_auth_token",
-      "sb_session",
-    ];
+    const commonNames = ["sb-auth-token", "sb-session", "sb_auth_token", "sb_session"];
     const cookieList: Array<{ name: string; value: string }> = [];
     for (const name of commonNames) {
       const cookie = cookieGetter?.(name);
@@ -67,7 +63,11 @@ export function createServerClient(
         cookieList.push({ name, value: cookie.value });
       }
     }
-    console.log("[DEBUG createServerClient] getAllCookies (fallback) returned:", cookieList.length, "cookies");
+    console.log(
+      "[DEBUG createServerClient] getAllCookies (fallback) returned:",
+      cookieList.length,
+      "cookies"
+    );
     return cookieList;
   };
 
@@ -96,14 +96,10 @@ export function createServiceRoleClient() {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL in environment variables"
-    );
+    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL in environment variables");
   }
   if (!serviceRoleKey) {
-    throw new Error(
-      "Missing SUPABASE_SERVICE_ROLE_KEY in environment variables"
-    );
+    throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY in environment variables");
   }
 
   return createSupabaseClient<Database>(supabaseUrl, serviceRoleKey, {
@@ -150,9 +146,7 @@ export async function uploadToStorage(
  * Helper to get user's session from request cookies
  * Returns user ID if authenticated, null otherwise
  */
-export async function getUserIdFromRequest(
-  supabase: ReturnType<typeof createServerClient>
-) {
+export async function getUserIdFromRequest(supabase: ReturnType<typeof createServerClient>) {
   const {
     data: { session },
   } = await supabase.auth.getSession();

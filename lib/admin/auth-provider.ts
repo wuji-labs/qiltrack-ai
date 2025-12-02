@@ -83,7 +83,7 @@ export const authProvider: AuthProvider = {
       .eq("id", session.user.id)
       .single();
 
-    if (!profile || (profile.role !== "admin" && profile.role !== "superadmin")) {
+    if (!profile || profile.role !== "admin") {
       return {
         authenticated: false,
         redirectTo: "/",
@@ -130,7 +130,7 @@ export const authProvider: AuthProvider = {
 
     return {
       id: user.id,
-      name: profile?.display_name || profile?.full_name || user.email,
+      name: profile?.display_name || user.email,
       email: user.email,
       avatar: profile?.avatar_url,
       role: profile?.role,

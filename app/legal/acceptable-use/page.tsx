@@ -70,7 +70,11 @@ export default function AcceptableUsePage() {
 
         <div className="text-xs text-slate-500 space-y-2">
           <p>
-            如需申诉或说明用途，请邮件 <a className="text-emerald-300" href="mailto:legal@investor.ai">legal@investor.ai</a> 与我们联系。
+            如需申诉或说明用途，请邮件{" "}
+            <a className="text-emerald-300" href="mailto:legal@investor.ai">
+              legal@investor.ai
+            </a>{" "}
+            与我们联系。
           </p>
           <div className="inline-flex flex-wrap items-center gap-2 text-emerald-300 text-xs">
             <span aria-hidden className="text-sm opacity-80">

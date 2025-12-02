@@ -1,10 +1,4 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[];
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export interface Database {
   public: {
@@ -113,7 +107,7 @@ export interface Database {
             columns: ["author_id"];
             referencedRelation: "profiles";
             referencedColumns: ["id"];
-          }
+          },
         ];
       };
       user_report_uploads: {
@@ -155,7 +149,7 @@ export interface Database {
             columns: ["user_id"];
             referencedRelation: "profiles";
             referencedColumns: ["id"];
-          }
+          },
         ];
       };
       report_runs: {
@@ -224,7 +218,7 @@ export interface Database {
             columns: ["user_id"];
             referencedRelation: "profiles";
             referencedColumns: ["id"];
-          }
+          },
         ];
       };
       report_documents: {
@@ -254,7 +248,7 @@ export interface Database {
             columns: ["report_run_id"];
             referencedRelation: "report_runs";
             referencedColumns: ["id"];
-          }
+          },
         ];
       };
       report_credits: {
@@ -290,7 +284,7 @@ export interface Database {
             columns: ["user_id"];
             referencedRelation: "profiles";
             referencedColumns: ["id"];
-          }
+          },
         ];
       };
       report_credit_events: {
@@ -329,7 +323,7 @@ export interface Database {
             columns: ["user_id"];
             referencedRelation: "profiles";
             referencedColumns: ["id"];
-          }
+          },
         ];
       };
     };

@@ -16,12 +16,14 @@
 2. 新建查询，复制以下 SQL 并执行（分段执行以便观察进度）：
 
 ### SQL 1: 添加 mode 列到 report_runs
+
 ```sql
 ALTER TABLE public.report_runs
 ADD COLUMN IF NOT EXISTS mode TEXT DEFAULT 'production';
 ```
 
 ### SQL 2: 迁移 report_documents（3 步）
+
 ```sql
 -- Step 1: 添加新列
 ALTER TABLE public.report_documents
@@ -61,6 +63,7 @@ DROP COLUMN IF EXISTS docx_summary;
 ```
 
 ### SQL 3: 添加审计字段到 report_credit_events
+
 ```sql
 ALTER TABLE public.report_credit_events
 ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT NULL,
@@ -68,6 +71,7 @@ ADD COLUMN IF NOT EXISTS delta INT;
 ```
 
 ### SQL 4: 修改 RPC 函数返回字段
+
 ```sql
 CREATE OR REPLACE FUNCTION public.fn_consume_report_credit(
   p_user_id UUID,
@@ -93,6 +97,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 ### SQL 5: 验证 Schema
+
 ```sql
 -- 确认新列存在
 SELECT column_name, data_type FROM information_schema.columns
@@ -111,6 +116,7 @@ SELECT proname FROM pg_proc WHERE proname = 'fn_consume_report_credit';
 ## 方案 B：pgAdmin 或 psql（如需更多控制）
 
 如已获取 Hosted 数据库连接信息：
+
 ```bash
 psql "postgresql://postgres:z/uHvR#5Bc-+gXB@db.inmtounwqcjwsxkfnsfd.supabase.co:5432/postgres" \
   -f supabase/migrations/20251124000002_align_hosted_schema.sql
@@ -121,6 +127,7 @@ psql "postgresql://postgres:z/uHvR#5Bc-+gXB@db.inmtounwqcjwsxkfnsfd.supabase.co:
 ## 后续步骤（Claude 执行）
 
 ### 1. 生成类型（执行迁移后）
+
 ```bash
 # 使用 Supabase CLI 生成
 npx supabase gen types typescript --project-id inmtounwqcjwsxkfnsfd > types/database.ts
@@ -132,17 +139,20 @@ curl -X POST "https://inmtounwqcjwsxkfnsfd.supabase.co/rest/v1/rpc/introspect" \
 ```
 
 ### 2. 创建存储桶（Dashboard UI）
+
 - 路径: Dashboard → Storage → Create new bucket
 - 名称: `report-assets`
 - 可见性: Private
 - 点击 Create
 
 ### 3. 配置 RLS 策略（Dashboard UI）
+
 - 进入 `report-assets` 桶
 - 点击 Policies
 - 添加策略：Role = service_role, 所有权限
 
 ### 4. 本地验证（迁移完成后）
+
 ```bash
 npm run lint        # expect: 0 errors
 npm test            # expect: 34/34 passing
@@ -157,9 +167,9 @@ curl "http://localhost:3000/api/report/credits?testToken=test-token-12345"
 ## 验收标准
 
 迁移完成后应满足：
+
 - ✅ `report_runs.mode` 列存在
 - ✅ `report_documents` 包含 report_run_id, document_type, storage_path（无旧列）
 - ✅ `v_user_quota` 视图可查询
 - ✅ `/api/report/credits` 返回 `{ remaining_credits: number }`
 - ✅ 本地 lint/test 全通过
-

@@ -59,6 +59,7 @@ WHERE id = 'your-user-id';
 **路径**: `/admin/users`
 
 #### 功能
+
 - 📋 查看所有注册用户
 - 🔍 按邮箱、用户名搜索
 - 📊 查看用户积分余额
@@ -66,18 +67,19 @@ WHERE id = 'your-user-id';
 
 #### 用户信息字段
 
-| 字段 | 说明 | 示例 |
-|------|------|------|
-| `id` | 用户 UUID | `123e4567-e89b-12d3-a456-426614174000` |
-| `email` | 邮箱地址 | `user@example.com` |
-| `role` | 用户角色 | `user` / `admin` / `superadmin` |
-| `created_at` | 注册时间 | `2025-12-01T10:00:00Z` |
+| 字段         | 说明      | 示例                                   |
+| ------------ | --------- | -------------------------------------- |
+| `id`         | 用户 UUID | `123e4567-e89b-12d3-a456-426614174000` |
+| `email`      | 邮箱地址  | `user@example.com`                     |
+| `role`       | 用户角色  | `user` / `admin` / `superadmin`        |
+| `created_at` | 注册时间  | `2025-12-01T10:00:00Z`                 |
 
 ### 查看用户详情
 
 **路径**: `/admin/users/[id]`
 
 点击用户列表中的「查看」按钮，可以查看：
+
 - 基本信息
 - 积分余额
 - 报告生成历史
@@ -88,6 +90,7 @@ WHERE id = 'your-user-id';
 **路径**: `/admin/users/[id]/edit`
 
 可编辑字段：
+
 - ✅ 用户角色 (`role`)
 - ✅ 用户名 (`username`)
 - ❌ 邮箱 (通过 Supabase Auth 管理)
@@ -97,7 +100,7 @@ WHERE id = 'your-user-id';
 
 ```typescript
 // 在编辑页面
-role: "admin"  // 从下拉选择
+role: "admin"; // 从下拉选择
 ```
 
 ---
@@ -109,6 +112,7 @@ role: "admin"  // 从下拉选择
 **路径**: `/admin/credits`
 
 #### 功能
+
 - 📋 查看所有用户的积分余额
 - 📊 查看积分使用情况
 - ➕ 授予用户积分
@@ -116,13 +120,13 @@ role: "admin"  // 从下拉选择
 
 #### 积分信息字段
 
-| 字段 | 说明 |
-|------|------|
-| `user_id` | 用户 ID |
-| `credits_available` | 可用积分 |
-| `credits_used` | 已使用积分 |
+| 字段                | 说明             |
+| ------------------- | ---------------- |
+| `user_id`           | 用户 ID          |
+| `credits_available` | 可用积分         |
+| `credits_used`      | 已使用积分       |
 | `last_daily_reward` | 上次每日奖励时间 |
-| `streak_count` | 连续签到天数 |
+| `streak_count`      | 连续签到天数     |
 
 ### 授予积分
 
@@ -146,6 +150,7 @@ role: "admin"  // 从下拉选择
 ```
 
 **注意事项**：
+
 - ✅ 积分数量必须为正整数
 - ✅ 系统会自动记录操作到审计日志
 - ✅ 系统会自动创建积分交易记录
@@ -156,6 +161,7 @@ role: "admin"  // 从下拉选择
 **路径**: `/admin/credits` → 点击用户 → 「交易记录」
 
 显示信息：
+
 - 交易类型（`earn`, `consume`, `grant`, `refund`）
 - 交易金额
 - 交易时间
@@ -171,6 +177,7 @@ role: "admin"  // 从下拉选择
 **路径**: `/admin/reports`
 
 #### 功能
+
 - 📋 查看所有生成的报告
 - 🔍 按股票代码、用户搜索
 - 📊 查看报告状态
@@ -178,19 +185,20 @@ role: "admin"  // 从下拉选择
 
 #### 报告信息字段
 
-| 字段 | 说明 |
-|------|------|
-| `id` | 报告 Run ID |
-| `user_id` | 生成用户 |
-| `symbol` | 股票代码 |
-| `language` | 语言 |
-| `tone` | 报告风格 |
-| `status` | 报告状态 (`completed`, `failed`) |
-| `created_at` | 生成时间 |
+| 字段         | 说明                             |
+| ------------ | -------------------------------- |
+| `id`         | 报告 Run ID                      |
+| `user_id`    | 生成用户                         |
+| `symbol`     | 股票代码                         |
+| `language`   | 语言                             |
+| `tone`       | 报告风格                         |
+| `status`     | 报告状态 (`completed`, `failed`) |
+| `created_at` | 生成时间                         |
 
 ### 查看报告内容
 
 点击报告列表中的「查看」按钮：
+
 - 查看完整报告内容
 - 查看市场数据快照
 - 查看生成参数
@@ -198,12 +206,14 @@ role: "admin"  // 从下拉选择
 ### 删除报告
 
 **注意事项**：
+
 - ⚠️ 删除报告不会返还用户积分
 - ⚠️ 删除操作不可逆
 - ✅ 删除会记录到审计日志
 - ✅ 会同时删除 Storage 中的 JSON 文件
 
 **步骤**：
+
 1. 找到需要删除的报告
 2. 点击「删除」按钮
 3. 确认删除
@@ -218,26 +228,26 @@ role: "admin"  // 从下拉选择
 
 #### 日志类型
 
-| 类型 | 说明 |
-|------|------|
-| `report.generated` | 报告生成成功 |
-| `report.failed` | 报告生成失败 |
-| `credits.granted` | 管理员授予积分 |
-| `credits.consumed` | 用户消费积分 |
-| `user.role_changed` | 用户角色变更 |
-| `report.deleted` | 报告被删除 |
+| 类型                | 说明           |
+| ------------------- | -------------- |
+| `report.generated`  | 报告生成成功   |
+| `report.failed`     | 报告生成失败   |
+| `credits.granted`   | 管理员授予积分 |
+| `credits.consumed`  | 用户消费积分   |
+| `user.role_changed` | 用户角色变更   |
+| `report.deleted`    | 报告被删除     |
 
 #### 日志字段
 
 ```typescript
 {
-  id: string;                    // 日志 ID
-  user_id: string;               // 操作用户
-  action: string;                // 操作类型
-  resource_type: string;         // 资源类型
-  resource_id: string;           // 资源 ID
+  id: string; // 日志 ID
+  user_id: string; // 操作用户
+  action: string; // 操作类型
+  resource_type: string; // 资源类型
+  resource_id: string; // 资源 ID
   metadata: Record<string, any>; // 元数据
-  created_at: string;            // 操作时间
+  created_at: string; // 操作时间
 }
 ```
 
@@ -341,6 +351,7 @@ END $$;
 **症状**: 访问 `/admin` 时重定向到首页或显示 403
 
 **可能原因**：
+
 1. 用户角色不是 `admin` 或 `superadmin`
 2. Session 过期
 
@@ -361,6 +372,7 @@ UPDATE profiles SET role = 'admin' WHERE id = 'user-id';
 **症状**: 点击「授予」后显示错误
 
 **可能原因**：
+
 1. 用户不存在
 2. 积分数量无效
 3. RPC 函数权限问题
@@ -385,6 +397,7 @@ WHERE user_id = 'user-id';
 **症状**: Dashboard 显示的统计数据与实际不符
 
 **可能原因**：
+
 1. 缓存问题
 2. 数据库查询错误
 
@@ -402,6 +415,7 @@ window.location.reload();
 **症状**: `/admin/reports` 页面加载超过 5 秒
 
 **可能原因**：
+
 1. 报告数量过多
 2. 缺少索引
 

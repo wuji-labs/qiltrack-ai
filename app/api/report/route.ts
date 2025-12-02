@@ -8,11 +8,7 @@ import { ReportPersistence } from "@/lib/core/reports/persistence";
 import { EmbeddingsManager } from "@/lib/core/reports/embeddings";
 import { ContentSanitizer } from "@/lib/core/reports/content-sanitizer";
 import { handleApiError, successResponse } from "@/lib/api/error-handler";
-import {
-  UnauthorizedError,
-  InsufficientCreditsError,
-  ValidationError,
-} from "@/lib/core/errors";
+import { UnauthorizedError, InsufficientCreditsError, ValidationError } from "@/lib/core/errors";
 import { DEFAULT_LANGUAGE, type Language } from "@/lib/i18n-config";
 import type { ReportTone } from "@/lib/core/reports/types";
 
@@ -23,9 +19,7 @@ function checkTestBypass(request: NextRequest): boolean {
   const testToken = process.env.TEST_REPORT_TOKEN || "local-test-token";
   const tokenFromHeader = request.headers.get("x-test-token");
   const tokenFromQuery = new URL(request.url).searchParams.get("testToken");
-  return Boolean(
-    testToken && (tokenFromHeader === testToken || tokenFromQuery === testToken)
-  );
+  return Boolean(testToken && (tokenFromHeader === testToken || tokenFromQuery === testToken));
 }
 
 /**
@@ -81,12 +75,7 @@ export async function GET(request: NextRequest) {
     // 3. Check for reusable report (within 7 days)
     if (!isTestBypass) {
       const persistence = new ReportPersistence();
-      const existingReport = await persistence.checkReusableReport(
-        symbol,
-        language,
-        tone,
-        userId
-      );
+      const existingReport = await persistence.checkReusableReport(symbol, language, tone, userId);
 
       if (existingReport) {
         console.info(
@@ -140,9 +129,7 @@ export async function GET(request: NextRequest) {
 
     // 6. Extract title from report (first # line)
     const titleMatch = generatedReport.content.match(/^#\s+(.+)$/m);
-    const title =
-      titleMatch?.[1] ||
-      `Investment Analysis Report: ${symbol} (${language})`;
+    const title = titleMatch?.[1] || `Investment Analysis Report: ${symbol} (${language})`;
 
     // 7. Save report to database
     const persistence = new ReportPersistence();
@@ -173,12 +160,7 @@ export async function GET(request: NextRequest) {
       const embeddingsManager = new EmbeddingsManager();
       // Fire and forget
       embeddingsManager
-        .generateEmbeddings(
-          savedReport.report_run_id,
-          generatedReport.content,
-          language,
-          tone
-        )
+        .generateEmbeddings(savedReport.report_run_id, generatedReport.content, language, tone)
         .catch((err) => {
           console.warn("Background embedding generation failed:", err);
         });

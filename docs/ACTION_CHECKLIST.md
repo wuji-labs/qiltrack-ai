@@ -56,6 +56,7 @@ supabase migration up        # 应用所有待处理迁移
 ```
 
 **验证成功**:
+
 ```sql
 -- 在 SQL Editor 运行这些查询
 SELECT column_default FROM information_schema.columns
@@ -87,6 +88,7 @@ SELECT proname FROM pg_proc WHERE proname='fn_claim_daily_reward';
 - [ ] **验证**: 应该显示 **30 积分** ✅
 
 如果显示其他数字:
+
 - 显示 0: 迁移可能未应用，重试第 1 步
 - 显示 1: 清除浏览器缓存重试
 - 显示 5: 触发器未生效，检查迁移日志
@@ -105,21 +107,22 @@ SELECT proname FROM pg_proc WHERE proname='fn_claim_daily_reward';
 - [ ] 复制并运行以下代码:
 
 ```javascript
-fetch('/api/report/daily-reward', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' }
+fetch("/api/report/daily-reward", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
 })
-.then(r => r.json())
-.then(d => {
-  console.log('Response:', d);
-  console.log('Success:', d.success);
-  console.log('Message:', d.message);
-  console.log('Remaining:', d.remainingCredits);
-})
-.catch(e => console.error('Error:', e));
+  .then((r) => r.json())
+  .then((d) => {
+    console.log("Response:", d);
+    console.log("Success:", d.success);
+    console.log("Message:", d.message);
+    console.log("Remaining:", d.remainingCredits);
+  })
+  .catch((e) => console.error("Error:", e));
 ```
 
 **预期输出**:
+
 ```
 Response: Object { success: true, message: "Daily reward claimed", remainingCredits: 40 }
 Success: true
@@ -128,6 +131,7 @@ Remaining: 40
 ```
 
 **验证**:
+
 - [ ] `success` 是 `true`
 - [ ] `remainingCredits` 从 30 增加到 40（+10）
 - [ ] 再运行一次，应该返回错误信息
@@ -147,11 +151,13 @@ Remaining: 40
 找到位置: 首页顶部的配额显示卡片附近
 
 添加状态:
+
 ```typescript
 const [claimingReward, setClaimingReward] = useState(false);
 ```
 
 添加函数:
+
 ```typescript
 const handleClaimDailyReward = async () => {
   if (!isAuthenticated) {
@@ -164,12 +170,12 @@ const handleClaimDailyReward = async () => {
     const result = await claimDailyReward();
     if (result.success) {
       await refreshQuota();
-      alert('每日奖励已领取！');
+      alert("每日奖励已领取！");
     } else {
       alert(result.message);
     }
   } catch (err) {
-    alert('领取失败，请重试');
+    alert("领取失败，请重试");
   } finally {
     setClaimingReward(false);
   }
@@ -177,18 +183,20 @@ const handleClaimDailyReward = async () => {
 ```
 
 添加导入 (在文件顶部):
+
 ```typescript
 import { claimDailyReward } from "@/lib/services/api";
 ```
 
 添加按钮 (在 JSX 中):
+
 ```tsx
 <button
   onClick={handleClaimDailyReward}
   disabled={claimingReward || !isAuthenticated}
   className="rounded-full border border-emerald-400 px-4 py-2 text-sm text-emerald-300 hover:bg-emerald-400/10"
 >
-  {claimingReward ? '正在领取...' : '领取 10 积分'}
+  {claimingReward ? "正在领取..." : "领取 10 积分"}
 </button>
 ```
 
@@ -199,6 +207,7 @@ import { claimDailyReward } from "@/lib/services/api";
 找到位置: 最后一个翻译键的后面（在关闭大括号前）
 
 添加:
+
 ```typescript
 "quota.daily.claim": {
   "en": "Claim 10 credits",
@@ -237,11 +246,13 @@ import { claimDailyReward } from "@/lib/services/api";
 ### 问题 1: 新账号仍显示 0 积分
 
 **可能原因**:
+
 1. 迁移未应用
 2. 缓存问题
 3. 浏览器 Cookie
 
 **解决步骤**:
+
 - [ ] 确认迁移已运行 (查看 Supabase "Migrations" 选项卡)
 - [ ] 用完全新邮箱注册
 - [ ] 用无痕浏览器测试
@@ -250,11 +261,13 @@ import { claimDailyReward } from "@/lib/services/api";
 ### 问题 2: 迁移执行失败
 
 **可能原因**:
+
 1. SQL 语法错误
 2. 权限不足
 3. 表名冲突
 
 **解决步骤**:
+
 - [ ] 查看错误消息详情
 - [ ] 确保复制了完整的 SQL
 - [ ] 检查 `report_credits` 表是否已存在
@@ -263,11 +276,13 @@ import { claimDailyReward } from "@/lib/services/api";
 ### 问题 3: API 返回 500
 
 **可能原因**:
+
 1. `daily_rewards` 表不存在
 2. RLS 策略缺失
 3. 函数权限问题
 
 **解决步骤**:
+
 - [ ] 查看服务器日志
 - [ ] 检查 daily_rewards 表是否存在
 - [ ] 验证 RLS 策略是否已创建
@@ -276,10 +291,12 @@ import { claimDailyReward } from "@/lib/services/api";
 ### 问题 4: "Already claimed today" 提示一直出现
 
 **可能原因**:
+
 1. 系统时间不对
 2. 时区设置问题
 
 **解决步骤**:
+
 - [ ] 检查服务器时间: `SELECT CURRENT_TIMESTAMP;`
 - [ ] 检查时区设置
 - [ ] 等待真正的新一天（或在开发环境修改时间）
@@ -318,12 +335,12 @@ import { claimDailyReward } from "@/lib/services/api";
 
 ## 📞 需要帮助？
 
-| 问题 | 查看文档 |
-|------|--------|
-| 不知道怎么开始 | 📖 `CREDITS_SYSTEM_QUICK_FIX.md` |
-| 需要代码示例 | 📖 `ARCHITECTURE_AND_DATA_FLOW.md` |
+| 问题           | 查看文档                                   |
+| -------------- | ------------------------------------------ |
+| 不知道怎么开始 | 📖 `CREDITS_SYSTEM_QUICK_FIX.md`           |
+| 需要代码示例   | 📖 `ARCHITECTURE_AND_DATA_FLOW.md`         |
 | 想了解设计细节 | 📖 `2025-11-30-credits-system-solution.md` |
-| 想看完整总结 | 📖 `CREDITS_FIX_SUMMARY.md` |
+| 想看完整总结   | 📖 `CREDITS_FIX_SUMMARY.md`                |
 
 ---
 

@@ -43,6 +43,7 @@
 ```
 
 **问题点**:
+
 - ❌ 左侧英雄区浪费空间，重复信息
 - ❌ 右侧表单过大，视觉不聚焦
 - ❌ Magic Link 表单始终展开，占用空间
@@ -85,6 +86,7 @@
 ```
 
 **改进点**:
+
 - ✅ 去除左侧英雄区，节省 50% 空间
 - ✅ 居中单卡片，视觉聚焦
 - ✅ Magic Link 默认折叠，减少干扰
@@ -129,6 +131,7 @@
 ```
 
 **问题点**:
+
 - ❌ Security 区块没有显示认证方法
 - ❌ OAuth 用户看不到自己是通过 Google 登录的
 - ❌ 缺少"修改密码"入口（或者对 OAuth 用户显示无效选项）
@@ -179,6 +182,7 @@
 ```
 
 **改进点**:
+
 - ✅ 新增"Authentication Methods"区块
 - ✅ 显示 Google OAuth 徽章 + "Active" 状态
 - ✅ 明确告知"无需密码"
@@ -248,6 +252,7 @@
 ```
 
 **改进点**:
+
 - ✅ 在页面加载时检测 `authMethod === "oauth"`
 - ✅ 显示友好的说明页面，不是错误提示
 - ✅ 提供明确的操作指引（返回账号页）
@@ -318,8 +323,8 @@ export function useSupabaseAuth() {
     session,
     loading,
     isAuthenticated,
-    signInWithEmail,        // 仅 Magic Link
-    signInWithProvider,     // 仅 OAuth
+    signInWithEmail, // 仅 Magic Link
+    signInWithProvider, // 仅 OAuth
     // ❌ 没有 signInWithPassword
     signOut,
     refreshSession,
@@ -358,10 +363,12 @@ export function useSupabaseAuth() {
     // 检查 OAuth identities
     const { data: identities } = await supabase.auth.getUserIdentities();
     if (identities && identities.length > 0) {
-      setOauthProviders(identities.map(id => ({
-        provider: id.provider,
-        connected_at: id.created_at,
-      })));
+      setOauthProviders(
+        identities.map((id) => ({
+          provider: id.provider,
+          connected_at: id.created_at,
+        }))
+      );
 
       // 检查是否有密码
       const { data: hasPassword } = await supabase.rpc("fn_user_has_password");
@@ -410,30 +417,30 @@ export function useSupabaseAuth() {
 
 ### 问题拆解与解决方案映射
 
-| 用户问题 | Before | After | 解决方案 |
-|---------|--------|-------|----------|
-| "云端没有密码它点修改密码咋办" | ❌ OAuth 用户可以访问密码修改页 → 提示"密码错误" | ✅ OAuth 用户被友好拦截 + 说明原因 | Phase 1: 认证方法识别 |
-| "谷歌登陆的没法也没必要改密码" | ❌ 系统不区分 OAuth 和密码用户 | ✅ 账号页显示"Google Account - No password required" | Phase 1: 账号页改造 |
-| "模块逻辑是不是不对" | ❌ 所有用户看到相同的"Security"区块 | ✅ 根据 `authMethod` 动态显示选项 | Phase 1: 智能 UI |
-| "不够大厂风格" | ❌ 登录页左右分栏 + 大卡片 | ✅ 居中单卡片 (Vercel 风格) | Phase 2: 登录页重构 |
-| "太繁琐" | ❌ Magic Link 表单始终展开 | ✅ Magic Link 默认折叠 | Phase 2: 渐进披露 |
-| "不清爽" | ❌ 英雄区重复信息 | ✅ 去除英雄区，仅保留核心 Logo + Title | Phase 2: 简化布局 |
-| "不主流" | ❌ 未遵循 GitHub/Vercel 模式 | ✅ 参考业界最佳实践重构 | 全部 Phases |
-| "不高级" | ❌ 缺少智能引导和状态透明 | ✅ 智能检测 + 友好提示 + 清晰状态 | Phase 1 + 2 |
+| 用户问题                       | Before                                           | After                                                | 解决方案              |
+| ------------------------------ | ------------------------------------------------ | ---------------------------------------------------- | --------------------- |
+| "云端没有密码它点修改密码咋办" | ❌ OAuth 用户可以访问密码修改页 → 提示"密码错误" | ✅ OAuth 用户被友好拦截 + 说明原因                   | Phase 1: 认证方法识别 |
+| "谷歌登陆的没法也没必要改密码" | ❌ 系统不区分 OAuth 和密码用户                   | ✅ 账号页显示"Google Account - No password required" | Phase 1: 账号页改造   |
+| "模块逻辑是不是不对"           | ❌ 所有用户看到相同的"Security"区块              | ✅ 根据 `authMethod` 动态显示选项                    | Phase 1: 智能 UI      |
+| "不够大厂风格"                 | ❌ 登录页左右分栏 + 大卡片                       | ✅ 居中单卡片 (Vercel 风格)                          | Phase 2: 登录页重构   |
+| "太繁琐"                       | ❌ Magic Link 表单始终展开                       | ✅ Magic Link 默认折叠                               | Phase 2: 渐进披露     |
+| "不清爽"                       | ❌ 英雄区重复信息                                | ✅ 去除英雄区，仅保留核心 Logo + Title               | Phase 2: 简化布局     |
+| "不主流"                       | ❌ 未遵循 GitHub/Vercel 模式                     | ✅ 参考业界最佳实践重构                              | 全部 Phases           |
+| "不高级"                       | ❌ 缺少智能引导和状态透明                        | ✅ 智能检测 + 友好提示 + 清晰状态                    | Phase 1 + 2           |
 
 ---
 
 ## 代码量变化预估 Code Changes Estimate
 
-| 文件 | Before | After | 变化量 |
-|------|--------|-------|--------|
-| `hooks/useSupabaseAuth.ts` | 226 行 | ~320 行 | +94 行 |
-| `app/(auth)/login/page.tsx` | 237 行 | ~180 行 | -57 行 |
-| `app/account/page.tsx` | 283 行 | ~380 行 | +97 行 |
-| `app/account/change-password/page.tsx` | 0 行 | ~150 行 | +150 行 (新文件) |
-| `lib/i18n-config.ts` | - | - | +30 行 (翻译) |
-| `supabase/migrations/xxx.sql` | 0 行 | ~40 行 | +40 行 (新文件) |
-| **总计** | | | **+354 行** |
+| 文件                                   | Before | After   | 变化量           |
+| -------------------------------------- | ------ | ------- | ---------------- |
+| `hooks/useSupabaseAuth.ts`             | 226 行 | ~320 行 | +94 行           |
+| `app/(auth)/login/page.tsx`            | 237 行 | ~180 行 | -57 行           |
+| `app/account/page.tsx`                 | 283 行 | ~380 行 | +97 行           |
+| `app/account/change-password/page.tsx` | 0 行   | ~150 行 | +150 行 (新文件) |
+| `lib/i18n-config.ts`                   | -      | -       | +30 行 (翻译)    |
+| `supabase/migrations/xxx.sql`          | 0 行   | ~40 行  | +40 行 (新文件)  |
+| **总计**                               |        |         | **+354 行**      |
 
 ---
 

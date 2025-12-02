@@ -10,12 +10,12 @@
 
 ## 1. 依赖速查
 
-| 工具 | 最低版本 | 推荐版本 | 验证命令 |
-|------|----------|----------|----------|
-| Node.js | 18.0.0 | 20.19+ | `node --version` |
-| npm | 8.0.0 | 10.8+ | `npm --version` |
-| Docker Desktop / podman | 最新 | 最新 | `docker version` |
-| Supabase CLI | 2.58+ | 2.62+ | `npx supabase --version` |
+| 工具                    | 最低版本 | 推荐版本 | 验证命令                 |
+| ----------------------- | -------- | -------- | ------------------------ |
+| Node.js                 | 18.0.0   | 20.19+   | `node --version`         |
+| npm                     | 8.0.0    | 10.8+    | `npm --version`          |
+| Docker Desktop / podman | 最新     | 最新     | `docker version`         |
+| Supabase CLI            | 2.58+    | 2.62+    | `npx supabase --version` |
 
 若尚未安装 CLI：
 
@@ -126,10 +126,10 @@ npx supabase gen types typescript --linked --schema public > types/database.ts
 
 ## 5. 环境变量矩阵
 
-| 场景 | `NEXT_PUBLIC_SUPABASE_URL` | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `SUPABASE_SERVICE_ROLE_KEY` | 备注 |
-|------|---------------------------|---------------------------------|-----------------------------|------|
-| Hosted | `https://<project>.supabase.co` | Dashboard → API → `anon` | Dashboard → API → `service_role` | 生产/预发布 |
-| Local CLI | `http://127.0.0.1:54321` | `npx supabase status` 输出 | 同上 | 默认 `supabase/config.toml` 端口 |
+| 场景      | `NEXT_PUBLIC_SUPABASE_URL`      | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `SUPABASE_SERVICE_ROLE_KEY`      | 备注                             |
+| --------- | ------------------------------- | ------------------------------- | -------------------------------- | -------------------------------- |
+| Hosted    | `https://<project>.supabase.co` | Dashboard → API → `anon`        | Dashboard → API → `service_role` | 生产/预发布                      |
+| Local CLI | `http://127.0.0.1:54321`        | `npx supabase status` 输出      | 同上                             | 默认 `supabase/config.toml` 端口 |
 
 其他变量（Finnhub、Helicone、OpenRouter、`TEST_REPORT_TOKEN` 等）与 Hosted 一致，可放在 `.env.local` 中一并管理。
 
@@ -147,14 +147,14 @@ npx supabase gen types typescript --linked --schema public > types/database.ts
 
 ## 7. 常见问题
 
-| 症状 | 可能原因 | 解决方案 |
-|------|----------|----------|
-| `supabase start` 报 Docker 未运行 | Docker Desktop 未启动 | 打开 Docker Desktop 或 `docker context use default` |
-| `db push` 提示 “diff failed” | migrations 与实际 schema 不一致 | `npx supabase db reset` 后重试，或手动清理 shadow DB |
-| `types/database.ts` 缺字段 | 忘记重新生成 | 运行 `npx supabase gen types ...`（local/linked 对应） |
-| `/api/report` 返回 500 且日志显示 Storage 404 | Bucket 未创建或非 Private | Dashboard → Storage 创建 `report-assets` 并设 Private |
-| `curl` 返回 401 | 缺少登录或 `testToken` | 使用 `TEST_REPORT_TOKEN`（仅限本地）或先登录 Supabase Auth |
-| CLI 一直要求登录 | `$HOME/.config/supabase` 无写权限 | 以管理员身份运行或更改目录权限 |
+| 症状                                          | 可能原因                          | 解决方案                                                   |
+| --------------------------------------------- | --------------------------------- | ---------------------------------------------------------- |
+| `supabase start` 报 Docker 未运行             | Docker Desktop 未启动             | 打开 Docker Desktop 或 `docker context use default`        |
+| `db push` 提示 “diff failed”                  | migrations 与实际 schema 不一致   | `npx supabase db reset` 后重试，或手动清理 shadow DB       |
+| `types/database.ts` 缺字段                    | 忘记重新生成                      | 运行 `npx supabase gen types ...`（local/linked 对应）     |
+| `/api/report` 返回 500 且日志显示 Storage 404 | Bucket 未创建或非 Private         | Dashboard → Storage 创建 `report-assets` 并设 Private      |
+| `curl` 返回 401                               | 缺少登录或 `testToken`            | 使用 `TEST_REPORT_TOKEN`（仅限本地）或先登录 Supabase Auth |
+| CLI 一直要求登录                              | `$HOME/.config/supabase` 无写权限 | 以管理员身份运行或更改目录权限                             |
 
 ---
 
@@ -167,4 +167,4 @@ npx supabase gen types typescript --linked --schema public > types/database.ts
 
 ---
 
-若流程仍有疑问，请在 PR/Issue 中引用本指南并描述所卡步骤，方便 Codex 评审与追踪。***
+若流程仍有疑问，请在 PR/Issue 中引用本指南并描述所卡步骤，方便 Codex 评审与追踪。\*\*\*

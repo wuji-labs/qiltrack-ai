@@ -41,9 +41,7 @@
                   "tools",
                   "tool_choice"
                 ],
-                "supportedPlugins": [
-                  "web"
-                ],
+                "supportedPlugins": ["web"],
                 "ptbEnabled": true,
                 "responseFormat": "ANTHROPIC",
                 "endpointConfigs": {
@@ -412,13 +410,8 @@
         "maxOutput": 32000,
         "trainingDate": "2025-08-05T00:00:00.000Z",
         "description": "Our most capable model with the highest level of intelligence and capability. Supports extended thinking, multilingual capabilities, and vision processing. Moderately fast latency with 32,000 max output tokens. Training data cut-off: March 2025. API model name: claude-opus-4-1-20250805",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -471,9 +464,7 @@
                   "tools",
                   "tool_choice"
                 ],
-                "supportedPlugins": [
-                  "web"
-                ],
+                "supportedPlugins": ["web"],
                 "ptbEnabled": true,
                 "responseFormat": "ANTHROPIC",
                 "endpointConfigs": {
@@ -842,13 +833,8 @@
         "maxOutput": 32000,
         "trainingDate": "2025-05-14T00:00:00.000Z",
         "description": "Our previous flagship model with very high intelligence and capability. Supports extended thinking, multilingual capabilities, and vision processing. Moderately fast latency with 32,000 max output tokens. Training data cut-off: March 2025. API model name: claude-opus-4-20250514",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -906,9 +892,7 @@
                   "tools",
                   "tool_choice"
                 ],
-                "supportedPlugins": [
-                  "web"
-                ],
+                "supportedPlugins": ["web"],
                 "ptbEnabled": true,
                 "responseFormat": "ANTHROPIC",
                 "endpointConfigs": {
@@ -1371,13 +1355,8 @@
         "maxOutput": 64000,
         "trainingDate": "2025-05-14T00:00:00.000Z",
         "description": "High-performance model with high intelligence and balanced performance. Supports extended thinking, multilingual capabilities, and vision processing. Fast latency with 64,000 max output tokens. API model name: claude-sonnet-4-20250514",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -1430,9 +1409,7 @@
                   "top_k",
                   "stop"
                 ],
-                "supportedPlugins": [
-                  "web"
-                ],
+                "supportedPlugins": ["web"],
                 "ptbEnabled": true,
                 "responseFormat": "ANTHROPIC",
                 "endpointConfigs": {
@@ -1863,13 +1840,8 @@
         "maxOutput": 64000,
         "trainingDate": "2025-02-19T00:00:00.000Z",
         "description": "High-performance model with toggleable extended thinking for complex reasoning tasks. Combines high intelligence with the ability to think through problems step-by-step. Fast latency with 64,000 max output tokens. API model name: claude-3-7-sonnet-20250219",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -1919,9 +1891,7 @@
                   "top_k",
                   "stop"
                 ],
-                "supportedPlugins": [
-                  "web"
-                ],
+                "supportedPlugins": ["web"],
                 "ptbEnabled": true,
                 "responseFormat": "ANTHROPIC",
                 "endpointConfigs": {
@@ -2280,13 +2250,8 @@
         "maxOutput": 8192,
         "trainingDate": "2024-10-22T00:00:00.000Z",
         "description": "Our previous intelligent model with high level of intelligence and capability. Fast latency with multilingual and vision capabilities, but no extended thinking. 8,192 max output tokens. Training data cut-off: April 2024. Upgraded version API: claude-3-5-sonnet-20241022, Previous version API: claude-3-5-sonnet-20240620",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -2336,9 +2301,7 @@
                   "top_k",
                   "stop"
                 ],
-                "supportedPlugins": [
-                  "web"
-                ],
+                "supportedPlugins": ["web"],
                 "ptbEnabled": true,
                 "endpointConfigs": {
                   "*": {}
@@ -2693,13 +2656,8 @@
         "maxOutput": 8192,
         "trainingDate": "2024-10-22T00:00:00.000Z",
         "description": "Our fastest model. Intelligence at blazing speeds. Multilingual and vision capabilities. 8,192 max output tokens. Training data cut-off: July 2024. API model name: claude-3-5-haiku-20241022",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -2874,13 +2832,8 @@
         "maxOutput": 4096,
         "trainingDate": "2024-03-07T00:00:00.000Z",
         "description": "Claude 3 Haiku is Anthropic's fastest and most compact model. Designed for near-instant responsiveness and seamless AI experiences that mimic human interactions. Multilingual and vision capabilities. 4,096 max output tokens. Training data cut-off: August 2023. API model name: claude-3-haiku-20240307",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -3383,13 +3336,8 @@
         "maxOutput": 64000,
         "trainingDate": "2025-09-29T00:00:00.000Z",
         "description": "Best-in-class coding and agentic model with hours-long autonomous operation capabilities. Supports extended thinking, context awareness, parallel tool usage, and vision processing. Refined concise communication style with 64,000 max output tokens. API model name: claude-sonnet-4-5-20250929",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -3441,9 +3389,7 @@
                   "top_k",
                   "stop"
                 ],
-                "supportedPlugins": [
-                  "web"
-                ],
+                "supportedPlugins": ["web"],
                 "ptbEnabled": true,
                 "endpointConfigs": {
                   "*": {}
@@ -3798,13 +3744,8 @@
         "maxOutput": 8192,
         "trainingDate": "2025-10-01T00:00:00.000Z",
         "description": "Our fastest model. Intelligence at blazing speeds. Multilingual and vision capabilities. 8,192 max output tokens. Training data cut-off: October 2024. API model name: claude-haiku-4-5-20251001",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -4307,13 +4248,8 @@
         "maxOutput": 64000,
         "trainingDate": "2025-09-29T00:00:00.000Z",
         "description": "Best-in-class coding and agentic model with hours-long autonomous operation capabilities. Supports extended thinking, context awareness, parallel tool usage, and vision processing. Refined concise communication style with 64,000 max output tokens. API model name: claude-sonnet-4-5-20250929",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -4365,9 +4301,7 @@
                   "top_k",
                   "stop"
                 ],
-                "supportedPlugins": [
-                  "web"
-                ],
+                "supportedPlugins": ["web"],
                 "ptbEnabled": true,
                 "endpointConfigs": {
                   "*": {}
@@ -4722,13 +4656,8 @@
         "maxOutput": 8192,
         "trainingDate": "2025-10-01T00:00:00.000Z",
         "description": "Our fastest model. Intelligence at blazing speeds. Multilingual and vision capabilities. 8,192 max output tokens. Training data cut-off: October 2024. API model name: claude-haiku-4-5-20251001",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -4779,9 +4708,7 @@
                   "tools",
                   "tool_choice"
                 ],
-                "supportedPlugins": [
-                  "web"
-                ],
+                "supportedPlugins": ["web"],
                 "ptbEnabled": true,
                 "responseFormat": "ANTHROPIC",
                 "endpointConfigs": {
@@ -5150,13 +5077,8 @@
         "maxOutput": 32000,
         "trainingDate": "2025-08-05T00:00:00.000Z",
         "description": "Our most capable model with the highest level of intelligence and capability. Supports extended thinking, multilingual capabilities, and vision processing. Moderately fast latency with 32,000 max output tokens. Training data cut-off: March 2025. API model name: claude-opus-4-1-20250805",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -5493,13 +5415,8 @@
         "maxOutput": 16384,
         "trainingDate": "2024-05-13T00:00:00.000Z",
         "description": "GPT-4o (\"o\" for \"omni\") is OpenAI's latest AI model, supporting both text and image inputs with text outputs. It maintains the intelligence level of GPT-4 Turbo while being twice as fast and 50% more cost-effective. GPT-4o also offers improved performance in processing non-English languages and enhanced visual capabilities.\n\nFor benchmarking against other models, it was briefly called [\"im-also-a-good-gpt2-chatbot\"](https://twitter.com/LiamFedus/status/1790064963966370209)\n\n#multimodal",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -5837,13 +5754,8 @@
         "maxOutput": 16384,
         "trainingDate": "2024-07-18T00:00:00.000Z",
         "description": "GPT-4o mini is OpenAI's newest model after GPT-4 Omni, supporting both text and image inputs with text outputs.\n\nAs their most advanced small model, it is many multiples more affordable than other recent frontier models, and more than 60% cheaper than GPT-3.5 Turbo. It maintains SOTA intelligence, while being significantly more cost-effective.\n\nGPT-4o mini achieves an 82% score on MMLU and presently ranks higher than GPT-4 on chat preferences common leaderboards.\n\nCheck out the launch announcement to learn more.\n\n#multimodal",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -6025,13 +5937,8 @@
         "maxOutput": 16384,
         "trainingDate": "2024-08-14T00:00:00.000Z",
         "description": "OpenAI ChatGPT 4o is continually updated by OpenAI to point to the current version of GPT-4o used by ChatGPT. It therefore differs slightly from the API version of GPT-4o in that it has additional RLHF. It is intended for research and evaluation.\n\nOpenAI notes that this model is not suited for production use-cases as it may be removed or redirected to another model in the future.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -6073,9 +5980,7 @@
                 ],
                 "contextLength": 200000,
                 "maxCompletionTokens": 100000,
-                "supportedParameters": [
-                  "max_tokens"
-                ],
+                "supportedParameters": ["max_tokens"],
                 "ptbEnabled": true,
                 "endpointConfigs": {
                   "*": {}
@@ -6101,9 +6006,7 @@
               "contextLength": 200000,
               "maxCompletionTokens": 100000,
               "ptbEnabled": true,
-              "supportedParameters": [
-                "max_tokens"
-              ]
+              "supportedParameters": ["max_tokens"]
             },
             "supportsPtb": true,
             "pricing": {
@@ -6117,15 +6020,9 @@
         "maxOutput": 100000,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "Reasoning model with extended thinking capabilities",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
-        "supportedParameters": [
-          "max_tokens"
-        ]
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
+        "supportedParameters": ["max_tokens"]
       },
       {
         "id": "o1-mini",
@@ -6155,9 +6052,7 @@
                 ],
                 "contextLength": 128000,
                 "maxCompletionTokens": 65536,
-                "supportedParameters": [
-                  "max_tokens"
-                ],
+                "supportedParameters": ["max_tokens"],
                 "ptbEnabled": true,
                 "endpointConfigs": {
                   "*": {}
@@ -6183,9 +6078,7 @@
               "contextLength": 128000,
               "maxCompletionTokens": 65536,
               "ptbEnabled": true,
-              "supportedParameters": [
-                "max_tokens"
-              ]
+              "supportedParameters": ["max_tokens"]
             },
             "supportsPtb": true,
             "pricing": {
@@ -6199,15 +6092,9 @@
         "maxOutput": 65536,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "Efficient reasoning model",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
-        "supportedParameters": [
-          "max_tokens"
-        ]
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
+        "supportedParameters": ["max_tokens"]
       },
       {
         "id": "o3",
@@ -6334,9 +6221,7 @@
                 ],
                 "contextLength": 200000,
                 "maxCompletionTokens": 100000,
-                "supportedParameters": [
-                  "max_tokens"
-                ],
+                "supportedParameters": ["max_tokens"],
                 "unsupportedParameters": [
                   "temperature",
                   "top_p",
@@ -6373,9 +6258,7 @@
               "contextLength": 200000,
               "maxCompletionTokens": 100000,
               "ptbEnabled": true,
-              "supportedParameters": [
-                "max_tokens"
-              ],
+              "supportedParameters": ["max_tokens"],
               "unsupportedParameters": [
                 "temperature",
                 "top_p",
@@ -6485,13 +6368,8 @@
         "maxOutput": 100000,
         "trainingDate": "2024-06-01T00:00:00.000Z",
         "description": "o3 is a well-rounded and powerful model across domains. It sets a new standard for math, science, coding, and visual reasoning tasks. It also excels at technical writing and instruction-following. Use it to think through multi-step problems that involve analysis across text, code, and images. o3 is succeeded by GPT-5.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -6616,9 +6494,7 @@
                 ],
                 "contextLength": 200000,
                 "maxCompletionTokens": 100000,
-                "supportedParameters": [
-                  "max_tokens"
-                ],
+                "supportedParameters": ["max_tokens"],
                 "unsupportedParameters": [
                   "temperature",
                   "top_p",
@@ -6652,9 +6528,7 @@
               "contextLength": 200000,
               "maxCompletionTokens": 100000,
               "ptbEnabled": true,
-              "supportedParameters": [
-                "max_tokens"
-              ],
+              "supportedParameters": ["max_tokens"],
               "unsupportedParameters": [
                 "temperature",
                 "top_p",
@@ -6763,13 +6637,8 @@
         "maxOutput": 100000,
         "trainingDate": "2024-06-01T00:00:00.000Z",
         "description": "The o-series of models are trained with reinforcement learning to think before they answer and perform complex reasoning. The o3-pro model uses more compute to think harder and provide consistently better answers. o3-pro is available in the Responses API only to enable support for multi-turn model interactions before responding to API requests. Since o3-pro is designed to tackle tough problems, some requests may take several minutes to finish.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -7000,9 +6869,7 @@
                 ],
                 "contextLength": 200000,
                 "maxCompletionTokens": 100000,
-                "supportedParameters": [
-                  "max_tokens"
-                ],
+                "supportedParameters": ["max_tokens"],
                 "unsupportedParameters": [
                   "temperature",
                   "top_p",
@@ -7039,9 +6906,7 @@
               "contextLength": 200000,
               "maxCompletionTokens": 100000,
               "ptbEnabled": true,
-              "supportedParameters": [
-                "max_tokens"
-              ],
+              "supportedParameters": ["max_tokens"],
               "unsupportedParameters": [
                 "temperature",
                 "top_p",
@@ -7151,12 +7016,8 @@
         "maxOutput": 100000,
         "trainingDate": "2023-10-01T00:00:00.000Z",
         "description": "o3-mini is our newest small reasoning model, providing high intelligence at the same cost and latency targets of o1-mini. o3-mini supports key developer features, like Structured Outputs, function calling, and Batch API. This model supports the `reasoning_effort` parameter, which can be set to 'high', 'medium', or 'low' to control the thinking time of the model.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -7343,9 +7204,7 @@
                 ],
                 "contextLength": 200000,
                 "maxCompletionTokens": 100000,
-                "supportedParameters": [
-                  "max_tokens"
-                ],
+                "supportedParameters": ["max_tokens"],
                 "ptbEnabled": true,
                 "endpointConfigs": {
                   "*": {}
@@ -7371,9 +7230,7 @@
               "contextLength": 200000,
               "maxCompletionTokens": 100000,
               "ptbEnabled": true,
-              "supportedParameters": [
-                "max_tokens"
-              ]
+              "supportedParameters": ["max_tokens"]
             },
             "supportsPtb": true,
             "pricing": {
@@ -7450,13 +7307,8 @@
         "maxOutput": 100000,
         "trainingDate": "2024-06-01T00:00:00.000Z",
         "description": "o4-mini is our latest small o-series model. It's optimized for fast, effective reasoning with exceptionally efficient performance in coding and visual tasks. It's succeeded by GPT-5 mini.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -7790,13 +7642,8 @@
         "maxOutput": 32768,
         "trainingDate": "2025-04-14T17:23:05.000Z",
         "description": "GPT-4.1 is a flagship large language model optimized for advanced instruction following, real-world software engineering, and long-context reasoning. It supports a 1 million token context window and outperforms GPT-4o and GPT-4.5 across coding (54.6% SWE-bench Verified), instruction compliance (87.4% IFEval), and multimodal understanding benchmarks. It is tuned for precise code diffs, agent reliability, and high recall in large document contexts, making it ideal for agents, IDE tooling, and enterprise knowledge retrieval.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -8134,13 +7981,8 @@
         "maxOutput": 32768,
         "trainingDate": "2025-04-14T17:23:01.000Z",
         "description": "GPT-4.1 Mini is a mid-sized model delivering performance competitive with GPT-4o at substantially lower latency and cost. It retains a 1 million token context window and scores 45.1% on hard instruction evals, 35.8% on MultiChallenge, and 84.1% on IFEval. Mini also shows strong coding ability (e.g., 31.6% on Aider's polyglot diff benchmark) and vision understanding, making it suitable for interactive applications with tight performance constraints.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -8351,12 +8193,7 @@
                 ],
                 "contextLength": 128000,
                 "maxCompletionTokens": 8192,
-                "supportedParameters": [
-                  "max_tokens",
-                  "temperature",
-                  "top_p",
-                  "stop"
-                ],
+                "supportedParameters": ["max_tokens", "temperature", "top_p", "stop"],
                 "ptbEnabled": true,
                 "endpointConfigs": {
                   "*": {}
@@ -8382,12 +8219,7 @@
               "contextLength": 128000,
               "maxCompletionTokens": 8192,
               "ptbEnabled": true,
-              "supportedParameters": [
-                "max_tokens",
-                "temperature",
-                "top_p",
-                "stop"
-              ]
+              "supportedParameters": ["max_tokens", "temperature", "top_p", "stop"]
             },
             "supportsPtb": true,
             "pricing": {
@@ -8474,13 +8306,8 @@
         "maxOutput": 32768,
         "trainingDate": "2025-04-14T17:22:49.000Z",
         "description": "For tasks that demand low latency, GPT-4.1 nano is the fastest and cheapest model in the GPT-4.1 series. It delivers exceptional performance at a small size with its 1 million token context window, and scores 80.1% on MMLU, 50.3% on GPQA, and 9.8% on Aider polyglot coding – even higher than GPT-4o mini. It's ideal for tasks like classification or autocompletion.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -8621,10 +8448,7 @@
                 ],
                 "contextLength": 128000,
                 "maxCompletionTokens": 32768,
-                "supportedParameters": [
-                  "max_completion_tokens",
-                  "stop"
-                ],
+                "supportedParameters": ["max_completion_tokens", "stop"],
                 "unsupportedParameters": [
                   "temperature",
                   "top_p",
@@ -8660,10 +8484,7 @@
               "contextLength": 128000,
               "maxCompletionTokens": 32768,
               "ptbEnabled": true,
-              "supportedParameters": [
-                "max_completion_tokens",
-                "stop"
-              ],
+              "supportedParameters": ["max_completion_tokens", "stop"],
               "unsupportedParameters": [
                 "temperature",
                 "top_p",
@@ -8865,13 +8686,8 @@
         "maxOutput": 128000,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "GPT-5 is OpenAI's most advanced language model, featuring enhanced reasoning capabilities with 80% fewer factual errors than o3. It supports a 400K total context (272K input + 128K output), advanced tool calling with reliable chaining of dozens of calls, and a new verbosity parameter for response length control. Ideal for complex reasoning, multi-step planning, and applications requiring high accuracy.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -9101,10 +8917,7 @@
                 ],
                 "contextLength": 128000,
                 "maxCompletionTokens": 16384,
-                "supportedParameters": [
-                  "max_completion_tokens",
-                  "stop"
-                ],
+                "supportedParameters": ["max_completion_tokens", "stop"],
                 "unsupportedParameters": [
                   "temperature",
                   "top_p",
@@ -9140,10 +8953,7 @@
               "contextLength": 128000,
               "maxCompletionTokens": 16384,
               "ptbEnabled": true,
-              "supportedParameters": [
-                "max_completion_tokens",
-                "stop"
-              ],
+              "supportedParameters": ["max_completion_tokens", "stop"],
               "unsupportedParameters": [
                 "temperature",
                 "top_p",
@@ -9252,13 +9062,8 @@
         "maxOutput": 128000,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "GPT-5 Mini delivers GPT-5-level performance at a fraction of the cost and latency. With the same 400K context window and advanced capabilities including tool calling and verbosity control, it's optimized for speed and efficiency while maintaining strong reasoning and instruction-following capabilities. Perfect for high-volume applications requiring advanced AI capabilities with resource constraints.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -9397,9 +9202,7 @@
                 ],
                 "contextLength": 128000,
                 "maxCompletionTokens": 8192,
-                "supportedParameters": [
-                  "max_completion_tokens"
-                ],
+                "supportedParameters": ["max_completion_tokens"],
                 "unsupportedParameters": [
                   "temperature",
                   "top_p",
@@ -9436,9 +9239,7 @@
               "contextLength": 128000,
               "maxCompletionTokens": 8192,
               "ptbEnabled": true,
-              "supportedParameters": [
-                "max_completion_tokens"
-              ],
+              "supportedParameters": ["max_completion_tokens"],
               "unsupportedParameters": [
                 "temperature",
                 "top_p",
@@ -9548,13 +9349,8 @@
         "maxOutput": 128000,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "GPT-5 Nano is the smallest and fastest model in the GPT-5 family, designed for ultra-low latency applications. Despite its compact size, it maintains the full 400K context window and delivers impressive performance on classification, completion, and simple reasoning tasks. Ideal for real-time applications, edge deployments, and high-throughput scenarios.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -9693,10 +9489,7 @@
                 ],
                 "contextLength": 128000,
                 "maxCompletionTokens": 32768,
-                "supportedParameters": [
-                  "max_completion_tokens",
-                  "stop"
-                ],
+                "supportedParameters": ["max_completion_tokens", "stop"],
                 "unsupportedParameters": [
                   "temperature",
                   "top_p",
@@ -9733,10 +9526,7 @@
               "contextLength": 128000,
               "maxCompletionTokens": 32768,
               "ptbEnabled": true,
-              "supportedParameters": [
-                "max_completion_tokens",
-                "stop"
-              ],
+              "supportedParameters": ["max_completion_tokens", "stop"],
               "unsupportedParameters": [
                 "temperature",
                 "top_p",
@@ -9848,13 +9638,8 @@
         "maxOutput": 16384,
         "trainingDate": "2024-09-30T00:00:00.000Z",
         "description": "GPT-5 Chat Latest is a continuously updated version of GPT-5 optimized for conversational interactions. It receives regular updates with the latest improvements in dialogue management, safety, and helpfulness. Features a 128K context window and 16K max output tokens, making it ideal for focused conversations. Knowledge cutoff: September 30, 2024.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -9890,10 +9675,7 @@
                 ],
                 "contextLength": 128000,
                 "maxCompletionTokens": 32768,
-                "supportedParameters": [
-                  "max_completion_tokens",
-                  "stop"
-                ],
+                "supportedParameters": ["max_completion_tokens", "stop"],
                 "unsupportedParameters": [
                   "temperature",
                   "top_p",
@@ -9926,10 +9708,7 @@
               "contextLength": 128000,
               "maxCompletionTokens": 32768,
               "ptbEnabled": true,
-              "supportedParameters": [
-                "max_completion_tokens",
-                "stop"
-              ],
+              "supportedParameters": ["max_completion_tokens", "stop"],
               "unsupportedParameters": [
                 "temperature",
                 "top_p",
@@ -9952,16 +9731,9 @@
         "maxOutput": 32768,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "Most capable GPT-5 model with extended thinking capabilities",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
-        "supportedParameters": [
-          "max_completion_tokens",
-          "stop"
-        ]
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
+        "supportedParameters": ["max_completion_tokens", "stop"]
       },
       {
         "id": "gpt-5-codex",
@@ -10090,10 +9862,7 @@
                 ],
                 "contextLength": 400000,
                 "maxCompletionTokens": 128000,
-                "supportedParameters": [
-                  "max_completion_tokens",
-                  "stop"
-                ],
+                "supportedParameters": ["max_completion_tokens", "stop"],
                 "unsupportedParameters": [
                   "temperature",
                   "top_p",
@@ -10130,10 +9899,7 @@
               "contextLength": 400000,
               "maxCompletionTokens": 128000,
               "ptbEnabled": true,
-              "supportedParameters": [
-                "max_completion_tokens",
-                "stop"
-              ],
+              "supportedParameters": ["max_completion_tokens", "stop"],
               "unsupportedParameters": [
                 "temperature",
                 "top_p",
@@ -10245,12 +10011,8 @@
         "maxOutput": 128000,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "Specialized model for code generation and analysis",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -10454,14 +10216,8 @@
         "maxOutput": 128000,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "GPT-5.1 is an enhanced version of GPT-5 with improved performance and capabilities. It features the same 400K context window and advanced tool calling capabilities as GPT-5, with optimized pricing for better cost efficiency.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text",
-          "image"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text", "image"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -10668,14 +10424,8 @@
         "maxOutput": 128000,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "Specialized model for code generation and analysis, based on GPT-5.1",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text",
-          "image"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text", "image"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -10881,14 +10631,8 @@
         "maxOutput": 128000,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "Compact specialized model for code generation and analysis, based on GPT-5.1",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text",
-          "image"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text", "image"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -11096,14 +10840,8 @@
         "maxOutput": 16384,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "GPT-5.1 Chat is a continuously updated version of GPT-5.1 optimized for conversational interactions. It receives regular updates with the latest improvements in dialogue management, safety, and helpfulness. Features a 128K context window and 16K max output tokens, making it ideal for focused conversations.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text",
-          "image"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text", "image"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -11310,13 +11048,8 @@
         "maxOutput": 100000,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "Latest version of Codex Mini, a compact specialized model for code generation and analysis",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -11672,12 +11405,8 @@
         "maxOutput": 131072,
         "trainingDate": "2024-06-01T00:00:00.000Z",
         "description": "gpt-oss-120b is our most powerful open-weight model, which fits into a single H100 GPU (117B parameters with 5.1B active parameters). Features permissive Apache 2.0 license, configurable reasoning effort (low, medium, high), full chain-of-thought access, fine-tunable parameters, and agentic capabilities including function calling, web browsing, Python code execution, and structured outputs.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "include_reasoning",
@@ -11969,12 +11698,8 @@
         "maxOutput": 131072,
         "trainingDate": "2024-06-01T00:00:00.000Z",
         "description": "gpt-oss-20b is our medium-sized open-weight model for low latency, local, or specialized use-cases (21B parameters with 3.6B active parameters). Features permissive Apache 2.0 license, configurable reasoning effort (low, medium, high), full chain-of-thought access, fine-tunable parameters, and agentic capabilities including function calling, web browsing, Python code execution, and structured outputs.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "include_reasoning",
@@ -12298,13 +12023,8 @@
         "maxOutput": 65536,
         "trainingDate": "2025-06-17T07:12:24",
         "description": "Gemini 2.5 Pro is Google’s state-of-the-art AI model designed for advanced reasoning, coding, mathematics, and scientific tasks. It employs “thinking” capabilities, enabling it to reason through responses with enhanced accuracy and nuanced context handling. Gemini 2.5 Pro achieves top-tier performance on multiple benchmarks, including first-place positioning on the LMArena leaderboard, reflecting superior human-preference alignment and complex problem-solving abilities.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "include_reasoning",
           "max_tokens",
@@ -12583,13 +12303,8 @@
         "maxOutput": 65535,
         "trainingDate": "2025-06-17T08:01:28",
         "description": "Gemini 2.5 Flash is Google's state-of-the-art workhorse model, specifically designed for advanced reasoning, coding, mathematics, and scientific tasks. It includes built-in \"thinking\" capabilities, enabling it to provide responses with greater accuracy and nuanced context handling. \n\nAdditionally, Gemini 2.5 Flash is configurable through the \"max tokens for reasoning\" parameter, allowing fine-tuned control over its reasoning process.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "include_reasoning",
           "max_tokens",
@@ -12862,13 +12577,8 @@
         "maxOutput": 65535,
         "trainingDate": "2025-07-22T09:04:36",
         "description": "Gemini 2.5 Flash-Lite is a lightweight reasoning model in the Gemini 2.5 family, optimized for ultra-low latency and cost efficiency. It offers improved throughput, faster token generation, and better performance across common benchmarks compared to earlier Flash models. By default, \"thinking\" (i.e. multi-pass reasoning) is disabled to prioritize speed, but developers can enable it via the [Reasoning API parameter](https://openrouter.ai/docs/use-cases/reasoning-tokens) to selectively trade off cost for intelligence. ",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "include_reasoning",
           "max_tokens",
@@ -13197,15 +12907,8 @@
         "maxOutput": 65536,
         "trainingDate": "2025-11-18T00:00:00",
         "description": "Gemini 3 Pro Preview is Google's latest experimental AI model with advanced reasoning, coding, and multimodal capabilities. This preview version offers cutting-edge performance across various tasks including complex problem-solving, code generation, and scientific reasoning. It features enhanced accuracy and improved context understanding compared to previous generations.",
-        "inputModalities": [
-          "text",
-          "image",
-          "audio",
-          "video"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image", "audio", "video"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "include_reasoning",
           "max_tokens",
@@ -13370,12 +13073,8 @@
         "maxOutput": 8192,
         "trainingDate": "2024-06-25T00:00:00.000Z",
         "description": "Gemma is a family of lightweight, state-of-the-art open models from Google, built from the same research and technology used to create the Gemini models. They are text-to-text, decoder-only large language models, with open weights for both pre-trained variants and instruction-tuned variants. Gemma models are well-suited for a variety of text generation tasks, including question answering, summarization, and reasoning. Their relatively small size makes it possible to deploy them in environments with limited resources such as a laptop, desktop or your own cloud infrastructure, democratizing access to state of the art AI models and helping foster innovation for everyone.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -13478,13 +13177,8 @@
         "maxOutput": 8192,
         "trainingDate": "2024-12-01T00:00:00.000Z",
         "description": "Gemma is a family of lightweight, state-of-the-art open models from Google, built from the same research and technology used to create the Gemini models. Gemma 3 models are multimodal, handling text and image input and generating text output, with open weights for both pre-trained variants and instruction-tuned variants. Gemma 3 has a large, 128K context window, multilingual support in over 140 languages, and is available in more sizes than previous versions. Gemma 3 models are well-suited for a variety of text generation and image understanding tasks, including question answering, summarization, and reasoning. Their relatively small size makes it possible to deploy them in environments with limited resources such as laptops, desktops or your own cloud infrastructure, democratizing access to state of the art AI models and helping foster innovation for everyone.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -13676,12 +13370,8 @@
         "maxOutput": 10000,
         "trainingDate": "2024-08-25T00:00:00.000Z",
         "description": "Speedy and economical reasoning model that excels at agentic coding. Features function calling, structured outputs, and reasoning capabilities.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "logit_bias",
@@ -13916,12 +13606,8 @@
         "maxOutput": 256000,
         "trainingDate": "2024-07-09T00:00:00.000Z",
         "description": "Latest and greatest flagship model, offering unparalleled performance in natural language, math and reasoning - the perfect jack of all trades. Features function calling, structured outputs, and reasoning capabilities.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "logit_bias",
@@ -13953,9 +13639,7 @@
                 "providerModelId": "grok-4-fast",
                 "provider": "xai",
                 "author": "xai",
-                "providerModelIdAliases": [
-                  "grok-4-fast-reasoning"
-                ],
+                "providerModelIdAliases": ["grok-4-fast-reasoning"],
                 "pricing": [
                   {
                     "threshold": 0,
@@ -14067,13 +13751,8 @@
         "maxOutput": 2000000,
         "trainingDate": "2025-09-01T00:00:00.000Z",
         "description": "Grok 4 Fast is xAI's latest advancement in cost-efficient reasoning models. Built on xAI’s learnings from Grok 4, Grok 4 Fast delivers frontier-level performance across Enterprise and Consumer domains—with exceptional token efficiency. This model pushes the boundaries for smaller and faster AI, making high-quality reasoning accessible to more users and developers. Grok 4 Fast features state-of-the-art (SOTA) cost-efficiency, cutting-edge web and X search capabilities, a 2M token context window, and a unified architecture that blends reasoning and non-reasoning modes in one model.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -14212,14 +13891,8 @@
         "maxOutput": 2000000,
         "trainingDate": "2025-09-19T00:00:00.000Z",
         "description": "Grok 4 Fast is xAI's latest advancement in cost-efficient reasoning models. Built on xAI’s learnings from Grok 4, Grok 4 Fast delivers frontier-level performance across Enterprise and Consumer domains—with exceptional token efficiency. This model pushes the boundaries for smaller and faster AI, making high-quality reasoning accessible to more users and developers. Grok 4 Fast features state-of-the-art (SOTA) cost-efficiency, cutting-edge web and X search capabilities, a 2M token context window. This non-reasoning model specifically excludes reasoning capabilities.",
-        "inputModalities": [
-          "text",
-          "image",
-          "audio"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image", "audio"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -14411,12 +14084,8 @@
         "maxOutput": 131072,
         "trainingDate": "2024-06-01T00:00:00.000Z",
         "description": "Excels at enterprise use cases like data extraction, coding, and text summarization. Possesses deep domain knowledge in finance, healthcare, law, and science. Features function calling, structured outputs, and reasoning capabilities.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "logit_bias",
@@ -14611,12 +14280,8 @@
         "maxOutput": 131072,
         "trainingDate": "2024-06-01T00:00:00.000Z",
         "description": "Lightweight model that thinks before responding. Fast, smart, and great for logic-based tasks that do not require deep domain knowledge. Features function calling, structured outputs, and reasoning capabilities.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "logit_bias",
@@ -14950,13 +14615,8 @@
         "maxOutput": 8192,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "Llama 4 instruction-tuned MoE (17B, 16 experts) for fast, high-quality chat, tool use, and multilingual reasoning with balanced latency and cost.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "repetition_penalty",
@@ -15298,13 +14958,8 @@
         "maxOutput": 8192,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "Llama 4 instruction-tuned MoE (17B, 128 experts) targeting tougher reasoning and long-form tasks, trading more compute for higher response diversity and robustness.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "repetition_penalty",
@@ -15486,13 +15141,8 @@
         "maxOutput": 1024,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "Meta’s latest safety/guardrail model for prompt and output moderation, aligning conversations to policy via classification and constrained generation.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "logit_bias",
@@ -15600,12 +15250,8 @@
         "maxOutput": 32678,
         "trainingDate": "2024-12-06T00:00:00.000Z",
         "description": "Llama-3.3-70B-Versatile is Meta's advanced multilingual large language model, optimized for a wide range of natural language processing tasks. With 70 billion parameters, it offers high performance across various benchmarks while maintaining efficiency suitable for diverse applications.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "logit_bias",
@@ -15782,12 +15428,8 @@
         "maxOutput": 16400,
         "trainingDate": "2024-12-06T00:00:00.000Z",
         "description": "The Meta Llama 3.3 multilingual large language model (LLM) is a pretrained and instruction tuned generative model in 70B (text in/text out). The Llama 3.3 instruction tuned text only model is optimized for multilingual dialogue use cases and outperforms many of the available open source and closed chat models on common industry benchmarks. Supported languages: English, German, French, Italian, Portuguese, Hindi, Spanish, and Thai.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "max_tokens",
@@ -15973,12 +15615,8 @@
         "maxOutput": 32678,
         "trainingDate": "2024-07-01T00:00:00.000Z",
         "description": "Compact 8B general-purpose model offering efficient inference for chat, coding, and RAG workflows on limited compute.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "logit_bias",
@@ -16025,11 +15663,7 @@
                 ],
                 "contextLength": 512,
                 "maxCompletionTokens": 2,
-                "supportedParameters": [
-                  "max_tokens",
-                  "temperature",
-                  "top_p"
-                ],
+                "supportedParameters": ["max_tokens", "temperature", "top_p"],
                 "ptbEnabled": true,
                 "endpointConfigs": {
                   "*": {}
@@ -16055,11 +15689,7 @@
               "contextLength": 512,
               "maxCompletionTokens": 2,
               "ptbEnabled": true,
-              "supportedParameters": [
-                "max_tokens",
-                "temperature",
-                "top_p"
-              ]
+              "supportedParameters": ["max_tokens", "temperature", "top_p"]
             },
             "supportsPtb": true,
             "pricing": {
@@ -16071,17 +15701,9 @@
         "maxOutput": 2,
         "trainingDate": "2024-10-01T00:00:00.000Z",
         "description": "86M parameter multilingual prompt safety classifier based on mDeBERTa-base, detecting prompt injections and jailbreaks across 8+ languages with adversarial-resistant tokenization.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
-        "supportedParameters": [
-          "max_tokens",
-          "temperature",
-          "top_p"
-        ]
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
+        "supportedParameters": ["max_tokens", "temperature", "top_p"]
       },
       {
         "id": "llama-prompt-guard-2-22m",
@@ -16111,11 +15733,7 @@
                 ],
                 "contextLength": 512,
                 "maxCompletionTokens": 2,
-                "supportedParameters": [
-                  "max_tokens",
-                  "temperature",
-                  "top_p"
-                ],
+                "supportedParameters": ["max_tokens", "temperature", "top_p"],
                 "ptbEnabled": true,
                 "endpointConfigs": {
                   "*": {}
@@ -16141,11 +15759,7 @@
               "contextLength": 512,
               "maxCompletionTokens": 2,
               "ptbEnabled": true,
-              "supportedParameters": [
-                "max_tokens",
-                "temperature",
-                "top_p"
-              ]
+              "supportedParameters": ["max_tokens", "temperature", "top_p"]
             },
             "supportsPtb": true,
             "pricing": {
@@ -16157,17 +15771,9 @@
         "maxOutput": 2,
         "trainingDate": "2024-10-01T00:00:00.000Z",
         "description": "22M parameter lightweight prompt safety classifier based on DeBERTa-xsmall, offering 75% reduced latency for detecting prompt injections and jailbreaks, primarily optimized for English.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
-        "supportedParameters": [
-          "max_tokens",
-          "temperature",
-          "top_p"
-        ]
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
+        "supportedParameters": ["max_tokens", "temperature", "top_p"]
       },
       {
         "id": "llama-3.1-8b-instruct",
@@ -16329,12 +15935,8 @@
         "maxOutput": 16384,
         "trainingDate": "2024-07-23T00:00:00.000Z",
         "description": "Meta's latest class of models, Llama 3.1, launched with a variety of sizes and configurations. The 8B instruct-tuned version is particularly fast and efficient. It has demonstrated strong performance in human evaluations, outperforming several leading closed-source models.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -16522,12 +16124,8 @@
         "maxOutput": 128000,
         "trainingDate": "2024-07-23T00:00:00.000Z",
         "description": "Optimized version of Llama 3.1 8B Instruct with 128K context window, designed for high-speed inference in multilingual chat and dialogue use cases with improved throughput and efficiency.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -16634,12 +16232,8 @@
         "maxOutput": 131072,
         "trainingDate": "2024-05-27T00:00:00.000Z",
         "description": "Hermes 2 Pro is an upgraded, retrained version of Nous Hermes 2, consisting of an updated and cleaned version of the OpenHermes 2.5 Dataset, as well as a newly introduced Function Calling and JSON Mode dataset developed in-house.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "repetition_penalty",
@@ -16816,12 +16410,8 @@
         "maxOutput": 16384,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "Kimi K2 Instruct is a large-scale Mixture-of-Experts (MoE) language model developed by Moonshot AI, featuring 1 trillion total parameters with 32 billion active per forward pass. It is optimized for agentic capabilities, including advanced tool use, reasoning, and code synthesis. Kimi K2 excels across a broad range of benchmarks, particularly in coding (LiveCodeBench, SWE-bench), reasoning (ZebraLogic, GPQA), and tool-use (Tau2, AceBench) tasks. It supports long-context inference up to 128K tokens and is designed with a novel training stack that includes the MuonClip optimizer for stable large-scale MoE training.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "logprobs",
@@ -17332,12 +16922,8 @@
         "maxOutput": 16384,
         "trainingDate": "2025-09-05T00:00:00.000Z",
         "description": "Enhanced version of Kimi K2 with doubled context window (256k tokens) and significantly improved coding capabilities, especially for frontend development. Features superior performance on public benchmarks (69.2% on SWE-bench Verified) and more polished code generation for web and 3D scenarios.\n\nKey Improvements\n2x Context Window: Increased from 128k to 256k tokens for better long-horizon task support.\nEnhanced Coding: Specialized training for frontend development, UI code generation, and tool calling.\nAgentic Capabilities: Improved reliability for code generation rivaling frontier closed models.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "logit_bias",
@@ -17598,12 +17184,8 @@
         "maxOutput": 262144,
         "trainingDate": "2025-11-06T00:00:00.000Z",
         "description": "Kimi K2 Thinking is a powerful open-source AI model from Moonshot AI designed for complex, step-by-step reasoning and long-horizon agentic tasks. It excels at solving challenging problems that require multiple steps of reasoning, data retrieval, and tool use, as it can execute up to 200–300 sequential tool calls without degradation. This makes it proficient in areas like math, coding, and autonomous web research by interleaving reasoning with tool invocation.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -17710,12 +17292,8 @@
         "maxOutput": 8192,
         "trainingDate": "2024-09-15T00:00:00.000Z",
         "description": "Qwen2.5 is the latest series of Qwen large language models. For Qwen2.5, we release a number of base language models and instruction-tuned language models ranging from 0.5 to 72 billion parameters.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "structured_outputs",
           "response_format",
@@ -17910,12 +17488,8 @@
         "maxOutput": 40960,
         "trainingDate": "2025-04-28T00:00:00.000Z",
         "description": "Qwen3-32B is a 32.8 billion parameter language model that uniquely supports seamless switching between thinking mode for complex reasoning tasks and non-thinking mode for efficient general dialogue within a single model. The model excels across 100+ languages with enhanced reasoning capabilities, superior human preference alignment, and strong agent-based task performance, supporting up to 131,072 tokens with YaRN extension.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "include_reasoning",
@@ -18030,13 +17604,8 @@
         "maxOutput": 41000,
         "trainingDate": "2025-06-01T00:00:00.000Z",
         "description": "Qwen3 is the latest generation of large language models in Qwen series, offering a comprehensive suite of dense and mixture-of-experts (MoE) models. Built upon extensive training, Qwen3 delivers groundbreaking advancements in reasoning, instruction-following, agent capabilities, and multilingual support.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -18145,15 +17714,8 @@
         "maxOutput": 16384,
         "trainingDate": "2025-07-23T00:00:00.000Z",
         "description": "Qwen3-Coder-480B-A35B-Instruct is the Qwen3's most agentic code model, featuring significant performance on agentic coding, agentic browser-use and other foundational coding tasks, achieving results comparable to Claude Sonnet. This model supports multimodal capabilities including text, images, audio, video, and audio-visual reasoning.",
-        "inputModalities": [
-          "text",
-          "image",
-          "audio",
-          "video"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image", "audio", "video"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -18262,14 +17824,8 @@
         "maxOutput": 16384,
         "trainingDate": "2025-01-01T00:00:00.000Z",
         "description": "Qwen3-Next-80B-A3B-Instruct is a causal language model that is instruction-optimized for chat and agent applications. It features a Mixture-of-Experts (MoE) architecture that achieves an extremely low activation ratio, drastically reducing FLOPs per token while preserving model capacity. The model supports ultra-long contexts and has a Multi-Token Prediction (MTP) mechanism to boost performance and accelerate inference.",
-        "inputModalities": [
-          "text",
-          "image",
-          "video"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image", "video"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -18453,14 +18009,8 @@
         "maxOutput": 81920,
         "trainingDate": "2025-07-25T00:00:00.000Z",
         "description": "Qwen3-235B-A22B-Thinking-2507 is the Qwen3's new model with scaling the thinking capability of Qwen3-235B-A22B, improving both the quality and depth of reasoning.",
-        "inputModalities": [
-          "text",
-          "image",
-          "video"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image", "video"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -18569,14 +18119,8 @@
         "maxOutput": 16384,
         "trainingDate": "2025-09-23T00:00:00.000Z",
         "description": "Qwen3 VL 235B A22B Instruct is a powerful, open-weight multimodal model from Alibaba Cloud that excels at both language and vision tasks. It integrates strong text generation with advanced visual understanding of images and video, enabling applications like visual question answering, document parsing, chart extraction, and multilingual OCR. Key features include robust perception, spatial and long-form video comprehension, and the ability to follow complex instructions in multi-turn dialogues. This model also supports agentic interactions and tool use, including visual coding and GUI automation. ",
-        "inputModalities": [
-          "text",
-          "image",
-          "video"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image", "video"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -18682,12 +18226,8 @@
         "maxOutput": 262144,
         "trainingDate": "2025-07-31T00:00:00.000Z",
         "description": "This streamlined model maintains impressive performance and efficiency, featuring the following key enhancements: (a) Significant Performance among open models on Agentic Coding, Agentic Browser-Use, and other foundational coding tasks. (b) Long-context Capabilities with native support for 256K tokens, extendable up to 1M tokens using Yarn, optimized for repository-scale understanding. (c) Agentic Coding supporting for most platform such as Qwen Code, CLINE, featuring a specially designed function call format.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -19015,12 +18555,8 @@
         "maxOutput": 4096,
         "trainingDate": "2025-01-20T00:00:00.000Z",
         "description": "DeepSeek-R1-Distill-Llama-70B is a 70-billion parameter model created by distilling the reasoning capabilities of DeepSeek's flagship R1 model (671B parameters) into Meta's Llama-3.3-70B-Instruct base. It achieves exceptional performance on mathematical reasoning and coding benchmarks (94.5% on MATH-500, 1633 CodeForces rating), rivaling OpenAI's o1-mini while being fully open-source under MIT license. The model demonstrates that advanced reasoning patterns from larger models can be effectively transferred to smaller, more deployable architectures through knowledge distillation.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "include_reasoning",
@@ -19303,12 +18839,8 @@
         "maxOutput": 8192,
         "trainingDate": "2024-12-26T00:00:00.000Z",
         "description": "DeepSeek-V3.1 (deepseek-chat) is a powerful generalist model with 671B parameters, offering exceptional performance at an economical price. It achieves strong results on mathematical reasoning, coding, and general language tasks. The model supports 128K context length with a default output of 4K tokens (max 8K) and features advanced capabilities like function calling and JSON output.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "function_call",
@@ -19503,12 +19035,8 @@
         "maxOutput": 16384,
         "trainingDate": "2025-09-22T00:00:00.000Z",
         "description": "DeepSeek-V3.1 Terminus is an update to DeepSeek V3.1 that maintains the model's original capabilities while addressing issues reported by users, including language consistency and agent capabilities, further optimizing the model's performance in coding and search agents. It is a large hybrid reasoning model (671B parameters, 37B active) that supports both thinking and non-thinking modes. It extends the DeepSeek-V3 base with a two-phase long-context training process. Users can control the reasoning behaviour with the reasoning enabled boolean. The model improves tool use, code generation, and reasoning efficiency, achieving performance comparable to DeepSeek-R1 on difficult benchmarks while responding more quickly. It supports structured tool calling, code agents, and search agents, making it suitable for research, coding, and agentic workflows.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -19616,12 +19144,8 @@
         "maxOutput": 65536,
         "trainingDate": "2025-09-22T00:00:00.000Z",
         "description": "DeepSeek-V3.2-Exp is an experimental model introducing the groundbreaking DeepSeek Sparse Attention (DSA) mechanism for enhanced long-context processing efficiency. Built on V3.1-Terminus, DSA achieves fine-grained sparse attention while maintaining identical output quality. This delivers substantial computational efficiency improvements without compromising accuracy. Comprehensive benchmarks confirm V3.2-Exp matches V3.1-Terminus performance, proving efficiency gains don't sacrifice capability. As both a powerful tool and research platform, it establishes new paradigms for efficient long-context AI processing.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "tools",
           "tool_choice",
@@ -19884,12 +19408,8 @@
         "maxOutput": 64000,
         "trainingDate": "2025-01-20T00:00:00.000Z",
         "description": "DeepSeek-Reasoner (DeepSeek-V3.1 Thinking Mode) is designed for advanced reasoning, mathematical problem-solving, and complex coding tasks. It uses chain-of-thought reasoning to break down complex problems and achieve superior performance on reasoning benchmarks. Supports 128K context with a default output of 32K tokens (max 64K) for extensive reasoning chains.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "frequency_penalty",
           "logprobs",
@@ -19997,12 +19517,8 @@
         "maxOutput": 163840,
         "trainingDate": "2025-07-02T00:00:00.000Z",
         "description": "DeepSeek-TNG-R1T2-Chimera is the second-generation Chimera model from TNG Tech. It is a 671 B-parameter mixture-of-experts text-generation model assembled from DeepSeek-AI’s R1-0528, R1, and V3-0324 checkpoints with an Assembly-of-Experts merge. The tri-parent design yields strong reasoning performance while running roughly 20 % faster than the original R1 and more than 2× faster than R1-0528 under vLLM, giving a favorable cost-to-intelligence trade-off. The checkpoint supports contexts up to 60 k tokens in standard use (tested to ~130 k) and maintains consistent <think> token behaviour, making it suitable for long-context analysis, dialogue and other open-ended generation tasks.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -20109,13 +19625,8 @@
         "maxOutput": 16400,
         "trainingDate": "2024-07-18T00:00:00.000Z",
         "description": "The Mistral-Nemo-Instruct-2407 Large Language Model (LLM) is an instruct fine-tuned version of the Mistral-Nemo-Base-2407. Trained jointly by Mistral AI and NVIDIA, it significantly outperforms existing models smaller or similar in size.",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -20218,13 +19729,8 @@
         "maxOutput": 128000,
         "trainingDate": "2024-02-26T00:00:00.000Z",
         "description": "Mistral-Small-3.2-24B-Instruct-2506 is an updated 24B parameter model from Mistral optimized for instruction following, repetition reduction, and improved function calling. Compared to the 3.1 release, version 3.2 significantly improves accuracy on WildBench and Arena Hard, reduces infinite generations, and delivers gains in tool use and structured output tasks. It supports image and text inputs with structured outputs, function/tool calling, and strong performance across coding (HumanEval+, MBPP), STEM (MMLU, MATH, GPQA), and vision benchmarks (ChartQA, DocVQA).",
-        "inputModalities": [
-          "text",
-          "image"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text", "image"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -20321,12 +19827,8 @@
         "maxOutput": 32768,
         "trainingDate": "2024-07-24T00:00:00.000Z",
         "description": "Mistral Large 2.1",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -20436,12 +19938,8 @@
         "maxOutput": 131072,
         "trainingDate": "2024-07-18T00:00:00.000Z",
         "description": "As the latest iteration in the GLM series, GLM-4.6 achieves comprehensive enhancements across multiple domains, including real-world coding, long-context processing, reasoning, searching, writing, and agentic applications.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "functions",
           "structured_outputs",
@@ -20547,12 +20045,8 @@
         "maxOutput": 8000,
         "trainingDate": "2025-03-16T00:00:00.000Z",
         "description": "ERNIE-4.5-21B-A3B-Thinking is a text-based Mixture of Experts (MoE) post-training model featuring 21B total parameters with 3B active parameters per token. It delivers enhanced performance on reasoning tasks, including logical reasoning, mathematics, science, coding, text generation, and academic benchmarks that typically require human expertise. The model offers efficient tool utilization capabilities and supports up to 128K tokens for long-context understanding.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "reasoning",
           "max_tokens",
@@ -20649,12 +20143,8 @@
         "maxOutput": 4096,
         "trainingDate": "2025-01-27T00:00:00.000Z",
         "description": "Fast and accurate web-grounded chat model with real-time search capabilities. Ideal for general queries requiring up-to-date information from the web.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -20745,12 +20235,8 @@
         "maxOutput": 4096,
         "trainingDate": "2025-01-27T00:00:00.000Z",
         "description": "Advanced web-grounded chat model with enhanced search quality and 200K context window. Best for complex queries requiring comprehensive web research.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -20843,12 +20329,8 @@
         "maxOutput": 4096,
         "trainingDate": "2025-01-27T00:00:00.000Z",
         "description": "Web-grounded reasoning model that thinks step-by-step before responding. Combines search capabilities with logical reasoning for accurate, well-reasoned answers.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -20942,12 +20424,8 @@
         "maxOutput": 4096,
         "trainingDate": "2025-01-27T00:00:00.000Z",
         "description": "Advanced reasoning model with 128K context window designed for complex, multi-step queries. Provides in-depth analysis with web-grounded research and logical reasoning.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -21041,12 +20519,8 @@
         "maxOutput": 4096,
         "trainingDate": "2025-01-27T00:00:00.000Z",
         "description": "Specialized research model that conducts comprehensive multi-query searches with citation tracking and reasoning tokens. Automatically determines search depth needed for thorough investigation.",
-        "inputModalities": [
-          "text"
-        ],
-        "outputModalities": [
-          "text"
-        ],
+        "inputModalities": ["text"],
+        "outputModalities": ["text"],
         "supportedParameters": [
           "max_tokens",
           "temperature",
@@ -21157,12 +20631,7 @@
         "xai",
         "zai"
       ],
-      "capabilities": [
-        "audio",
-        "caching",
-        "image",
-        "web_search"
-      ]
+      "capabilities": ["audio", "caching", "image", "web_search"]
     }
   },
   "error": null

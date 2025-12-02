@@ -32,7 +32,7 @@ export class RewardsManager {
     const supabase = await createClient();
 
     const { data, error } = await supabase
-      .from("daily_rewards")
+      .from("daily_rewards" as any)
       .select("last_claimed, streak_count")
       .eq("user_id", userId)
       .single();
@@ -46,7 +46,8 @@ export class RewardsManager {
       };
     }
 
-    const lastClaimed = new Date(data.last_claimed);
+    const rewardData = data as any;
+    const lastClaimed = new Date(rewardData.last_claimed);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -61,8 +62,8 @@ export class RewardsManager {
 
     return {
       canClaim,
-      lastClaimed: data.last_claimed,
-      streakCount: data.streak_count || 0,
+      lastClaimed: rewardData.last_claimed,
+      streakCount: rewardData.streak_count || 0,
       nextClaimTime: canClaim ? undefined : nextClaimTime.toISOString(),
       rewardAmount: 10,
     };
@@ -88,7 +89,7 @@ export class RewardsManager {
     const supabase = await createClient();
 
     const { data, error } = await supabase
-      .from("daily_rewards")
+      .from("daily_rewards" as any)
       .select("streak_count, last_claimed, created_at")
       .eq("user_id", userId)
       .single();
@@ -101,16 +102,16 @@ export class RewardsManager {
       };
     }
 
+    const streakData = data as any;
+
     // Calculate total days since first reward
-    const created = new Date(data.created_at);
+    const created = new Date(streakData.created_at);
     const today = new Date();
-    const totalDays = Math.floor(
-      (today.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)
-    );
+    const totalDays = Math.floor((today.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
 
     return {
-      streak_count: data.streak_count || 0,
-      last_claimed: data.last_claimed,
+      streak_count: streakData.streak_count || 0,
+      last_claimed: streakData.last_claimed,
       total_days: totalDays + 1, // +1 to include the first day
     };
   }

@@ -23,24 +23,6 @@ export interface LLMGenerationOptions {
 }
 
 /**
- * Token usage information from LLM API response
- */
-export interface TokenUsage {
-  prompt_tokens: number;
-  completion_tokens: number;
-  total_tokens: number;
-}
-
-/**
- * LLM response with content and usage
- * @internal
- */
-interface LLMResponse {
-  content: string;
-  usage?: TokenUsage;
-}
-
-/**
  * LLM Service handles all AI model interactions
  *
  * Supports both Helicone and OpenRouter with automatic failover
@@ -49,10 +31,7 @@ export class LLMService {
   private heliconeConfig?: LLMConfig;
   private openRouterConfig?: LLMConfig;
 
-  constructor(options?: {
-    helicone?: LLMConfig;
-    openRouter?: LLMConfig;
-  }) {
+  constructor(options?: { helicone?: LLMConfig; openRouter?: LLMConfig }) {
     this.heliconeConfig = options?.helicone;
     this.openRouterConfig = options?.openRouter;
 
@@ -68,8 +47,7 @@ export class LLMService {
       this.openRouterConfig = {
         apiKey: process.env.OPENROUTER_API_KEY,
         model: process.env.OPENROUTER_MODEL || "openai/gpt-5.1",
-        siteUrl:
-          process.env.OPENROUTER_SITE_URL || "http://localhost:3000",
+        siteUrl: process.env.OPENROUTER_SITE_URL || "http://localhost:3000",
         appName: process.env.OPENROUTER_APP_NAME || "investor-ai",
       };
     }
@@ -101,36 +79,13 @@ export class LLMService {
       try {
         const span = trace?.span({
           name: "llm.helicone",
-          input: {
-            systemPromptLength: systemPrompt.length,
-            userPromptLength: userPrompt.length,
-            model: this.heliconeConfig.model,
-          },
+          input: { systemPrompt, userPrompt, options },
         });
 
-        const response = await this.callHelicone(
-          systemPrompt,
-          userPrompt,
-          options
-        );
+        const result = await this.callHelicone(systemPrompt, userPrompt, options);
 
-        // Record token usage and cost
-        if (response.usage) {
-          const cost = this.calculateCost(
-            response.usage,
-            this.heliconeConfig.model
-          );
-          span?.update({
-            metadata: {
-              ...response.usage,
-              estimated_cost_usd: cost,
-              model: this.heliconeConfig.model,
-            },
-          });
-        }
-
-        span?.end({ output: { contentLength: response.content.length } });
-        return response.content;
+        span?.end({ output: { length: result.length } });
+        return result;
       } catch (error) {
         console.warn("Helicone failed, falling back to OpenRouter:", error);
         trace?.event({
@@ -145,118 +100,23 @@ export class LLMService {
       try {
         const span = trace?.span({
           name: "llm.openrouter",
-          input: {
-            systemPromptLength: systemPrompt.length,
-            userPromptLength: userPrompt.length,
-            model: this.openRouterConfig.model,
-          },
+          input: { systemPrompt, userPrompt, options },
         });
 
-        const response = await this.callOpenRouter(
-          systemPrompt,
-          userPrompt,
-          options
-        );
+        const result = await this.callOpenRouter(systemPrompt, userPrompt, options);
 
-        // Record token usage and cost
-        if (response.usage) {
-          const cost = this.calculateCost(
-            response.usage,
-            this.openRouterConfig.model
-          );
-          span?.update({
-            metadata: {
-              ...response.usage,
-              estimated_cost_usd: cost,
-              model: this.openRouterConfig.model,
-            },
-          });
-        }
-
-        span?.end({ output: { contentLength: response.content.length } });
-        return response.content;
+        span?.end({ output: { length: result.length } });
+        return result;
       } catch (error) {
         trace?.event({
           name: "openrouter-failed",
           metadata: { error: String(error) },
         });
-        throw new ExternalServiceError("All LLM providers failed", {
-          error: String(error),
-        });
+        throw new ExternalServiceError("All LLM providers failed", { error: String(error) });
       }
     }
 
     throw new ExternalServiceError("No LLM provider configured");
-  }
-
-  /**
-   * Calculate estimated cost for LLM API call
-   *
-   * Pricing as of 2025-12 (subject to change)
-   *
-   * @param usage - Token usage information
-   * @param model - Model identifier
-   * @returns Estimated cost in USD
-   * @private
-   */
-  private calculateCost(usage: TokenUsage, model: string): number {
-    // Pricing per 1M tokens (as of 2025-12)
-    const pricing: Record<
-      string,
-      { prompt: number; completion: number }
-    > = {
-      "gpt-4o-mini": {
-        prompt: 0.15, // $0.15 / 1M tokens
-        completion: 0.6, // $0.60 / 1M tokens
-      },
-      "gpt-4o": {
-        prompt: 2.5, // $2.50 / 1M tokens
-        completion: 10.0, // $10.00 / 1M tokens
-      },
-      "gpt-4-turbo": {
-        prompt: 10.0,
-        completion: 30.0,
-      },
-      "claude-3.5-sonnet": {
-        prompt: 3.0,
-        completion: 15.0,
-      },
-      "claude-3-opus": {
-        prompt: 15.0,
-        completion: 75.0,
-      },
-      // OpenRouter models
-      "openai/gpt-4o-mini": {
-        prompt: 0.15,
-        completion: 0.6,
-      },
-      "openai/gpt-4o": {
-        prompt: 2.5,
-        completion: 10.0,
-      },
-      "openai/gpt-5.1": {
-        prompt: 2.5, // Estimated, adjust when official pricing available
-        completion: 10.0,
-      },
-      "anthropic/claude-3.5-sonnet": {
-        prompt: 3.0,
-        completion: 15.0,
-      },
-      "anthropic/claude-3-opus": {
-        prompt: 15.0,
-        completion: 75.0,
-      },
-    };
-
-    // Default to gpt-4o-mini pricing if model not found
-    const modelPricing = pricing[model] || pricing["gpt-4o-mini"];
-
-    // Calculate cost (pricing is per 1M tokens, so divide by 1,000,000)
-    const promptCost = (usage.prompt_tokens * modelPricing.prompt) / 1_000_000;
-    const completionCost =
-      (usage.completion_tokens * modelPricing.completion) / 1_000_000;
-
-    return promptCost + completionCost;
   }
 
   /**
@@ -267,37 +127,32 @@ export class LLMService {
     systemPrompt: string,
     userPrompt: string,
     options?: LLMGenerationOptions
-  ): Promise<LLMResponse> {
+  ): Promise<string> {
     if (!this.heliconeConfig) {
       throw new Error("Helicone not configured");
     }
 
-    const res = await fetch(
-      "https://gateway.helicone.ai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Helicone-Auth": `Bearer ${this.heliconeConfig.apiKey}`,
-        },
-        body: JSON.stringify({
-          model: this.heliconeConfig.model,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-          temperature: options?.temperature ?? 0.7,
-          max_tokens: options?.maxTokens ?? 4096,
-          top_p: options?.topP ?? 1.0,
-        }),
-      }
-    );
+    const res = await fetch("https://gateway.helicone.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Helicone-Auth": `Bearer ${this.heliconeConfig.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: this.heliconeConfig.model,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: options?.temperature ?? 0.7,
+        max_tokens: options?.maxTokens ?? 4096,
+        top_p: options?.topP ?? 1.0,
+      }),
+    });
 
     if (!res.ok) {
       const errText = await res.text();
-      throw new Error(
-        `Helicone request failed: ${res.status} ${errText}`
-      );
+      throw new Error(`Helicone request failed: ${res.status} ${errText}`);
     }
 
     const data = await res.json();
@@ -307,10 +162,7 @@ export class LLMService {
       throw new Error("Invalid response from Helicone");
     }
 
-    return {
-      content,
-      usage: data.usage as TokenUsage | undefined,
-    };
+    return content;
   }
 
   /**
@@ -321,39 +173,34 @@ export class LLMService {
     systemPrompt: string,
     userPrompt: string,
     options?: LLMGenerationOptions
-  ): Promise<LLMResponse> {
+  ): Promise<string> {
     if (!this.openRouterConfig) {
       throw new Error("OpenRouter not configured");
     }
 
-    const res = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.openRouterConfig.apiKey}`,
-          "HTTP-Referer": this.openRouterConfig.siteUrl || "",
-          "X-Title": this.openRouterConfig.appName || "",
-        },
-        body: JSON.stringify({
-          model: this.openRouterConfig.model,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-          temperature: options?.temperature ?? 0.7,
-          max_tokens: options?.maxTokens ?? 4096,
-          top_p: options?.topP ?? 1.0,
-        }),
-      }
-    );
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.openRouterConfig.apiKey}`,
+        "HTTP-Referer": this.openRouterConfig.siteUrl || "",
+        "X-Title": this.openRouterConfig.appName || "",
+      },
+      body: JSON.stringify({
+        model: this.openRouterConfig.model,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: options?.temperature ?? 0.7,
+        max_tokens: options?.maxTokens ?? 4096,
+        top_p: options?.topP ?? 1.0,
+      }),
+    });
 
     if (!res.ok) {
       const errText = await res.text();
-      throw new Error(
-        `OpenRouter request failed: ${res.status} ${errText}`
-      );
+      throw new Error(`OpenRouter request failed: ${res.status} ${errText}`);
     }
 
     const data = await res.json();
@@ -363,10 +210,7 @@ export class LLMService {
       throw new Error("Invalid response from OpenRouter");
     }
 
-    return {
-      content,
-      usage: data.usage as TokenUsage | undefined,
-    };
+    return content;
   }
 
   /**
@@ -380,42 +224,31 @@ export class LLMService {
       throw new Error("OpenRouter not configured for embeddings");
     }
 
-    const model =
-      process.env.OPENROUTER_EMBEDDING_MODEL ||
-      "text-embedding-3-small";
+    const model = process.env.OPENROUTER_EMBEDDING_MODEL || "text-embedding-3-small";
 
-    const res = await fetch(
-      "https://openrouter.ai/api/v1/embeddings",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.openRouterConfig.apiKey}`,
-          "HTTP-Referer": this.openRouterConfig.siteUrl || "",
-          "X-Title": this.openRouterConfig.appName || "",
-        },
-        body: JSON.stringify({
-          model,
-          input,
-        }),
-      }
-    );
+    const res = await fetch("https://openrouter.ai/api/v1/embeddings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.openRouterConfig.apiKey}`,
+        "HTTP-Referer": this.openRouterConfig.siteUrl || "",
+        "X-Title": this.openRouterConfig.appName || "",
+      },
+      body: JSON.stringify({
+        model,
+        input,
+      }),
+    });
 
     if (!res.ok) {
       const errText = await res.text();
-      throw new Error(
-        `Embedding request failed: ${res.status} ${errText}`
-      );
+      throw new Error(`Embedding request failed: ${res.status} ${errText}`);
     }
 
     const data = await res.json();
     const embedding = data?.data?.[0]?.embedding;
 
-    if (
-      !embedding ||
-      !Array.isArray(embedding) ||
-      embedding.length !== 1536
-    ) {
+    if (!embedding || !Array.isArray(embedding) || embedding.length !== 1536) {
       throw new Error("Invalid embedding response");
     }
 

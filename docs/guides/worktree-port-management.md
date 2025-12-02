@@ -5,6 +5,7 @@
 > **请勿修改此端口系统！** 这是经过长时间调试和多次迭代优化的稳定方案。
 >
 > 🚫 **禁止操作：**
+>
 > - 不要修改 `package.json` 中的 `"dev": "next dev"` 脚本
 > - 不要添加 `-p` 或 `--port` 参数
 > - 不要删除或修改 `scripts/worktree-ports.json`
@@ -31,6 +32,7 @@
 ### 方案选择
 
 采用**环境变量方案**（Next.js 原生支持）：
+
 - `package.json` 中的 `dev` 脚本**不包含端口号**：`"dev": "next dev"`
 - Next.js 自动从 `.env.local` 读取 `PORT` 环境变量
 - 每个 worktree 有自己的 `.env.local` 文件（被 gitignore，不会提交）
@@ -55,6 +57,7 @@ npm run worktree:setup-port
 ```
 
 输出示例：
+
 ```
 📍 Current branch: g2/worktree
 🔌 Setting dev port to: 3002
@@ -94,20 +97,21 @@ node scripts/setup-worktree-port.js
 
 ## 端口分配
 
-| 目录/分支 | 端口 | .env.local 配置 |
-|-----------|------|-----------------|
-| main (主目录) | 3000 | `PORT=3000` |
-| g1/worktree | 3001 | `PORT=3001` |
-| g2/worktree | 3002 | `PORT=3002` |
-| g3/worktree | 3003 | `PORT=3003` |
-| g4/worktree | 3004 | `PORT=3004` |
-| g5/worktree | 3005 | `PORT=3005` |
+| 目录/分支     | 端口 | .env.local 配置 |
+| ------------- | ---- | --------------- |
+| main (主目录) | 3000 | `PORT=3000`     |
+| g1/worktree   | 3001 | `PORT=3001`     |
+| g2/worktree   | 3002 | `PORT=3002`     |
+| g3/worktree   | 3003 | `PORT=3003`     |
+| g4/worktree   | 3004 | `PORT=3004`     |
+| g5/worktree   | 3005 | `PORT=3005`     |
 
 ## 维护说明
 
 ### 添加新 Worktree
 
 1. 在 `scripts/worktree-ports.json` 中添加新的端口映射：
+
 ```json
 {
   "ports": {
@@ -117,6 +121,7 @@ node scripts/setup-worktree-port.js
 ```
 
 2. 在新 worktree 中运行：
+
 ```bash
 npm run worktree:setup-port
 ```
@@ -132,6 +137,7 @@ done
 ```
 
 预期输出：
+
 ```
 === investor-ai-g1 ===
   PORT=3001
@@ -165,20 +171,23 @@ Next.js CLI (`next dev`) 会按以下优先级读取端口：
 如果你之前使用 `package.json` 的 `-p` 参数：
 
 1. **更新 package.json**:
+
 ```json
 {
   "scripts": {
-    "dev": "next dev"  // 移除 -p 3002
+    "dev": "next dev" // 移除 -p 3002
   }
 }
 ```
 
 2. **运行设置脚本**:
+
 ```bash
 npm run worktree:setup-port
 ```
 
 3. **验证**:
+
 ```bash
 npm run dev
 # 应该启动在正确的端口

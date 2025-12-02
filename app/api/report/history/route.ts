@@ -36,9 +36,16 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * pageSize;
 
     // Query report history with RLS (automatically filtered by user_id via RLS)
-    const { data: reports, error: queryError, count } = await supabase
+    const {
+      data: reports,
+      error: queryError,
+      count,
+    } = await supabase
       .from("report_runs")
-      .select("id, symbol, created_at, status, markdown_path, docx_path, pdf_path, mode, reused_from_run_id, is_featured, lang", { count: "exact" })
+      .select(
+        "id, symbol, created_at, status, markdown_path, docx_path, pdf_path, mode, reused_from_run_id, is_featured, lang",
+        { count: "exact" }
+      )
       .eq("user_id", userId as never)
       .order("created_at", { ascending: false })
       .range(offset, offset + pageSize - 1);
@@ -64,24 +71,21 @@ export async function GET(request: NextRequest) {
         return Promise.all(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           reports.map(async (report: any) => {
-            const docxSigned =
-              report.docx_path
-                ? await serviceClient.storage
-                    .from("report-assets")
-                    .createSignedUrl(report.docx_path, SIGNED_URL_TTL_SECONDS)
-                : null;
-            const markdownSigned =
-              report.markdown_path
-                ? await serviceClient.storage
-                    .from("report-assets")
-                    .createSignedUrl(report.markdown_path, SIGNED_URL_TTL_SECONDS)
-                : null;
-            const pdfSigned =
-              report.pdf_path
-                ? await serviceClient.storage
-                    .from("report-assets")
-                    .createSignedUrl(report.pdf_path, SIGNED_URL_TTL_SECONDS)
-                : null;
+            const docxSigned = report.docx_path
+              ? await serviceClient.storage
+                  .from("report-assets")
+                  .createSignedUrl(report.docx_path, SIGNED_URL_TTL_SECONDS)
+              : null;
+            const markdownSigned = report.markdown_path
+              ? await serviceClient.storage
+                  .from("report-assets")
+                  .createSignedUrl(report.markdown_path, SIGNED_URL_TTL_SECONDS)
+              : null;
+            const pdfSigned = report.pdf_path
+              ? await serviceClient.storage
+                  .from("report-assets")
+                  .createSignedUrl(report.pdf_path, SIGNED_URL_TTL_SECONDS)
+              : null;
 
             return {
               ...report,
@@ -115,9 +119,6 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (err) {
     console.error("Report history error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

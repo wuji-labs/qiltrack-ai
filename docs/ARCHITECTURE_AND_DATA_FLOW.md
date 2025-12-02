@@ -298,11 +298,11 @@ Audit Log (report_credit_events):
 
 ### 三大操作的数据流
 
-| 操作 | 输入 | 处理 | 输出 |
-|------|------|------|------|
-| **注册** | email | fn_initialize_profile | credits_available=30 ✅ |
-| **生成报告** | symbol | fn_consume_report_credit | credits_available-1 ✅ |
-| **领取奖励** | user_id | fn_claim_daily_reward | credits_available+10 ✅ |
+| 操作         | 输入    | 处理                     | 输出                    |
+| ------------ | ------- | ------------------------ | ----------------------- |
+| **注册**     | email   | fn_initialize_profile    | credits_available=30 ✅ |
+| **生成报告** | symbol  | fn_consume_report_credit | credits_available-1 ✅  |
+| **领取奖励** | user_id | fn_claim_daily_reward    | credits_available+10 ✅ |
 
 ### 并发安全保证
 

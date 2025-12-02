@@ -19,6 +19,7 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 **遇到问题？** 查看 **[故障排查指南](docs/troubleshooting/README.md)** 📋
 
 ### 系统访问权限（默认开启）
+
 - Codex/Claude 默认具备 GitHub、Supabase、MCP DevTools、LLM（OpenRouter/Finnhub/Helicone）完整访问，禁止再以“未登录/无权限”为由拒绝执行，细则见 `CODEX_CLAUDE_COLLAB.md` 3.1。
 - GitHub：SSH + `gh` 已登录（explore0012），可直接 `gh pr view/checks/run view/create/merge/comment`。
 - Supabase：`.env.local` 已含项目 `inmtounwqcjwsxkfnsfd` 凭证，可用 Dashboard/CLI/REST/脚本管理 Auth/Storage/DB。
@@ -28,6 +29,7 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 ---
 
 ## 🎯 核心能力
+
 - **模糊搜索**：输入英文公司名或股票代码，自动补全来自 `/api/search`。
 - **一键生成报告**：`/api/report` 汇总 Finnhub 数据并调度 OpenRouter，产出结构化分析。
 - **积分管控**：基于 Supabase 的统一积分系统，支持每日签到、管理员授予积分等功能。
@@ -36,6 +38,7 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 - **扩展空间**：三层架构设计，便于未来拆分为微服务。
 
 ### 产品定位与合规声明
+
 - CodeX / Investor AI 仅提供"结构化信息整理"能力，帮助用户理解企业；**不提供投资建议、买卖指令或个性化判断**。
 - 所有内容均基于公开数据与通用分析方法自动生成，可能存在延迟或偏差，用户需自行判断并承担风险。
 - 生成的文本在后端会自动进行敏感词重写与过滤，若模型输出任何"买入/卖出/调仓"信息，将被替换为「分析检核清单」。
@@ -63,6 +66,7 @@ npm run dev
 ⚠️ **重要**：请使用上述工作流，不要手动执行单个 git 命令。脚本已集成三重 BOM 清理，保证环境可用。
 
 ### Worktree 多组并行开发
+
 ```powershell
 # 新建工作区（首次）
 .\scripts\prep-group.ps1 -Name g1 -Branch g1/task-name
@@ -75,19 +79,20 @@ git reset --hard origin/main
 # 启动开发服务器（不同端口避免冲突）
 cd D:\Projects\investor-ai-g1 && npm run dev
 ```
+
 详见 [Worktree 多组协作](docs/guides/worktree-multi-team.md)。
 
 ⚠️ **避免手动 git 操作**：不要单独执行 `git reset`、`git sparse-checkout` 等命令，请使用 `reset-worktrees-only.ps1` 确保 BOM 问题不会出现。
 
-| 命令 | 说明 |
-| --- | --- |
-| `npm run dev` | 启动开发服务器，默认 http://localhost:3000 |
-| `npm run build` | 生成 `.next` 生产构建 |
-| `npm start` | 运行生产构建 |
-| `npm run lint` | ESLint（core-web-vitals） |
-| `npm run test` | Vitest（jsdom），覆盖 API service 与进度条 hook |
-| `npm run env:check` | 检查开发环境是否满足要求 |
-| `npm run pr:ready` | 一键验证代码质量（lint + test） |
+| 命令                | 说明                                            |
+| ------------------- | ----------------------------------------------- |
+| `npm run dev`       | 启动开发服务器，默认 http://localhost:3000      |
+| `npm run build`     | 生成 `.next` 生产构建                           |
+| `npm start`         | 运行生产构建                                    |
+| `npm run lint`      | ESLint（core-web-vitals）                       |
+| `npm run test`      | Vitest（jsdom），覆盖 API service 与进度条 hook |
+| `npm run env:check` | 检查开发环境是否满足要求                        |
+| `npm run pr:ready`  | 一键验证代码质量（lint + test）                 |
 
 > 运行前请复制 `.env.local.example` 为 `.env.local` 并补齐密钥。
 
@@ -98,6 +103,7 @@ cd D:\Projects\investor-ai-g1 && npm run dev
 - **Git** 2.40.0+
 
 **首次使用，请运行环境检查**：
+
 ```bash
 npm run env:check
 ```
@@ -109,24 +115,28 @@ npm run env:check
 本仓库使用 SSH 进行 Git 推送，请按以下步骤配置本地 SSH key：
 
 #### 1. 生成 SSH key（若未生成）
+
 ```bash
 ssh-keygen -t ed25519 -C "your_email@example.com"
 # 提示时直接回车（使用默认路径 ~/.ssh/id_ed25519，不设密码短语）
 ```
 
 #### 2. 启动 SSH agent 并添加密钥
+
 ```bash
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
 ```
 
 #### 3. 获取并添加公钥到 GitHub
+
 ```bash
 cat ~/.ssh/id_ed25519.pub
 # 复制输出的公钥
 ```
 
 然后打开 [GitHub SSH Keys 设置](https://github.com/settings/keys)：
+
 - 点击 **New SSH key**
 - Title 填入 "Local Dev Machine"（或自定义名称）
 - Key type 选择 **Authentication Key**
@@ -134,12 +144,14 @@ cat ~/.ssh/id_ed25519.pub
 - 点击 **Add SSH key**
 
 #### 4. 验证 SSH 连接
+
 ```bash
 ssh -T git@github.com
 # 应返回：Hi <username>! You've successfully authenticated...
 ```
 
 #### 5. 推送代码
+
 ```bash
 # 首次推送需要设置上游分支
 git push --set-upstream origin <branch-name>
@@ -151,42 +163,47 @@ git push
 ## 环境变量
 
 ### 核心配置（必需）
-| 环境变量 | 说明 | 示例 |
-|---------|------|------|
-| `FINNHUB_API_KEY` | Finnhub API 密钥（行情数据） | `demo` / 真实密钥 |
-| `NEXTAUTH_URL` | 应用地址 | `http://localhost:3000` |
+
+| 环境变量          | 说明                            | 示例                      |
+| ----------------- | ------------------------------- | ------------------------- |
+| `FINNHUB_API_KEY` | Finnhub API 密钥（行情数据）    | `demo` / 真实密钥         |
+| `NEXTAUTH_URL`    | 应用地址                        | `http://localhost:3000`   |
 | `NEXTAUTH_SECRET` | NextAuth 密钥（任意随机字符串） | `openssl rand -base64 32` |
 
 ### LLM 供应商（至少配置其一）
-| 环境变量 | 说明 | 优先级 |
-|---------|------|--------|
-| `OPENROUTER_API_KEY` | OpenRouter API Key | 兜底 |
-| `OPENROUTER_MODEL` | OpenRouter 模型 | 兜底 |
-| `HELICONE_API_KEY` | Helicone API Key（可选，用于监控） | 优先 |
-| `HELICONE_MODEL` | Helicone 模型 | 优先 |
+
+| 环境变量             | 说明                               | 优先级 |
+| -------------------- | ---------------------------------- | ------ |
+| `OPENROUTER_API_KEY` | OpenRouter API Key                 | 兜底   |
+| `OPENROUTER_MODEL`   | OpenRouter 模型                    | 兜底   |
+| `HELICONE_API_KEY`   | Helicone API Key（可选，用于监控） | 优先   |
+| `HELICONE_MODEL`     | Helicone 模型                      | 优先   |
 
 ### Supabase 部署（Hosted 实例）
-| 环境变量 | 说明 | 获取位置 |
-|---------|------|--------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Hosted 项目 API URL | Supabase Dashboard → Settings → API |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 公钥（客户端用） | Supabase Dashboard → Settings → API → Anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | 服务密钥（服务端用） | Supabase Dashboard → Settings → API → Service role key |
-| `SUPABASE_STORAGE_REPORT_BUCKET` | 存储桶名 | 默认 `report-assets`（需先创建） |
-| `TEST_REPORT_TOKEN` | 测试报告 Token（开发/验证使用） | 任意字符串 |
+
+| 环境变量                         | 说明                            | 获取位置                                               |
+| -------------------------------- | ------------------------------- | ------------------------------------------------------ |
+| `NEXT_PUBLIC_SUPABASE_URL`       | Hosted 项目 API URL             | Supabase Dashboard → Settings → API                    |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`  | 公钥（客户端用）                | Supabase Dashboard → Settings → API → Anon key         |
+| `SUPABASE_SERVICE_ROLE_KEY`      | 服务密钥（服务端用）            | Supabase Dashboard → Settings → API → Service role key |
+| `SUPABASE_STORAGE_REPORT_BUCKET` | 存储桶名                        | 默认 `report-assets`（需先创建）                       |
+| `TEST_REPORT_TOKEN`              | 测试报告 Token（开发/验证使用） | 任意字符串                                             |
 
 ### 可选配置
-| 环境变量 | 说明 |
-|---------|------|
-| `STRIPE_SECRET_KEY` | Stripe 私钥（支付功能） |
-| `STRIPE_WEBHOOK_SECRET` | Stripe Webhook 密钥 |
-| `EMAIL_SERVER` | SMTP 服务器地址（邮件提醒） |
-| `EMAIL_FROM` | 发件地址 |
+
+| 环境变量                | 说明                        |
+| ----------------------- | --------------------------- |
+| `STRIPE_SECRET_KEY`     | Stripe 私钥（支付功能）     |
+| `STRIPE_WEBHOOK_SECRET` | Stripe Webhook 密钥         |
+| `EMAIL_SERVER`          | SMTP 服务器地址（邮件提醒） |
+| `EMAIL_FROM`            | 发件地址                    |
 
 参考示例：[`.env.local.example`](./.env.local.example)
 
 ## 📁 目录结构
 
 ### 三层架构
+
 ```
 app/                          # 表现层 (Next.js App Router)
 ├── api/                     # API Routes
@@ -221,6 +238,7 @@ types/                       # TypeScript 类型定义
 ## Supabase 部署（Hosted 实例）
 
 ### 前置条件
+
 - Node 18+，Supabase CLI ≥ 2.58
 - Hosted Supabase 项目已创建（[Supabase Dashboard](https://app.supabase.com)）
 - Finnhub API Key（免费或付费）
@@ -229,6 +247,7 @@ types/                       # TypeScript 类型定义
 ### 部署步骤
 
 #### 1. 初始化 Supabase 连接
+
 ```bash
 # 登录 Supabase CLI
 npx supabase login
@@ -239,6 +258,7 @@ npx supabase link --project-ref <your-project-ref>
 ```
 
 #### 2. 推送数据库迁移
+
 ```bash
 # 将本地 migrations/ 推送到 Hosted 实例
 npx supabase db push
@@ -248,12 +268,15 @@ npx supabase gen types typescript --linked --schema public > types/database.ts
 ```
 
 #### 3. 创建存储桶
+
 在 [Supabase Dashboard](https://app.supabase.com) → Storage 中创建私有桶：
+
 - **桶名**：`report-assets`
 - **设为私有**：勾选 "Private"
 - **RLS 策略**：仅 Service Role 可上传；客户端通过签名 URL 读取
 
 #### 4. 配置环境变量
+
 复制 `.env.local.example` 为 `.env.local`，补齐以下值：
 
 ```bash
@@ -284,6 +307,7 @@ TEST_REPORT_TOKEN=test-token-12345
 ```
 
 #### 5. 本地校验
+
 ```bash
 npm run lint   # 检查代码风格
 npm run test   # 运行单元与集成测试
@@ -291,6 +315,7 @@ npm run dev    # 启动开发服务器
 ```
 
 #### 6. 手动 API 验证
+
 ```bash
 # 测试报告生成（需 LLM 配置）
 curl "http://localhost:3000/api/report?symbol=AAPL&testToken=test-token-12345"
@@ -305,13 +330,16 @@ curl -H "Cookie: ..." "http://localhost:3000/api/report/history"
 ```
 
 ### 常见问题
+
 - **部署失败**：检查 CLI 是否已 `link` 到项目，且网络连接正常。
 - **类型错误**：运行 `npx supabase gen types typescript --linked > types/database.ts` 重新生成。
 - **存储上传失败**：确认桶为私有，Service Role 策略已启用。
 - **额度查询返回 null**：检查 `v_user_quota` 视图是否存在，及 RLS 策略。
 
 更详细的部署与故障排查见 `docs/guides/supabase-report-stage2-cavr.md`。
+
 ## 注册 / 额度逻辑（当前实现）
+
 - NextAuth（Email / Google / Apple / Azure AD）登录，Prisma SQLite 存储用户信息与会话。
 - `User.quota` 默认为 1，`reportsUsed` 每次生成成功后递增，后端 `/api/report` 直接校验并返回 401/429。
 - 前端拿到 401 会引导去登录，429 会提示额度耗尽；成功生成后自动刷新 session 的剩余额度。
@@ -322,6 +350,7 @@ curl -H "Cookie: ..." "http://localhost:3000/api/report/history"
 - 点击任一卡片会导航到 `/reports/[slug]`，该路由展示大图、标签/作者、阅读时长和段落正文，打造正式博客体验。
 
 ## 手动验证脚本
+
 1. `npm run dev` 启动服务。
 2. 打开首页，测试导航锚点（产品介绍 / 生成器 / 工作流程 / 定价 / FAQ）。
 3. 输入 `NVDA`，从下拉选择生成报告；留意进度条与错误提示。
@@ -329,11 +358,13 @@ curl -H "Cookie: ..." "http://localhost:3000/api/report/history"
 5. 再次尝试生成，确认 UI 提示"仅首份报告免费，订阅后解锁更多"（额度校验上线后替换成真实逻辑）。
 
 ## 调试工具与 MCP
+
 - 推荐直接使用浏览器 DevTools；如需远程或脚本化调试，可启用 Chrome DevTools MCP（`docs/guides/chrome-devtools-mcp-guide.md`）。
 - 需要查官方文档时，可使用 Context7 MCP（`docs/guides/context7-mcp-guide.md`）搜索/拉取库的 API 参考。
 - 团队成员在使用 MCP 前需确认本地环境满足要求，并避免多个实例竞争同一浏览器进程。
 
 ## 路线图摘要
+
 - **Phase 0**：信息架构、README、环境变量模板（当前完成）。
 - **Phase 1**：导航 + 核心入口体验，突出仅首份免费（进行中）。
 - **Phase 2**：NextAuth 登录、用户资料、首份免费额度校验。

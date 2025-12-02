@@ -26,12 +26,14 @@
 ### 1.1 项目概况
 
 **Investor AI** 是一个基于 AI 的美股投研报告生成平台，当前技术栈：
+
 - Next.js 16.0.3 (App Router)
 - Supabase (PostgreSQL + Auth + Storage)
 - OpenRouter/Helicone (LLM 服务)
 - TypeScript 5+
 
 **代码统计**：
+
 - 87 个 TS/TSX 文件
 - 21 个 API 路由
 - 核心 API 文件：`app/api/report/route.ts` (795 行)
@@ -41,6 +43,7 @@
 #### 🔴 P0 - 严重问题
 
 **问题 1: 业务逻辑混杂在 API 路由中**
+
 ```typescript
 // 当前：app/api/report/route.ts (795 行)
 export async function POST(request: Request) {
@@ -52,13 +55,16 @@ export async function POST(request: Request) {
   // - 积分扣除
 }
 ```
+
 **影响**：
+
 - 代码难以测试（需要 mock 多个外部依赖）
 - 逻辑无法复用
 - 违反单一职责原则
 - 维护成本高
 
 **问题 2: 配额系统重复实现**
+
 ```sql
 -- 存在两套配额系统：
 -- 1. profiles 表
@@ -69,12 +75,15 @@ profiles.reports_used     -- 已使用次数
 report_credits.credits_available  -- 可用积分
 report_credits.credits_used       -- 已用积分
 ```
+
 **影响**：
+
 - 数据可能不一致
 - 业务逻辑混乱
 - 增加维护成本
 
 **问题 3: 缺少核心服务层（core/）**
+
 ```
 当前结构：
 lib/
@@ -90,7 +99,9 @@ lib/
 │   ├── credits/
 │   └── users/
 ```
+
 **影响**：
+
 - 业务逻辑散落各处
 - 无法支持微服务化
 - 代码复用困难
@@ -100,12 +111,14 @@ lib/
 **问题 4: Admin 面板功能不完整**
 
 当前只有报告管理，缺少：
+
 - ❌ 用户管理（查看、编辑、删除用户）
 - ❌ 积分管理（手动调整、批量操作）
 - ❌ 审计日志查看
 - ❌ 系统配置管理
 
 **问题 5: 错误处理不统一**
+
 ```typescript
 // app/api/report/route.ts
 throw new Error(`Embedding request failed: ${res.status}`);
@@ -117,6 +130,7 @@ throw error;
 ```
 
 **问题 6: 测试覆盖率低**
+
 - 已测试：`api.test.ts`, `quota.test.ts` (约 15%)
 - 未测试：报告生成核心逻辑、Admin API、内容净化
 
@@ -128,14 +142,14 @@ throw error;
 
 ### 1.3 与 ADR 目标的差距
 
-| ADR 要求 | 当前状态 | 完成度 |
-|---------|---------|--------|
-| 业务逻辑迁移到 `core/` 层 | ❌ 未实现 | 0% |
-| 创建独立的 `/admin` 面板 | ⚠️ 部分实现（仅报告管理） | 30% |
-| 核心服务层（reports/credits/users） | ❌ 未实现 | 10% |
-| 统一 API 端点与服务通信 | ⚠️ 部分实现 | 50% |
-| 数据库模型与 RLS | ✅ 已完成 | 100% |
-| 可扩展性与微服务支持 | ❌ 未准备 | 5% |
+| ADR 要求                            | 当前状态                  | 完成度 |
+| ----------------------------------- | ------------------------- | ------ |
+| 业务逻辑迁移到 `core/` 层           | ❌ 未实现                 | 0%     |
+| 创建独立的 `/admin` 面板            | ⚠️ 部分实现（仅报告管理） | 30%    |
+| 核心服务层（reports/credits/users） | ❌ 未实现                 | 10%    |
+| 统一 API 端点与服务通信             | ⚠️ 部分实现               | 50%    |
+| 数据库模型与 RLS                    | ✅ 已完成                 | 100%   |
+| 可扩展性与微服务支持                | ❌ 未准备                 | 5%     |
 
 **总体进度：约 32.5%**
 
@@ -205,6 +219,7 @@ throw error;
 #### 决策 1: 引入 Refine 作为 Admin 框架
 
 **理由**：
+
 - ✅ 开箱即用的 CRUD（列表、表单、详情页）
 - ✅ 内置权限管理（RBAC）
 - ✅ 自动生成 API 调用（Data Provider）
@@ -221,6 +236,7 @@ throw error;
 | 手写 | 完全控制 | 开发慢、维护成本高 | ❌ 不推荐 |
 
 **技术栈**：
+
 ```json
 {
   "@refinedev/core": "^4.47.0",
@@ -233,6 +249,7 @@ throw error;
 #### 决策 2: 统一配额系统为 Credits 模型
 
 **当前问题**：
+
 ```sql
 -- 两套系统并存
 profiles.quota_limit / profiles.reports_used  -- ❌ 废弃
@@ -240,6 +257,7 @@ report_credits.*                               -- ✅ 保留
 ```
 
 **解决方案**：
+
 1. 完全移除 `profiles.quota_limit` 和 `reports_used` 字段
 2. 所有配额操作通过 `report_credits` 表
 3. 使用 RPC 函数确保原子性：
@@ -250,6 +268,7 @@ report_credits.*                               -- ✅ 保留
 #### 决策 3: 创建 `lib/core/` 业务逻辑层
 
 **目标结构**：
+
 ```
 lib/core/
 ├── reports/
@@ -271,6 +290,7 @@ lib/core/
 ```
 
 **每个模块的职责**：
+
 - **reports/generator.ts**: LLM 调用、数据整合、报告生成
 - **credits/manager.ts**: 积分查询、扣除、充值
 - **users/profile.ts**: 用户信息更新、权限检查
@@ -282,49 +302,53 @@ lib/core/
 
 ### 3.1 核心技术栈（保持不变）
 
-| 层级 | 技术 | 版本 | 用途 |
-|------|------|------|------|
-| **前端框架** | Next.js | 16.0.3 | App Router + SSR |
-| **UI** | Tailwind CSS | 4.0 | 样式框架 |
-| **语言** | TypeScript | 5+ | 类型安全 |
-| **数据库** | Supabase (PostgreSQL) | - | 数据存储 + Auth |
-| **LLM** | OpenRouter/Helicone | - | AI 报告生成 |
+| 层级         | 技术                  | 版本   | 用途             |
+| ------------ | --------------------- | ------ | ---------------- |
+| **前端框架** | Next.js               | 16.0.3 | App Router + SSR |
+| **UI**       | Tailwind CSS          | 4.0    | 样式框架         |
+| **语言**     | TypeScript            | 5+     | 类型安全         |
+| **数据库**   | Supabase (PostgreSQL) | -      | 数据存储 + Auth  |
+| **LLM**      | OpenRouter/Helicone   | -      | AI 报告生成      |
 
 ### 3.2 新增技术栈
 
 #### Admin 面板
+
 ```json
 {
   "@refinedev/core": "^4.47.0",
   "@refinedev/nextjs-router": "^6.0.0",
   "@refinedev/simple-rest": "^5.0.0",
   "@refinedev/react-table": "^5.6.0",
-  "@refinedev/inferencer": "^4.5.0"  // 自动生成 CRUD 页面
+  "@refinedev/inferencer": "^4.5.0" // 自动生成 CRUD 页面
 }
 ```
 
 #### 测试增强
+
 ```json
 {
-  "vitest": "^2.1.8",              // 保持
+  "vitest": "^2.1.8", // 保持
   "@vitest/coverage-v8": "^2.1.8", // 新增：覆盖率报告
-  "msw": "^2.0.0"                  // 新增：API Mock
+  "msw": "^2.0.0" // 新增：API Mock
 }
 ```
 
 #### 错误追踪与监控
+
 ```json
 {
-  "@sentry/nextjs": "^8.0.0",      // 新增：错误追踪
-  "@vercel/analytics": "^1.0.0"    // 新增：性能监控
+  "@sentry/nextjs": "^8.0.0", // 新增：错误追踪
+  "@vercel/analytics": "^1.0.0" // 新增：性能监控
 }
 ```
 
 #### API 文档
+
 ```json
 {
-  "swagger-jsdoc": "^6.2.8",       // 新增：生成 OpenAPI 文档
-  "swagger-ui-react": "^5.0.0"     // 新增：API 文档 UI
+  "swagger-jsdoc": "^6.2.8", // 新增：生成 OpenAPI 文档
+  "swagger-ui-react": "^5.0.0" // 新增：API 文档 UI
 }
 ```
 
@@ -333,6 +357,7 @@ lib/core/
 #### 新增表
 
 **admin_settings** - 系统配置表
+
 ```sql
 CREATE TABLE admin_settings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -345,6 +370,7 @@ CREATE TABLE admin_settings (
 ```
 
 **audit_logs** - 审计日志（增强版）
+
 ```sql
 -- 已存在，需增强索引
 CREATE INDEX idx_audit_logs_action ON audit_logs(action);
@@ -403,6 +429,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 **拆分为**：
 
 **1. `lib/core/reports/generator.ts`** (核心生成逻辑)
+
 ```typescript
 export class ReportGenerator {
   constructor(
@@ -427,6 +454,7 @@ export class ReportGenerator {
 ```
 
 **2. `lib/services/llm.ts`** (LLM 服务适配器)
+
 ```typescript
 export class LLMService {
   async generateReport(data: MarketData, params: ReportParams): Promise<string> {
@@ -444,6 +472,7 @@ export class LLMService {
 ```
 
 **3. `lib/services/market-data.ts`** (Finnhub 数据获取)
+
 ```typescript
 export class MarketDataService {
   async fetchCompanyData(symbol: string): Promise<MarketData> {
@@ -451,7 +480,7 @@ export class MarketDataService {
       this.getProfile(symbol),
       this.getQuote(symbol),
       this.getMetrics(symbol),
-      this.getNews(symbol)
+      this.getNews(symbol),
     ]);
 
     return { profile, quote, metrics, news };
@@ -460,18 +489,19 @@ export class MarketDataService {
 ```
 
 **4. `lib/core/reports/content-sanitizer.ts`** (内容净化)
+
 ```typescript
 export class ContentSanitizer {
   sanitize(content: string): string {
     const replacements = {
-      '买入': '分析视角',
-      '目标价': '市场预期讨论',
+      买入: "分析视角",
+      目标价: "市场预期讨论",
       // ...更多敏感词
     };
 
     let sanitized = content;
     for (const [bad, good] of Object.entries(replacements)) {
-      sanitized = sanitized.replace(new RegExp(bad, 'gi'), good);
+      sanitized = sanitized.replace(new RegExp(bad, "gi"), good);
     }
 
     return this.addDisclaimer(sanitized);
@@ -480,9 +510,10 @@ export class ContentSanitizer {
 ```
 
 **5. 新的 `app/api/report/route.ts`** (仅负责 HTTP 处理)
+
 ```typescript
-import { ReportGenerator } from '@/lib/core/reports/generator';
-import { CreditManager } from '@/lib/core/credits/manager';
+import { ReportGenerator } from "@/lib/core/reports/generator";
+import { CreditManager } from "@/lib/core/credits/manager";
 
 export async function POST(request: Request) {
   // 1. 认证
@@ -512,6 +543,7 @@ export async function POST(request: Request) {
 ```
 
 **优势**：
+
 - ✅ 每个类职责单一
 - ✅ 可独立测试（mock 依赖）
 - ✅ 可复用（CLI、定时任务、Webhook 都可调用）
@@ -522,6 +554,7 @@ export async function POST(request: Request) {
 #### 数据库迁移
 
 **Migration: 20251201_unify_credits.sql**
+
 ```sql
 -- 1. 数据迁移（将 profiles 的配额数据迁移到 report_credits）
 UPDATE report_credits rc
@@ -548,19 +581,20 @@ WHERE NOT EXISTS (
 #### 统一的 Credits Manager
 
 **lib/core/credits/manager.ts**
+
 ```typescript
 export class CreditManager {
   /**
    * 检查并消费积分（原子操作）
    */
   async checkAndConsume(userId: string, amount: number = 1): Promise<void> {
-    const { data, error } = await supabase.rpc('fn_consume_report_credit', {
+    const { data, error } = await supabase.rpc("fn_consume_report_credit", {
       p_user_id: userId,
-      p_amount: amount
+      p_amount: amount,
     });
 
     if (error || !data?.success) {
-      throw new InsufficientCreditsError('积分不足');
+      throw new InsufficientCreditsError("积分不足");
     }
   }
 
@@ -569,9 +603,9 @@ export class CreditManager {
    */
   async getBalance(userId: string): Promise<number> {
     const { data } = await supabase
-      .from('report_credits')
-      .select('credits_available')
-      .eq('user_id', userId)
+      .from("report_credits")
+      .select("credits_available")
+      .eq("user_id", userId)
       .single();
 
     return data?.credits_available ?? 0;
@@ -589,10 +623,10 @@ export class CreditManager {
     // 检查管理员权限
     await this.checkAdminPermission(adminId);
 
-    const { error } = await supabase.rpc('fn_grant_credits', {
+    const { error } = await supabase.rpc("fn_grant_credits", {
       target_user_id: targetUserId,
       amount,
-      reason
+      reason,
     });
 
     if (error) throw error;
@@ -611,13 +645,14 @@ npm install @refinedev/core @refinedev/nextjs-router @refinedev/simple-rest @ref
 #### 创建 Supabase Data Provider
 
 **lib/admin/data-provider.ts**
+
 ```typescript
 import { DataProvider } from "@refinedev/core";
 import { supabase } from "@/lib/supabase/client";
 
 export const supabaseDataProvider: DataProvider = {
   getList: async ({ resource, pagination, sorters, filters }) => {
-    let query = supabase.from(resource).select('*', { count: 'exact' });
+    let query = supabase.from(resource).select("*", { count: "exact" });
 
     // 分页
     if (pagination) {
@@ -628,13 +663,13 @@ export const supabaseDataProvider: DataProvider = {
     // 排序
     if (sorters && sorters.length > 0) {
       const { field, order } = sorters[0];
-      query = query.order(field, { ascending: order === 'asc' });
+      query = query.order(field, { ascending: order === "asc" });
     }
 
     // 过滤
     if (filters) {
-      filters.forEach(filter => {
-        if (filter.operator === 'eq') {
+      filters.forEach((filter) => {
+        if (filter.operator === "eq") {
           query = query.eq(filter.field, filter.value);
         }
         // 更多操作符...
@@ -652,11 +687,7 @@ export const supabaseDataProvider: DataProvider = {
   },
 
   getOne: async ({ resource, id }) => {
-    const { data, error } = await supabase
-      .from(resource)
-      .select('*')
-      .eq('id', id)
-      .single();
+    const { data, error } = await supabase.from(resource).select("*").eq("id", id).single();
 
     if (error) throw error;
 
@@ -664,11 +695,7 @@ export const supabaseDataProvider: DataProvider = {
   },
 
   create: async ({ resource, variables }) => {
-    const { data, error } = await supabase
-      .from(resource)
-      .insert(variables)
-      .select()
-      .single();
+    const { data, error } = await supabase.from(resource).insert(variables).select().single();
 
     if (error) throw error;
 
@@ -679,7 +706,7 @@ export const supabaseDataProvider: DataProvider = {
     const { data, error } = await supabase
       .from(resource)
       .update(variables)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -689,12 +716,7 @@ export const supabaseDataProvider: DataProvider = {
   },
 
   deleteOne: async ({ resource, id }) => {
-    const { data, error } = await supabase
-      .from(resource)
-      .delete()
-      .eq('id', id)
-      .select()
-      .single();
+    const { data, error } = await supabase.from(resource).delete().eq("id", id).select().single();
 
     if (error) throw error;
 
@@ -708,6 +730,7 @@ export const supabaseDataProvider: DataProvider = {
 #### Refine 配置
 
 **app/admin/layout.tsx**
+
 ```typescript
 "use client";
 
@@ -787,6 +810,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 #### 用户管理页面（自动生成）
 
 **app/admin/users/page.tsx**
+
 ```typescript
 "use client";
 
@@ -861,6 +885,7 @@ export default function UserList() {
 #### 积分管理页面
 
 **app/admin/credits/page.tsx**
+
 ```typescript
 "use client";
 
@@ -917,6 +942,7 @@ export default function CreditManagement() {
 #### 创建标准错误类
 
 **lib/core/errors.ts**
+
 ```typescript
 export class AppError extends Error {
   constructor(
@@ -952,6 +978,7 @@ export class UnauthorizedError extends AppError {
 #### API 错误处理中间件
 
 **lib/api/error-handler.ts**
+
 ```typescript
 import { NextResponse } from "next/server";
 import { AppError } from "@/lib/core/errors";
@@ -991,6 +1018,7 @@ export function handleApiError(error: unknown): NextResponse {
 #### 在 API 路由中使用
 
 **app/api/report/route.ts**
+
 ```typescript
 import { handleApiError } from "@/lib/api/error-handler";
 import { InsufficientCreditsError } from "@/lib/core/errors";
@@ -1019,11 +1047,13 @@ export async function POST(request: Request) {
 ### 阶段 0: 准备工作（1-2 天）
 
 #### 0.1 创建功能分支
+
 ```bash
 git checkout -b refactor/saas-architecture
 ```
 
 #### 0.2 安装新依赖
+
 ```bash
 # Refine
 npm install @refinedev/core @refinedev/nextjs-router @refinedev/simple-rest @refinedev/react-table @tanstack/react-table
@@ -1039,6 +1069,7 @@ npm install swagger-jsdoc swagger-ui-react
 ```
 
 #### 0.3 更新文档
+
 - 更新 `docs/decisions/2025-12-01-saas-architecture-and-restructure.md`
 - 添加本文档：`docs/decisions/2025-12-01-complete-refactor-plan.md`
 
@@ -1047,6 +1078,7 @@ npm install swagger-jsdoc swagger-ui-react
 ### 阶段 1: 核心服务层重构（5-7 天）
 
 #### 1.1 创建目录结构（0.5 天）
+
 ```bash
 mkdir -p lib/core/{reports,credits,users,admin}
 mkdir -p lib/services
@@ -1055,6 +1087,7 @@ mkdir -p lib/services
 #### 1.2 实现 Credits Manager（1 天）
 
 **任务清单**：
+
 - [ ] 创建 `lib/core/credits/manager.ts`
 - [ ] 实现 `checkAndConsume()` 方法
 - [ ] 实现 `getBalance()` 方法
@@ -1064,31 +1097,37 @@ mkdir -p lib/services
 #### 1.3 拆分报告生成逻辑（3-4 天）
 
 **Day 1: 创建服务适配器**
+
 - [ ] `lib/services/llm.ts` - LLM 调用封装
 - [ ] `lib/services/market-data.ts` - Finnhub API 封装
 - [ ] `lib/services/storage.ts` - Supabase Storage 封装
 
 **Day 2: 实现核心生成逻辑**
+
 - [ ] `lib/core/reports/generator.ts` - 报告生成器
 - [ ] `lib/core/reports/content-sanitizer.ts` - 内容净化
 - [ ] `lib/core/reports/types.ts` - 类型定义
 
 **Day 3: 实现报告复用与导出**
+
 - [ ] `lib/core/reports/reuse.ts` - 报告复用逻辑
 - [ ] `lib/core/reports/export.ts` - PDF/Word 导出
 
 **Day 4: 重构 API 路由**
+
 - [ ] 更新 `app/api/report/route.ts` 使用新的服务层
 - [ ] 删除旧的内联逻辑
 - [ ] 确保所有功能正常
 
 #### 1.4 编写测试（1 天）
+
 - [ ] `lib/core/reports/generator.test.ts`
 - [ ] `lib/services/llm.test.ts`
 - [ ] `lib/services/market-data.test.ts`
 - [ ] 使用 MSW mock 外部 API
 
 #### 1.5 验证与测试（0.5 天）
+
 ```bash
 npm run test
 npm run dev  # 手动测试报告生成
@@ -1101,11 +1140,13 @@ npm run dev  # 手动测试报告生成
 #### 2.1 数据库迁移（0.5 天）
 
 **创建迁移文件**：
+
 ```bash
 # 创建 supabase/migrations/20251201120000_unify_credits.sql
 ```
 
 **迁移内容**：
+
 ```sql
 -- 1. 数据迁移
 UPDATE report_credits rc
@@ -1139,6 +1180,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 **执行迁移**：
+
 ```bash
 supabase db push
 ```
@@ -1146,6 +1188,7 @@ supabase db push
 #### 2.2 更新代码引用（1 天）
 
 **搜索并替换**：
+
 ```bash
 # 搜索所有使用 profiles.quota_limit 的代码
 grep -r "quota_limit" app/
@@ -1153,6 +1196,7 @@ grep -r "reports_used" app/
 ```
 
 **更新为**：
+
 ```typescript
 // 旧代码
 const { quota_limit, reports_used } = profile;
@@ -1165,6 +1209,7 @@ const balance = await creditManager.getBalance(userId);
 #### 2.3 测试迁移（0.5 天）
 
 **验证清单**：
+
 - [ ] 新用户注册时自动创建 credits 记录（30 积分）
 - [ ] 报告生成正常扣除积分
 - [ ] 每日签到正常增加积分
@@ -1172,6 +1217,7 @@ const balance = await creditManager.getBalance(userId);
 - [ ] 数据库中无 `quota_limit` 和 `reports_used` 字段
 
 #### 2.4 清理代码（1 天）
+
 - [ ] 删除 `lib/services/quota.ts`（已被 `CreditManager` 替代）
 - [ ] 删除相关测试 `lib/services/quota.test.ts`
 - [ ] 更新类型定义 `types/database.ts`
@@ -1183,6 +1229,7 @@ const balance = await creditManager.getBalance(userId);
 #### 3.1 基础集成（1 天）
 
 **Day 1: 安装与配置**
+
 - [ ] 安装 Refine 依赖
 - [ ] 创建 `lib/admin/data-provider.ts`
 - [ ] 创建 `lib/admin/auth-provider.ts`
@@ -1191,11 +1238,13 @@ const balance = await creditManager.getBalance(userId);
 #### 3.2 用户管理（2 天）
 
 **Day 2: 列表与详情**
+
 - [ ] `app/admin/users/page.tsx` - 用户列表
 - [ ] `app/admin/users/[id]/page.tsx` - 用户详情
 - [ ] 添加搜索、过滤、排序功能
 
 **Day 3: 编辑与删除**
+
 - [ ] `app/admin/users/[id]/edit/page.tsx` - 编辑用户
 - [ ] 实现软删除（标记 `deleted_at`）
 - [ ] 添加批量操作（批量删除、批量导出）
@@ -1203,11 +1252,13 @@ const balance = await creditManager.getBalance(userId);
 #### 3.3 积分管理（1-2 天）
 
 **Day 4: 积分列表**
+
 - [ ] `app/admin/credits/page.tsx` - 积分列表
 - [ ] 显示每个用户的积分余额、使用情况
 - [ ] 添加积分变动历史（`report_credit_events`）
 
 **Day 5: 积分操作**
+
 - [ ] `app/admin/credits/grant/page.tsx` - 授予积分表单
 - [ ] 实现批量授予积分
 - [ ] 添加积分回收功能（扣除积分）
@@ -1215,6 +1266,7 @@ const balance = await creditManager.getBalance(userId);
 #### 3.4 报告管理迁移（1 天）
 
 **Day 6: 迁移现有功能**
+
 - [ ] 将 `app/admin/reports/page.tsx` 迁移到 Refine
 - [ ] 使用 Refine 的 `useTable` hook
 - [ ] 保留封面上传功能
@@ -1223,6 +1275,7 @@ const balance = await creditManager.getBalance(userId);
 #### 3.5 审计日志（1 天）
 
 **Day 7: 日志查看器**
+
 - [ ] `app/admin/audit/page.tsx` - 审计日志列表
 - [ ] 添加过滤器（按用户、按操作类型、按时间范围）
 - [ ] 实现日志导出（CSV）
@@ -1234,10 +1287,12 @@ const balance = await creditManager.getBalance(userId);
 #### 4.1 统一错误处理（1-2 天）
 
 **Day 1: 创建错误类**
+
 - [ ] `lib/core/errors.ts` - 标准错误类
 - [ ] `lib/api/error-handler.ts` - 错误处理中间件
 
 **Day 2: 更新所有 API 路由**
+
 - [ ] 为每个 API 路由添加 `try-catch`
 - [ ] 使用 `handleApiError` 统一处理
 - [ ] 确保返回格式一致
@@ -1245,20 +1300,24 @@ const balance = await creditManager.getBalance(userId);
 #### 4.2 增加测试覆盖率（2-3 天）
 
 **Day 3: 核心业务逻辑测试**
+
 - [ ] `lib/core/reports/generator.test.ts` (目标 80% 覆盖率)
 - [ ] `lib/core/credits/manager.test.ts` (目标 90% 覆盖率)
 - [ ] `lib/services/llm.test.ts`
 
 **Day 4: API 路由集成测试**
+
 - [ ] `app/api/report/route.test.ts`
 - [ ] `app/api/credits/route.test.ts`
 - [ ] 使用 MSW mock Supabase 和外部 API
 
 **Day 5: E2E 测试（可选）**
+
 - [ ] 使用 Playwright 测试完整流程
 - [ ] 用户注册 → 生成报告 → 扣除积分
 
 #### 4.3 生成测试报告
+
 ```bash
 npm run test -- --coverage
 # 目标：整体覆盖率 > 70%
@@ -1271,6 +1330,7 @@ npm run test -- --coverage
 #### 5.1 API 文档生成（1 天）
 
 **使用 Swagger JSDoc**：
+
 ```typescript
 // app/api/report/route.ts
 /**
@@ -1299,12 +1359,14 @@ npm run test -- --coverage
 ```
 
 **生成文档页面**：
+
 - [ ] `app/api-docs/page.tsx` - Swagger UI
 - [ ] 自动生成 OpenAPI 规范
 
 #### 5.2 错误监控（1 天）
 
 **集成 Sentry**：
+
 ```typescript
 // sentry.client.config.ts
 import * as Sentry from "@sentry/nextjs";
@@ -1316,20 +1378,22 @@ Sentry.init({
 ```
 
 **添加自定义追踪**：
+
 ```typescript
 // lib/core/reports/generator.ts
 try {
   const report = await this.generate(params);
 } catch (error) {
   Sentry.captureException(error, {
-    tags: { module: 'report-generator' },
-    extra: { symbol: params.symbol }
+    tags: { module: "report-generator" },
+    extra: { symbol: params.symbol },
   });
   throw error;
 }
 ```
 
 #### 5.3 更新文档（1 天）
+
 - [ ] 更新 `README.md`
 - [ ] 编写 `docs/architecture/core-services.md`
 - [ ] 编写 `docs/guides/admin-guide.md`（管理员操作手册）
@@ -1342,6 +1406,7 @@ try {
 #### 6.1 功能验证（1 天）
 
 **验收清单**：
+
 - [ ] 用户注册流程正常
 - [ ] 报告生成功能正常（各种语言、模式）
 - [ ] 积分扣除与查询正常
@@ -1356,12 +1421,14 @@ try {
 #### 6.2 性能测试（1 天）
 
 **负载测试**：
+
 ```bash
 # 使用 Apache Bench 测试 API 性能
 ab -n 1000 -c 10 http://localhost:3000/api/report
 ```
 
 **检查项**：
+
 - [ ] 报告生成响应时间 < 30s (P95)
 - [ ] 积分查询响应时间 < 200ms (P95)
 - [ ] Admin 面板加载时间 < 2s
@@ -1369,11 +1436,13 @@ ab -n 1000 -c 10 http://localhost:3000/api/report
 #### 6.3 部署前检查（0.5 天）
 
 **环境变量检查**：
+
 ```bash
 npm run env:check
 ```
 
 **构建测试**：
+
 ```bash
 npm run build
 npm run start  # 测试生产环境
@@ -1382,6 +1451,7 @@ npm run start  # 测试生产环境
 #### 6.4 灰度发布（0.5 天）
 
 **部署策略**：
+
 1. 先部署到 Staging 环境测试
 2. 监控 Sentry 错误率
 3. 无问题后合并到 `main` 分支
@@ -1515,25 +1585,30 @@ D:\Projects\investor-ai-g2\
 ### 6.2 核心模块职责说明
 
 #### `lib/core/reports/`
+
 - **generator.ts**: 报告生成核心逻辑，编排 LLM、数据获取、内容净化
 - **reuse.ts**: 检查是否有可复用的报告（7 天内相同参数）
 - **export.ts**: 将报告导出为 PDF、Word、Markdown 等格式
 - **content-sanitizer.ts**: 敏感词替换、免责声明注入
 
 #### `lib/core/credits/`
+
 - **manager.ts**: 积分管理核心逻辑（查询、扣除、授予）
 - **transactions.ts**: 积分交易日志记录
 - **rewards.ts**: 每日签到奖励逻辑
 
 #### `lib/core/users/`
+
 - **profile.ts**: 用户资料更新、权限检查
 - **preferences.ts**: 用户偏好设置（语言、主题等）
 
 #### `lib/core/admin/`
+
 - **user-management.ts**: 管理员操作用户（CRUD）
 - **audit.ts**: 审计日志查询与分析
 
 #### `lib/services/`
+
 - **llm.ts**: 封装 LLM 调用（Helicone 优先，失败回退到 OpenRouter）
 - **market-data.ts**: 封装 Finnhub API（公司信息、报价、新闻）
 - **storage.ts**: 封装 Supabase Storage（上传封面、报告 JSON）
@@ -1544,31 +1619,32 @@ D:\Projects\investor-ai-g2\
 
 ### 7.1 工作量估算（人天）
 
-| 阶段 | 任务 | 工作量 | 依赖 |
-|------|------|--------|------|
-| **阶段 0** | 准备工作 | 1-2 天 | - |
-| **阶段 1** | 核心服务层重构 | 5-7 天 | 阶段 0 |
-| **阶段 2** | 统一配额系统 | 2-3 天 | 阶段 1 |
-| **阶段 3** | Refine Admin 集成 | 5-7 天 | 阶段 1 |
-| **阶段 4** | 错误处理与测试 | 3-5 天 | 阶段 1, 2, 3 |
-| **阶段 5** | 文档与监控 | 2-3 天 | 阶段 4 |
-| **阶段 6** | 最终验证与部署 | 2-3 天 | 阶段 5 |
-| **总计** | | **20-30 天** | |
+| 阶段       | 任务              | 工作量       | 依赖         |
+| ---------- | ----------------- | ------------ | ------------ |
+| **阶段 0** | 准备工作          | 1-2 天       | -            |
+| **阶段 1** | 核心服务层重构    | 5-7 天       | 阶段 0       |
+| **阶段 2** | 统一配额系统      | 2-3 天       | 阶段 1       |
+| **阶段 3** | Refine Admin 集成 | 5-7 天       | 阶段 1       |
+| **阶段 4** | 错误处理与测试    | 3-5 天       | 阶段 1, 2, 3 |
+| **阶段 5** | 文档与监控        | 2-3 天       | 阶段 4       |
+| **阶段 6** | 最终验证与部署    | 2-3 天       | 阶段 5       |
+| **总计**   |                   | **20-30 天** |              |
 
 ### 7.2 里程碑与交付物
 
-| 里程碑 | 日期 | 交付物 | 验收标准 |
-|--------|------|--------|---------|
-| **M1: 核心服务层完成** | Day 7 | `lib/core/` 完整实现 | 单元测试通过，API 路由重构完成 |
-| **M2: 配额系统统一** | Day 10 | 数据库迁移完成 | 无 `quota_limit` 字段，积分功能正常 |
-| **M3: Admin 面板上线** | Day 17 | Refine 集成完成 | 用户/积分/报告管理全部可用 |
-| **M4: 测试覆盖完成** | Day 22 | 测试覆盖率 > 70% | CI/CD 通过，无关键 bug |
-| **M5: 文档与监控** | Day 25 | API 文档、Sentry | 文档完整，错误监控正常 |
-| **M6: 生产环境部署** | Day 30 | 灰度发布完成 | 无 P0/P1 bug，性能达标 |
+| 里程碑                 | 日期   | 交付物               | 验收标准                            |
+| ---------------------- | ------ | -------------------- | ----------------------------------- |
+| **M1: 核心服务层完成** | Day 7  | `lib/core/` 完整实现 | 单元测试通过，API 路由重构完成      |
+| **M2: 配额系统统一**   | Day 10 | 数据库迁移完成       | 无 `quota_limit` 字段，积分功能正常 |
+| **M3: Admin 面板上线** | Day 17 | Refine 集成完成      | 用户/积分/报告管理全部可用          |
+| **M4: 测试覆盖完成**   | Day 22 | 测试覆盖率 > 70%     | CI/CD 通过，无关键 bug              |
+| **M5: 文档与监控**     | Day 25 | API 文档、Sentry     | 文档完整，错误监控正常              |
+| **M6: 生产环境部署**   | Day 30 | 灰度发布完成         | 无 P0/P1 bug，性能达标              |
 
 ### 7.3 人力资源分配
 
 **推荐团队配置**（可根据实际调整）：
+
 - **后端工程师（1 人）**: 负责阶段 1、2（核心服务层、配额系统）
 - **全栈工程师（1 人）**: 负责阶段 3（Refine Admin）
 - **测试工程师（0.5 人）**: 负责阶段 4（测试覆盖）
@@ -1582,40 +1658,42 @@ D:\Projects\investor-ai-g2\
 
 ### 8.1 技术风险
 
-| 风险 | 可能性 | 影响 | 应对措施 |
-|------|--------|------|---------|
-| **Refine 学习曲线** | 中 | 中 | 提前学习官方文档，使用 Inferencer 自动生成代码 |
-| **数据库迁移失败** | 低 | 高 | 先在 Staging 环境测试，备份生产数据 |
-| **LLM 服务不稳定** | 中 | 中 | 已有 Failover 机制（Helicone → OpenRouter） |
-| **测试覆盖不足** | 中 | 中 | 优先覆盖核心逻辑（报告生成、积分管理） |
-| **性能回归** | 低 | 中 | 部署前进行负载测试，监控响应时间 |
+| 风险                | 可能性 | 影响 | 应对措施                                       |
+| ------------------- | ------ | ---- | ---------------------------------------------- |
+| **Refine 学习曲线** | 中     | 中   | 提前学习官方文档，使用 Inferencer 自动生成代码 |
+| **数据库迁移失败**  | 低     | 高   | 先在 Staging 环境测试，备份生产数据            |
+| **LLM 服务不稳定**  | 中     | 中   | 已有 Failover 机制（Helicone → OpenRouter）    |
+| **测试覆盖不足**    | 中     | 中   | 优先覆盖核心逻辑（报告生成、积分管理）         |
+| **性能回归**        | 低     | 中   | 部署前进行负载测试，监控响应时间               |
 
 ### 8.2 业务风险
 
-| 风险 | 可能性 | 影响 | 应对措施 |
-|------|--------|------|---------|
-| **重构期间功能不可用** | 低 | 高 | 使用功能分支开发，主分支保持稳定 |
-| **积分数据不一致** | 中 | 高 | 迁移前备份，迁移后对账验证 |
-| **用户体验变差** | 低 | 中 | 保持前端 UI 不变，仅后端重构 |
-| **Admin 面板权限泄露** | 低 | 高 | 实现严格的 RBAC，审计所有管理员操作 |
+| 风险                   | 可能性 | 影响 | 应对措施                            |
+| ---------------------- | ------ | ---- | ----------------------------------- |
+| **重构期间功能不可用** | 低     | 高   | 使用功能分支开发，主分支保持稳定    |
+| **积分数据不一致**     | 中     | 高   | 迁移前备份，迁移后对账验证          |
+| **用户体验变差**       | 低     | 中   | 保持前端 UI 不变，仅后端重构        |
+| **Admin 面板权限泄露** | 低     | 高   | 实现严格的 RBAC，审计所有管理员操作 |
 
 ### 8.3 进度风险
 
-| 风险 | 可能性 | 影响 | 应对措施 |
-|------|--------|------|---------|
-| **工作量估算不足** | 中 | 中 | 预留 20% buffer 时间（30 天 → 36 天） |
-| **依赖阻塞** | 低 | 中 | 优先完成核心服务层（其他模块依赖它） |
-| **人员变动** | 低 | 高 | 编写详细文档，代码 Review 保证知识共享 |
+| 风险               | 可能性 | 影响 | 应对措施                               |
+| ------------------ | ------ | ---- | -------------------------------------- |
+| **工作量估算不足** | 中     | 中   | 预留 20% buffer 时间（30 天 → 36 天）  |
+| **依赖阻塞**       | 低     | 中   | 优先完成核心服务层（其他模块依赖它）   |
+| **人员变动**       | 低     | 高   | 编写详细文档，代码 Review 保证知识共享 |
 
 ### 8.4 应急预案
 
 **Plan B: 如果 Refine 集成失败**
+
 - 回退到手写 Admin 面板
 - 使用现有 `app/admin/reports/` 架构
 - 仅实现核心功能（用户管理、积分授予）
 - 工作量增加 5-7 天
 
 **Plan C: 如果时间不足**
+
 - 优先完成 P0 任务（核心服务层、配额系统）
 - P1 任务（Admin 完整功能）后续迭代
 - P2 任务（API 文档、监控）推迟到下一版本
@@ -1627,6 +1705,7 @@ D:\Projects\investor-ai-g2\
 ### 9.1 功能验收
 
 #### 核心业务功能
+
 - [ ] 用户可以正常注册（获得 30 积分）
 - [ ] 用户可以生成报告（扣除 1 积分）
 - [ ] 积分不足时无法生成报告
@@ -1635,6 +1714,7 @@ D:\Projects\investor-ai-g2\
 - [ ] 报告导出功能正常（PDF、Word）
 
 #### Admin 面板功能
+
 - [ ] 管理员可以查看所有用户
 - [ ] 管理员可以编辑用户信息
 - [ ] 管理员可以授予/扣除积分
@@ -1646,6 +1726,7 @@ D:\Projects\investor-ai-g2\
 ### 9.2 技术验收
 
 #### 代码质量
+
 - [ ] ESLint 无错误
 - [ ] TypeScript 编译通过
 - [ ] 所有单元测试通过
@@ -1653,12 +1734,14 @@ D:\Projects\investor-ai-g2\
 - [ ] 核心模块测试覆盖率 > 80%
 
 #### 性能指标
+
 - [ ] 报告生成响应时间 < 30s (P95)
 - [ ] 积分查询响应时间 < 200ms (P95)
 - [ ] Admin 面板加载时间 < 2s (P95)
 - [ ] Lighthouse Score > 90 (Performance)
 
 #### 安全性
+
 - [ ] 所有 Admin API 有权限校验
 - [ ] RLS 策略正确配置
 - [ ] 敏感信息不在日志中泄露
@@ -1736,6 +1819,7 @@ D:\Projects\investor-ai-g2\
 ### B. 联系方式
 
 如有问题，请联系架构团队：
+
 - Slack: #investor-ai-refactor
 - Email: arch-team@investor.ai
 

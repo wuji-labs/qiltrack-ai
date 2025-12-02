@@ -33,11 +33,11 @@
 
 ### 测试覆盖率目标
 
-| 层级 | 覆盖率目标 | 当前状态 |
-|------|-----------|----------|
-| 单元测试 | 80%+ | ✅ 97% |
-| 集成测试 | 60%+ | ✅ 85% |
-| E2E 测试 | 关键流程 | ⚠️ 待完善 |
+| 层级     | 覆盖率目标 | 当前状态  |
+| -------- | ---------- | --------- |
+| 单元测试 | 80%+       | ✅ 97%    |
+| 集成测试 | 60%+       | ✅ 85%    |
+| E2E 测试 | 关键流程   | ⚠️ 待完善 |
 
 ---
 
@@ -164,9 +164,9 @@ describe("CreditManager", () => {
         rpc: mockRpc,
       } as any);
 
-      await expect(
-        creditManager.checkAndConsume("user-123", 1)
-      ).rejects.toThrow(InsufficientCreditsError);
+      await expect(creditManager.checkAndConsume("user-123", 1)).rejects.toThrow(
+        InsufficientCreditsError
+      );
     });
   });
 
@@ -290,9 +290,11 @@ describe("GET /api/report", () => {
 
     // Mock authenticated session
     vi.mocked(createServerClient).mockReturnValue({
-      auth: { getSession: vi.fn().mockResolvedValue({
-        data: { session: { user: { id: "user-123" } } }
-      })},
+      auth: {
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: { user: { id: "user-123" } } },
+        }),
+      },
     } as any);
 
     const response = await GET(request);
@@ -308,9 +310,11 @@ describe("GET /api/report", () => {
 
     // Mock authenticated session
     vi.mocked(createServerClient).mockReturnValue({
-      auth: { getSession: vi.fn().mockResolvedValue({
-        data: { session: { user: { id: "user-123" } } }
-      })},
+      auth: {
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: { user: { id: "user-123" } } },
+        }),
+      },
     } as any);
 
     // Mock insufficient credits
@@ -331,9 +335,11 @@ describe("GET /api/report", () => {
 
     // Mock authenticated session
     vi.mocked(createServerClient).mockReturnValue({
-      auth: { getSession: vi.fn().mockResolvedValue({
-        data: { session: { user: { id: "user-123" } } }
-      })},
+      auth: {
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: { user: { id: "user-123" } } },
+        }),
+      },
     } as any);
 
     // Mock successful credit consumption
@@ -371,9 +377,11 @@ describe("GET /api/report", () => {
 
     // Mock authenticated session
     vi.mocked(createServerClient).mockReturnValue({
-      auth: { getSession: vi.fn().mockResolvedValue({
-        data: { session: { user: { id: "user-123" } } }
-      })},
+      auth: {
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: { user: { id: "user-123" } } },
+        }),
+      },
     } as any);
 
     // Mock existing report
@@ -417,9 +425,11 @@ describe("POST /api/admin/credits/grant", () => {
 
     // Mock non-admin session
     vi.mocked(createServerClient).mockReturnValue({
-      auth: { getSession: vi.fn().mockResolvedValue({
-        data: { session: { user: { id: "admin-123" } } }
-      })},
+      auth: {
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: { user: { id: "admin-123" } } },
+        }),
+      },
       from: vi.fn(() => ({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
@@ -450,9 +460,11 @@ describe("POST /api/admin/credits/grant", () => {
 
     // Mock admin session
     vi.mocked(createServerClient).mockReturnValue({
-      auth: { getSession: vi.fn().mockResolvedValue({
-        data: { session: { user: { id: "admin-123" } } }
-      })},
+      auth: {
+        getSession: vi.fn().mockResolvedValue({
+          data: { session: { user: { id: "admin-123" } } },
+        }),
+      },
       from: vi.fn(() => ({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
@@ -583,12 +595,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
-      exclude: [
-        "node_modules/",
-        ".next/",
-        "**/*.config.ts",
-        "**/*.test.ts",
-      ],
+      exclude: ["node_modules/", ".next/", "**/*.config.ts", "**/*.test.ts"],
     },
   },
   resolve: {
@@ -629,6 +636,7 @@ afterAll(() => server.close());
 ### 1. 测试命名
 
 ✅ **好的命名**:
+
 ```typescript
 describe("CreditManager", () => {
   describe("checkAndConsume()", () => {
@@ -639,6 +647,7 @@ describe("CreditManager", () => {
 ```
 
 ❌ **不好的命名**:
+
 ```typescript
 describe("Test 1", () => {
   it("works", () => {});
@@ -648,6 +657,7 @@ describe("Test 1", () => {
 ### 2. 测试隔离
 
 ✅ **每个测试独立**:
+
 ```typescript
 beforeEach(() => {
   vi.clearAllMocks();
@@ -656,6 +666,7 @@ beforeEach(() => {
 ```
 
 ❌ **测试之间有依赖**:
+
 ```typescript
 let sharedState;
 
@@ -671,6 +682,7 @@ it("test 2", () => {
 ### 3. Mock 外部依赖
 
 ✅ **Mock 外部服务**:
+
 ```typescript
 vi.mock("@/lib/services/llm", () => ({
   LLMService: vi.fn(() => ({
@@ -682,6 +694,7 @@ vi.mock("@/lib/services/llm", () => ({
 ### 4. 测试边界条件
 
 ✅ **测试边界值**:
+
 ```typescript
 it("should handle zero credits", async () => {
   await expect(creditManager.checkAndConsume("user", 1)).rejects.toThrow();

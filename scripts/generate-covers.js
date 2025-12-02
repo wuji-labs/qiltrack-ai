@@ -60,9 +60,7 @@ async function generateCovers() {
       </svg>`;
 
     const outputPath = path.join(coversDir, `${cover.symbol}.webp`);
-    await sharp(Buffer.from(svg))
-      .webp({ quality: 85 })
-      .toFile(outputPath);
+    await sharp(Buffer.from(svg)).webp({ quality: 85 }).toFile(outputPath);
 
     const stats = fs.statSync(outputPath);
     console.log(`✓ ${cover.symbol}.webp (${(stats.size / 1024).toFixed(1)} KB)`);

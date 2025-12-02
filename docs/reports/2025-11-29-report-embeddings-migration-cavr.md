@@ -1,11 +1,13 @@
 # CAVR：report embeddings migration — 2025-11-29
 
 ## Context
+
 - 生成链路在缺省模板时会因 `report_runs.template_id` NOT NULL 写库失败，且模板被删除无法级联为 NULL。
 - 缺少 embeddings 表，无法落盘向量用于“相似报告”推荐或复用。
 - Snapshot 要求先修复 schema，再接入 tracing/embedding 流程。
 
 ## Actions
+
 - 新增迁移 `supabase/migrations/20251129000005_report_embeddings_and_template_nullable.sql`：
   - 引入 `vector` 扩展。
   - 将 `report_runs.template_id` 改为可空，外键调整为 `ON DELETE SET NULL`。
@@ -16,10 +18,12 @@
 - 本地执行 `supabase start`（已在跑）+ `supabase db reset` 成功；提示 ivfflat 数据量少；repo 无 seed.sql。
 
 ## Verification
+
 - 未跑 `npm run lint`、`npm test`（仅 SQL 迁移修改）。
 - 本地：`supabase db reset` 成功，ivfflat 创建提示数据量少。
 
 ## Risks
+
 - 向量维度固定 1536；如改用 2048（如 nomic），需调整列/索引并重建数据。
 - ivfflat 需足够数据且 `ANALYZE` 后才生效；lists/probes 需随数据量调优。
 - 上层代码若仍假定模板必填，需要同步放宽校验逻辑，避免请求层报错。

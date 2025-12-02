@@ -55,14 +55,14 @@ SELECT table_name FROM information_schema.tables WHERE table_name = 'daily_rewar
 
 ```javascript
 // 替换 YOUR_TOKEN 为实际的认证 token
-fetch('/api/report/daily-reward', {
-  method: 'POST',
+fetch("/api/report/daily-reward", {
+  method: "POST",
   headers: {
-    'Content-Type': 'application/json',
-  }
+    "Content-Type": "application/json",
+  },
 })
-.then(r => r.json())
-.then(data => console.log(data));
+  .then((r) => r.json())
+  .then((data) => console.log(data));
 
 // 预期输出: { success: true, message: "Daily reward claimed", remainingCredits: 40 }
 ```
@@ -160,17 +160,18 @@ const handleClaimDailyReward = async () => {
 
 ## 🆘 故障排除
 
-| 症状 | 原因 | 修复方法 |
-|------|------|--------|
-| 迁移执行失败 | SQL 语法错误或权限不足 | 检查迁移文件，确保 service role 有权限 |
-| 新账号仍显示 0 | 触发器未生效 | 重新创建触发器或手动插入数据 |
-| API 返回 401 | 未登录 | 先登录再调用 |
-| API 返回 500 | daily_rewards 表不存在 | 检查第二步的验证是否通过 |
-| 同一用户可领取多次 | RLS 策略不完整 | 检查 daily_rewards 表的 RLS 策略 |
+| 症状               | 原因                   | 修复方法                               |
+| ------------------ | ---------------------- | -------------------------------------- |
+| 迁移执行失败       | SQL 语法错误或权限不足 | 检查迁移文件，确保 service role 有权限 |
+| 新账号仍显示 0     | 触发器未生效           | 重新创建触发器或手动插入数据           |
+| API 返回 401       | 未登录                 | 先登录再调用                           |
+| API 返回 500       | daily_rewards 表不存在 | 检查第二步的验证是否通过               |
+| 同一用户可领取多次 | RLS 策略不完整         | 检查 daily_rewards 表的 RLS 策略       |
 
 ## 📊 预期结果
 
 ### 迁移前
+
 ```
 新账号 → 显示 0 积分 ❌
 账号页面 → 显示 1 ❌
@@ -178,6 +179,7 @@ const handleClaimDailyReward = async () => {
 ```
 
 ### 迁移后
+
 ```
 新账号 → 显示 30 积分 ✅
 账号页面 → 显示 30 积分 ✅
@@ -187,17 +189,18 @@ const handleClaimDailyReward = async () => {
 
 ## 🔗 相关文件
 
-| 文件 | 修改内容 |
-|------|---------|
-| supabase/migrations/20251130000001_init_user_credits_30.sql | 数据库迁移 + 函数 |
-| app/api/report/daily-reward/route.ts | 新 API 端点 |
-| lib/services/api.ts | 添加 claimDailyReward() |
-| app/page.tsx | 添加按钮（待做） |
-| lib/i18n.tsx | 添加翻译（待做） |
+| 文件                                                        | 修改内容                |
+| ----------------------------------------------------------- | ----------------------- |
+| supabase/migrations/20251130000001_init_user_credits_30.sql | 数据库迁移 + 函数       |
+| app/api/report/daily-reward/route.ts                        | 新 API 端点             |
+| lib/services/api.ts                                         | 添加 claimDailyReward() |
+| app/page.tsx                                                | 添加按钮（待做）        |
+| lib/i18n.tsx                                                | 添加翻译（待做）        |
 
 ## 💬 反馈
 
 如有问题，请检查：
+
 1. 迁移是否已应用（查看 Supabase "Migrations" 选项卡）
 2. 新账号的 report_credits 是否有记录（query the table directly）
 3. API 日志是否有错误（check server console）

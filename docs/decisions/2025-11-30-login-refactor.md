@@ -1,11 +1,13 @@
 # 登录体验重构 Snapshot (2025-11-30)
 
 ## 背景 / 问题
+
 - 现有 `/login` 混合多家 OAuth（Google/Microsoft/Apple）与邮箱入口，按钮有禁用态、文案泛化，品牌质感和信任度不足，且未来只保留 Google + Supabase 邮箱 OTP。
 - 错误与成功提示（URL `?error`、魔法链接发送）不区分场景，缺少速率限制/风控反馈；用户不知道邮箱链路是由 Supabase 托管，也不了解本地模式要去 Inbucket。
 - 视觉层级单一（灰底卡片），未突出主 CTA，移动端缺乏明确的层次与留白，不能支撑“顶级水准”的第一印象。
 
 ## 设计目标
+
 1. 登录手段收敛：仅保留 Google OAuth 与 Supabase 邮箱 OTP（魔法链接），界面和代码同时去掉其他 IdP。
 2. 体验优先：首屏突出 Google CTA，邮箱入口作为平权的二级 CTA，完整状态流（加载、成功、失败、冷却）。
 3. 可信背书：显式展示 “Supabase Auth 托管 / 数据加密” 安全徽标与隐私链接，减少用户疑虑。
@@ -13,6 +15,7 @@
 5. 可测试与可维护：`useSupabaseAuth` 只暴露 `google` + `email` 分支，i18n key 明确，新增 UI 状态可在 Vitest 中覆盖。
 
 ## 技术约束
+
 - 技术栈：Next.js App Router + React 19；登录页仍为 Client Component，保留 Suspense fallback。
 - Auth SDK：仅使用 `supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo } })` 与 `signInWithOtp({ email, options })`；删除其他 provider 配置/常量。
 - 复制已有约束：沿用 `useLanguage` i18n，按钮/提示使用 Tailwind v4 class，颜色 token 用 `@theme inline` 默认调色板；遵守 ESLint 规则。
@@ -20,6 +23,7 @@
 - 回调路径：沿用 `/api/auth/callback` 与 `callbackUrl` 支持，避免破坏既有路由跳转。
 
 ## 方案概览
+
 - **信息架构**
   - 头部：品牌徽标 + “Supabase Secure Login” 徽章。
   - 主 CTA：Google 登录（大按钮，左侧图标，右侧说明“推荐，2 秒完成”）。
@@ -40,6 +44,7 @@
   - 若当前已有 session，则 SSR 前置重定向到 `/account`（Claude 可评估是否在 `app/(auth)/login/page.tsx` 内通过 `useEffect` + `useSupabaseAuth` 早退）。
 
 ## 文案 key（补充/替换）
+
 - `auth.hero.title`: `登录 Investor AI`
 - `auth.hero.subtitle`: `使用 Google 或邮箱一次性验证码快速进入。`
 - `auth.provider.google`: `使用 Google 登录`
@@ -55,6 +60,7 @@
 - `auth.badge.supabase`: `Supabase Auth 托管 · 数据加密`
 
 ## 测试 / 验收
+
 1. **Unit**：为 `useSupabaseAuth` 新增用例，覆盖 `signInWithProvider("google")` 与 `signInWithEmail` 错误/成功分支；模拟 429 返回触发 cooldown。
 2. **Component**：在 Vitest + Testing Library 为 `/login` 渲染测试：Google 按钮仅一个；邮箱发送后展示成功提示；`?error=foo` 时出现通用错误。
 3. **Manual**：
@@ -63,6 +69,7 @@
 4. **Lint**：`npm run lint` 必须通过。
 
 ## 交付拆解（给 Claude）
+
 1. 清理 `app/(auth)/login/page.tsx` 仅保留 Google + 邮箱流，改造 UI 结构与状态。
 2. 更新 `useSupabaseAuth`，删除非 Google provider 分支；邮箱发送增加错误码处理并返回状态码供 UI 使用。
 3. 补充 `lib/i18n.tsx` 文案 key，删除 Apple/Microsoft 相关条目；若涉及 icon 清理，移除未使用静态资源。

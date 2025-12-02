@@ -71,11 +71,7 @@ export class EmbeddingsManager {
    * @param overlap - Overlap between chunks
    * @returns Array of text chunks
    */
-  private chunkReport(
-    markdown: string,
-    maxChars: number = 3500,
-    overlap: number = 400
-  ): string[] {
+  private chunkReport(markdown: string, maxChars: number = 3500, overlap: number = 400): string[] {
     const paragraphs = markdown
       .split(/\n{2,}/)
       .map((p) => p.trim())

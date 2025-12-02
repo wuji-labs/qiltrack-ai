@@ -32,17 +32,25 @@
   --color-accent-blue: var(--accent-blue);
   --color-accent-purple: var(--accent-purple);
   --color-accent-emerald: var(--accent-emerald);
-  --font-sans: var(--font-geist-sans), "Inter", "SF Pro Display", -apple-system,
-    BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: var(--font-geist-mono), "SFMono-Regular", Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+  --font-sans:
+    var(--font-geist-sans), "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-mono:
+    var(--font-geist-mono), "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
 }
 
 body {
   background-color: var(--bg-base);
   color: var(--color-foreground);
-  font-family: var(--font-geist-sans), "Inter", "SF Pro Display", -apple-system,
-    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family:
+    var(--font-geist-sans),
+    "Inter",
+    "SF Pro Display",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   letter-spacing: 0.01em;
 }
 
@@ -54,7 +62,6 @@ body {
 #why {
   scroll-margin-top: var(--nav-offset);
 }
-
 
 /* ====== 核心视觉辅助类 ====== */
 .glass-card {
@@ -112,7 +119,9 @@ body {
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  transition: border-color 0.2s ease, color 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .btn-ghost:hover {
@@ -180,11 +189,7 @@ body {
     radial-gradient(220px 220px at 88% 28%, rgba(91, 224, 176, 0.1), transparent 62%),
     radial-gradient(260px 260px at 18% 82%, rgba(91, 224, 176, 0.1), transparent 65%),
     radial-gradient(320px 320px at 84% 78%, rgba(63, 157, 255, 0.08), transparent 68%);
-  background-size:
-    auto,
-    auto,
-    auto,
-    auto;
+  background-size: auto, auto, auto, auto;
   background-position:
     8% 18%,
     88% 28%,
@@ -225,7 +230,8 @@ body {
 .progress-fill-glow {
   position: absolute;
   inset: -40% -10%;
-  background: radial-gradient(circle at 30% 50%, rgba(81, 242, 191, 0.45), transparent 45%),
+  background:
+    radial-gradient(circle at 30% 50%, rgba(81, 242, 191, 0.45), transparent 45%),
     radial-gradient(circle at 70% 50%, rgba(63, 157, 255, 0.35), transparent 50%);
   filter: blur(22px);
   opacity: 0.55;
@@ -250,7 +256,8 @@ body {
 .progress-track-backdrop {
   position: absolute;
   inset: -40% 0;
-  background: radial-gradient(circle at 10% 50%, rgba(81, 242, 191, 0.18), transparent 35%),
+  background:
+    radial-gradient(circle at 10% 50%, rgba(81, 242, 191, 0.18), transparent 35%),
     radial-gradient(circle at 90% 50%, rgba(63, 157, 255, 0.16), transparent 38%),
     linear-gradient(90deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
   filter: blur(22px);
@@ -258,7 +265,6 @@ body {
   pointer-events: none;
   z-index: 0;
 }
-
 
 .progress-stack {
   display: flex;
@@ -295,7 +301,8 @@ body {
     border-color 0.5s ease;
   letter-spacing: 0.01em;
   isolation: isolate;
-  background-image: radial-gradient(circle at 12% 20%, rgba(81, 242, 191, 0.12), transparent 32%),
+  background-image:
+    radial-gradient(circle at 12% 20%, rgba(81, 242, 191, 0.12), transparent 32%),
     radial-gradient(circle at 88% 80%, rgba(63, 157, 255, 0.12), transparent 36%);
 }
 
@@ -325,18 +332,26 @@ body {
 .progress-chip-ring {
   position: absolute;
   inset: -45%;
-  background: radial-gradient(circle at 50% 50%, rgba(81, 242, 191, 0.18), transparent 52%),
+  background:
+    radial-gradient(circle at 50% 50%, rgba(81, 242, 191, 0.18), transparent 52%),
     radial-gradient(circle at 60% 40%, rgba(63, 157, 255, 0.12), transparent 55%);
   filter: blur(20px);
   opacity: 0.35;
   transform: scale(0.86);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
 }
 
 .progress-chip-spark {
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, rgba(81, 242, 191, 0) 0%, rgba(81, 242, 191, 0.28) 45%, rgba(63, 157, 255, 0) 100%);
+  background: linear-gradient(
+    120deg,
+    rgba(81, 242, 191, 0) 0%,
+    rgba(81, 242, 191, 0.28) 45%,
+    rgba(63, 157, 255, 0) 100%
+  );
   mix-blend-mode: screen;
   transform: translateX(-40%);
   animation: spark-move 1.9s ease-in-out infinite;
@@ -365,7 +380,8 @@ body {
 .progress-chip-glow {
   position: absolute;
   inset: -30%;
-  background: radial-gradient(circle at 35% 50%, rgba(81, 242, 191, 0.18), transparent 52%),
+  background:
+    radial-gradient(circle at 35% 50%, rgba(81, 242, 191, 0.18), transparent 52%),
     radial-gradient(circle at 70% 50%, rgba(82, 163, 255, 0.18), transparent 58%);
   filter: blur(32px);
   opacity: 0;

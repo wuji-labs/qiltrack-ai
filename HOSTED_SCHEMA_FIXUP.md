@@ -11,6 +11,7 @@
 在 Dashboard → SQL Editor 执行以下检查 SQL：
 
 ### 检查 1: report_documents 结构
+
 ```sql
 -- 查看现有列
 SELECT column_name, data_type, is_nullable, column_default
@@ -26,6 +27,7 @@ SELECT * FROM report_documents LIMIT 5;
 ```
 
 ### 检查 2: report_credit_events 结构
+
 ```sql
 -- 检查表是否存在
 SELECT EXISTS(
@@ -41,6 +43,7 @@ ORDER BY ordinal_position;
 ```
 
 ### 检查 3: v_user_quota 视图
+
 ```sql
 -- 查看视图定义
 SELECT view_definition FROM information_schema.views
@@ -330,7 +333,7 @@ git commit -m "chore: sync types from Hosted instance"
 ---
 
 **何时完成本步骤**：
+
 - SQL 1-4 都执行无误
 - 验证查询 (第 4 步) 显示所有表/视图/函数存在
 - 粘贴验证查询结果或直接说 "schema 修正完成" 告知 Claude
-

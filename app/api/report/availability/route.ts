@@ -44,10 +44,7 @@ export async function GET(request: NextRequest) {
     const mode = searchParams.get("mode") || "production";
 
     if (!symbol) {
-      const response = NextResponse.json(
-        { error: "Missing symbol parameter" },
-        { status: 400 }
-      );
+      const response = NextResponse.json({ error: "Missing symbol parameter" }, { status: 400 });
       responseCookies.forEach(({ name, value }) => {
         response.headers.append("Set-Cookie", `${name}=${value}`);
       });
@@ -55,7 +52,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Call the database function to find reusable report
-    const { data, error } = await supabase.rpc("fn_find_reusable_report", {
+    const { data, error } = await supabase.rpc("fn_find_reusable_report" as any, {
       p_symbol: symbol,
       p_lang: lang,
       p_mode: mode,
@@ -131,9 +128,6 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (err) {
     console.error("Report availability error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -68,15 +68,9 @@ function checkCommand(name, command, minimum, optional = false) {
 
   const ok = compareVersions(version, minimum);
   if (ok) {
-    print(
-      `  ✓ ${name}: ${version} (需求: >=${minimum})`,
-      "green"
-    );
+    print(`  ✓ ${name}: ${version} (需求: >=${minimum})`, "green");
   } else {
-    print(
-      `  ✗ ${name}: ${version} (需求: >=${minimum})`,
-      "red"
-    );
+    print(`  ✗ ${name}: ${version} (需求: >=${minimum})`, "red");
   }
   return ok;
 }
@@ -137,10 +131,7 @@ function checkNpmDependencies() {
 
   const nodeModulesPath = path.resolve("node_modules");
   if (!fs.existsSync(nodeModulesPath)) {
-    print(
-      `  ⚠ node_modules 目录不存在，请运行 npm install`,
-      "yellow"
-    );
+    print(`  ⚠ node_modules 目录不存在，请运行 npm install`, "yellow");
     return false;
   }
 
@@ -178,7 +169,7 @@ function checkNpmScripts() {
     const scripts = packageJson.scripts || {};
 
     const requiredScripts = ["dev", "build", "lint", "test"];
-    const available = requiredScripts.filter(s => scripts[s]).length;
+    const available = requiredScripts.filter((s) => scripts[s]).length;
 
     if (available === requiredScripts.length) {
       print(`  ✓ 核心 npm 脚本已配置 (dev, build, lint, test)`, "green");
@@ -238,10 +229,10 @@ function main() {
 
   if (allPassed) {
     print("你的开发环境已准备好。可以开始以下操作:\n", "green");
-    print('  npm run dev      # 启动开发服务器', "green");
-    print('  npm run lint     # 代码质量检查', "green");
-    print('  npm test         # 运行单元测试', "green");
-    print('  npm run build    # 生成生产构建\n', "green");
+    print("  npm run dev      # 启动开发服务器", "green");
+    print("  npm run lint     # 代码质量检查", "green");
+    print("  npm test         # 运行单元测试", "green");
+    print("  npm run build    # 生成生产构建\n", "green");
   } else {
     print("\n请根据上述错误信息修复问题。详细说明见 ENVIRONMENT.md", "red");
     process.exit(1);

@@ -113,8 +113,7 @@ export class ContentSanitizer {
 
     if (key === "ja" || key === "ja-jp") return "ja";
     if (key === "ko" || key === "ko-kr") return "ko";
-    if (key === "zh-hant" || key === "zh-hk" || key === "zh-tw")
-      return "zh-Hant";
+    if (key === "zh-hant" || key === "zh-hk" || key === "zh-tw") return "zh-Hant";
     if (key === "zh-hans" || key === "zh-cn" || key === "zh") return "zh-Hans";
 
     return DEFAULT_LANGUAGE;

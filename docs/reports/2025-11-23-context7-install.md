@@ -169,9 +169,11 @@ claude mcp add context7 -- npx -y @upstash/context7-mcp --api-key YOUR_API_KEY
 ## 4. 验证步骤
 
 1. **Inspector 快速校验**（适用于本地 npx）：
+
    ```bash
    npx -y @modelcontextprotocol/inspector npx -y @upstash/context7-mcp --api-key YOUR_API_KEY
    ```
+
    - 预期输出：`resolve-library-id` 与 `get-library-docs` 两个工具，返回 “Ready for requests”。
 
 2. **客户端自检**：
@@ -186,14 +188,14 @@ claude mcp add context7 -- npx -y @upstash/context7-mcp --api-key YOUR_API_KEY
 
 ## 5. 常见问题 / 故障排除
 
-| 问题 | 现象 | 解决方案 |
-| --- | --- | --- |
-| Node 版本过低 | `SyntaxError: Unexpected token '??'` 或 `fetch is not defined` | 升级到 Node ≥ 18（可用 nvm / fnm），或改用 bunx。 |
-| `ERR_MODULE_NOT_FOUND` | npx 启动报模块不存在 | 使用 `bunx -y @upstash/context7-mcp` 或 `npx --node-options=--experimental-vm-modules ...`；必要时先 `npm install -g @upstash/context7-mcp`。 |
-| Windows 找不到 npx | `command not found: npx` | 在配置中写入绝对路径（`C:\Users\<你>\AppData\Roaming\npm\npx.cmd`），或通过 `cmd /c npx`。 |
-| TLS/代理问题 | 远程 HTTP 连接报 TLS 错误 | 设置 `--node-options=--experimental-fetch`，或在系统中配置 `HTTPS_PROXY`；必要时换成本地 npx 模式。 |
-| API Key 泄露风险 | 配置文件明文存储 Key | 使用环境变量 (`env` 字段) 或密码管理器；注意不要将配置文件提交到版本库。 |
-| 大量客户端 | 需要安装 >4 个客户端 | 先完成核心 4 个（Codex/Claude/Cursor/VS Code），额外客户端需经过 mini design review，并把配置示例写入附录。 |
+| 问题                   | 现象                                                           | 解决方案                                                                                                                                      |
+| ---------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node 版本过低          | `SyntaxError: Unexpected token '??'` 或 `fetch is not defined` | 升级到 Node ≥ 18（可用 nvm / fnm），或改用 bunx。                                                                                             |
+| `ERR_MODULE_NOT_FOUND` | npx 启动报模块不存在                                           | 使用 `bunx -y @upstash/context7-mcp` 或 `npx --node-options=--experimental-vm-modules ...`；必要时先 `npm install -g @upstash/context7-mcp`。 |
+| Windows 找不到 npx     | `command not found: npx`                                       | 在配置中写入绝对路径（`C:\Users\<你>\AppData\Roaming\npm\npx.cmd`），或通过 `cmd /c npx`。                                                    |
+| TLS/代理问题           | 远程 HTTP 连接报 TLS 错误                                      | 设置 `--node-options=--experimental-fetch`，或在系统中配置 `HTTPS_PROXY`；必要时换成本地 npx 模式。                                           |
+| API Key 泄露风险       | 配置文件明文存储 Key                                           | 使用环境变量 (`env` 字段) 或密码管理器；注意不要将配置文件提交到版本库。                                                                      |
+| 大量客户端             | 需要安装 >4 个客户端                                           | 先完成核心 4 个（Codex/Claude/Cursor/VS Code），额外客户端需经过 mini design review，并把配置示例写入附录。                                   |
 
 ---
 
@@ -217,21 +219,27 @@ Risks：
 ## 7. Claude Code 安装验证报告（2025-11-23）
 
 ### Context（上下文）
+
 在 Claude Code CLI 中安装 Context7 MCP，使用本地 npx 方式（免费速率，无需 API Key）。
 
 ### Actions（执行行动）
 
 **第一步**：移除旧配置
+
 ```bash
 claude mcp remove context7
 ```
+
 输出：`Removed MCP server "context7" from local config`
 
 **第二步**：安装本地 npx 版本
+
 ```bash
 claude mcp add context7 -- npx -y @upstash/context7-mcp
 ```
+
 输出：
+
 ```
 Added stdio MCP server context7 with command: npx -y @upstash/context7-mcp to local config
 File modified: C:\Users\xiuluart\.claude.json [project: D:\Projects\investor-ai]
@@ -242,6 +250,7 @@ File modified: C:\Users\xiuluart\.claude.json [project: D:\Projects\investor-ai]
 **命令**：`claude mcp list`
 
 **输出**：
+
 ```
 Checking MCP server health...
 
@@ -249,6 +258,7 @@ context7: npx -y @upstash/context7-mcp - ✓ Connected
 ```
 
 **验证状态**：✅ 安装成功
+
 - MCP 服务已在本地注册
 - 连接状态正常（✓ Connected）
 - npx 命令可正确执行并拉取依赖
@@ -258,6 +268,7 @@ context7: npx -y @upstash/context7-mcp - ✓ Connected
 **位置**：`C:\Users\xiuluart\.claude.json` (project-level)
 
 **内容**：
+
 ```json
 {
   "mcpServers": {
@@ -271,14 +282,15 @@ context7: npx -y @upstash/context7-mcp - ✓ Connected
 
 ### Risks（风险与缓解）
 
-| 风险 | 缓解方案 | 状态 |
-|------|--------|------|
-| npx 首次下载耗时 | 已缓存本地，后续启动快速 | ✅ |
-| 免费速率限制 | 足够开发和测试使用 | ✅ |
-| Windows 兼容性 | 已验证在 Windows PowerShell 工作正常 | ✅ |
-| 网络连接依赖 | Upstash 服务稳定，若超时检查防火墙 | ✅ |
+| 风险             | 缓解方案                             | 状态 |
+| ---------------- | ------------------------------------ | ---- |
+| npx 首次下载耗时 | 已缓存本地，后续启动快速             | ✅   |
+| 免费速率限制     | 足够开发和测试使用                   | ✅   |
+| Windows 兼容性   | 已验证在 Windows PowerShell 工作正常 | ✅   |
+| 网络连接依赖     | Upstash 服务稳定，若超时检查防火墙   | ✅   |
 
 ### 备注
+
 - 无需配置 API Key，保持免费使用
 - 若未来需要更高速率，可通过 `--api-key` 参数或远程 HTTP 方式升级
 - 已准备就绪用于文档检索任务

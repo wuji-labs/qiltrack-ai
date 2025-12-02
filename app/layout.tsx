@@ -15,8 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Investor AI",
-  description:
-    "三分钟生成结构化美股投研报告，支持模糊搜索、富文本复制与 DOCX 导出。",
+  description: "三分钟生成结构化美股投研报告，支持模糊搜索、富文本复制与 DOCX 导出。",
 };
 
 export default function RootLayout({

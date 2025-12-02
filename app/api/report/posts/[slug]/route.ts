@@ -44,10 +44,7 @@ export async function GET(
     return context.applyCookies(response);
   } catch (err) {
     console.error("Error fetching report post detail:", err);
-    const response = NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    const response = NextResponse.json({ error: "Internal server error" }, { status: 500 });
     return context.applyCookies(response);
   }
 }

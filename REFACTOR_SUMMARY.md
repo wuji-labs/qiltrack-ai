@@ -11,6 +11,7 @@
 ## ✅ 已完成的工作
 
 ### Phase 0: 准备工作
+
 - ✅ 安装 Refine 依赖 (`@refinedev/*`)
 - ✅ 安装测试工具 (MSW, coverage-v8)
 - ✅ 安装 uuid 依赖
@@ -18,6 +19,7 @@
 ### Phase 1: 核心服务层重构
 
 #### 1.1 错误处理系统
+
 - **lib/core/errors.ts**: 统一错误类
   - AppError, InsufficientCreditsError, ValidationError
   - UnauthorizedError, ForbiddenError, NotFoundError
@@ -28,6 +30,7 @@
   - successResponse(): 成功响应辅助函数
 
 #### 1.2 积分管理系统
+
 - **lib/core/credits/manager.ts**: CreditManager 核心类
   - checkAndConsume(): 原子性积分扣除
   - getBalance(): 查询余额
@@ -41,6 +44,7 @@
   - getStreakInfo(): 获取连续签到信息
 
 #### 1.3 服务适配器层
+
 - **lib/services/llm.ts**: LLM 服务
   - 支持 Helicone 和 OpenRouter
   - 自动故障转移
@@ -62,6 +66,7 @@
   - deleteFile(), getPublicUrl(), fileExists()
 
 #### 1.4 报告生成系统
+
 - **lib/core/reports/types.ts**: 类型定义
   - GenerateReportParams, GeneratedReport
   - ReportMetadata, SavedReport
@@ -87,6 +92,7 @@
   - chunkReport(): 报告分块
 
 #### 1.5 API 路由重构
+
 - **app/api/report/route.ts**: 重构为 200 行简洁代码
   - 使用新的服务层
   - 统一错误处理
@@ -106,6 +112,7 @@
 ### Phase 3: Refine Admin 面板
 
 #### 3.1 基础设施
+
 - **lib/admin/data-provider.ts**: Supabase Data Provider
   - getList, getOne, create, update, deleteOne
   - 支持过滤、排序、分页
@@ -115,6 +122,7 @@
   - 管理员权限检查
 
 #### 3.2 Admin 页面
+
 - **app/admin/layout.tsx**: Admin 布局
   - Refine 容器配置
   - 导航菜单
@@ -145,6 +153,7 @@
 ## 📁 新增文件清单
 
 ### Core 业务逻辑层
+
 ```
 lib/core/
 ├── errors.ts                  # 统一错误类
@@ -163,6 +172,7 @@ lib/core/
 ```
 
 ### 服务适配器层
+
 ```
 lib/services/
 ├── llm.ts                    # LLM 服务
@@ -171,12 +181,14 @@ lib/services/
 ```
 
 ### API 层
+
 ```
 lib/api/
 └── error-handler.ts          # 错误处理中间件
 ```
 
 ### Admin 面板
+
 ```
 lib/admin/
 ├── data-provider.ts          # Refine Data Provider
@@ -192,6 +204,7 @@ app/admin/
 ```
 
 ### 数据库迁移
+
 ```
 supabase/migrations/
 └── 20251201000000_unify_credits_system.sql
@@ -202,12 +215,14 @@ supabase/migrations/
 ## 🏗️ 架构改进
 
 ### 之前 (单体架构)
+
 ```
 app/api/report/route.ts (795 行)
 └── 包含所有逻辑：LLM、数据获取、内容净化、Storage、积分
 ```
 
 ### 之后 (三层架构)
+
 ```
 表现层 (API Routes)
     ↓
@@ -236,6 +251,7 @@ Coverage:   97% (99/102)
 ```
 
 **失败的测试**: 3 个（都是旧测试需要更新 mock）
+
 - `__tests__/api/report.supabase.test.ts`: 需要更新为新 API 格式
 
 ---
@@ -243,27 +259,32 @@ Coverage:   97% (99/102)
 ## 🎯 关键成就
 
 ### 1. 代码质量提升
+
 - ✅ app/api/report/route.ts 从 795 行减少到 200 行 (75% 减少)
 - ✅ 每个模块职责单一，易于测试和维护
 - ✅ 统一的错误处理
 - ✅ 完整的类型定义
 
 ### 2. 可测试性
+
 - ✅ 业务逻辑可独立测试（无需 mock 框架）
 - ✅ 所有依赖可注入
 - ✅ 测试覆盖率 97%
 
 ### 3. 可维护性
+
 - ✅ 清晰的目录结构
 - ✅ 关注点分离
 - ✅ 代码复用性高
 
 ### 4. 可扩展性
+
 - ✅ 便于未来拆分为微服务
 - ✅ 新功能易于添加
 - ✅ Admin 面板基于 Refine，快速开发
 
 ### 5. 可观测性
+
 - ✅ 集成 Langfuse 追踪
 - ✅ 完整的审计日志
 - ✅ 统一的错误记录
@@ -273,6 +294,7 @@ Coverage:   97% (99/102)
 ## 📝 待办事项
 
 ### 短期（可选）
+
 1. 更新 3 个失败的测试 mock
 2. 运行数据库迁移：
    ```bash
@@ -281,6 +303,7 @@ Coverage:   97% (99/102)
 3. 测试 Admin 面板功能
 
 ### 中期（功能增强）
+
 1. 完善 Admin 面板其他页面：
    - 报告管理页面
    - 审计日志页面
@@ -288,6 +311,7 @@ Coverage:   97% (99/102)
 3. 集成 Sentry 错误监控
 
 ### 长期（架构优化）
+
 1. 性能优化（Redis 缓存）
 2. 微服务化准备
 3. API 文档生成 (Swagger)
@@ -297,26 +321,31 @@ Coverage:   97% (99/102)
 ## 🚀 如何使用
 
 ### 1. 安装依赖
+
 ```bash
 npm install
 ```
 
 ### 2. 运行数据库迁移
+
 ```bash
 supabase db push
 ```
 
 ### 3. 启动开发服务器
+
 ```bash
 npm run dev
 ```
 
 ### 4. 访问 Admin 面板
+
 ```
 http://localhost:3000/admin
 ```
 
 ### 5. 运行测试
+
 ```bash
 npm test
 ```
