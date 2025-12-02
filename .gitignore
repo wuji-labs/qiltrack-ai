@@ -103,3 +103,8 @@ next-env.d.ts
 .claude/
 chrome/
 
+# Temporary admin setup scripts (should not be committed)
+scripts/*admin*.js
+scripts/*direct*.js
+scripts/manual-*.sql
+
