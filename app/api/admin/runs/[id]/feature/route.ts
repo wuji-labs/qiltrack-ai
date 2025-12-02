@@ -50,9 +50,9 @@ export async function POST(
       return response;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const isAdmin =
-      (profile as any).plan === "admin" || (profile as any).email?.endsWith("@investor.ai");
+      (profile as { plan?: string; email?: string }).plan === "admin" ||
+      (profile as { plan?: string; email?: string }).email?.endsWith("@investor.ai");
 
     if (!isAdmin) {
       const response = NextResponse.json(

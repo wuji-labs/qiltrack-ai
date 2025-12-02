@@ -1,12 +1,27 @@
 import React from 'react';
 
+interface QueueStats {
+  waiting: number;
+  active: number;
+  completed: number;
+  failed: number;
+  failedJobs: Array<{
+    id: string;
+    reportRunId: string;
+    language: string;
+    tone: string;
+    failedReason: string;
+    attemptsMade: number;
+  }>;
+}
+
 /**
  * Admin Queue Monitoring Component
  *
  * Displays queue statistics and recent failed jobs
  */
 export default function QueueMonitoring() {
-  const [stats, setStats] = React.useState<any>(null);
+  const [stats, setStats] = React.useState<QueueStats | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -131,7 +146,7 @@ export default function QueueMonitoring() {
           <div className="text-gray-500">No failed jobs</div>
         ) : (
           <div className="space-y-2">
-            {stats?.failedJobs.map((job: any) => (
+            {stats?.failedJobs.map((job) => (
               <div key={job.id} className="bg-white p-4 rounded shadow">
                 <div className="flex justify-between items-start">
                   <div>
