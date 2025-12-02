@@ -15,6 +15,7 @@ import {
 } from "@/lib/core/errors";
 import { DEFAULT_LANGUAGE, type Language } from "@/lib/i18n-config";
 import type { ReportTone } from "@/lib/core/reports/types";
+import { reportGenerationRateLimit, checkRateLimit } from "@/lib/api/rate-limit";
 
 /**
  * Check for test bypass token
@@ -78,7 +79,39 @@ export async function GET(request: NextRequest) {
     const language = sanitizer.normalizeLanguage(searchParams.get("lang"));
     const tone = (searchParams.get("tone") || "baseline") as ReportTone;
 
-    // 3. Check for reusable report (within 7 days)
+    // 3. Rate limiting check (skip in test mode)
+    if (!isTestBypass) {
+      const { success, headers } = await checkRateLimit(
+        userId,
+        reportGenerationRateLimit
+      );
+
+      if (!success) {
+        const response = NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: "RATE_LIMIT_EXCEEDED",
+              message: "请求过于频繁，请稍后再试",
+            },
+          },
+          { status: 429, headers }
+        );
+
+        responseCookies.forEach(({ name, value }) => {
+          response.headers.append("Set-Cookie", `${name}=${value}`);
+        });
+
+        return response;
+      }
+
+      // Add rate limit headers to response cookies for later use
+      Object.entries(headers).forEach(([key, value]) => {
+        responseCookies.push({ name: key, value });
+      });
+    }
+
+    // 4. Check for reusable report (within 7 days)
     if (!isTestBypass) {
       const persistence = new ReportPersistence();
       const existingReport = await persistence.checkReusableReport(
@@ -107,7 +140,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 4. Check and consume credits
+    // 5. Check and consume credits
     if (!isTestBypass) {
       const creditManager = new CreditManager();
 
@@ -125,7 +158,7 @@ export async function GET(request: NextRequest) {
       console.info(`[CREDIT_CONSUMED] user_id: ${userId}, symbol: ${symbol}`);
     }
 
-    // 5. Generate report using new service layer
+    // 6. Generate report using new service layer
     const generator = new ReportGenerator();
 
     const generatedReport = await generator.generate({
@@ -138,13 +171,13 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // 6. Extract title from report (first # line)
+    // 7. Extract title from report (first # line)
     const titleMatch = generatedReport.content.match(/^#\s+(.+)$/m);
     const title =
       titleMatch?.[1] ||
       `Investment Analysis Report: ${symbol} (${language})`;
 
-    // 7. Save report to database
+    // 8. Save report to database
     const persistence = new ReportPersistence();
 
     const savedReport = await persistence.saveReport(
@@ -159,7 +192,7 @@ export async function GET(request: NextRequest) {
       userId
     );
 
-    // 8. Record audit log
+    // 9. Record audit log
     await persistence.recordAudit(userId, "GENERATE_REPORT", {
       symbol,
       language,
@@ -168,7 +201,7 @@ export async function GET(request: NextRequest) {
       report_run_id: savedReport.report_run_id,
     });
 
-    // 9. Generate embeddings in background (non-blocking)
+    // 10. Generate embeddings in background (non-blocking)
     if (!isTestBypass && savedReport.report_run_id) {
       const embeddingsManager = new EmbeddingsManager();
       // Fire and forget
@@ -188,7 +221,7 @@ export async function GET(request: NextRequest) {
       `[REPORT_GENERATED] user_id: ${userId}, symbol: ${symbol}, report_id: ${savedReport.id}`
     );
 
-    // 10. Return success response
+    // 11. Return success response
     const response = successResponse({
       report: savedReport,
       reused: false,
