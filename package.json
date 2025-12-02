@@ -22,6 +22,7 @@
     "pr:ready": "npm run lint && npm run test && echo '✅代码已准备好提交 PR'"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "@react-pdf/renderer": "^4.3.1",
     "@refinedev/core": "^5.0.6",
     "@refinedev/nextjs-router": "^7.0.4",
@@ -44,9 +45,11 @@
     "pdf-lib": "^1.17.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "react-hook-form": "^7.67.0",
     "react-markdown": "^10.1.0",
     "recharts": "^3.5.1",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
