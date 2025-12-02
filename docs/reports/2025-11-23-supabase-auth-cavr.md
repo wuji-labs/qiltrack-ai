@@ -3,6 +3,7 @@
 ## 完成清单
 
 ### ✅ Auth 阶段交付项
+
 - [x] Supabase Auth Hook (`useSupabaseAuth.ts`)
   - 认证状态管理（用户、会话、加载状态）
   - 邮件登录（OTP）
@@ -30,6 +31,7 @@
 ### 📊 验证结果
 
 #### Lint 检查
+
 ```
 ✖ 19 problems (2 errors, 17 warnings)
 - 2 errors: 旧的 require() 导入（非本次修改）
@@ -38,6 +40,7 @@
 ```
 
 #### 测试结果
+
 ```
 ✅ Test Files: 2 passed (2)
 ✅ Tests: 5 passed (5)
@@ -46,6 +49,7 @@
 ```
 
 ### 📁 核心文件清单
+
 ```
 D:\Projects\investor-ai
 ├── hooks/
@@ -71,6 +75,7 @@ D:\Projects\investor-ai
 ### 🔑 关键实现细节
 
 #### useSupabaseAuth Hook
+
 - **状态管理**：user、session、loading、isAuthenticated
 - **认证方法**：
   - `signInWithEmail(email)` - OTP 登录
@@ -82,6 +87,7 @@ D:\Projects\investor-ai
   - `getReportCredits()` - 获取报告积分
 
 #### Auth Flow
+
 1. 用户点击登录 → 选择邮件或 OAuth
 2. OAuth：Supabase 处理 → `/api/auth/callback` 获取 code → 交换为 session
 3. 邮件：发送 OTP → 用户点击链接 → `/api/auth/callback` 处理
@@ -89,17 +95,20 @@ D:\Projects\investor-ai
 5. 重定向到首页或指定回调 URL
 
 ### 🔐 安全考虑
+
 - ✅ 行级别安全 (RLS) 政策已配置
 - ✅ 用户只能访问自己的数据
 - ✅ Session 由 Supabase 管理
 - ✅ Sensitive 信息存在 `.env.local`（不提交）
 
 ### ⚠️ 已知问题与限制
+
 1. **本地开发**：需要 Docker Desktop 运行 Supabase stack
 2. **NextAuth 兼容**：旧的 `useAuth` hook 仍然存在，但已被新 hook 替换
 3. **登录页面 provider 映射**：Apple 映射到 GitHub（需根据实际 Supabase 配置调整）
 
 ### 🚀 后续步骤
+
 1. ✅ Schema 和 Auth - **第 1 PR**（本 PR）
 2. ⏳ Report API RPC 集成 - 第 2 PR
 3. ⏳ 内容模块数据迁移 - 第 3 PR
@@ -130,10 +139,12 @@ npx supabase gen types typescript --local > types/database.ts
 ```
 
 ## 分支信息
+
 - **分支**：`feat/supabase-integration`
 - **基于**：`main`
 - **提交数**：待 PR 统计
 
 ---
+
 生成时间：2025-11-23
 Supabase CLI 版本：2.58.5

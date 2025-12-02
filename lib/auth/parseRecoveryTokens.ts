@@ -32,9 +32,5 @@ export function parseRecoveryTokens(params: {
  * Check if recovery tokens are present (at least one valid token source)
  */
 export function hasRecoveryTokens(tokens: RecoveryTokens): boolean {
-  return !!(
-    tokens.code ||
-    tokens.tokenHash ||
-    (tokens.accessToken && tokens.refreshToken)
-  );
+  return !!(tokens.code || tokens.tokenHash || (tokens.accessToken && tokens.refreshToken));
 }

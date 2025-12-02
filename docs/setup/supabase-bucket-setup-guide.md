@@ -10,12 +10,12 @@
 
 你需要创建一个名为 `report-assets` 的私有存储桶，用于存储用户生成的报告（DOCX、PDF 等）。
 
-| 项目 | 值 |
-|------|-----|
-| 桶名 | `report-assets` |
-| 访问权限 | Private（私有） |
-| 上传者 | Service Role（后端）使用 `admin` 权限 |
-| 读取者 | 已认证用户（通过签名 URL）|
+| 项目     | 值                                           |
+| -------- | -------------------------------------------- |
+| 桶名     | `report-assets`                              |
+| 访问权限 | Private（私有）                              |
+| 上传者   | Service Role（后端）使用 `admin` 权限        |
+| 读取者   | 已认证用户（通过签名 URL）                   |
 | RLS 策略 | 仅 Service Role 可上传，用户可读取自己的文件 |
 
 ---
@@ -36,6 +36,7 @@
 4. 点击 **Create bucket**
 
 ![Dashboard Screenshot Placeholder]
+
 ```
 Dashboard > Storage > New Bucket
 ┌─────────────────────────────────┐
@@ -57,9 +58,11 @@ Dashboard > Storage > New Bucket
 4. 操作：**INSERT**
 5. 目标角色：**service_role**
 6. SQL 表达式：
+
 ```sql
 true
 ```
+
 7. 点击 **Save**
 
 #### 策略 2：用户读取自己的文件
@@ -70,9 +73,11 @@ true
 4. 操作：**SELECT**
 5. 目标角色：**authenticated**
 6. SQL 表达式：
+
 ```sql
 bucket_id = 'report-assets'
 ```
+
 7. 点击 **Save**
 
 #### 策略 3：Service Role 完全访问（用于删除/更新）
@@ -83,12 +88,15 @@ bucket_id = 'report-assets'
 4. 操作：**UPDATE, DELETE**
 5. 目标角色：**service_role**
 6. SQL 表达式：
+
 ```sql
 true
 ```
+
 7. 点击 **Save**
 
 **完成后应该看到 3 条策略**：
+
 ```
 ✓ service_role_upload (INSERT)
 ✓ authenticated_read_own_files (SELECT)
@@ -102,6 +110,7 @@ true
 如果你更喜欢命令行或想自动化流程：
 
 ### 前置条件
+
 ```bash
 # 安装 Supabase CLI（如果还没有）
 npm install -g supabase
@@ -151,6 +160,7 @@ USING (bucket_id = 'report-assets');
 ```
 
 然后运行迁移：
+
 ```bash
 supabase db push
 ```
@@ -225,18 +235,18 @@ ORDER BY policyname;
 // 使用 Service Role（仅后端，.env 中）
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!  // 超级管理员权限
+  process.env.SUPABASE_SERVICE_ROLE_KEY! // 超级管理员权限
 );
 
 // 上传文件（只有 Service Role 能做）
 const { data, error } = await supabase.storage
-  .from('report-assets')
+  .from("report-assets")
   .upload(`${userId}/${filename}`, fileBuffer, {
-    contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   });
 
-if (error) console.error('Upload failed:', error);
-else console.log('Uploaded:', data);
+if (error) console.error("Upload failed:", error);
+else console.log("Uploaded:", data);
 ```
 
 ---
@@ -266,6 +276,7 @@ else console.log('Uploaded:', data);
 **原因**：桶已存在（可能来自之前的尝试）
 
 **解决**：
+
 - 在 Dashboard 中删除旧桶（Storage → 选中桶 → Delete）
 - 等待 30 秒后重新创建
 
@@ -274,6 +285,7 @@ else console.log('Uploaded:', data);
 **原因**：没有正确配置 Service Role INSERT 权限
 
 **解决**：
+
 1. 确认后端使用了 `SUPABASE_SERVICE_ROLE_KEY`
 2. 在 Dashboard 检查 Policies 是否正确保存
 3. 运行 SQL 验证策略是否存在
@@ -283,9 +295,11 @@ else console.log('Uploaded:', data);
 **原因**：RLS 策略过于严格
 
 **解决**：修改 SELECT 策略为：
+
 ```sql
 bucket_id = 'report-assets'
 ```
+
 （不需要检查 owner，只要桶 ID 匹配即可）
 
 ---
@@ -302,7 +316,7 @@ bucket_id = 'report-assets'
 ```typescript
 // 生成 7 天有效期的签名 URL
 const { data: signedUrl } = await supabase.storage
-  .from('report-assets')
+  .from("report-assets")
   .createSignedUrl(`${userId}/${filename}`, 7 * 24 * 60 * 60);
 
 // 前端用这个 URL 下载文件

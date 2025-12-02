@@ -42,6 +42,7 @@ Worktree g2 (D:\Projects\investor-ai-g2)
 ```
 
 **关键点：**
+
 - `package.json` 在所有仓库中完全相同，避免 merge conflict
 - 端口通过 `.env.local` 本地配置（gitignored）
 - 每个 worktree 独立设置，互不干扰
@@ -55,12 +56,14 @@ Worktree g2 (D:\Projects\investor-ai-g2)
 ### 🤖 AI 助手注意事项
 
 **当用户说"不要动端口"时：**
+
 1. 不要尝试修改任何端口相关文件
 2. 不要建议"改进"或"优化"端口系统
 3. 不要自作主张修改 package.json
 4. 如果发现端口问题，询问用户而不是直接修改
 
 **如果用户要求修改端口系统：**
+
 1. 先确认用户真的理解现有系统
 2. 提醒这是经过调试的稳定方案
 3. 询问为什么要修改
@@ -69,6 +72,7 @@ Worktree g2 (D:\Projects\investor-ai-g2)
 ### 🔒 保护机制
 
 系统已设置以下保护措施：
+
 - Git pre-commit hook 阻止提交端口配置
 - `.env.local` 在 `.gitignore` 中
 - 文档明确说明禁止修改

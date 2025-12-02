@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { createServerClient, createServiceRoleClient, uploadToStorage } from "@/lib/supabase/server";
+import {
+  createServerClient,
+  createServiceRoleClient,
+  uploadToStorage,
+} from "@/lib/supabase/server";
 
 // Mock @supabase/ssr
 vi.mock("@supabase/ssr", () => ({
@@ -134,7 +138,12 @@ describe("lib/supabase/server", () => {
       };
 
       try {
-        await uploadToStorage(mockClient as unknown as ReturnType<typeof createServiceRoleClient>, "test-bucket", "test/path.md", "content");
+        await uploadToStorage(
+          mockClient as unknown as ReturnType<typeof createServiceRoleClient>,
+          "test-bucket",
+          "test/path.md",
+          "content"
+        );
         expect.fail("Should have thrown");
       } catch (err) {
         expect(String(err)).toContain("Storage upload failed");
@@ -154,7 +163,12 @@ describe("lib/supabase/server", () => {
       };
 
       try {
-        await uploadToStorage(mockClient as unknown as ReturnType<typeof createServiceRoleClient>, "test-bucket", "test/path.md", "content");
+        await uploadToStorage(
+          mockClient as unknown as ReturnType<typeof createServiceRoleClient>,
+          "test-bucket",
+          "test/path.md",
+          "content"
+        );
         expect.fail("Should have thrown");
       } catch (err) {
         expect(String(err)).toContain("signed URL");
@@ -174,7 +188,12 @@ describe("lib/supabase/server", () => {
         },
       };
 
-      const result = await uploadToStorage(mockClient as unknown as ReturnType<typeof createServiceRoleClient>, "test-bucket", "test/path.md", "content");
+      const result = await uploadToStorage(
+        mockClient as unknown as ReturnType<typeof createServiceRoleClient>,
+        "test-bucket",
+        "test/path.md",
+        "content"
+      );
 
       expect(result).toBe("https://example.com/signed");
     });

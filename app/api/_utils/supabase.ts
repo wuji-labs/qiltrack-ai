@@ -39,9 +39,7 @@ export function initSupabase(request: NextRequest): SupabaseRequestContext {
   return { supabase, responseCookies, applyCookies };
 }
 
-export async function getAuthContext(
-  context: SupabaseRequestContext
-): Promise<AuthContext> {
+export async function getAuthContext(context: SupabaseRequestContext): Promise<AuthContext> {
   const {
     data: { session },
   } = await context.supabase.auth.getSession();
@@ -58,7 +56,8 @@ export async function getAuthContext(
 
   return {
     userId: session.user.id,
-    role: (profile as { role?: Database["public"]["Tables"]["profiles"]["Row"]["role"] })?.role ?? null,
+    role:
+      (profile as { role?: Database["public"]["Tables"]["profiles"]["Row"]["role"] })?.role ?? null,
   };
 }
 

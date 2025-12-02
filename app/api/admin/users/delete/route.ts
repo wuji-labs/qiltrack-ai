@@ -18,10 +18,7 @@ export async function POST(request: Request) {
     const { userId } = body;
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "用户ID为必填项" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "用户ID为必填项" }, { status: 400 });
     }
 
     // 删除用户
@@ -29,10 +26,7 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("Delete user error:", error);
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     return NextResponse.json({

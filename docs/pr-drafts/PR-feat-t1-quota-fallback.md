@@ -21,6 +21,7 @@
 ## 🎯 核心变更
 
 ### 文件修改统计
+
 ```
 14 files changed, 743 insertions(+), 102 deletions(-)
 
@@ -97,8 +98,10 @@ const handleSubscribeMonthly = () => {
     router.push("/login");
     return;
   }
-  alert(t("pricing.plan.monthly.cta.notReady") ||
-    "Subscription is coming soon. Contact us for early access.");
+  alert(
+    t("pricing.plan.monthly.cta.notReady") ||
+      "Subscription is coming soon. Contact us for early access."
+  );
   handlePrimaryCta(); // 降级到报告生成
 };
 ```
@@ -108,11 +111,13 @@ const handleSubscribeMonthly = () => {
 ## ✅ 验证清单
 
 ### 自动化验证
+
 - [x] Lint 检查通过：`npm run lint` ✅ 13 warnings（既有，无新增 errors）
 - [x] 单元测试框架：Vitest 集成（后续 CI 验证）
 - [ ] E2E 测试：待 Hosted 部署后补充
 
 ### 手动验证场景
+
 - [x] 登录后配额正确显示（非硬编码 1）
 - [x] 生成报告后配额扣减并刷新
 - [x] 刷新页面配额保留
@@ -127,11 +132,13 @@ const handleSubscribeMonthly = () => {
 ## 📚 依赖项
 
 ### 前置条件（T0 由 Codex 完成）
+
 - [x] `feat/supabase-deployment` 分支代码已就绪
 - [ ] Supabase 存储桶 `report-assets` 创建 ⏳
 - [ ] `feat/supabase-deployment → main` 合并 ⏳
 
 ### API 依赖
+
 - [x] `/api/report/credits` 实现 ✅
 - [x] `/api/report/history` 实现 ✅
 - [x] `/api/report` 实现 ✅
@@ -139,6 +146,7 @@ const handleSubscribeMonthly = () => {
 - [x] `useSupabaseAuth` hook 提供 `refreshSession()` ✅
 
 ### i18n 依赖
+
 - [x] 多语言字典已包含所需 key
   - `generator.alert.unregistered` ✅
   - `generator.alert.quota` ✅
@@ -149,27 +157,30 @@ const handleSubscribeMonthly = () => {
 
 ## 🚨 风险与缓解
 
-| 风险 | 级别 | 缓解方案 | 状态 |
-|------|------|---------|------|
-| Session 刷新延迟 | 中 | 配额扣减后强制 `refreshSession()` + `refreshQuota()` | ✅ 实现 |
-| Storage 未就绪 | 中 | 报告生成不依赖 Storage（仅后端写入）；前端继续工作 | ⏳ T0 依赖 |
-| Stripe 未接通 | 中 | Fallback 确保 CTA 不失效；后续 T+2 接通 | ✅ Fallback 就绪 |
-| i18n 字典缺失 | 低 | 所需 key 已存在；alert 提供英文降级 | ✅ 覆盖完整 |
+| 风险             | 级别 | 缓解方案                                             | 状态             |
+| ---------------- | ---- | ---------------------------------------------------- | ---------------- |
+| Session 刷新延迟 | 中   | 配额扣减后强制 `refreshSession()` + `refreshQuota()` | ✅ 实现          |
+| Storage 未就绪   | 中   | 报告生成不依赖 Storage（仅后端写入）；前端继续工作   | ⏳ T0 依赖       |
+| Stripe 未接通    | 中   | Fallback 确保 CTA 不失效；后续 T+2 接通              | ✅ Fallback 就绪 |
+| i18n 字典缺失    | 低   | 所需 key 已存在；alert 提供英文降级                  | ✅ 覆盖完整      |
 
 ---
 
 ## 📝 后续步骤
 
 ### 当前步骤（等待中）
+
 1. **Codex 审批本 PR** 及实施报告
 2. **T0 完成**：Codex 创建 Storage 桶 + 合并 `feat/supabase-deployment`
 3. **本 PR 合并**：在 T0 完成后提交审批并合并
 
 ### T+2 计划
+
 - 若 Stripe 接通：替换 fallback 为真实支付流程
 - 若时间允许：完成手动端到端验证并记录在 `docs/reports/` 中
 
 ### 上线检查清单
+
 - [ ] 所有 lint 检查通过
 - [ ] 所有测试通过
 - [ ] Storage 桶创建并配置 RLS

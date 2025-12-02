@@ -35,18 +35,16 @@ export class StorageService {
   ): Promise<UploadResult> {
     const supabase = createServiceRoleClient();
 
-    const { data, error } = await supabase.storage
-      .from(this.bucket)
-      .upload(path, content, {
-        contentType,
-        upsert: true,
-      });
+    const { data, error } = await supabase.storage.from(this.bucket).upload(path, content, {
+      contentType,
+      upsert: true,
+    });
 
     if (error) {
-      throw new ExternalServiceError(
-        `Failed to upload file: ${error.message}`,
-        { path, error: error.message }
-      );
+      throw new ExternalServiceError(`Failed to upload file: ${error.message}`, {
+        path,
+        error: error.message,
+      });
     }
 
     if (!data) {
@@ -56,9 +54,7 @@ export class StorageService {
     }
 
     // Get public URL
-    const { data: urlData } = supabase.storage
-      .from(this.bucket)
-      .getPublicUrl(path);
+    const { data: urlData } = supabase.storage.from(this.bucket).getPublicUrl(path);
 
     return {
       path: data.path,
@@ -73,10 +69,7 @@ export class StorageService {
    * @param content - Report content
    * @returns Upload result
    */
-  async uploadReportJson(
-    reportId: string,
-    content: any
-  ): Promise<UploadResult> {
+  async uploadReportJson(reportId: string, content: any): Promise<UploadResult> {
     const path = `reports/${reportId}.json`;
     const json = JSON.stringify(content, null, 2);
 
@@ -103,10 +96,7 @@ export class StorageService {
     let buffer: Buffer;
     if (typeof imageData === "string") {
       // Remove data URL prefix if present
-      const base64Data = imageData.replace(
-        /^data:image\/\w+;base64,/,
-        ""
-      );
+      const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
       buffer = Buffer.from(base64Data, "base64");
     } else {
       buffer = imageData;
@@ -123,15 +113,13 @@ export class StorageService {
   async deleteFile(path: string): Promise<void> {
     const supabase = createServiceRoleClient();
 
-    const { error } = await supabase.storage
-      .from(this.bucket)
-      .remove([path]);
+    const { error } = await supabase.storage.from(this.bucket).remove([path]);
 
     if (error) {
-      throw new ExternalServiceError(
-        `Failed to delete file: ${error.message}`,
-        { path, error: error.message }
-      );
+      throw new ExternalServiceError(`Failed to delete file: ${error.message}`, {
+        path,
+        error: error.message,
+      });
     }
   }
 
@@ -144,9 +132,7 @@ export class StorageService {
   getPublicUrl(path: string): string {
     const supabase = createServiceRoleClient();
 
-    const { data } = supabase.storage
-      .from(this.bucket)
-      .getPublicUrl(path);
+    const { data } = supabase.storage.from(this.bucket).getPublicUrl(path);
 
     return data.publicUrl;
   }

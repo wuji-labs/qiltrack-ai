@@ -4,23 +4,25 @@
 
 你发现的问题完全正确：
 
-| 现象 | 原因 | 严重性 |
-|------|------|--------|
-| 首页显示 0 积分 | report_credits 表未初始化 | 🔴 高 |
-| 账号页面显示 1 | 可能有默认值或兜底逻辑 | 🟡 中 |
-| 应该是 30 但只有 5 | 旧迁移默认值过小 | 🔴 高 |
-| 无法主动获取积分 | 没有日常奖励机制 | 🟡 中 |
+| 现象               | 原因                      | 严重性 |
+| ------------------ | ------------------------- | ------ |
+| 首页显示 0 积分    | report_credits 表未初始化 | 🔴 高  |
+| 账号页面显示 1     | 可能有默认值或兜底逻辑    | 🟡 中  |
+| 应该是 30 但只有 5 | 旧迁移默认值过小          | 🔴 高  |
+| 无法主动获取积分   | 没有日常奖励机制          | 🟡 中  |
 
 ## 解决方案 ✅
 
 ### 核心改动
 
 **1. 数据库层 - 新迁移文件**
+
 ```
 supabase/migrations/20251130000001_init_user_credits_30.sql
 ```
 
 做了什么：
+
 - ✅ 修改 `profiles.quota_limit` 默认值: 1 → **30**
 - ✅ 初始化所有现存用户为 30 积分
 - ✅ 更新新用户注册触发器: 自动创建 30 积分
@@ -29,21 +31,25 @@ supabase/migrations/20251130000001_init_user_credits_30.sql
 - ✅ 新增 `fn_claim_daily_reward` 函数: 每日 +10 积分
 
 **2. API 层 - 新端点**
+
 ```
 app/api/report/daily-reward/route.ts
 ```
 
 做了什么：
+
 - ✅ POST 端点，需认证
 - ✅ 调用数据库 RPC 函数
 - ✅ 返回 { success, message, remainingCredits }
 
 **3. 前端服务层 - API 客户端**
+
 ```
 lib/services/api.ts
 ```
 
 做了什么：
+
 - ✅ 添加 `claimDailyReward()` 函数
 - ✅ 添加 `DailyRewardResponse` 类型定义
 
@@ -65,6 +71,7 @@ lib/services/api.ts
 ### 第 1 步：应用迁移（必做，3 分钟）
 
 **使用 Supabase 控制台：**
+
 1. 登录 Supabase 仪表盘
 2. SQL Editor
 3. 打开并复制：`supabase/migrations/20251130000001_init_user_credits_30.sql` 全部内容
@@ -75,6 +82,7 @@ lib/services/api.ts
 ### 第 2 步：验证迁移（1 分钟）
 
 在 SQL Editor 执行：
+
 ```sql
 -- 验证 profiles 默认值
 SELECT column_default FROM information_schema.columns
@@ -96,10 +104,11 @@ SELECT proname FROM pg_proc WHERE proname = 'fn_claim_daily_reward';
 ### 第 4 步：测试 API（可选，2 分钟）
 
 登录后，在浏览器控制台执行：
+
 ```javascript
-fetch('/api/report/daily-reward', { method: 'POST' })
-  .then(r => r.json())
-  .then(d => console.log(d));
+fetch("/api/report/daily-reward", { method: "POST" })
+  .then((r) => r.json())
+  .then((d) => console.log(d));
 
 // 预期: { success: true, message: "Daily reward claimed", remainingCredits: 40 }
 ```
@@ -107,9 +116,11 @@ fetch('/api/report/daily-reward', { method: 'POST' })
 ### 第 5 步：前端集成（可选，10 分钟）
 
 编辑 `app/page.tsx`，添加"领取每日奖励"按钮
+
 - 参考: `docs/CREDITS_SYSTEM_QUICK_FIX.md` 的完整代码
 
 编辑 `lib/i18n.tsx`，添加翻译
+
 - 参考: `docs/CREDITS_SYSTEM_QUICK_FIX.md` 的翻译表
 
 ## 📋 技术细节
@@ -150,23 +161,23 @@ fn_consume_report_credit 扣除 1 积分
 
 ## 🎯 预期效果
 
-| 指标 | 修复前 | 修复后 |
-|------|--------|--------|
-| 新账号首页显示 | 0 | **30** ✅ |
-| 新账号账号页面 | 1 | **30** ✅ |
-| 初始配额 | 5 | **30** ✅ |
-| 每日可领取 | 无 | **10** ✅ |
-| 首页-账号页一致性 | ❌ | **✅** |
-| 用户活跃度 | 低 | 高（每日签到） |
+| 指标              | 修复前 | 修复后         |
+| ----------------- | ------ | -------------- |
+| 新账号首页显示    | 0      | **30** ✅      |
+| 新账号账号页面    | 1      | **30** ✅      |
+| 初始配额          | 5      | **30** ✅      |
+| 每日可领取        | 无     | **10** ✅      |
+| 首页-账号页一致性 | ❌     | **✅**         |
+| 用户活跃度        | 低     | 高（每日签到） |
 
 ## 📚 相关文档
 
-| 文档 | 内容 | 用途 |
-|------|------|------|
-| `CREDITS_SYSTEM_QUICK_FIX.md` | 5 分钟快速指南 | 立即执行 |
-| `2025-11-30-credits-system-solution.md` | 完整设计文档 | 深入理解 |
-| `supabase/migrations/20251130000001_init_user_credits_30.sql` | 数据库迁移 | 应用修改 |
-| `app/api/report/daily-reward/route.ts` | API 实现 | 参考代码 |
+| 文档                                                          | 内容           | 用途     |
+| ------------------------------------------------------------- | -------------- | -------- |
+| `CREDITS_SYSTEM_QUICK_FIX.md`                                 | 5 分钟快速指南 | 立即执行 |
+| `2025-11-30-credits-system-solution.md`                       | 完整设计文档   | 深入理解 |
+| `supabase/migrations/20251130000001_init_user_credits_30.sql` | 数据库迁移     | 应用修改 |
+| `app/api/report/daily-reward/route.ts`                        | API 实现       | 参考代码 |
 
 ## ❓ 常见问题
 
@@ -178,6 +189,7 @@ A: 注册并完成邮箱验证或 Google OAuth 后，立即自动创建。不需
 
 **Q: 能否让用户一次性领取 30 积分？**
 A: 可以，修改迁移中的 `fn_claim_daily_reward` 函数，改成：
+
 ```sql
 UPDATE report_credits
 SET credits_available = credits_available + 30  -- 改成 30
@@ -185,6 +197,7 @@ SET credits_available = credits_available + 30  -- 改成 30
 
 **Q: 如何追踪积分变动历史？**
 A: 查询 `report_credit_events` 表：
+
 ```sql
 SELECT * FROM report_credit_events
 WHERE user_id = 'user-id'
@@ -193,6 +206,7 @@ ORDER BY created_at DESC;
 
 **Q: 是否可以在某个时间段关闭每日奖励？**
 A: 可以，在 API 端点添加条件检查：
+
 ```typescript
 if (new Date().getHours() < 8 || new Date().getHours() > 22) {
   return NextResponse.json({ error: "Reward only available 8:00-22:00" });
@@ -209,11 +223,13 @@ if (new Date().getHours() < 8 || new Date().getHours() > 22) {
 ## 🎓 学到的教训
 
 这个问题的根本原因是：
+
 1. **多个数据源不同步**：首页读 report_credits，账号页可能读 profiles.quota_limit
 2. **初始化时机不对**：新用户注册时没有及时创建 report_credits 记录
 3. **默认值设计不当**：5 太小，用户体验差
 
 **最佳实践**：
+
 - ✅ 使用单一真实源（report_credits）
 - ✅ 在认证回调时立即初始化
 - ✅ 充分的默认值（30）

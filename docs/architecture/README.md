@@ -86,6 +86,7 @@ Investor AI 采用标准的三层架构设计，清晰分离表现层、业务�
 ## 核心设计原则
 
 ### 1. 关注点分离 (Separation of Concerns)
+
 - **表现层**: 仅负责 UI 渲染和用户交互
 - **API 层**: 负责 HTTP 请求处理、认证、授权
 - **业务逻辑层**: 包含核心业务规则和流程
@@ -93,23 +94,28 @@ Investor AI 采用标准的三层架构设计，清晰分离表现层、业务�
 - **数据层**: 数据存储和访问
 
 ### 2. 单一职责原则 (Single Responsibility)
+
 每个模块只负责一件事：
+
 - `ReportGenerator`: 仅负责报告生成流程编排
 - `CreditManager`: 仅负责积分管理
 - `LLMService`: 仅负责 LLM 调用
 - `ContentSanitizer`: 仅负责内容净化
 
 ### 3. 依赖倒置 (Dependency Inversion)
+
 - 高层模块不依赖低层模块，都依赖抽象
 - 业务逻辑层不直接依赖具体的 LLM 提供商
 - 通过依赖注入实现解耦
 
 ### 4. 可测试性 (Testability)
+
 - 所有业务逻辑可独立测试
 - 外部依赖可 mock
 - 测试覆盖率目标: 80%+
 
 ### 5. 可扩展性 (Extensibility)
+
 - 便于添加新功能
 - 便于替换外部服务
 - 便于未来微服务化
@@ -121,6 +127,7 @@ Investor AI 采用标准的三层架构设计，清晰分离表现层、业务�
 ### 表现层 (Presentation Layer)
 
 #### 用户前端
+
 - **技术栈**: Next.js 16.0.3 (App Router) + Tailwind CSS 4.0
 - **职责**:
   - 渲染用户界面
@@ -129,6 +136,7 @@ Investor AI 采用标准的三层架构设计，清晰分离表现层、业务�
   - 展示错误和成功消息
 
 #### Admin 后台
+
 - **技术栈**: Refine 4.x + Next.js
 - **职责**:
   - 用户管理 (CRUD)
@@ -139,6 +147,7 @@ Investor AI 采用标准的三层架构设计，清晰分离表现层、业务�
 ### API 层 (API Layer)
 
 #### 核心职责
+
 - HTTP 请求处理
 - 认证和授权
 - 请求参数验证
@@ -146,27 +155,32 @@ Investor AI 采用标准的三层架构设计，清晰分离表现层、业务�
 - 响应格式化
 
 #### 主要端点
+
 ```typescript
-GET  /api/report              // 生成报告
-GET  /api/report/history      // 报告历史
-GET  /api/report/credits      // 查询积分
-POST /api/admin/credits/grant // 授予积分
-GET  /api/admin/users         // 用户列表
+GET / api / report; // 生成报告
+GET / api / report / history; // 报告历史
+GET / api / report / credits; // 查询积分
+POST / api / admin / credits / grant; // 授予积分
+GET / api / admin / users; // 用户列表
 ```
 
 #### 统一错误处理
+
 ```typescript
 // lib/api/error-handler.ts
 export function handleApiError(error: unknown): NextResponse {
   if (error instanceof AppError) {
-    return NextResponse.json({
-      success: false,
-      error: {
-        code: error.code,
-        message: error.message,
-        details: error.details,
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+        },
       },
-    }, { status: error.statusCode });
+      { status: error.statusCode }
+    );
   }
   // ... 处理其他错误
 }
@@ -175,6 +189,7 @@ export function handleApiError(error: unknown): NextResponse {
 ### 业务逻辑层 (Business Logic Layer)
 
 #### lib/core/reports/
+
 报告生成核心逻辑：
 
 - **generator.ts**: 报告生成器
@@ -198,6 +213,7 @@ export function handleApiError(error: unknown): NextResponse {
   - 后台处理
 
 #### lib/core/credits/
+
 积分管理逻辑：
 
 - **manager.ts**: 积分管理器
@@ -213,6 +229,7 @@ export function handleApiError(error: unknown): NextResponse {
 ### 服务适配器层 (Service Adapter Layer)
 
 #### LLMService (lib/services/llm.ts)
+
 ```typescript
 export class LLMService {
   async generateReport(
@@ -232,6 +249,7 @@ export class LLMService {
 ```
 
 #### MarketDataService (lib/services/market-data.ts)
+
 ```typescript
 export class MarketDataService {
   async fetchCompanyData(symbol: string): Promise<MarketData> {
@@ -352,6 +370,7 @@ Response to Admin
 ### 统一响应格式
 
 #### 成功响应
+
 ```json
 {
   "success": true,
@@ -360,6 +379,7 @@ Response to Admin
 ```
 
 #### 错误响应
+
 ```json
 {
   "success": false,
@@ -373,15 +393,15 @@ Response to Admin
 
 ### 错误代码
 
-| 错误代码 | HTTP 状态码 | 说明 |
-|---------|-----------|------|
-| `UNAUTHORIZED` | 401 | 未授权 |
-| `FORBIDDEN` | 403 | 权限不足 |
-| `INSUFFICIENT_CREDITS` | 403 | 积分不足 |
-| `NOT_FOUND` | 404 | 资源不存在 |
-| `VALIDATION_ERROR` | 400 | 参数验证失败 |
-| `EXTERNAL_SERVICE_ERROR` | 502 | 外部服务错误 |
-| `REPORT_GENERATION_FAILED` | 500 | 报告生成失败 |
+| 错误代码                   | HTTP 状态码 | 说明         |
+| -------------------------- | ----------- | ------------ |
+| `UNAUTHORIZED`             | 401         | 未授权       |
+| `FORBIDDEN`                | 403         | 权限不足     |
+| `INSUFFICIENT_CREDITS`     | 403         | 积分不足     |
+| `NOT_FOUND`                | 404         | 资源不存在   |
+| `VALIDATION_ERROR`         | 400         | 参数验证失败 |
+| `EXTERNAL_SERVICE_ERROR`   | 502         | 外部服务错误 |
+| `REPORT_GENERATION_FAILED` | 500         | 报告生成失败 |
 
 ---
 

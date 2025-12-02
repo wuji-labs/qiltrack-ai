@@ -3,6 +3,7 @@
 ## ✅ 交付状态
 
 ### 第 1 PR：Schema + Auth 基座
+
 **分支**: `feat/supabase-integration`
 **提交**: c372034 - "feat: integrate Supabase Auth and Schema foundation"
 **推送**: ✅ 已推送到 `origin/feat/supabase-integration`
@@ -12,6 +13,7 @@
 ## 📦 交付内容清单
 
 ### 核心功能实现
+
 - [x] **Supabase Auth Hook** (`hooks/useSupabaseAuth.ts`)
   - 完整的认证状态管理
   - Email OTP 登录
@@ -37,6 +39,7 @@
   - 登出功能
 
 ### 数据库设计
+
 - [x] **完整 Schema**
   - profiles（用户资料）
   - report_credits（积分管理）
@@ -58,12 +61,14 @@
   - 认证检查
 
 ### 环境与工具
+
 - [x] **Supabase CLI** v2.58.5 安装验证
 - [x] **环境变量** (.env.local 配置)
 - [x] **依赖管理** (package.json 更新)
 - [x] **TypeScript 类型** (types/database.ts)
 
 ### 文档和报告
+
 - [x] **实施计划** - `docs/plans/2025-11-23-supabase-integration.md`
 - [x] **Schema CAVR** - `docs/reports/2025-11-23-supabase-schema-cavr.md`
 - [x] **Auth CAVR** - `docs/reports/2025-11-23-supabase-auth-cavr.md`
@@ -73,6 +78,7 @@
 ## 🧪 验证结果
 
 ### 测试覆盖
+
 ```
 ✅ Test Files: 2 passed
 ✅ Total Tests: 5 passed
@@ -81,6 +87,7 @@
 ```
 
 ### 代码质量
+
 ```
 ✅ Lint Status: 19 problems (2 pre-existing errors, 17 pre-existing warnings)
 ✅ Auth Components: 0 new errors
@@ -89,6 +96,7 @@
 ```
 
 ### 功能验证清单
+
 - [x] useSupabaseAuth hook 完整实现
 - [x] Email OTP 登录流
 - [x] OAuth 回调处理
@@ -102,20 +110,21 @@
 
 ## 📊 技术栈
 
-| 组件 | 版本 | 状态 |
-|------|------|------|
-| Supabase CLI | 2.58.5 | ✅ |
-| @supabase/supabase-js | Latest | ✅ |
-| @supabase/auth-helpers-nextjs | Latest | ✅ |
-| Next.js | 16.0.3 | ✅ |
-| TypeScript | 5.x | ✅ |
-| React | 19.2.0 | ✅ |
+| 组件                          | 版本   | 状态 |
+| ----------------------------- | ------ | ---- |
+| Supabase CLI                  | 2.58.5 | ✅   |
+| @supabase/supabase-js         | Latest | ✅   |
+| @supabase/auth-helpers-nextjs | Latest | ✅   |
+| Next.js                       | 16.0.3 | ✅   |
+| TypeScript                    | 5.x    | ✅   |
+| React                         | 19.2.0 | ✅   |
 
 ---
 
 ## 🚀 后续步骤
 
 ### 本地验证（用户指南）
+
 ```bash
 # 1. 检出分支
 git checkout feat/supabase-integration
@@ -141,6 +150,7 @@ npm run lint && npm run test
 ```
 
 ### 后续 PR 计划
+
 1. **PR #2 - Report API** (待开发)
    - RPC 调用和 Storage 集成
    - `/api/report` 端点重构
@@ -210,30 +220,33 @@ npm run lint && npm run test
 
 ## 📈 指标
 
-| 指标 | 值 |
-|------|-----|
-| 新增代码行数 | ~1,500 |
-| 删除代码行数 | ~300 |
-| 修改文件数 | 13 |
-| 测试覆盖 | 100% 通过 |
-| Type Coverage | 95%+ |
-| 文档页数 | 3 (CAVR + Plan) |
+| 指标          | 值              |
+| ------------- | --------------- |
+| 新增代码行数  | ~1,500          |
+| 删除代码行数  | ~300            |
+| 修改文件数    | 13              |
+| 测试覆盖      | 100% 通过       |
+| Type Coverage | 95%+            |
+| 文档页数      | 3 (CAVR + Plan) |
 
 ---
 
 ## 📞 下一步行动
 
 ### 立即可做
+
 1. ✅ 审查 PR 内容
 2. ✅ 在本地运行验证
 3. ✅ 运行 `npm run lint && npm run test`
 
 ### 合并前检查
+
 - [ ] 代码审查通过
 - [ ] 所有检查绿灯
 - [ ] 文档审查完成
 
 ### 合并后
+
 - [ ] 部署到 staging 环境
 - [ ] 功能端到端测试
 - [ ] 启动 PR #2 开发

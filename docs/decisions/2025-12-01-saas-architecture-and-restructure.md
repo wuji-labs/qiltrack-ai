@@ -2,21 +2,19 @@
 
 ### 1. **文件命名**：
 
-* 由于这个文件主要是关于项目架构、重构指令和未来扩展性，所以文件命名应该简洁且有描述性。
-* 推荐文件名：
-
-  * `docs/decisions/2025-12-01-saas-architecture-and-restructure.md`
+- 由于这个文件主要是关于项目架构、重构指令和未来扩展性，所以文件命名应该简洁且有描述性。
+- 推荐文件名：
+  - `docs/decisions/2025-12-01-saas-architecture-and-restructure.md`
     (这里的 `2025-12-01` 可以替换为你实际创建文件的日期，保持一致性)
 
     **格式说明**：
-
-    * **`docs/decisions/`**：放置架构决策文档的标准文件夹。
-    * **`2025-12-01`**：日期标记，有利于项目团队和 AI 以后能按时间顺序查看决策文档。
-    * **`saas-architecture-and-restructure.md`**：描述这个文件的主题，结构清晰。
+    - **`docs/decisions/`**：放置架构决策文档的标准文件夹。
+    - **`2025-12-01`**：日期标记，有利于项目团队和 AI 以后能按时间顺序查看决策文档。
+    - **`saas-architecture-and-restructure.md`**：描述这个文件的主题，结构清晰。
 
 ### 2. **文件格式**：
 
-* 使用 **Markdown** 格式（`.md`），这是最常见的文档格式，也是 GitHub 和大部分开发团队的首选，因为它支持快速渲染、清晰排版、代码块等。
+- 使用 **Markdown** 格式（`.md`），这是最常见的文档格式，也是 GitHub 和大部分开发团队的首选，因为它支持快速渲染、清晰排版、代码块等。
 
 ### 3. **文档结构（示例）**：
 
@@ -30,6 +28,7 @@
 **目标**：将现有的项目架构从单体化前端 / 后端逻辑中抽离，转变为符合 SaaS 架构的模块化系统，并为未来扩展奠定基础。
 
 ### 目标概述：
+
 - 从前端组件中分离业务逻辑，并将其迁移到服务层。
 - 为后台管理创建独立的 `/admin` 面板，用于操作用户、额度和报告。
 - 设计核心业务逻辑服务，确保其可复用性和可扩展性。
@@ -39,13 +38,16 @@
 ### 2.1 业务服务层重构
 
 #### 目标：
+
 - 将所有涉及用户、额度、报告的逻辑从前端提取到 `core/` 层。
 
 #### 步骤：
+
 ```txt
 1. Move all reports-related logic, such as report generation, report retries, and LLM calls, into a new service inside the `core/reports` directory.
 2. Refactor the credits handling system to a separate module inside `core/credits`. Ensure the logic for consuming and granting credits is encapsulated in service methods.
 3. Create helper functions inside `core/` for common tasks, such as writing logs and handling errors.
+```
 ````
 
 ---
@@ -54,7 +56,7 @@
 
 #### 目标：
 
-* 创建一个后台管理面板，管理员可以管理用户、调整额度、查看报告。
+- 创建一个后台管理面板，管理员可以管理用户、调整额度、查看报告。
 
 #### 步骤：
 
@@ -74,7 +76,7 @@
 
 #### 目标：
 
-* 确保所有核心的业务逻辑都放到后台服务中执行，前端不再处理任何核心逻辑。
+- 确保所有核心的业务逻辑都放到后台服务中执行，前端不再处理任何核心逻辑。
 
 #### 步骤：
 
@@ -102,7 +104,7 @@
 
 ### 目标：
 
-* 使得项目具备良好的扩展性，可以轻松引入微服务架构、外部服务、第三方 API 等。
+- 使得项目具备良好的扩展性，可以轻松引入微服务架构、外部服务、第三方 API 等。
 
 #### 未来扩展步骤：
 
@@ -143,6 +145,6 @@
 
 你可以把上面的结构直接复制进你的项目 `docs/decisions/` 文件夹中，作为架构决策文档保存。如果你希望我进一步帮你生成 **具体代码**，你只需要回我一句：
 
-> **生成 Admin 中台代码骨架**  
+> **生成 Admin 中台代码骨架**
 我会直接给你一套最简化、可运行的 Admin 面板骨架，适合接入你当前的项目。
 ```

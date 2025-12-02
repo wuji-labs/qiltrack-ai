@@ -12,17 +12,20 @@
 ## 完成的修复
 
 ### 1. ✅ Cookie 透传与写回 (lib/supabase/server.ts)
+
 - 修复 `getAll()` 真实从请求 cookie 中读取 `sb-auth-token` 和 `sb-session`
 - 增加 `onResponseHeaders` callback 参数，支持 route handler 写回 session cookies
 - 在 `/api/report` 和 `/api/report/history` 中应用 cookie 写回机制
 
 ### 2. ✅ TEST_REPORT_TOKEN 流程重写
+
 - test-bypass 模式下现在完整写入 `report_runs`、`report_documents`、`report_credit_events`
 - 标记 `mode='test'` 以区分生产环境
 - 创建 Storage upload（best-effort，fail gracefully）
 - 调用 `writeReportAudit` 标记审计
 
 ### 3. ✅ API 测试全部通过
+
 - `__tests__/api/report.supabase.test.ts`: 4 核心场景全通过
   - ✅ 无 session 返回 401
   - ✅ test bypass 成功生成报告
@@ -33,12 +36,14 @@
   - ✅ 授权检查、分页、RLS 过滤、错误处理
 
 ### 4. ✅ 测试修复完成
+
 - `lib/services/quota.test.ts` - 修复 mock 链式调用
   - ✅ 9 tests passed
 - `__tests__/api/report.supabase.test.ts` - 环境变量运行时读取
   - ✅ 4 tests passed（全通过，无 skip）
 
 ### 5. ✅ Lint 通过
+
 - 0 errors（Stage 2 所有改动）
 - 15 warnings（现有代码，非本次修改）
 
@@ -54,14 +59,14 @@ Lint:       0 errors (Stage 2 changes)
 
 ### 按文件分解
 
-| 测试文件 | 结果 | 说明 |
-|---------|------|------|
-| `lib/supabase/server.test.ts` | ✅ 9/9 | Cookie 处理、client 创建 |
-| `__tests__/api.test.ts` | ✅ 3/3 | 基础路由测试 |
-| `lib/services/quota.test.ts` | ✅ 9/9 | 额度消费、审计日志 |
-| `__tests__/api/report.history.test.ts` | ✅ 7/7 | 历史查询、RLS 过滤 |
+| 测试文件                                | 结果   | 说明                        |
+| --------------------------------------- | ------ | --------------------------- |
+| `lib/supabase/server.test.ts`           | ✅ 9/9 | Cookie 处理、client 创建    |
+| `__tests__/api.test.ts`                 | ✅ 3/3 | 基础路由测试                |
+| `lib/services/quota.test.ts`            | ✅ 9/9 | 额度消费、审计日志          |
+| `__tests__/api/report.history.test.ts`  | ✅ 7/7 | 历史查询、RLS 过滤          |
 | `__tests__/api/report.supabase.test.ts` | ✅ 4/4 | 报告 API（全通过，无 skip） |
-| `__tests__/useProgress.test.tsx` | ✅ 2/2 | UI Hook 测试 |
+| `__tests__/useProgress.test.tsx`        | ✅ 2/2 | UI Hook 测试                |
 
 ---
 
@@ -91,7 +96,7 @@ response.headers.forEach(({ name, value }) => {
 
 ```typescript
 if (isTestBypass) {
-  userId = "00000000-0000-0000-0000-000000000001"  // 确定性 UUID
+  userId = "00000000-0000-0000-0000-000000000001"; // 确定性 UUID
   // 写入 report_runs(mode='test')
   // 上传 Storage（graceful fail）
   // 创建 report_documents 引用
@@ -115,15 +120,15 @@ const mockChain = {
 
 ## 文件修改清单
 
-| 文件 | 修改 | 行数 | 状态 |
-|------|------|------|------|
-| `lib/supabase/server.ts` | Cookie 透传+写回 callback | ~75 | ✅ |
-| `app/api/report/route.ts` | Supabase RPC + Storage 集成 | ~630 | ✅ |
-| `app/api/report/history/route.ts` | 新端点：报告列表 | ~50 | ✅ |
-| `lib/services/quota.ts` | RPC 消费、审计日志 | ~118 | ✅ |
-| `lib/services/quota.test.ts` | Mock 链式调用修复 | ~176 | ✅ |
-| `__tests__/api/report.supabase.test.ts` | 测试环境优化 | ~236 | ✅ |
-| `docs/guides/supabase-report-stage2-cavr.md` | 新增：CAVR + 环境配置 | ~700 | ✅ |
+| 文件                                         | 修改                        | 行数 | 状态 |
+| -------------------------------------------- | --------------------------- | ---- | ---- |
+| `lib/supabase/server.ts`                     | Cookie 透传+写回 callback   | ~75  | ✅   |
+| `app/api/report/route.ts`                    | Supabase RPC + Storage 集成 | ~630 | ✅   |
+| `app/api/report/history/route.ts`            | 新端点：报告列表            | ~50  | ✅   |
+| `lib/services/quota.ts`                      | RPC 消费、审计日志          | ~118 | ✅   |
+| `lib/services/quota.test.ts`                 | Mock 链式调用修复           | ~176 | ✅   |
+| `__tests__/api/report.supabase.test.ts`      | 测试环境优化                | ~236 | ✅   |
+| `docs/guides/supabase-report-stage2-cavr.md` | 新增：CAVR + 环境配置       | ~700 | ✅   |
 
 ---
 
@@ -162,6 +167,7 @@ const mockChain = {
 ## 文档
 
 ### 新增文档
+
 - ✅ `docs/guides/supabase-report-stage2-cavr.md` (700+ 行)
   - 环境变量配置
   - 本地 Supabase 设置
@@ -171,6 +177,7 @@ const mockChain = {
   - 验证清单
 
 ### 关键文档引用
+
 - Stage 1：`docs/decisions/2025-11-24-supabase-report-stage1.md`
 - Stage 2 设计：`docs/decisions/2025-11-24-supabase-report-stage2.md`
 - Codex Quickstart：`docs/guides/codex-claude-quickstart.md`
@@ -179,19 +186,20 @@ const mockChain = {
 
 ## 代码质量指标
 
-| 指标 | 值 | 说明 |
-|------|-----|------|
-| Test Coverage | 34 tests | 核心功能和边界情况（无 skip） |
-| Type Safety | ✅ 全覆盖 | 无 `any` 或明确文档化 |
-| Lint Errors | 0 | Stage 2 改动 |
-| Module Size | < 650 lines | `app/api/report/route.ts` |
-| Test Execution | ~1.2s | 完整套件 |
+| 指标           | 值          | 说明                          |
+| -------------- | ----------- | ----------------------------- |
+| Test Coverage  | 34 tests    | 核心功能和边界情况（无 skip） |
+| Type Safety    | ✅ 全覆盖   | 无 `any` 或明确文档化         |
+| Lint Errors    | 0           | Stage 2 改动                  |
+| Module Size    | < 650 lines | `app/api/report/route.ts`     |
+| Test Execution | ~1.2s       | 完整套件                      |
 
 ---
 
 ## 集成检查清单
 
 ### 与现有功能的兼容性
+
 - ✅ `useSupabaseAuth` hook 仍然可用（Stage 1）
 - ✅ 现有身份验证流程未改变
 - ✅ Helicone/OpenRouter 调用保留
@@ -199,6 +207,7 @@ const mockChain = {
 - ✅ 现有 UI 组件兼容
 
 ### 与 Database Schema 的一致性
+
 - ✅ `report_runs` 表结构
 - ✅ `report_documents` 表结构
 - ✅ `report_credit_events` 表结构
@@ -206,6 +215,7 @@ const mockChain = {
 - ✅ Storage `report-assets` 桶
 
 ### 与 Security 的一致性
+
 - ✅ Service role key 仅限服务器使用
 - ✅ RLS 策略尊重（history, credits 端点）
 - ✅ Session 验证强制（除 test bypass）
@@ -237,6 +247,7 @@ GET /api/report/credits
 ```
 
 ### 数据库查询优化
+
 - `v_user_quota` 视图可缓存（稳定数据）
 - `fn_consume_report_credit` RPC 原子操作
 - Storage 上传异步，不阻塞响应
@@ -246,11 +257,13 @@ GET /api/report/credits
 ## 回归测试
 
 ### 现有测试仍然通过
+
 - ✅ `__tests__/api.test.ts` (3 tests)
 - ✅ `__tests__/useProgress.test.tsx` (2 tests)
 - ✅ 所有 UI 相关测试（未修改）
 
 ### 新增测试
+
 - ✅ `lib/services/quota.test.ts` (9 tests) - 修复并验证
 - ✅ `__tests__/api/report.history.test.ts` (7 tests) - 新端点
 - ✅ `lib/supabase/server.test.ts` (9 tests) - 新 client 功能
@@ -269,11 +282,11 @@ GET /api/report/credits
 
 ## 签核
 
-| 角色 | 任务 | 状态 |
-|------|------|------|
-| 开发 | 代码实现 + 测试 + 文档 | ✅ |
-| QA | 测试验证 + CAVR | ✅ |
-| 审查 | Code review (待 PR) | 📋 |
+| 角色 | 任务                   | 状态 |
+| ---- | ---------------------- | ---- |
+| 开发 | 代码实现 + 测试 + 文档 | ✅   |
+| QA   | 测试验证 + CAVR        | ✅   |
+| 审查 | Code review (待 PR)    | 📋   |
 
 ---
 
@@ -296,4 +309,3 @@ Stage 2 完整实现了 Supabase 报告工作流的核心功能：
 **Generated:** 2025-11-24 | **Tests:** 34 passed / 0 skipped
 **Branch:** feat/supabase-integration
 **Deployment:** Hosted Supabase (default) | Local stack (optional)
-

@@ -9,18 +9,22 @@
 ## Context（上下文）
 
 ### 问题定义
+
 用户在测试时发现新账号注册后显示的积分不一致：
+
 - 首页（从 `/api/report/credits` 查询）显示: **0 积分** ❌
 - 账号页（可能读 `profiles.quota_limit`）显示: **1 积分** ❌
 - **预期**: 都应该显示 **30 积分** ✅
 
 ### 根本原因分析
+
 1. **初始值设定错误**: `profiles.quota_limit` 默认值为 1，不是 30
 2. **初始化时序问题**: 新用户注册时 `report_credits` 表未及时创建
 3. **数据源不同步**: 首页和账号页读取不同表导致显示值不一致
 4. **缺少日常机制**: 用户无法主动获取更多积分
 
 ### 依赖关系
+
 - ✅ Supabase RLS 和 Auth 已启用
 - ✅ `v_user_quota` 视图已存在
 - ✅ `report_credit_events` 审计表已存在
@@ -36,6 +40,7 @@
 **文件**: `supabase/migrations/20251130000001_init_user_credits_30.sql` (150 行)
 
 **操作**:
+
 ```sql
 -- 1️⃣ 修改默认值
 ALTER TABLE profiles ALTER COLUMN quota_limit SET DEFAULT 30;
@@ -86,15 +91,13 @@ CREATE POLICY "Users can view their own daily rewards" ON daily_rewards
 **文件**: `app/api/report/daily-reward/route.ts` (59 行)
 
 **实现**:
+
 ```typescript
 export async function POST(request: NextRequest) {
   // 1. 认证检查 → 401 if not logged in
   const { session } = await supabase.auth.getSession();
   if (!session?.user?.id) {
-    return NextResponse.json(
-      { error: "Unauthorized", code: "unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Unauthorized", code: "unauthorized" }, { status: 401 });
   }
 
   // 2. 调用 RPC 函数
@@ -114,11 +117,13 @@ export async function POST(request: NextRequest) {
 #### 2.2 增强现有端点
 
 **文件**: `app/api/report/credits/route.ts`
+
 - 添加错误码: `code: "unauthorized"` (401)、`code: "quota_fetch_failed"` (500)
 - 改进日志: `[UNAUTHORIZED_SESSION]`、`[QUOTA_FETCH_FAILED]`
 - 保留 Set-Cookie 头维护会话
 
 **文件**: `app/api/report/route.ts`
+
 - 添加错误码: `code: "quota_exceeded"` (429)
 - 改进 quota check 逻辑
 
@@ -127,6 +132,7 @@ export async function POST(request: NextRequest) {
 #### 3.1 配额管理 (`app/page.tsx`)
 
 **改动**:
+
 ```typescript
 // quotaLoaded 标记防止显示默认 0
 const [quotaLoaded, setQuotaLoaded] = useState(false);
@@ -140,7 +146,7 @@ useEffect(() => {
     } catch (err) {
       setRemainingQuota(0);
     } finally {
-      setQuotaLoaded(true);  // 关键：标记已加载
+      setQuotaLoaded(true); // 关键：标记已加载
     }
   };
 
@@ -153,6 +159,7 @@ useEffect(() => {
 ```
 
 **关键点**:
+
 - `quotaLoaded=true` 表示已尝试加载（无论成功或失败）
 - 防止在加载中时显示错误的 0
 - 允许后端正确返回 429 而不是被前端拦截
@@ -160,6 +167,7 @@ useEffect(() => {
 #### 3.2 服务层 (`lib/services/api.ts`)
 
 **新增**:
+
 ```typescript
 type DailyRewardResponse = {
   success: boolean;
@@ -168,19 +176,20 @@ type DailyRewardResponse = {
 };
 
 export async function claimDailyReward(): Promise<DailyRewardResponse> {
-  const res = await fetch('/api/report/daily-reward', { method: 'POST' });
+  const res = await fetch("/api/report/daily-reward", { method: "POST" });
   return handleJson<DailyRewardResponse>(res, "Failed to claim daily reward");
 }
 ```
 
 **改进错误处理**:
+
 ```typescript
 async function handleJson<T>(res: Response, fallbackMsg: string): Promise<T> {
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
     const apiError: ApiErrorResponse = {
       error: error.error || fallbackMsg,
-      code: error.code,  // 保留错误码
+      code: error.code, // 保留错误码
     };
     throw { ...apiError, statusCode: res.status };
   }
@@ -191,6 +200,7 @@ async function handleJson<T>(res: Response, fallbackMsg: string): Promise<T> {
 #### 3.3 UI 组件 (`app/sections/ReportGeneratorSection.tsx`)
 
 **错误分类**:
+
 ```typescript
 // 根据 error.code 分类显示
 if (error.code === "unauthorized" || error.statusCode === 401) {
@@ -207,6 +217,7 @@ if (error.code === "unauthorized" || error.statusCode === 401) {
 **文件**: `__tests__/api.test.ts`、`__tests__/ReportGeneratorSection.test.tsx`
 
 **测试场景**:
+
 - ✅ `fetchCredits()` 401 响应 → 返回 `code: "unauthorized"`
 - ✅ `fetchCredits()` 500 响应 → 返回 `code: "quota_fetch_failed"`
 - ✅ `fetchCredits()` 200 响应 → 正确解析 remaining_credits
@@ -217,6 +228,7 @@ if (error.code === "unauthorized" || error.statusCode === 401) {
 ### 5. 文档交付
 
 **新增文档**:
+
 - `docs/IMPLEMENTATION_CHECKLIST.md` - 5 步执行清单
 - `docs/TECHNICAL_SUMMARY.md` - 代码架构总结
 - `docs/QUICK_START.md` - 快速指南
@@ -244,23 +256,25 @@ npm test (运行中)
 
 ### 手动验证检查表
 
-| 检查项 | 状态 | 说明 |
-|--------|------|------|
-| 迁移脚本语法 | ✅ | SQL 已审查，幂等且安全 |
-| API 错误码 | ✅ | 401/429/500 正确返回 |
-| 前端类型安全 | ✅ | TypeScript strict mode 通过 |
-| i18n 翻译 | ✅ | 新增错误消息已翻译 |
-| 日志记录 | ✅ | 含 user_id 便于调试 |
-| Set-Cookie 保留 | ✅ | 会话正确维护 |
+| 检查项          | 状态 | 说明                        |
+| --------------- | ---- | --------------------------- |
+| 迁移脚本语法    | ✅   | SQL 已审查，幂等且安全      |
+| API 错误码      | ✅   | 401/429/500 正确返回        |
+| 前端类型安全    | ✅   | TypeScript strict mode 通过 |
+| i18n 翻译       | ✅   | 新增错误消息已翻译          |
+| 日志记录        | ✅   | 含 user_id 便于调试         |
+| Set-Cookie 保留 | ✅   | 会话正确维护                |
 
 ### 测试结果
 
 **Lint**:
+
 ```
 ✅ Pass - No errors or warnings
 ```
 
 **Vitest**:
+
 ```
 ✅ Pass - All 82 tests passed
 
@@ -290,19 +304,19 @@ Test Summary:
 
 ### 低风险
 
-| 风险 | 影响 | 缓解措施 |
-|------|------|---------|
-| 迁移失败 | 积分初始化失败 | ON CONFLICT 保护，可重新运行 |
-| daily_rewards 表冲突 | 表已存在错误 | IF NOT EXISTS 保护 |
-| 现存数据丢失 | 数据完整性 | 所有操作都是 INSERT/UPDATE，无 DELETE |
+| 风险                 | 影响           | 缓解措施                              |
+| -------------------- | -------------- | ------------------------------------- |
+| 迁移失败             | 积分初始化失败 | ON CONFLICT 保护，可重新运行          |
+| daily_rewards 表冲突 | 表已存在错误   | IF NOT EXISTS 保护                    |
+| 现存数据丢失         | 数据完整性     | 所有操作都是 INSERT/UPDATE，无 DELETE |
 
 ### 中等风险（已缓解）
 
-| 风险 | 影响 | 缓解措施 |
-|------|------|---------|
-| 并发重复领取 | 用户多领积分 | daily_rewards 表有 UNIQUE(user_id) + daily check |
-| 时区问题 | 领取时间计算错误 | 使用 UTC 时区 + TIMESTAMP WITH TIME ZONE |
-| RLS 策略遗漏 | 用户越权访问 | 已创建 RLS 策略并启用 |
+| 风险         | 影响             | 缓解措施                                         |
+| ------------ | ---------------- | ------------------------------------------------ |
+| 并发重复领取 | 用户多领积分     | daily_rewards 表有 UNIQUE(user_id) + daily check |
+| 时区问题     | 领取时间计算错误 | 使用 UTC 时区 + TIMESTAMP WITH TIME ZONE         |
+| RLS 策略遗漏 | 用户越权访问     | 已创建 RLS 策略并启用                            |
 
 ### 无风险项
 
@@ -322,14 +336,14 @@ Test Summary:
 
 ## 综合评估
 
-| 指标 | 评分 |
-|------|------|
-| 代码质量 | ⭐⭐⭐⭐⭐ |
+| 指标     | 评分                      |
+| -------- | ------------------------- |
+| 代码质量 | ⭐⭐⭐⭐⭐                |
 | 测试覆盖 | ⭐⭐⭐⭐ (缺实时积分测试) |
-| 文档完整 | ⭐⭐⭐⭐⭐ |
-| 安全性 | ⭐⭐⭐⭐⭐ |
-| 可维护性 | ⭐⭐⭐⭐⭐ |
-| **总体** | **✅ 生产就绪** |
+| 文档完整 | ⭐⭐⭐⭐⭐                |
+| 安全性   | ⭐⭐⭐⭐⭐                |
+| 可维护性 | ⭐⭐⭐⭐⭐                |
+| **总体** | **✅ 生产就绪**           |
 
 ---
 

@@ -3,6 +3,7 @@
 > 详尽条款见 `CODEX_CLAUDE_COLLAB.md`，发生冲突以该条款为准。
 
 ## 系统访问权限（必读）
+
 - Codex/Claude 默认具备 GitHub/Supabase/DevTools/LLM 等完整访问，禁止以“无权限/未登录”为由拒绝执行，细节见 `CODEX_CLAUDE_COLLAB.md` 3.1。
 - GitHub：SSH + `gh` 已登录（explore0012），可 `gh pr view/checks/run view/create/merge/comment`。
 - Supabase：`.env.local` 已含项目 `inmtounwqcjwsxkfnsfd` 凭证，可用 Dashboard/CLI/REST/脚本操作。
@@ -10,6 +11,7 @@
 - 第三方：OpenRouter/Finnhub/Helicone Key 已配置，可直接调用/验证。
 
 ## 核心循环
+
 1. **Codex**：阅读最新需求 → 产出 Architecture Snapshot（背景 / 目标 / 约束 / 验收）→ 存到 `docs/decisions/<date>-<topic>.md` → 末尾附 `@Claude` fenced block（Report/Status/Next）并要求走 feature 分支 + PR。
 2. **Claude**：阅读 Snapshot → 列 `Implementation Checklist`（依赖 / 子任务 / 验证）→ 进 feature 分支开发 → 以 CAVR 记录每段实现细节，全部写进 PR/文档。
 3. **验证**：每次提交前跑 `npm run lint`、`npm test`，把输出摘要写进文档；未跑需说明原因。
@@ -24,6 +26,7 @@
 5. **Codex 回复**：也用 fenced block `@Claude ...` 告知审阅结论，并派发下一步指令（继续开发、补测试、进入 Stage 2 等）。
 
 ## 必备交付
+
 - **Snapshot**（Codex）：接口/组件、技术约束、测试矩阵、范围拆解。
 - **Implementation Checklist**（Claude）：任务拆分、依赖、测试计划。
 - **CAVR 文档**（Claude）：沉淀到 `docs/reports/<date>-<topic>.md` 或 PR 描述，含 lint/test 结果；GitHub PR 强制使用 `.github/pull_request_template.md` 填写 CAVR + 三行简讯。
@@ -31,6 +34,7 @@
 - **知识同步**：涉及 env / README / PLAN / 设计决策时同步更新相应文件。
 
 ## 快速检查表
+
 - [ ] GitHub CLI 已登录（默认 explore0012/SSH，异常先跑 `gh auth status`；PR 直接 `git checkout -b <feature>` → `git push origin <feature>` → `gh pr create --fill`）。
 - [ ] 是否已阅读最新 Snapshot 并确认依赖？
 - [ ] 是否在 feature 分支？禁止直推 `main`。
@@ -39,6 +43,7 @@
 - [ ] Codex 是否已给出下一步 Snapshot/Review 指令？
 
 ## 常见错误
+
 - 终端贴长段落、截图或日志 → 直接判定未按流程交付。
 - 未附 lint/test 结果 → 视为验证缺失。
 - Claude 没写 Next 或要求不明确 → Codex 无法继续派工。

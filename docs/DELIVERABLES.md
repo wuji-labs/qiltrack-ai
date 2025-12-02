@@ -74,6 +74,7 @@
 **文件**: `supabase/migrations/20251130000001_init_user_credits_30.sql`
 
 **做了什么**:
+
 - ✅ 修改 `profiles` 表的 `quota_limit` 列默认值: 1 → **30**
 - ✅ 初始化所有现存用户的 `report_credits`: **30 积分**
 - ✅ 创建触发器: 新用户注册时自动创建 `report_credits` (30 积分)
@@ -87,6 +88,7 @@
 **风险等级**: 🟢 低（全部使用 IF NOT EXISTS）
 
 **使用方法**:
+
 ```bash
 # 选项 1：Supabase 控制台
 1. 登录 Supabase 仪表盘
@@ -105,6 +107,7 @@ supabase migration up
 **文件**: `app/api/report/daily-reward/route.ts`
 
 **做了什么**:
+
 - ✅ 创建 POST 端点: `/api/report/daily-reward`
 - ✅ 认证检查: 返回 401 (未登录)
 - ✅ 调用 RPC: `fn_claim_daily_reward(user_id)`
@@ -115,6 +118,7 @@ supabase migration up
 **依赖**: Supabase @supabase/supabase-js (已有)
 
 **调用示例**:
+
 ```typescript
 const result = await claimDailyReward();
 if (result.success) {
@@ -129,6 +133,7 @@ if (result.success) {
 **文件**: `lib/services/api.ts`
 
 **修改内容**:
+
 - ✅ 新增类型: `DailyRewardResponse`
 - ✅ 新增函数: `claimDailyReward()`
 - ✅ 扩展错误码: 添加 `'reward_claim_failed'`
@@ -145,6 +150,7 @@ if (result.success) {
 **用途**: 入门指南，快速了解整体方案
 
 **内容**:
+
 - 问题诊断
 - 解决方案概览
 - 3 步快速启动
@@ -161,6 +167,7 @@ if (result.success) {
 **用途**: 具体操作步骤 + 故障排除
 
 **内容**:
+
 - ✅ 已完成项目清单
 - 🎯 需要做的 4 步
 - 每步详细说明 + 验证方法
@@ -177,6 +184,7 @@ if (result.success) {
 **用途**: 5 分钟快速上手
 
 **内容**:
+
 - 5 分钟快速修复步骤
 - 前端集成代码示例
 - 完整清单
@@ -192,6 +200,7 @@ if (result.success) {
 **用途**: 深入了解设计和实现
 
 **内容**:
+
 - 完整问题诊断
 - 解决方案详解
 - 代码修改汇总
@@ -210,6 +219,7 @@ if (result.success) {
 **用途**: 理解系统架构和数据流
 
 **内容**:
+
 - ASCII 架构图
 - 三个操作的数据流 (注册/生成/领取)
 - 并发安全保证
@@ -225,23 +235,23 @@ if (result.success) {
 
 ### 代码量统计
 
-| 部分 | 数量 | 说明 |
-|------|------|------|
-| SQL 迁移 | 296 行 | 新迁移文件 |
-| TypeScript | 50 行 | API 端点 |
-| TypeScript | ~20 行 | API 服务修改 |
-| **合计** | **~370 行** | 生产就绪 |
+| 部分       | 数量        | 说明         |
+| ---------- | ----------- | ------------ |
+| SQL 迁移   | 296 行      | 新迁移文件   |
+| TypeScript | 50 行       | API 端点     |
+| TypeScript | ~20 行      | API 服务修改 |
+| **合计**   | **~370 行** | 生产就绪     |
 
 ### 文档量统计
 
-| 文档 | 字数 | 阅读时间 |
-|------|------|---------|
-| README_CREDITS_FIX.md | 2500 | 3 分钟 |
-| ACTION_CHECKLIST.md | 4000 | 10 分钟 |
-| CREDITS_SYSTEM_QUICK_FIX.md | 3000 | 5 分钟 |
-| CREDITS_FIX_SUMMARY.md | 5000 | 20 分钟 |
-| ARCHITECTURE_AND_DATA_FLOW.md | 4000 | 15 分钟 |
-| **合计** | **18,500 字** | **53 分钟** |
+| 文档                          | 字数          | 阅读时间    |
+| ----------------------------- | ------------- | ----------- |
+| README_CREDITS_FIX.md         | 2500          | 3 分钟      |
+| ACTION_CHECKLIST.md           | 4000          | 10 分钟     |
+| CREDITS_SYSTEM_QUICK_FIX.md   | 3000          | 5 分钟      |
+| CREDITS_FIX_SUMMARY.md        | 5000          | 20 分钟     |
+| ARCHITECTURE_AND_DATA_FLOW.md | 4000          | 15 分钟     |
+| **合计**                      | **18,500 字** | **53 分钟** |
 
 ---
 
@@ -370,6 +380,7 @@ if (result.success) {
 ## 📄 许可与使用
 
 所有代码和文档：
+
 - ✅ 开源友好
 - ✅ 可自由修改
 - ✅ 可用于商业用途
@@ -381,14 +392,14 @@ if (result.success) {
 
 你现在拥有：
 
-| 物品 | 数量 | 说明 |
-|------|------|------|
-| 数据库迁移 | 1 个 | 准生产代码 |
-| API 端点 | 1 个 | 完整实现 |
-| 代码修改 | 2 个 | 最小化改动 |
-| 详细文档 | 5 份 | 全覆盖 |
-| 执行清单 | 1 份 | 步骤清晰 |
-| 故障排查 | 10 项 | 常见问题覆盖 |
+| 物品       | 数量  | 说明         |
+| ---------- | ----- | ------------ |
+| 数据库迁移 | 1 个  | 准生产代码   |
+| API 端点   | 1 个  | 完整实现     |
+| 代码修改   | 2 个  | 最小化改动   |
+| 详细文档   | 5 份  | 全覆盖       |
+| 执行清单   | 1 份  | 步骤清晰     |
+| 故障排查   | 10 项 | 常见问题覆盖 |
 
 **预计实施时间**: 15-25 分钟
 **成功率**: 99% 以上（风险极低）

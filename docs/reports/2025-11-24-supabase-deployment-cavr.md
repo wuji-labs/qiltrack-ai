@@ -13,6 +13,7 @@
 基于 Stage 2 完整实现（`feat/supabase-integration`），为托管 Supabase 部署做对齐与文档化工作。
 
 **初期发现（已修复）：**
+
 1. Schema 字段不一致（`report_documents`、`fn_consume_report_credit`、`v_user_quota`）
 2. Anon key 命名不统一（`SUPABASE_ANON_KEY` vs `NEXT_PUBLIC_SUPABASE_ANON_KEY`）
 3. Credits API 契约过复杂（含 `total_credits`、`used_credits` 冗余字段）
@@ -25,6 +26,7 @@
 ### 第一阶段：Schema 对齐 + 文档完善 ✅
 
 #### 1. 创建新迁移文件（Schema 对齐）
+
 **文件：** `supabase/migrations/20251124000002_align_hosted_schema.sql`
 
 - ✅ 添加 `mode` 列到 `report_runs`（test/production 区分）
@@ -35,17 +37,20 @@
 - ✅ 新增性能索引
 
 #### 2. 同步 TypeScript 类型
+
 **文件：** `types/database.ts`
 
 - ✅ 更新所有表行类型与新 schema 对齐
 - ✅ RPC 返回类型改为 `remaining_credits`
 
 #### 3. 修复 API 端点
+
 **文件：** `app/api/report/credits/route.ts`
 
 - ✅ 修改查询以匹配新视图字段
 
 #### 4. 部署文档完善
+
 **文件：** `README.md`、`.env.local.example`
 
 - ✅ Hosted 部署完整指南（6 步流程、FAQ）
@@ -56,6 +61,7 @@
 ### 第二阶段：3 个阻塞项修复 ✅
 
 #### 1. Anon Key 命名统一 ✅
+
 **改动：** `.env.local.example`、`README.md`
 
 - ✅ 统一为 `NEXT_PUBLIC_SUPABASE_ANON_KEY`（Next.js 公钥约定）
@@ -63,6 +69,7 @@
 - ✅ 所有文档更新，标注从 Dashboard → Settings → API → Anon key 获取
 
 #### 2. Credits 契约对齐 ✅
+
 **改动：** `lib/services/api.ts`
 
 - ✅ 采用"仅 `remaining_credits`"契约
@@ -71,11 +78,13 @@
 - ✅ 无需修改 SQL 视图或 RPC（已对齐）
 
 #### 3. 数据保护迁移方案 ✅
+
 **改动：** `supabase/migrations/20251124000002_align_hosted_schema.sql`
 
 从 DROP 重建改为安全的 ALTER TABLE 迁移：
 
 **步骤：**
+
 1. 新增列 `report_run_id`、`document_type`、`storage_path`（带默认值）
 2. 数据迁移：
    - `run_id` → `report_run_id`
@@ -91,6 +100,7 @@
 ## Verification（验证）
 
 ### 代码质量
+
 ```
 ✓ ESLint：0 错误，15 个警告（既有代码）
 ✓ Vitest：34/34 测试通过
@@ -103,12 +113,14 @@
 ```
 
 ### Schema 验证
+
 - ✅ 迁移语法正确（ALTER TABLE 递进式）
 - ✅ 数据映射逻辑清晰（document_type 推断、path 构造）
 - ✅ 类型与迁移完全对齐
 - ✅ RLS 策略覆盖所有表
 
 ### 文档一致性
+
 - ✅ `.env.local.example`、`README.md` 使用统一 `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - ✅ Credits API 说明已更新为仅返回 `remaining_credits`
 - ✅ 迁移安全性说明已补充
@@ -117,27 +129,28 @@
 
 ## Commits
 
-| Commit | 说明 |
-|--------|------|
-| `8fd2f9f` | feat: align Hosted Supabase schema（初期完整实现） |
+| Commit    | 说明                                                               |
+| --------- | ------------------------------------------------------------------ |
+| `8fd2f9f` | feat: align Hosted Supabase schema（初期完整实现）                 |
 | `c4ea8bb` | fix: address 3 blocking issues（修复 anon key、credits、数据保护） |
 
 ---
 
 ## Files Changed
 
-| 文件 | 变更 | 说明 |
-|------|------|------|
+| 文件                                                         | 变更 | 说明                        |
+| ------------------------------------------------------------ | ---- | --------------------------- |
 | `supabase/migrations/20251124000002_align_hosted_schema.sql` | 修改 | 改为安全的 ALTER TABLE 迁移 |
-| `lib/services/api.ts` | 修改 | Credits 契约简化 |
-| `README.md` | 修改 | Anon key 命名统一 |
-| `.env.local.example` | 修改 | 环保各变量统一 |
+| `lib/services/api.ts`                                        | 修改 | Credits 契约简化            |
+| `README.md`                                                  | 修改 | Anon key 命名统一           |
+| `.env.local.example`                                         | 修改 | 环保各变量统一              |
 
 ---
 
 ## Deployment Checklist
 
 ### 生产部署前清单（Hosted 项目）
+
 - [ ] Supabase Dashboard 创建项目
 - [ ] 执行 `npx supabase link --project-ref <ref>`
 - [ ] **执行 `npx supabase db push`（新迁移已为 ALTER 递进式，安全）**
@@ -150,6 +163,7 @@
 - [ ] 提交 PR 并获得审核通过
 
 ### 部署后验证
+
 - [ ] CI/CD 密钥配置正确（`NEXT_PUBLIC_SUPABASE_ANON_KEY`、`SUPABASE_SERVICE_ROLE_KEY`）
 - [ ] 无 RLS 拒绝错误
 - [ ] `/api/report` 可生成报告
@@ -160,18 +174,19 @@
 
 ## Risks & Mitigations
 
-| 风险 | 等级 | 状态 |
-|------|------|------|
-| 环保各变量命名混乱 | 中 | ✅ 修复：统一为 NEXT_PUBLIC_ 公钥 |
-| Credits API 契约过复杂 | 中 | ✅ 修复：简化为单字段 |
-| 数据迁移丢失 | 高 | ✅ 修复：ALTER TABLE 递进式，保留数据 |
-| Schema 与代码不同步 | 高 | ✅ 验证：类型、迁移、测试全覆盖 |
+| 风险                   | 等级 | 状态                                  |
+| ---------------------- | ---- | ------------------------------------- |
+| 环保各变量命名混乱     | 中   | ✅ 修复：统一为 NEXT*PUBLIC* 公钥     |
+| Credits API 契约过复杂 | 中   | ✅ 修复：简化为单字段                 |
+| 数据迁移丢失           | 高   | ✅ 修复：ALTER TABLE 递进式，保留数据 |
+| Schema 与代码不同步    | 高   | ✅ 验证：类型、迁移、测试全覆盖       |
 
 ---
 
 ## Deployment Execution（部署执行）
 
 ### 部署步骤文档
+
 - **执行清单：** `docs/reports/2025-11-24-deployment-execution-log.md`
   - Hosted link + db push 步骤
   - 私有桶创建与 RLS 配置
@@ -180,6 +195,7 @@
   - 风险评估与缓解策略
 
 ### 验证结果记录（可复用）
+
 ```
 # 1. Schema 迁移
 ✓ ALTER TABLE 递进式添加列
@@ -202,6 +218,7 @@
 ```
 
 ### 执行完成情况 ✅
+
 1. ✅ 托管项目 ref: inmtounwqcjwsxkfnsfd（已确认）
 2. ✅ 迁移执行：Dashboard SQL Editor 完成（report_documents/report_credit_events/v_user_quota/fn_consume_report_credit）
 3. ✅ 类型同步：types/database.ts 已对齐，无需变更
@@ -216,13 +233,16 @@
 本次 Hosted 部署工作已完成代码、迁移、验证的全部环节：
 
 ### 第一阶段：Schema 对齐 + 文档完善 ✅
+
 - Commit `8fd2f9f`: Schema 初期对齐与迁移策略
 
 ### 第二阶段：修复 3 个阻塞项 ✅
+
 - Commit `c4ea8bb`: Anon key 命名、Credits 契约、数据保护
 - Commits `1e282da`/`01fb92a`/`eb97634`: 文档与 CAVR 更新
 
 ### 第三阶段：部署执行与验证 ✅
+
 - Commit `5291ff5`: 手工迁移指南（Dashboard SQL Editor）
 - Commit `3a7c6ae`: Schema 修正完整指南与脚本
 - SQL 迁移：Codex 在 Dashboard 完成（report_documents/events/视图/函数）
@@ -230,18 +250,21 @@
 - 本地验证：ESLint 0 errors, Tests 34/34 passing
 
 **质量指标**：
+
 - ✅ 代码：34/34 测试通过，0 lint 错误
 - ✅ 迁移：安全 ALTER TABLE 策略，数据保护
 - ✅ 类型：完全对齐 Hosted schema
 - ✅ 文档：13 个 commits，8 份部署指南
 
 **部署状态**：
+
 - ✅ 代码交付完成
 - ✅ 迁移执行完成
 - ✅ 本地验证通过
 - ⏳ 存储桶待创建 (report-assets, Private + RLS)
 
 **可交付物**：
+
 - 13 commits（含所有修复与文档）
 - CAVR 完整报告（本文档）
 - 8 份部署指南与脚本

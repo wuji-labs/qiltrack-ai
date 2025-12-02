@@ -9,6 +9,7 @@
 ## 实施总结
 
 成功完成了 T+1 期间的核心需求：
+
 1. ✅ 额度真实读取与实时刷新
 2. ✅ 登录/配额不足提示强化
 3. ✅ 订阅 CTA Fallback 实现
@@ -19,6 +20,7 @@
 ## CAVR 报告
 
 ### Context（上下文）
+
 - **已有状态**：`feat/supabase-deployment` 分支代码已就绪，Supabase 存储桶待创建（T0 任务）
 - **API 已就绪**：`/api/report/credits`、`/api/report/history`、`/api/report` 均已实现
 - **Session 系统**：NextAuth + Supabase 完整集成，`useSupabaseAuth` 钩子提供 `refreshSession()`
@@ -27,11 +29,13 @@
 ### Actions（行动）
 
 #### 1. **额度真实读取实现** `app/page.tsx`
+
 - 添加 `useEffect` 在认证状态变化时调用 `fetchCredits()` API
 - 将硬编码的 `remainingQuota: 1` 替换为动态状态值
 - 添加 `refreshQuota()` 方法供报告生成后调用
 
 **代码变更**：
+
 ```tsx
 // 初始化读取配额
 useEffect(() => {
@@ -63,11 +67,13 @@ const refreshQuota = async () => {
 ```
 
 #### 2. **配额刷新集成** `app/sections/ReportGeneratorSection.tsx`
+
 - 向 `AuthInfo` 类型添加可选的 `refreshQuota` 方法
 - 报告生成成功后调用 `refreshQuota()`，确保配额实时显示
 - 增强错误处理，检测 "Quota exceeded" 错误并显示适当提示
 
 **代码变更**：
+
 ```tsx
 // AuthInfo 类型扩展
 type AuthInfo = {
@@ -83,24 +89,29 @@ if (auth.refreshQuota) {
 ```
 
 #### 3. **登录/配额提示强化**
+
 - 保持已有的登录和配额检查逻辑（L236-245）
 - 增强错误捕获，识别 429 响应（"Quota exceeded"）
 - 显示统一的多语言提示文案
 
 #### 4. **订阅 CTA Fallback** `app/page.tsx`
+
 - 实现 `handleSubscribeMonthly()` 和 `handleSubscribeAnnual()`
 - 未登录用户 → 跳转登录页面
 - 已登录用户 → 显示 "Subscription is coming soon" 提示 + 降级到报告生成流程
 
 **代码变更**：
+
 ```tsx
 const handleSubscribeMonthly = () => {
   if (!isAuthenticated) {
     router.push("/login");
     return;
   }
-  alert(t("pricing.plan.monthly.cta.notReady") ||
-    "Subscription is coming soon. Contact us for early access.");
+  alert(
+    t("pricing.plan.monthly.cta.notReady") ||
+      "Subscription is coming soon. Contact us for early access."
+  );
   handlePrimaryCta(); // 降级到报告生成
 };
 ```
@@ -108,15 +119,18 @@ const handleSubscribeMonthly = () => {
 ### Verification（验证）
 
 #### Lint 检查
+
 ```
 npm run lint
 ✖ 13 problems (0 errors, 13 warnings)
 ```
+
 - **状态**：✅ 通过（无新增错误）
 - **现存 warning**：13 个（均为既有代码，与本期改动无关）
 - **本期修复**：`ReportGeneratorSection.tsx` L139 缺失依赖 → 添加 `suppressNextSearch` 到依赖数组
 
 #### Test 检查
+
 - **状态**：⏳ 在 Vitest 框架下执行（集成测试可在后续 CI 中验证）
 - **手动验证清单**：
   1. ✅ 登录后配额正确显示（非硬编码 1）
@@ -130,24 +144,24 @@ npm run lint
 
 ### Risks（风险与缓解）
 
-| 风险 | 级别 | 缓解方案 | 状态 |
-|------|------|--------|------|
-| Session 刷新延迟 | 中 | 配额扣减后强制 `refreshSession()` + `refreshQuota()` | ✅ 实现 |
-| Storage 未就绪 | 中 | 报告生成不依赖 Storage（仅后端写入）；前端继续工作 | ⏳ T0 依赖 |
-| Stripe 未接通 | 中 | 用占位 fallback，确保不失效；后期补接 | ✅ Fallback 就绪 |
-| i18n 字典缺失 | 低 | 所需 key 已存在；alert 提供英文降级 | ✅ 覆盖完整 |
+| 风险             | 级别 | 缓解方案                                             | 状态             |
+| ---------------- | ---- | ---------------------------------------------------- | ---------------- |
+| Session 刷新延迟 | 中   | 配额扣减后强制 `refreshSession()` + `refreshQuota()` | ✅ 实现          |
+| Storage 未就绪   | 中   | 报告生成不依赖 Storage（仅后端写入）；前端继续工作   | ⏳ T0 依赖       |
+| Stripe 未接通    | 中   | 用占位 fallback，确保不失效；后期补接                | ✅ Fallback 就绪 |
+| i18n 字典缺失    | 低   | 所需 key 已存在；alert 提供英文降级                  | ✅ 覆盖完整      |
 
 ---
 
 ## 交付物清单
 
-| 项目 | 状态 | 说明 |
-|------|------|------|
-| 代码改动 | ✅ | `app/page.tsx`、`app/sections/ReportGeneratorSection.tsx` |
-| Lint 检查 | ✅ | 通过（13 warnings，无新增 errors） |
-| Test 框架 | ✅ | Vitest 集成（后续 CI 验证） |
-| 实施报告 | ✅ | 本文档 |
-| PR 模板 | ⏳ | 待提交 |
+| 项目      | 状态 | 说明                                                      |
+| --------- | ---- | --------------------------------------------------------- |
+| 代码改动  | ✅   | `app/page.tsx`、`app/sections/ReportGeneratorSection.tsx` |
+| Lint 检查 | ✅   | 通过（13 warnings，无新增 errors）                        |
+| Test 框架 | ✅   | Vitest 集成（后续 CI 验证）                               |
+| 实施报告  | ✅   | 本文档                                                    |
+| PR 模板   | ⏳   | 待提交                                                    |
 
 ---
 

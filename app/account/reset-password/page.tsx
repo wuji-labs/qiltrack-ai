@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useLanguage } from "@/lib/i18n";
@@ -16,7 +16,7 @@ type Status = "verifying" | "success" | "error";
  * Handles Supabase recovery links that return tokens in URL hash (#access_token / #code).
  * On success, stores session and redirects to /account/change-password?type=recovery.
  */
-export default function ResetPasswordRedirect() {
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { supabase } = useSupabaseAuth();
@@ -27,50 +27,50 @@ export default function ResetPasswordRedirect() {
 
   useEffect(() => {
     const resolveRecovery = async () => {
-			try {
-				const hash = typeof window !== "undefined" ? window.location.hash : "";
-				const tokens = parseRecoveryTokens({ searchParams, hash });
+      try {
+        const hash = typeof window !== "undefined" ? window.location.hash : "";
+        const tokens = parseRecoveryTokens({ searchParams, hash });
 
-				// Missing all required parameters - show link expired
-				if (!hasRecoveryTokens(tokens)) {
-					setStatus("error");
-					setErrorMessage(t("auth.resetPassword.linkExpired"));
-					return;
-				}
+        // Missing all required parameters - show link expired
+        if (!hasRecoveryTokens(tokens)) {
+          setStatus("error");
+          setErrorMessage(t("auth.resetPassword.linkExpired"));
+          return;
+        }
 
-				// Attempt session restoration in priority order
-				if (tokens.code) {
-					const { error } = await supabase.auth.exchangeCodeForSession(tokens.code);
-					if (error) throw error;
-				} else if (tokens.accessToken && tokens.refreshToken) {
-					const { error } = await supabase.auth.setSession({
-						access_token: tokens.accessToken,
-						refresh_token: tokens.refreshToken,
-					});
-					if (error) throw error;
-				} else if (tokens.tokenHash) {
-					const { error } = await supabase.auth.verifyOtp({
-						type: "recovery",
-						token_hash: tokens.tokenHash,
-					});
-					if (error) throw error;
-				}
+        // Attempt session restoration in priority order
+        if (tokens.code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(tokens.code);
+          if (error) throw error;
+        } else if (tokens.accessToken && tokens.refreshToken) {
+          const { error } = await supabase.auth.setSession({
+            access_token: tokens.accessToken,
+            refresh_token: tokens.refreshToken,
+          });
+          if (error) throw error;
+        } else if (tokens.tokenHash) {
+          const { error } = await supabase.auth.verifyOtp({
+            type: "recovery",
+            token_hash: tokens.tokenHash,
+          });
+          if (error) throw error;
+        }
 
-				setStatus("success");
-				router.replace("/account/change-password?type=recovery");
-			} catch (err) {
-				console.error("Password recovery session error:", err);
-				setStatus("error");
-				// Prioritize expired link message for Supabase-specific expiration errors
-				const errObj = err as { code?: string; message?: string };
-				const msg = errObj?.message?.toLowerCase() || "";
-				const isExpired =
-					errObj?.code === "otp_expired" ||
-					msg.includes("expired") ||
-					msg.includes("invalid or expired");
-				setErrorMessage(isExpired ? t("auth.resetPassword.linkExpired") : t("auth.error.generic"));
-			}
-		};
+        setStatus("success");
+        router.replace("/account/change-password?type=recovery");
+      } catch (err) {
+        console.error("Password recovery session error:", err);
+        setStatus("error");
+        // Prioritize expired link message for Supabase-specific expiration errors
+        const errObj = err as { code?: string; message?: string };
+        const msg = errObj?.message?.toLowerCase() || "";
+        const isExpired =
+          errObj?.code === "otp_expired" ||
+          msg.includes("expired") ||
+          msg.includes("invalid or expired");
+        setErrorMessage(isExpired ? t("auth.resetPassword.linkExpired") : t("auth.error.generic"));
+      }
+    };
 
     void resolveRecovery();
   }, [router, searchParams, supabase, t]);
@@ -141,5 +141,13 @@ export default function ResetPasswordRedirect() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordRedirect() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

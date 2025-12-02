@@ -16,14 +16,10 @@ export function createClient() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL in environment variables"
-    );
+    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL in environment variables");
   }
   if (!supabaseAnonKey) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_ANON_KEY in environment variables"
-    );
+    throw new Error("Missing NEXT_PUBLIC_SUPABASE_ANON_KEY in environment variables");
   }
 
   return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);

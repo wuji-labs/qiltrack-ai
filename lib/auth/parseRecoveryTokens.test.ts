@@ -77,9 +77,7 @@ describe("hasRecoveryTokens", () => {
   });
 
   it("should return true when both accessToken and refreshToken are present", () => {
-    expect(hasRecoveryTokens({ accessToken: "access123", refreshToken: "refresh456" })).toBe(
-      true
-    );
+    expect(hasRecoveryTokens({ accessToken: "access123", refreshToken: "refresh456" })).toBe(true);
   });
 
   it("should return false when only accessToken is present", () => {

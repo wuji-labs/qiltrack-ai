@@ -38,62 +38,70 @@
 
 ### 架构设计
 
-| 文档 | 说明 | 适用人群 |
-|------|------|----------|
-| [架构概览](./README.md) | 完整的系统架构文档 | 所有开发者 |
-| [重构总结](../../REFACTOR_SUMMARY.md) | v2.0 架构重构总结 | Tech Lead |
-| [错误处理](./error-handling.md) | 统一错误处理设计 | 后端开发者 |
+| 文档                                  | 说明               | 适用人群   |
+| ------------------------------------- | ------------------ | ---------- |
+| [架构概览](./README.md)               | 完整的系统架构文档 | 所有开发者 |
+| [重构总结](../../REFACTOR_SUMMARY.md) | v2.0 架构重构总结  | Tech Lead  |
+| [错误处理](./error-handling.md)       | 统一错误处理设计   | 后端开发者 |
 
 ### 开发指南
 
-| 文档 | 说明 | 适用人群 |
-|------|------|----------|
-| [API 开发指南](./api-development-guide.md) | API 开发规范与示例 | 后端开发者 |
-| [测试指南](./testing-guide.md) | 测试策略与最佳实践 | 所有开发者 |
-| [Admin 操作手册](../guides/admin-operations-guide.md) | Admin 面板使用指南 | 管理员 |
+| 文档                                                  | 说明               | 适用人群   |
+| ----------------------------------------------------- | ------------------ | ---------- |
+| [API 开发指南](./api-development-guide.md)            | API 开发规范与示例 | 后端开发者 |
+| [测试指南](./testing-guide.md)                        | 测试策略与最佳实践 | 所有开发者 |
+| [Admin 操作手册](../guides/admin-operations-guide.md) | Admin 面板使用指南 | 管理员     |
 
 ### 部署运维
 
-| 文档 | 说明 | 适用人群 |
-|------|------|----------|
-| [Supabase 部署](../guides/supabase-report-stage2-cavr.md) | Supabase 部署指南 | DevOps |
-| [环境配置](../../ENVIRONMENT.md) | 环境要求与配置 | 所有开发者 |
+| 文档                                                      | 说明              | 适用人群   |
+| --------------------------------------------------------- | ----------------- | ---------- |
+| [Supabase 部署](../guides/supabase-report-stage2-cavr.md) | Supabase 部署指南 | DevOps     |
+| [环境配置](../../ENVIRONMENT.md)                          | 环境要求与配置    | 所有开发者 |
 
 ---
 
 ## 🏗️ 架构层级
 
 ### 表现层 (Presentation Layer)
+
 - Next.js App Router (用户前端)
 - Refine Admin Panel (管理后台)
 
 **相关文档**:
+
 - [Admin 操作手册](../guides/admin-operations-guide.md)
 
 ### API 层 (API Layer)
+
 - HTTP 请求处理
 - 认证和授权
 - 错误处理
 
 **相关文档**:
+
 - [API 开发指南](./api-development-guide.md)
 - [错误处理](./error-handling.md)
 
 ### 业务逻辑层 (Business Logic Layer)
+
 - `lib/core/reports/` - 报告生成
 - `lib/core/credits/` - 积分管理
 - `lib/core/users/` - 用户管理
 
 **相关文档**:
+
 - [架构概览](./README.md)
 - [重构总结](../../REFACTOR_SUMMARY.md)
 
 ### 服务适配器层 (Service Adapter Layer)
+
 - `lib/services/llm.ts` - LLM 服务
 - `lib/services/market-data.ts` - 市场数据
 - `lib/services/storage.ts` - 存储服务
 
 **相关文档**:
+
 - [API 开发指南](./api-development-guide.md#服务适配器)
 
 ---

@@ -43,30 +43,32 @@ npm run dev
 
 ## 🔧 可用的脚本
 
-| 脚本 | 用途 | 何时使用 |
-|------|------|----------|
-| `reset-worktrees-only.ps1` | 重置所有工作树 | **每天开始工作前** ✅ |
-| `deep-clean-worktree.ps1` | 深度清理单个工作树 | 遇到 BOM 错误时 |
-| `fix-bom-emergency.ps1` | 快速修复当前目录 | 紧急情况 |
-| `reset-all.ps1` | 重置主仓库+工作树 | 不推荐（重复操作） |
-| `reset-worktree.ps1` | 重置单个工作树 | 已被 reset-worktrees-only.ps1 取代 |
+| 脚本                       | 用途               | 何时使用                           |
+| -------------------------- | ------------------ | ---------------------------------- |
+| `reset-worktrees-only.ps1` | 重置所有工作树     | **每天开始工作前** ✅              |
+| `deep-clean-worktree.ps1`  | 深度清理单个工作树 | 遇到 BOM 错误时                    |
+| `fix-bom-emergency.ps1`    | 快速修复当前目录   | 紧急情况                           |
+| `reset-all.ps1`            | 重置主仓库+工作树  | 不推荐（重复操作）                 |
+| `reset-worktree.ps1`       | 重置单个工作树     | 已被 reset-worktrees-only.ps1 取代 |
 
 ## 💡 为什么要用脚本？
 
 Windows 上的 Git 操作会在 `package.json` 中注入 BOM（字节顺序标记），导致：
+
 - ❌ `npm run dev` 失败
 - ❌ `npm install` 失败
 - ❌ JSON 解析错误
 
 脚本自动在**三个关键时刻**清理 BOM：
+
 1. git reset 后
 2. git sparse-checkout 后
 3. **所有操作完成后（最重要！）**
 
 ## 📋 端口分配
 
-| 工作树 | 端口 | URL |
-|--------|------|-----|
+| 工作树         | 端口 | URL                   |
+| -------------- | ---- | --------------------- |
 | investor-ai-g1 | 3001 | http://localhost:3001 |
 | investor-ai-g2 | 3002 | http://localhost:3002 |
 | investor-ai-g3 | 3003 | http://localhost:3003 |

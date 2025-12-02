@@ -9,12 +9,14 @@
 ## 1. 需求概述
 
 ### 核心目标
+
 - 接入 Stripe Checkout（托管版），支持**月套餐**和**年套餐**订阅
 - 订阅成功后自动扣除配额、更新用户额度与订阅计划标记
 - 支持订阅取消/续期/升级流程
 - 与现有配额系统无缝集成，兼容多语言提示
 
 ### 约束条件
+
 - **支付网关**：Stripe（托管版 Checkout，不自建表单）
 - **通知机制**：Webhook 接收 `checkout.session.completed`、`customer.subscription.updated` 等事件
 - **额度规则**：
@@ -28,6 +30,7 @@
 ## 2. 数据模型扩展
 
 ### users 表（扩展字段）
+
 ```sql
 -- 既有字段：id, email, provider, provider_id, created_at
 ALTER TABLE users ADD COLUMN (
@@ -47,6 +50,7 @@ CREATE INDEX idx_users_subscription_status ON users(subscription_status);
 ```
 
 ### quotas 表（扩展字段）
+
 ```sql
 -- 既有字段：user_id, remaining_credits, reports_used, created_at
 ALTER TABLE quotas ADD COLUMN (
@@ -65,6 +69,7 @@ ALTER TABLE quotas ADD COLUMN (
 ### 3.1 前端 CTA 流程
 
 **当前 Fallback 状态**：
+
 ```
 用户点击"升级订阅" CTA
   ├─ 未登录 → 跳转登录页面
@@ -72,6 +77,7 @@ ALTER TABLE quotas ADD COLUMN (
 ```
 
 **T+2 Stripe 接入后**：
+
 ```
 用户点击"升级订阅" CTA
   ├─ 未登录 → 跳转登录页面
@@ -102,6 +108,7 @@ ALTER TABLE quotas ADD COLUMN (
 ```
 
 **实现步骤**：
+
 1. 获取 session 用户 ID
 2. 查询或创建 Stripe Customer（`stripe.customers.create` 或 `retrieve`）
 3. 创建 Checkout Session（`stripe.checkout.sessions.create`）
@@ -109,16 +116,17 @@ ALTER TABLE quotas ADD COLUMN (
 5. 返回 checkoutUrl，前端重定向
 
 **关键参数**：
+
 ```typescript
 const session = await stripe.checkout.sessions.create({
   customer: stripeCustomerId,
   line_items: [
     {
-      price: priceId,  // 从 Stripe 仪表板获取
+      price: priceId, // 从 Stripe 仪表板获取
       quantity: 1,
     },
   ],
-  mode: 'subscription',
+  mode: "subscription",
   success_url: `${baseUrl}/reports?success=true&sessionId={CHECKOUT_SESSION_ID}`,
   cancel_url: `${baseUrl}/pricing`,
   metadata: {
@@ -133,6 +141,7 @@ const session = await stripe.checkout.sessions.create({
 **端点**：`POST /api/webhooks/stripe`
 
 **触发事件**：
+
 1. `checkout.session.completed` → 初次购买成功
 2. `customer.subscription.updated` → 订阅更新（续期、升级等）
 3. `customer.subscription.deleted` → 订阅取消
@@ -140,9 +149,10 @@ const session = await stripe.checkout.sessions.create({
 5. `invoice.payment_failed` → 续期扣款失败
 
 **核心逻辑**：
+
 ```typescript
 export async function POST(req: Request) {
-  const signature = req.headers.get('stripe-signature')!;
+  const signature = req.headers.get("stripe-signature")!;
   const event = await stripe.webhooks.constructEventAsync(
     rawBody,
     signature,
@@ -150,7 +160,7 @@ export async function POST(req: Request) {
   );
 
   switch (event.type) {
-    case 'checkout.session.completed': {
+    case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.metadata!.userId;
       const plan = session.metadata!.plan; // 'monthly' | 'annual'
@@ -159,22 +169,22 @@ export async function POST(req: Request) {
       await updateUserSubscription(userId, {
         stripe_customer_id: session.customer as string,
         subscription_plan: plan,
-        subscription_status: 'active',
+        subscription_status: "active",
         subscription_starts_at: new Date(),
       });
 
       // 2. 更新 quotas 表：扣除初次配额，设置重置时间
-      const quotaToAdd = plan === 'monthly' ? 10 : 120;
+      const quotaToAdd = plan === "monthly" ? 10 : 120;
       await updateQuota(userId, {
         remaining_credits: quotaToAdd,
-        monthly_quota: plan === 'monthly' ? 10 : 0,
-        yearly_quota: plan === 'annual' ? 120 : 0,
+        monthly_quota: plan === "monthly" ? 10 : 0,
+        yearly_quota: plan === "annual" ? 120 : 0,
         plan_source: `stripe_${plan}`,
         quota_resets_at: calculateNextReset(plan),
       });
 
       // 3. 发送确认邮件
-      await sendEmail(session.customer_details!.email!, 'subscription_confirmed', {
+      await sendEmail(session.customer_details!.email!, "subscription_confirmed", {
         plan,
         quota: quotaToAdd,
       });
@@ -182,14 +192,14 @@ export async function POST(req: Request) {
       break;
     }
 
-    case 'customer.subscription.updated': {
+    case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
       const userId = await getUserByStripeId(subscription.customer as string);
 
       // 更新订阅状态（续期时自动添加配额）
-      if (subscription.status === 'active') {
-        const plan = subscription.metadata?.plan || 'monthly';
-        const quotaToAdd = plan === 'monthly' ? 10 : 120;
+      if (subscription.status === "active") {
+        const plan = subscription.metadata?.plan || "monthly";
+        const quotaToAdd = plan === "monthly" ? 10 : 120;
         await updateQuota(userId, {
           remaining_credits: quotaToAdd,
           quota_resets_at: calculateNextReset(plan),
@@ -199,13 +209,13 @@ export async function POST(req: Request) {
       break;
     }
 
-    case 'customer.subscription.deleted': {
+    case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
       const userId = await getUserByStripeId(subscription.customer as string);
 
       await updateUserSubscription(userId, {
-        subscription_plan: 'free',
-        subscription_status: 'canceled',
+        subscription_plan: "free",
+        subscription_status: "canceled",
         subscription_ends_at: new Date(),
       });
 
@@ -228,25 +238,26 @@ export async function POST(req: Request) {
 **当前状态**：CTA 按钮为 fallback（点击显示 "coming soon"）
 
 **T+2 目标**：
+
 ```tsx
 // 定价卡片 CTA 按钮
-<button onClick={() => handleSubscribe(plan === 'monthly' ? 'price_...' : 'price_...')}>
-  {isLoading ? 'Processing...' : t('pricing.plan.cta.subscribe')}
-</button>
+<button onClick={() => handleSubscribe(plan === "monthly" ? "price_..." : "price_...")}>
+  {isLoading ? "Processing..." : t("pricing.plan.cta.subscribe")}
+</button>;
 
 // 处理逻辑
 const handleSubscribe = async (priceId: string) => {
   if (!isAuthenticated) {
-    router.push('/login');
+    router.push("/login");
     return;
   }
 
   setIsLoading(true);
   try {
-    const { checkoutUrl } = await fetch('/api/checkout/create', {
-      method: 'POST',
+    const { checkoutUrl } = await fetch("/api/checkout/create", {
+      method: "POST",
       body: JSON.stringify({ priceId }),
-    }).then(r => r.json());
+    }).then((r) => r.json());
 
     window.location.href = checkoutUrl; // 重定向到 Stripe Checkout
   } catch (err) {
@@ -264,16 +275,16 @@ const handleSubscribe = async (priceId: string) => {
 ```tsx
 // 验证 Checkout 成功
 useEffect(() => {
-  if (searchParams.get('success') === 'true') {
+  if (searchParams.get("success") === "true") {
     // 1. 显示成功提示
-    showNotification(t('subscription.success'), 'success');
+    showNotification(t("subscription.success"), "success");
 
     // 2. 刷新用户配额和订阅状态
     await refreshSession();
     await refreshQuota();
 
     // 3. 重定向到报告列表（或生成新报告）
-    setTimeout(() => router.push('/reports'), 2000);
+    setTimeout(() => router.push("/reports"), 2000);
   }
 }, [searchParams]);
 ```
@@ -285,19 +296,23 @@ useEffect(() => {
 ```tsx
 // 展示当前订阅状态
 <SubscriptionCard>
-  <p>{t('account.subscription.plan')}: {userPlan}</p>
-  <p>{t('account.subscription.status')}: {subscriptionStatus}</p>
-  <p>{t('account.subscription.renews')}: {subscriptionRenewsAt}</p>
-  <button onClick={() => goToStripePortal()}>
-    {t('account.subscription.manage')}
-  </button>
-</SubscriptionCard>
+  <p>
+    {t("account.subscription.plan")}: {userPlan}
+  </p>
+  <p>
+    {t("account.subscription.status")}: {subscriptionStatus}
+  </p>
+  <p>
+    {t("account.subscription.renews")}: {subscriptionRenewsAt}
+  </p>
+  <button onClick={() => goToStripePortal()}>{t("account.subscription.manage")}</button>
+</SubscriptionCard>;
 
 // 跳转 Stripe 客户门户
 const goToStripePortal = async () => {
-  const portalUrl = await fetch('/api/stripe/customer-portal')
-    .then(r => r.json())
-    .then(d => d.url);
+  const portalUrl = await fetch("/api/stripe/customer-portal")
+    .then((r) => r.json())
+    .then((d) => d.url);
 
   window.location.href = portalUrl;
 };
@@ -308,12 +323,14 @@ const goToStripePortal = async () => {
 ## 5. 配额重置逻辑
 
 ### 重置时机
+
 - **月套餐**：每月 1 日 UTC 0 时重置 10 份
 - **年套餐**：每年 1 月 1 日 UTC 0 时重置 120 份
 
 ### 实现方案
 
 **选项 A：数据库定时任务（推荐）**
+
 ```sql
 -- 每日凌晨 0 时 UTC 运行
 CREATE OR REPLACE FUNCTION reset_monthly_quotas()
@@ -337,28 +354,29 @@ $$ LANGUAGE plpgsql;
 ```
 
 **选项 B：后端定时任务**
+
 ```typescript
 // lib/cron/resetQuotas.ts
-import cron from 'node-cron';
+import cron from "node-cron";
 
 export function startQuotaResetCron() {
   // 每天 00:00 UTC 执行
-  cron.schedule('0 0 * * *', async () => {
+  cron.schedule("0 0 * * *", async () => {
     const expiredQuotas = await supabase
-      .from('quotas')
-      .select('user_id, plan_source')
-      .lte('quota_resets_at', new Date());
+      .from("quotas")
+      .select("user_id, plan_source")
+      .lte("quota_resets_at", new Date());
 
     for (const quota of expiredQuotas) {
-      const quotaAmount = quota.plan_source === 'stripe_monthly' ? 10 : 120;
+      const quotaAmount = quota.plan_source === "stripe_monthly" ? 10 : 120;
       await supabase
-        .from('quotas')
+        .from("quotas")
         .update({
           remaining_credits: quotaAmount,
           quota_resets_at: calculateNextReset(quota.plan_source),
           last_reset_at: new Date(),
         })
-        .eq('user_id', quota.user_id);
+        .eq("user_id", quota.user_id);
     }
   });
 }
@@ -369,6 +387,7 @@ export function startQuotaResetCron() {
 ## 6. 安全与合规
 
 ### 6.1 环境变量
+
 ```bash
 # .env.local
 STRIPE_PUBLIC_KEY=pk_live_...
@@ -379,12 +398,14 @@ STRIPE_ANNUAL_PRICE_ID=price_...
 ```
 
 ### 6.2 API 安全
+
 - **身份验证**：所有支付端点需 NextAuth session
 - **HTTPS 强制**：Webhook 仅接受 HTTPS
 - **签名验证**：Webhook 事件需 Stripe 签名验证（`stripe.webhooks.constructEvent`）
 - **幂等性**：Webhook 处理应幂等（支持重复调用）
 
 ### 6.3 PCI 合规
+
 - **不存储卡片信息**：全部由 Stripe 托管
 - **Webhook 日志**：记录关键事件便于审计
 - **错误处理**：敏感信息不泄露给前端
@@ -394,35 +415,37 @@ STRIPE_ANNUAL_PRICE_ID=price_...
 ## 7. 测试计划
 
 ### 单元测试
+
 ```typescript
 // api/checkout/create.test.ts
-describe('POST /api/checkout/create', () => {
-  test('unauthenticated user returns 401', async () => {
+describe("POST /api/checkout/create", () => {
+  test("unauthenticated user returns 401", async () => {
     // ...
   });
 
-  test('creates checkout session for monthly plan', async () => {
+  test("creates checkout session for monthly plan", async () => {
     // ...
   });
 
-  test('creates customer if not exists', async () => {
+  test("creates customer if not exists", async () => {
     // ...
   });
 });
 
 // api/webhooks/stripe.test.ts
-describe('Stripe Webhook', () => {
-  test('checkout.session.completed updates users and quotas', async () => {
+describe("Stripe Webhook", () => {
+  test("checkout.session.completed updates users and quotas", async () => {
     // ...
   });
 
-  test('subscription.deleted sets plan to free', async () => {
+  test("subscription.deleted sets plan to free", async () => {
     // ...
   });
 });
 ```
 
 ### 集成测试（手动）
+
 1. 进入定价页面 → 点击"升级" → 进入 Stripe Checkout
 2. 完成虚拟购买（使用 Stripe 测试卡 `4242 4242 4242 4242`）
 3. 验证配额更新：`SELECT * FROM quotas WHERE user_id = ...`
@@ -437,6 +460,7 @@ describe('Stripe Webhook', () => {
 ### 需要的 i18n keys
 
 **中文**：
+
 ```json
 {
   "pricing.plan.monthly.price": "¥99/月",
@@ -455,6 +479,7 @@ describe('Stripe Webhook', () => {
 ```
 
 **英文**：
+
 ```json
 {
   "pricing.plan.monthly.price": "$9.99/mo",
@@ -477,6 +502,7 @@ describe('Stripe Webhook', () => {
 ## 9. 实施时间表
 
 ### T+2 完成清单
+
 - [ ] 注册/配置 Stripe 账户（生产环境）
 - [ ] 创建 Price Objects（月 & 年）
 - [ ] 实现 `/api/checkout/create` 端点
@@ -491,6 +517,7 @@ describe('Stripe Webhook', () => {
 - [ ] 集成测试 & 手动验证
 
 ### 依赖关系
+
 ```
 Stripe 账户配置
   ↓
@@ -507,19 +534,20 @@ API 端点实现 & Webhook
 
 ## 10. 风险与缓解
 
-| 风险 | 级别 | 缓解方案 |
-|------|------|---------|
-| Webhook 延迟 | 中 | 实现幂等性处理，支持重试 |
-| 配额重置不及时 | 中 | 选用数据库触发器（更可靠）或 Cron + 告警 |
-| 支付失败通知缺失 | 高 | 监听 `invoice.payment_failed` Webhook，发送邮件 |
-| 价格调整影响现有用户 | 中 | 为现有订阅创建独立 Price ID，不影响续期 |
-| Stripe 账户限制 | 低 | 提前进行身份验证和合规审核 |
+| 风险                 | 级别 | 缓解方案                                        |
+| -------------------- | ---- | ----------------------------------------------- |
+| Webhook 延迟         | 中   | 实现幂等性处理，支持重试                        |
+| 配额重置不及时       | 中   | 选用数据库触发器（更可靠）或 Cron + 告警        |
+| 支付失败通知缺失     | 高   | 监听 `invoice.payment_failed` Webhook，发送邮件 |
+| 价格调整影响现有用户 | 中   | 为现有订阅创建独立 Price ID，不影响续期         |
+| Stripe 账户限制      | 低   | 提前进行身份验证和合规审核                      |
 
 ---
 
 ## 11. 审批检查清单
 
 ### 业务确认
+
 - [ ] 月套餐价格确认：¥99 / $9.99
 - [ ] 年套餐价格确认：¥999 / $99.99
 - [ ] 配额规则确认：10/月, 120/年
@@ -527,6 +555,7 @@ API 端点实现 & Webhook
 - [ ] 支持的国家和币种确认
 
 ### 技术实现
+
 - [ ] Stripe 环境配置（测试 & 生产）
 - [ ] API 端点安全审计
 - [ ] Webhook 签名验证完整
@@ -534,6 +563,7 @@ API 端点实现 & Webhook
 - [ ] 日志与监控系统就绪
 
 ### 运营支持
+
 - [ ] 客户支持文档（如何管理订阅）
 - [ ] 常见问题解答
 - [ ] 退款流程文档

@@ -92,7 +92,17 @@ describe("createReportBlueprint", () => {
       report: "",
       companyData: {
         symbol: "TSLA",
-        profile: { name: "Tesla", ticker: "TSLA", exchange: "", finnhubIndustry: "", country: "", currency: "USD", ipo: "", marketCapitalization: undefined, weburl: "" },
+        profile: {
+          name: "Tesla",
+          ticker: "TSLA",
+          exchange: "",
+          finnhubIndustry: "",
+          country: "",
+          currency: "USD",
+          ipo: "",
+          marketCapitalization: undefined,
+          weburl: "",
+        },
         quote: {},
         metrics: {},
         recentNews: [],

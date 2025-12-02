@@ -2,23 +2,25 @@
 
 ## 状态总览
 
-| 组件 | 状态 | 说明 |
-|------|------|------|
-| 数据库迁移文件 | ✅ 已创建 | `supabase/migrations/20251130000001_init_user_credits_30.sql` (150 行) |
-| API 错误码处理 | ✅ 已实现 | 401/429/500 正确区分，含 trace 日志 |
-| 每日奖励 API 端点 | ✅ 已创建 | `app/api/report/daily-reward/route.ts` (59 行) |
-| 前端服务函数 | ✅ 已创建 | `lib/services/api.ts` 中 `claimDailyReward()` 和 `DailyRewardResponse` 类型 |
-| 前端配额加载逻辑 | ✅ 已实现 | `quotaLoaded` 标记，错误分类与显示 |
-| **待完成** | 🔄 **就绪** | 执行迁移和测试 |
+| 组件              | 状态        | 说明                                                                        |
+| ----------------- | ----------- | --------------------------------------------------------------------------- |
+| 数据库迁移文件    | ✅ 已创建   | `supabase/migrations/20251130000001_init_user_credits_30.sql` (150 行)      |
+| API 错误码处理    | ✅ 已实现   | 401/429/500 正确区分，含 trace 日志                                         |
+| 每日奖励 API 端点 | ✅ 已创建   | `app/api/report/daily-reward/route.ts` (59 行)                              |
+| 前端服务函数      | ✅ 已创建   | `lib/services/api.ts` 中 `claimDailyReward()` 和 `DailyRewardResponse` 类型 |
+| 前端配额加载逻辑  | ✅ 已实现   | `quotaLoaded` 标记，错误分类与显示                                          |
+| **待完成**        | 🔄 **就绪** | 执行迁移和测试                                                              |
 
 ---
 
 ## 第 1 步：应用数据库迁移 (必做)
 
 ### 📋 任务
+
 将数据库迁移应用到本地 Supabase，初始化所有用户为 30 积分。
 
 ### 🕐 预计时间
+
 3-5 分钟
 
 ### 选项 A：使用 Supabase 控制台（推荐）
@@ -36,6 +38,7 @@
 9. 等待执行完成，应该看到 "Query successful" ✅
 
 **预期输出**:
+
 ```
 Query successful - X rows affected
 ```
@@ -82,9 +85,11 @@ FROM report_credits;
 ## 第 2 步：测试新账号注册 (强烈建议)
 
 ### 📋 任务
+
 验证新注册账号能正确显示 30 积分。
 
 ### 🕐 预计时间
+
 3-5 分钟
 
 ### 步骤
@@ -117,21 +122,23 @@ FROM report_credits;
 
 ### ❌ 故障排除
 
-| 显示数字 | 可能原因 | 解决方案 |
-|---------|---------|---------|
-| 0 | 迁移未应用 | 重新运行第 1 步迁移 |
-| 1 | 旧迁移生效 | 清除缓存，用新邮箱重新注册 |
-| 5 | 触发器未更新 | 检查迁移是否完全执行 |
-| 30 ✅ | 正常！ | 继续下一步 |
+| 显示数字 | 可能原因     | 解决方案                   |
+| -------- | ------------ | -------------------------- |
+| 0        | 迁移未应用   | 重新运行第 1 步迁移        |
+| 1        | 旧迁移生效   | 清除缓存，用新邮箱重新注册 |
+| 5        | 触发器未更新 | 检查迁移是否完全执行       |
+| 30 ✅    | 正常！       | 继续下一步                 |
 
 ---
 
 ## 第 3 步：测试每日奖励 API (可选但推荐)
 
 ### 📋 任务
+
 验证每日奖励 API 端点正常工作。
 
 ### 🕐 预计时间
+
 2-3 分钟
 
 ### 步骤
@@ -147,23 +154,24 @@ FROM report_credits;
 4. **复制并运行此代码**:
 
 ```javascript
-fetch('/api/report/daily-reward', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' }
+fetch("/api/report/daily-reward", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
 })
-.then(r => r.json())
-.then(d => {
-  console.log('响应:', d);
-  console.log('success:', d.success);
-  console.log('message:', d.message);
-  console.log('remaining:', d.remainingCredits);
-})
-.catch(e => console.error('错误:', e));
+  .then((r) => r.json())
+  .then((d) => {
+    console.log("响应:", d);
+    console.log("success:", d.success);
+    console.log("message:", d.message);
+    console.log("remaining:", d.remainingCredits);
+  })
+  .catch((e) => console.error("错误:", e));
 ```
 
 ### ✔️ 预期输出
 
 **第一次调用**:
+
 ```javascript
 响应: Object { success: true, message: "Daily reward claimed", remainingCredits: 40 }
 success: true
@@ -172,6 +180,7 @@ remaining: 40  // 从 30 增加到 40（+10）
 ```
 
 **再次调用** (同一天):
+
 ```javascript
 响应: Object { success: false, message: "Already claimed today", remainingCredits: 0 }
 success: false
@@ -191,9 +200,11 @@ remaining: 0
 ## 第 4 步：验证现有账号修复 (可选)
 
 ### 📋 任务
+
 确认已修复的账号（如 xiuluart@foxmail.com）现在显示正确的积分。
 
 ### 🕐 预计时间
+
 2-3 分钟
 
 ### 步骤
@@ -227,6 +238,7 @@ remaining: 0
 ## 第 5 步：添加前端 UI 按钮 (可选)
 
 ### 📋 任务
+
 在首页添加"领取 10 积分"按钮（改进用户体验）。
 
 ### ⚠️ 重要说明
@@ -255,12 +267,12 @@ const handleClaimDailyReward = async () => {
     const result = await claimDailyReward();
     if (result.success) {
       await refreshQuota();
-      alert('每日奖励已领取！');
+      alert("每日奖励已领取！");
     } else {
       alert(result.message);
     }
   } catch (err) {
-    alert('领取失败，请重试');
+    alert("领取失败，请重试");
   } finally {
     setClaimingReward(false);
   }
@@ -275,7 +287,7 @@ const handleClaimDailyReward = async () => {
   disabled={claimingReward || !isAuthenticated}
   className="rounded-full border border-emerald-400 px-4 py-2 text-sm text-emerald-300 hover:bg-emerald-400/10"
 >
-  {claimingReward ? '正在领取...' : '领取 10 积分'}
+  {claimingReward ? "正在领取..." : "领取 10 积分"}
 </button>
 ```
 
@@ -342,6 +354,7 @@ npm run lint
 ### 问题 1: 迁移执行失败
 
 **错误**:
+
 ```
 Error: Relation "daily_rewards" already exists
 ```
@@ -353,11 +366,13 @@ Error: Relation "daily_rewards" already exists
 ### 问题 2: 新账号仍显示 0 积分
 
 **可能原因**:
+
 1. 迁移未应用
 2. 浏览器缓存
 3. 新账号刚创建，数据未同步
 
 **解决步骤**:
+
 1. 确认 SQL Editor 迁移查询显示 "Query successful"
 2. 清除浏览器缓存: Ctrl+Shift+Delete
 3. 用无痕浏览器重新尝试
@@ -386,6 +401,7 @@ Error: Relation "daily_rewards" already exists
 **原因**: Mailpit 未运行或端口不对
 
 **解决**:
+
 ```bash
 # 确认 Mailpit 运行在 http://127.0.0.1:54324
 # 检查你的开发环境配置
@@ -397,12 +413,12 @@ Error: Relation "daily_rewards" already exists
 
 ### 快速查询
 
-| 问题 | 查询语句 |
-|------|---------|
-| 某用户当前积分 | `SELECT credits_available FROM report_credits WHERE user_id = 'user-id';` |
-| 某用户积分历史 | `SELECT * FROM report_credit_events WHERE user_id = 'user-id' ORDER BY created_at DESC;` |
-| 某用户是否今日领取 | `SELECT last_claimed FROM daily_rewards WHERE user_id = 'user-id';` |
-| 所有用户统计 | `SELECT COUNT(*) FROM report_credits;` |
+| 问题               | 查询语句                                                                                 |
+| ------------------ | ---------------------------------------------------------------------------------------- |
+| 某用户当前积分     | `SELECT credits_available FROM report_credits WHERE user_id = 'user-id';`                |
+| 某用户积分历史     | `SELECT * FROM report_credit_events WHERE user_id = 'user-id' ORDER BY created_at DESC;` |
+| 某用户是否今日领取 | `SELECT last_claimed FROM daily_rewards WHERE user_id = 'user-id';`                      |
+| 所有用户统计       | `SELECT COUNT(*) FROM report_credits;`                                                   |
 
 ---
 

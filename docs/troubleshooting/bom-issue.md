@@ -16,6 +16,7 @@ package.json is not parseable: invalid JSON: expected value at line 1 column 1
 ### BOM 是什么？
 
 BOM（Byte Order Mark）是文件开头的特殊字节序列：
+
 - UTF-8 BOM: `0xEF 0xBB 0xBF`（显示为 `﻿`）
 - JSON 规范**不允许** BOM 存在
 - npm、Node.js 等工具会拒绝解析带 BOM 的 JSON 文件
@@ -40,6 +41,7 @@ BOM（Byte Order Mark）是文件开头的特殊字节序列：
 ### 技术原因
 
 在 Windows 上，Git 的以下机制会触发文件重写：
+
 1. **core.autocrlf=true**：自动转换行尾（CRLF ↔ LF）
 2. **Sparse-checkout**：重新检出文件时可能插入 BOM
 3. **Working tree refresh**：某些 Git 操作会重新写入文件到工作区
@@ -67,6 +69,7 @@ npm run dev  # ✅ 保证能运行！
 **为什么需要三重 BOM 清理？**
 
 经过多次测试发现，BOM 会在**三个时间点**被注入：
+
 1. ✅ `git reset --hard origin/main` 后 → 立即清理
 2. ✅ `git sparse-checkout set` 后 → 立即清理
 3. ✅ 所有文件操作完成后（包括 .env 复制、npm ci 等）→ **最终清理（关键！）**
@@ -83,6 +86,7 @@ D:\Projects\investor-ai\scripts\deep-clean-worktree.ps1
 ```
 
 这个脚本会：
+
 - 停止运行中的 dev server
 - 删除 .next 和 node_modules/.cache
 - 深度修复 package.json
@@ -91,6 +95,7 @@ D:\Projects\investor-ai\scripts\deep-clean-worktree.ps1
 ### 📋 检查是否有 BOM
 
 **PowerShell 方式：**
+
 ```powershell
 $bytes = [System.IO.File]::ReadAllBytes("package.json")
 if ($bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
@@ -101,6 +106,7 @@ if ($bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
 ```
 
 **Git Bash / WSL：**
+
 ```bash
 # 查看文件开头的十六进制
 xxd -l 16 package.json
@@ -175,6 +181,7 @@ git config --global core.autocrlf false
 ```
 
 **为什么不行：**
+
 - 会破坏跨平台协作（Windows 开发者需要 CRLF，Linux 需要 LF）
 - 项目中有 `.ps1` 文件需要 CRLF，`.sh` 文件需要 LF
 - `.gitattributes` 已经正确配置，不应该禁用 autocrlf
@@ -188,6 +195,7 @@ git checkout main
 ```
 
 **为什么不够：**
+
 - `git checkout main` 仍然会触发 BOM
 - sparse-checkout 的重新应用也会触发 BOM
 - 不是根本解决方案
@@ -199,6 +207,7 @@ package.json -text
 ```
 
 **为什么不行：**
+
 - `-text` 会将文件视为二进制，禁用所有文本处理
 - 会导致跨平台行尾不一致
 - 不解决已有的 BOM 问题
@@ -220,14 +229,14 @@ package.json -text
 
 ## 历史记录
 
-| 日期 | Commit | 说明 |
-|------|--------|------|
-| 2025-12-02 | `2100375` | 首次添加 BOM 自动清理（sparse-checkout 后） |
-| 2025-12-02 | `187fe48` | 增强修复：git reset --hard 后也清理 BOM |
-| 2025-12-02 | `c269789` | 关键发现：主仓库污染导致工作树继承 BOM |
-| 2025-12-02 | `3448d30` | 创建 deep-clean-worktree.ps1 应急工具 |
-| 2025-12-02 | `dae0bdb` | 增强 Remove-BOMFromFile：检测所有类型的损坏 |
-| 2025-12-02 | `3d266f4` | 清理 node_modules/.cache 防止缓存问题 |
+| 日期       | Commit    | 说明                                                   |
+| ---------- | --------- | ------------------------------------------------------ |
+| 2025-12-02 | `2100375` | 首次添加 BOM 自动清理（sparse-checkout 后）            |
+| 2025-12-02 | `187fe48` | 增强修复：git reset --hard 后也清理 BOM                |
+| 2025-12-02 | `c269789` | 关键发现：主仓库污染导致工作树继承 BOM                 |
+| 2025-12-02 | `3448d30` | 创建 deep-clean-worktree.ps1 应急工具                  |
+| 2025-12-02 | `dae0bdb` | 增强 Remove-BOMFromFile：检测所有类型的损坏            |
+| 2025-12-02 | `3d266f4` | 清理 node_modules/.cache 防止缓存问题                  |
 | 2025-12-02 | `948f5a7` | **最终修复**：在所有操作完成后最终检查 BOM（三重清理） |
 
 ## 为什么这么复杂？
@@ -245,6 +254,7 @@ package.json -text
 ### 复现步骤
 
 1. 在工作树中执行：
+
    ```powershell
    git fetch origin
    git reset --hard origin/main
@@ -252,6 +262,7 @@ package.json -text
    ```
 
 2. 检查 package.json 是否有 BOM：
+
    ```powershell
    .\scripts\fix-bom.ps1
    ```
@@ -277,6 +288,7 @@ A: BOM 不符合 JSON 标准，问题在于文件本身，不应该让工具"容
 ### Q3: Linux / macOS 也会遇到这个问题吗？
 
 A: 不会。这是 Windows 特有的问题，因为：
+
 - Windows 上 Git 会处理 CRLF 转换
 - 某些 Windows 编辑器会添加 BOM
 - Linux/macOS 的文件系统和工具链不会引入 BOM
@@ -284,6 +296,7 @@ A: 不会。这是 Windows 特有的问题，因为：
 ### Q4: 其他 JSON 文件需要处理吗？
 
 A: 目前只有 `package.json` 经常出现问题，因为：
+
 - Git 经常操作它（切换分支、reset 等）
 - npm 对它的格式要求严格
 - 其他 JSON 文件（如 tsconfig.json）不常被 Git 重写

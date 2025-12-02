@@ -5,7 +5,9 @@
 按照 CODEX 规范第 6 节（Closeout Checklist），本次交付情况如下：
 
 ### 状态说明
+
 ✅ **Stage 1（Schema + Auth）完成**
+
 - 分支：`feat/supabase-integration`
 - 提交：`c372034` (主要) + `4b8b950` (文档)
 - 工作区：✅ 干净（所有改动已提交并推送）
@@ -33,6 +35,7 @@ npm run dev                  # 启动开发服务器
 ### 验证结果
 
 #### Lint 检查
+
 ```
 ✅ Auth 组件（login/account）：0 新错误
 ✅ useSupabaseAuth hook：0 新错误
@@ -42,6 +45,7 @@ npm run dev                  # 启动开发服务器
 ```
 
 #### 测试覆盖
+
 ```
 ✅ Test Files：2 passed (2)
 ✅ Total Tests：5 passed (5)
@@ -50,6 +54,7 @@ npm run dev                  # 启动开发服务器
 ```
 
 #### 功能验证（待 Codex 本地审查）
+
 - 🔄 Email OTP 登录流 → 待本地 Supabase stack 验证
 - 🔄 OAuth 回调处理 → 待 OAuth 凭证配置
 - ✅ Profile 自动创建 → 代码实现完成
@@ -57,6 +62,7 @@ npm run dev                  # 启动开发服务器
 - ✅ 页面认证检查 → 代码实现完成
 
 #### 截图/录屏
+
 - 本地验证完毕后可补充（待 Supabase stack 启动）
 - 附件路径：`docs/reports/2025-11-23-supabase-stage1-screenshots/`
 
@@ -65,11 +71,13 @@ npm run dev                  # 启动开发服务器
 ## 🎯 CAVR 总结
 
 ### Context（上下文）
+
 - **源头**：Codex Snapshot（2025-11-23-supabase-integration.md）
 - **范围**：Stage 1 - 完整的 Supabase Auth 和数据库基座
 - **依赖**：Supabase CLI v2.58.5、Docker、Next.js 16、React 19
 
 ### Actions（执行的操作）
+
 1. ✅ 创建 `hooks/useSupabaseAuth.ts` (207 行)
    - 认证状态管理（user、session、loading、isAuthenticated）
    - Email OTP 登录支持
@@ -93,6 +101,7 @@ npm run dev                  # 启动开发服务器
    - 登出功能
 
 5. ✅ 创建完整 Database Schema
+
    ```sql
    - profiles (用户资料)
    - report_credits (积分管理)
@@ -126,6 +135,7 @@ npm run dev                  # 启动开发服务器
    - 交付总结
 
 ### Verification（验证）
+
 - ✅ npm run lint：无新错误
 - ✅ npm run test：5/5 通过 (100%)
 - ✅ TypeScript：完整类型覆盖
@@ -135,11 +145,13 @@ npm run dev                  # 启动开发服务器
 ### Risks（风险和遗留项）
 
 #### 已解决
+
 - ✅ NextAuth 依赖已清理（从页面层移除）
 - ✅ 类型安全确保（100% TypeScript）
 - ✅ 测试不破坏（所有现有测试通过）
 
 #### 待处理（Block PR 合并）
+
 1. **OAuth 凭证配置** #blocking
    - 需要在 Supabase Auth 配置中设置 Google/GitHub/Microsoft 凭证
    - 需要验证回调 URL（current: http://localhost:3000/api/auth/callback）
@@ -155,6 +167,7 @@ npm run dev                  # 启动开发服务器
    - 计划在后续 PR 处理
 
 #### 未决策（建议 ADR）
+
 1. **报告正文存储位置**
    - 当前设计：Markdown 写入 Storage（`report-assets/{user_id}/{run_id}.md`）
    - 风险：> 50KB 报告可能触发性能问题
@@ -171,16 +184,16 @@ npm run dev                  # 启动开发服务器
 
 按 CODEX 规范第 6 节，本次交付：
 
-| 物料 | 位置 | 说明 |
-|------|------|------|
-| **源代码** | `feat/supabase-integration` 分支 | 8 个新文件 + 2 个修改 |
-| **CAVR Report #1** | `docs/reports/2025-11-23-supabase-schema-cavr.md` | Schema 阶段详细报告 |
-| **CAVR Report #2** | `docs/reports/2025-11-23-supabase-auth-cavr.md` | Auth 阶段详细报告 |
-| **交付总结** | `docs/reports/2025-11-23-supabase-stage1-delivery.md` | 完整交付清单和指标 |
-| **PR 审查指南** | `docs/reports/2025-11-23-pr-submission-guide.md` | 代码审查检查表 |
-| **实施计划** | `docs/plans/2025-11-23-supabase-integration.md` | 详细步骤和进度 |
-| **Lint 输出** | 见下文 | ✅ 无新错误 |
-| **Test 输出** | 见下文 | ✅ 5/5 通过 |
+| 物料               | 位置                                                  | 说明                  |
+| ------------------ | ----------------------------------------------------- | --------------------- |
+| **源代码**         | `feat/supabase-integration` 分支                      | 8 个新文件 + 2 个修改 |
+| **CAVR Report #1** | `docs/reports/2025-11-23-supabase-schema-cavr.md`     | Schema 阶段详细报告   |
+| **CAVR Report #2** | `docs/reports/2025-11-23-supabase-auth-cavr.md`       | Auth 阶段详细报告     |
+| **交付总结**       | `docs/reports/2025-11-23-supabase-stage1-delivery.md` | 完整交付清单和指标    |
+| **PR 审查指南**    | `docs/reports/2025-11-23-pr-submission-guide.md`      | 代码审查检查表        |
+| **实施计划**       | `docs/plans/2025-11-23-supabase-integration.md`       | 详细步骤和进度        |
+| **Lint 输出**      | 见下文                                                | ✅ 无新错误           |
+| **Test 输出**      | 见下文                                                | ✅ 5/5 通过           |
 
 ---
 
@@ -188,20 +201,21 @@ npm run dev                  # 启动开发服务器
 
 按 CODEX 规范第 7 节（质量门槛）的检查结果：
 
-| 检查项 | 状态 | 备注 |
-|--------|------|------|
-| Lint (npm run lint) | ✅ | 0 新错误，2 pre-existing |
-| Test (npm run test:ci) | ✅ | 5/5 通过 (100%) |
-| TypeScript 类型覆盖 | ✅ | 100%，无 `any` 类型 |
-| .env.local.example 更新 | ✅ | 新增 Supabase 变量 |
-| Schema 完整性 | ✅ | 9 表 + RPC + RLS |
-| 文档完整性 | ✅ | CAVR + Plan + Guide |
+| 检查项                  | 状态 | 备注                     |
+| ----------------------- | ---- | ------------------------ |
+| Lint (npm run lint)     | ✅   | 0 新错误，2 pre-existing |
+| Test (npm run test:ci)  | ✅   | 5/5 通过 (100%)          |
+| TypeScript 类型覆盖     | ✅   | 100%，无 `any` 类型      |
+| .env.local.example 更新 | ✅   | 新增 Supabase 变量       |
+| Schema 完整性           | ✅   | 9 表 + RPC + RLS         |
+| 文档完整性              | ✅   | CAVR + Plan + Guide      |
 
 ---
 
 ## 🚀 下一步行动
 
 ### Codex 需要做的
+
 1. **代码审查** (预计 1-2h)
    - 检查 useSupabaseAuth 逻辑
    - 验证 OAuth 回调安全性
@@ -209,6 +223,7 @@ npm run dev                  # 启动开发服务器
    - 提出反馈 → Claude 修复
 
 2. **本地验证** (预计 30-45min)
+
    ```bash
    git checkout feat/supabase-integration
    npm install
@@ -227,6 +242,7 @@ npm run dev                  # 启动开发服务器
    - 启动 Stage 2 (Report API)
 
 ### Claude 待做
+
 1. 🔄 根据 Codex 反馈修复问题（若有）
 2. 🔄 补充本地验证截图/录屏
 3. ⏳ 启动 Stage 2 (Report API RPC 集成)
@@ -238,16 +254,19 @@ npm run dev                  # 启动开发服务器
 为加速审查，以下问题待 Codex 回答：
 
 ### 问题 1：OAuth 凭证 #blocking
+
 **现状**：useSupabaseAuth 中写死了 signInWithProvider() 的提供商名称 (google/github/microsoft)
 **问题**：需要在 Supabase Auth 配置中设置真实凭证，同时验证回调 URL 是否正确
 **建议**：Codex 检查清单？或延迟到 Stage 2？
 
 ### 问题 2：报告正文存储 #discussion
+
 **现状**：Schema 设计中 `report_runs` 包含 `markdown_path` 和 `docx_path` 指向 Storage
 **问题**：Snapshot 中提及 > 50KB 报告可能性能问题，需要决策是否采用 CDN + 签名 URL
 **建议**：后续 PR 中补充压力测试，或现在提供决策？
 
 ### 问题 3：并发吞吐 #discussion
+
 **现状**：fn_consume_report_credit 使用 `select ... for update` 保证原子性
 **问题**：Supabase 共享计划是否支持高并发扣点？
 **建议**：Stage 2 压测，或现在提供压测指标？

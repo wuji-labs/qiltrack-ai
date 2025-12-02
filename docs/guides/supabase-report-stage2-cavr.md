@@ -83,16 +83,16 @@ SUPABASE_STORAGE_REPORT_BUCKET=report-assets
 
 ### Environment Variable Descriptions
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Anon key for client-side queries (public) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Service role key for privileged operations (server-only, never expose to client) |
-| `FINNHUB_API_KEY` | Yes | Finnhub API key for stock data |
-| `HELICONE_API_KEY` | No | Helicone API key for LLM calls (Preferred provider) |
-| `OPENROUTER_API_KEY` | No | OpenRouter API key for LLM calls (Fallback) |
-| `TEST_REPORT_TOKEN` | No | Token for bypassing auth in test mode |
-| `SUPABASE_STORAGE_REPORT_BUCKET` | No | Storage bucket name for reports (default: `report-assets`) |
+| Variable                         | Required | Description                                                                      |
+| -------------------------------- | -------- | -------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`       | Yes      | Your Supabase project URL                                                        |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`  | Yes      | Anon key for client-side queries (public)                                        |
+| `SUPABASE_SERVICE_ROLE_KEY`      | Yes      | Service role key for privileged operations (server-only, never expose to client) |
+| `FINNHUB_API_KEY`                | Yes      | Finnhub API key for stock data                                                   |
+| `HELICONE_API_KEY`               | No       | Helicone API key for LLM calls (Preferred provider)                              |
+| `OPENROUTER_API_KEY`             | No       | OpenRouter API key for LLM calls (Fallback)                                      |
+| `TEST_REPORT_TOKEN`              | No       | Token for bypassing auth in test mode                                            |
+| `SUPABASE_STORAGE_REPORT_BUCKET` | No       | Storage bucket name for reports (default: `report-assets`)                       |
 
 **Note:** At least one of `HELICONE_API_KEY` or `OPENROUTER_API_KEY` must be configured.
 
@@ -188,12 +188,14 @@ npm run dev
 ### Common Issues
 
 **Docker not running:**
+
 ```bash
 # Error: "Docker Desktop is a prerequisite..."
 # Solution: Start Docker Desktop or `docker-compose up`
 ```
 
 **Connection refused:**
+
 ```bash
 # Error: "ECONNREFUSED 127.0.0.1:54321"
 # Solution: Run `npx supabase status` to verify services are running
@@ -201,6 +203,7 @@ npm run dev
 ```
 
 **Service role key rejected:**
+
 ```bash
 # Error: "SUPABASE_SERVICE_ROLE_KEY is required"
 # Solution: Copy the correct key from `npx supabase status`
@@ -217,6 +220,7 @@ npm test
 ```
 
 **Current Status:**
+
 - **Test Files:** 6 passed
 - **Tests:** 34 passed, 0 failed
 - **Coverage:** Core report API, quota service, history API, server client, UI hooks
@@ -255,12 +259,14 @@ npm run lint
 **Steps:**
 
 1. **Start the app without logging in:**
+
    ```bash
    npm run dev
    # Open http://localhost:3000
    ```
 
 2. **Generate a report with test token:**
+
    ```bash
    # Via URL query parameter:
    # http://localhost:3000?symbol=AAPL&testToken=local-test-token
@@ -280,6 +286,7 @@ npm run lint
      - `reportRunId: "<uuid>"`
 
 4. **Check Supabase records:**
+
    ```sql
    -- In Supabase Studio (http://localhost:54323)
    -- Table: report_runs
@@ -305,6 +312,7 @@ npm run lint
 **Steps:**
 
 1. **Login to the application:**
+
    ```bash
    # Visit http://localhost:3000
    # Click "Login" or "Sign Up"
@@ -312,6 +320,7 @@ npm run lint
    ```
 
 2. **Check remaining quota:**
+
    ```bash
    # The quota should display in the UI
    # OR via API:
@@ -324,6 +333,7 @@ npm run lint
    ```
 
 3. **Generate a report:**
+
    ```bash
    # Use the UI report generator or:
    fetch('/api/report?symbol=MSFT', {
@@ -335,6 +345,7 @@ npm run lint
    ```
 
 4. **Verify quota decremented:**
+
    ```bash
    # Check quota again - should be reduced by 1
    fetch('/api/report/credits')
@@ -343,6 +354,7 @@ npm run lint
    ```
 
 5. **View report history:**
+
    ```bash
    # Via UI: Navigate to /reports
    # OR via API:
@@ -370,6 +382,7 @@ npm run lint
 **Steps:**
 
 1. **After generating a report, check Storage:**
+
    ```bash
    # In Supabase Studio (Storage tab)
    # Bucket: report-assets
@@ -379,6 +392,7 @@ npm run lint
    ```
 
 2. **Download report via signed URL:**
+
    ```bash
    # The API response includes a signed URL:
    # GET /api/report?symbol=AAPL
@@ -450,17 +464,20 @@ fetch('/api/report?symbol=AAPL')
 When manually testing, verify these in the browser:
 
 ### Network Tab
+
 - [ ] `/api/report` request completes with 200
 - [ ] Request headers include `Cookie` with Supabase session
 - [ ] Response headers include `Set-Cookie` for session refresh
 - [ ] Response time < 5 seconds
 
 ### Application Tab
+
 - [ ] `sb-auth-token` cookie present after login
 - [ ] `sb-session` cookie present after login
 - [ ] LocalStorage shows Supabase auth data
 
 ### Console Tab
+
 - [ ] No JavaScript errors
 - [ ] No `Missing SUPABASE_` warnings (all env vars loaded)
 - [ ] Successful Supabase client initialization logged
@@ -472,17 +489,20 @@ When manually testing, verify these in the browser:
 Complete these checks to verify Stage 2 implementation:
 
 ### Code Quality
+
 - [ ] `npm test` passes with 34 tests (0 skipped, 0 failed)
 - [ ] `npm run lint` shows 0 errors from our changes
 - [ ] All modified files have proper TypeScript types
 - [ ] No `any` types without explicit `/* eslint-disable-next-line */`
 
 ### API Endpoints
+
 - [ ] `GET /api/report?symbol=AAPL` generates report (auth or test-token)
 - [ ] `GET /api/report/history` lists user reports (auth required)
 - [ ] `GET /api/report/credits` returns remaining quota (auth required)
 
 ### Supabase Integration
+
 - [ ] `report_runs` table receives new records
 - [ ] `report_documents` table linked to reports
 - [ ] `report_credit_events` audit log populated
@@ -490,12 +510,14 @@ Complete these checks to verify Stage 2 implementation:
 - [ ] Signed URLs work for downloads
 
 ### Cookie & Session Handling
+
 - [ ] Supabase session cookies set after auth
 - [ ] Cookies persisted across page reloads
 - [ ] Cookie refresh on API calls
 - [ ] Session preserved in `useSupabaseAuth` hook
 
 ### Test Mode (`TEST_REPORT_TOKEN`)
+
 - [ ] Reports generated without login
 - [ ] Marked as `mode='test'` in database
 - [ ] user_id set to deterministic UUID (`00000000-0000-0000-0000-000000000001`)
@@ -510,6 +532,7 @@ Complete these checks to verify Stage 2 implementation:
 **Symptom:** API returns 429 after a few requests
 **Cause:** RPC function returning 0 remaining credits
 **Solution:**
+
 1. Check `v_user_quota` view in Supabase
 2. Verify `fn_consume_report_credit` RPC function exists
 3. Check user's initial quota in `user_credits` table
@@ -520,6 +543,7 @@ Complete these checks to verify Stage 2 implementation:
 **Symptom:** Report generated but file not accessible
 **Cause:** `report-assets` bucket doesn't exist or RLS blocked upload
 **Solution:**
+
 1. In Supabase Storage, create bucket `report-assets` (private)
 2. Add policy: `Allow service role to upload/read`
 3. Verify bucket path format: `{user_id}/{report_run_id}.md`
@@ -529,6 +553,7 @@ Complete these checks to verify Stage 2 implementation:
 **Symptom:** 401 Unauthorized despite being logged in
 **Cause:** Cookies not included in request, or session expired
 **Solution:**
+
 1. Ensure `credentials: 'include'` in fetch requests
 2. Check browser cookies - should have `sb-auth-token`
 3. Refresh page to renew session
@@ -539,6 +564,7 @@ Complete these checks to verify Stage 2 implementation:
 **Symptom:** `npm test` fails with Supabase connection errors
 **Cause:** Tests mock Supabase by default; only manual tests need real DB
 **Solution:**
+
 1. Run `npm test` - should pass with mocks
 2. For real Supabase testing, ensure local stack is running first
 3. Check that mock setup in test files covers all scenarios
@@ -547,16 +573,16 @@ Complete these checks to verify Stage 2 implementation:
 
 ## Files Modified in Stage 2
 
-| File | Changes |
-|------|---------|
-| `lib/supabase/server.ts` | Cookie handling via `getAll/setAll` callbacks |
-| `app/api/report/route.ts` | Complete Supabase RPC + Storage integration |
-| `app/api/report/history/route.ts` | New endpoint for report listings |
-| `app/api/report/credits/route.ts` | New endpoint for quota queries |
-| `lib/services/quota.ts` | RPC consumption, audit logging |
-| `__tests__/api/report.supabase.test.ts` | API route tests |
-| `__tests__/api/report.history.test.ts` | History endpoint tests |
-| `lib/services/quota.test.ts` | Quota service tests |
+| File                                    | Changes                                       |
+| --------------------------------------- | --------------------------------------------- |
+| `lib/supabase/server.ts`                | Cookie handling via `getAll/setAll` callbacks |
+| `app/api/report/route.ts`               | Complete Supabase RPC + Storage integration   |
+| `app/api/report/history/route.ts`       | New endpoint for report listings              |
+| `app/api/report/credits/route.ts`       | New endpoint for quota queries                |
+| `lib/services/quota.ts`                 | RPC consumption, audit logging                |
+| `__tests__/api/report.supabase.test.ts` | API route tests                               |
+| `__tests__/api/report.history.test.ts`  | History endpoint tests                        |
+| `lib/services/quota.test.ts`            | Quota service tests                           |
 
 ---
 
@@ -600,12 +626,14 @@ For issues with this Stage 2 implementation:
 ## Deployment Guide
 
 ### Vercel Deployment
+
 1. Push changes to GitHub
 2. Connect repo to Vercel
 3. Add environment variables (all from your Supabase project)
 4. Deploy
 
 ### Railway / Other Platforms
+
 1. Set environment variables from Supabase hosted project
 2. Run migrations: `npx supabase db push`
 3. Deploy Node.js application

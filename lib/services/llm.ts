@@ -31,10 +31,7 @@ export class LLMService {
   private heliconeConfig?: LLMConfig;
   private openRouterConfig?: LLMConfig;
 
-  constructor(options?: {
-    helicone?: LLMConfig;
-    openRouter?: LLMConfig;
-  }) {
+  constructor(options?: { helicone?: LLMConfig; openRouter?: LLMConfig }) {
     this.heliconeConfig = options?.helicone;
     this.openRouterConfig = options?.openRouter;
 
@@ -50,8 +47,7 @@ export class LLMService {
       this.openRouterConfig = {
         apiKey: process.env.OPENROUTER_API_KEY,
         model: process.env.OPENROUTER_MODEL || "openai/gpt-5.1",
-        siteUrl:
-          process.env.OPENROUTER_SITE_URL || "http://localhost:3000",
+        siteUrl: process.env.OPENROUTER_SITE_URL || "http://localhost:3000",
         appName: process.env.OPENROUTER_APP_NAME || "investor-ai",
       };
     }
@@ -86,11 +82,7 @@ export class LLMService {
           input: { systemPrompt, userPrompt, options },
         });
 
-        const result = await this.callHelicone(
-          systemPrompt,
-          userPrompt,
-          options
-        );
+        const result = await this.callHelicone(systemPrompt, userPrompt, options);
 
         span?.end({ output: { length: result.length } });
         return result;
@@ -111,11 +103,7 @@ export class LLMService {
           input: { systemPrompt, userPrompt, options },
         });
 
-        const result = await this.callOpenRouter(
-          systemPrompt,
-          userPrompt,
-          options
-        );
+        const result = await this.callOpenRouter(systemPrompt, userPrompt, options);
 
         span?.end({ output: { length: result.length } });
         return result;
@@ -124,16 +112,11 @@ export class LLMService {
           name: "openrouter-failed",
           metadata: { error: String(error) },
         });
-        throw new ExternalServiceError(
-          "All LLM providers failed",
-          { error: String(error) }
-        );
+        throw new ExternalServiceError("All LLM providers failed", { error: String(error) });
       }
     }
 
-    throw new ExternalServiceError(
-      "No LLM provider configured"
-    );
+    throw new ExternalServiceError("No LLM provider configured");
   }
 
   /**
@@ -149,32 +132,27 @@ export class LLMService {
       throw new Error("Helicone not configured");
     }
 
-    const res = await fetch(
-      "https://gateway.helicone.ai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Helicone-Auth": `Bearer ${this.heliconeConfig.apiKey}`,
-        },
-        body: JSON.stringify({
-          model: this.heliconeConfig.model,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-          temperature: options?.temperature ?? 0.7,
-          max_tokens: options?.maxTokens ?? 4096,
-          top_p: options?.topP ?? 1.0,
-        }),
-      }
-    );
+    const res = await fetch("https://gateway.helicone.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Helicone-Auth": `Bearer ${this.heliconeConfig.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: this.heliconeConfig.model,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: options?.temperature ?? 0.7,
+        max_tokens: options?.maxTokens ?? 4096,
+        top_p: options?.topP ?? 1.0,
+      }),
+    });
 
     if (!res.ok) {
       const errText = await res.text();
-      throw new Error(
-        `Helicone request failed: ${res.status} ${errText}`
-      );
+      throw new Error(`Helicone request failed: ${res.status} ${errText}`);
     }
 
     const data = await res.json();
@@ -200,34 +178,29 @@ export class LLMService {
       throw new Error("OpenRouter not configured");
     }
 
-    const res = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.openRouterConfig.apiKey}`,
-          "HTTP-Referer": this.openRouterConfig.siteUrl || "",
-          "X-Title": this.openRouterConfig.appName || "",
-        },
-        body: JSON.stringify({
-          model: this.openRouterConfig.model,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-          temperature: options?.temperature ?? 0.7,
-          max_tokens: options?.maxTokens ?? 4096,
-          top_p: options?.topP ?? 1.0,
-        }),
-      }
-    );
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.openRouterConfig.apiKey}`,
+        "HTTP-Referer": this.openRouterConfig.siteUrl || "",
+        "X-Title": this.openRouterConfig.appName || "",
+      },
+      body: JSON.stringify({
+        model: this.openRouterConfig.model,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: options?.temperature ?? 0.7,
+        max_tokens: options?.maxTokens ?? 4096,
+        top_p: options?.topP ?? 1.0,
+      }),
+    });
 
     if (!res.ok) {
       const errText = await res.text();
-      throw new Error(
-        `OpenRouter request failed: ${res.status} ${errText}`
-      );
+      throw new Error(`OpenRouter request failed: ${res.status} ${errText}`);
     }
 
     const data = await res.json();
@@ -251,42 +224,31 @@ export class LLMService {
       throw new Error("OpenRouter not configured for embeddings");
     }
 
-    const model =
-      process.env.OPENROUTER_EMBEDDING_MODEL ||
-      "text-embedding-3-small";
+    const model = process.env.OPENROUTER_EMBEDDING_MODEL || "text-embedding-3-small";
 
-    const res = await fetch(
-      "https://openrouter.ai/api/v1/embeddings",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.openRouterConfig.apiKey}`,
-          "HTTP-Referer": this.openRouterConfig.siteUrl || "",
-          "X-Title": this.openRouterConfig.appName || "",
-        },
-        body: JSON.stringify({
-          model,
-          input,
-        }),
-      }
-    );
+    const res = await fetch("https://openrouter.ai/api/v1/embeddings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.openRouterConfig.apiKey}`,
+        "HTTP-Referer": this.openRouterConfig.siteUrl || "",
+        "X-Title": this.openRouterConfig.appName || "",
+      },
+      body: JSON.stringify({
+        model,
+        input,
+      }),
+    });
 
     if (!res.ok) {
       const errText = await res.text();
-      throw new Error(
-        `Embedding request failed: ${res.status} ${errText}`
-      );
+      throw new Error(`Embedding request failed: ${res.status} ${errText}`);
     }
 
     const data = await res.json();
     const embedding = data?.data?.[0]?.embedding;
 
-    if (
-      !embedding ||
-      !Array.isArray(embedding) ||
-      embedding.length !== 1536
-    ) {
+    if (!embedding || !Array.isArray(embedding) || embedding.length !== 1536) {
       throw new Error("Invalid embedding response");
     }
 

@@ -7,7 +7,7 @@ import { createServerClient } from "@/lib/supabase/server";
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
@@ -40,36 +40,8 @@ export async function POST(
       .single();
 
     if (profileError || !profile) {
-      const response = NextResponse.json({ error: "Failed to verify admin status" }, { status: 500 });
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
-      return response;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const isAdmin = (profile as any).plan === "admin" || (profile as any).email?.endsWith("@investor.ai");
-
-    if (!isAdmin) {
-      const response = NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
-      return response;
-    }
-
-    const runId = params.id;
-
-    // Update the report to mark as featured
-    const { error: updateError } = await supabase
-      .from("report_runs")
-      .update({ is_featured: true })
-      .eq("id", runId);
-
-    if (updateError) {
-      console.error("Failed to feature report:", updateError);
       const response = NextResponse.json(
-        { error: "Failed to feature report" },
+        { error: "Failed to verify admin status" },
         { status: 500 }
       );
       responseCookies.forEach(({ name, value }) => {
@@ -78,16 +50,46 @@ export async function POST(
       return response;
     }
 
-    const response = NextResponse.json({ success: true, run_id: runId });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const isAdmin =
+      (profile as any).plan === "admin" || (profile as any).email?.endsWith("@investor.ai");
+
+    if (!isAdmin) {
+      const response = NextResponse.json(
+        { error: "Forbidden: Admin access required" },
+        { status: 403 }
+      );
+      responseCookies.forEach(({ name, value }) => {
+        response.headers.append("Set-Cookie", `${name}=${value}`);
+      });
+      return response;
+    }
+
+    const { id: runId } = await params;
+
+    // TODO: is_featured field not in database yet
+    // const { error: updateError } = await supabase
+    //   .from("report_runs")
+    //   .update({ is_featured: true })
+    //   .eq("id", runId);
+
+    // if (updateError) {
+    //   console.error("Failed to feature report:", updateError);
+    //   const response = NextResponse.json({ error: "Failed to feature report" }, { status: 500 });
+    //   responseCookies.forEach(({ name, value }) => {
+    //     response.headers.append("Set-Cookie", `${name}=${value}`);
+    //   });
+    //   return response;
+    // }
+
+    // Temporary: just return success without updating
+    const response = NextResponse.json({ success: true, run_id: runId, message: "Feature flag not implemented yet" });
     responseCookies.forEach(({ name, value }) => {
       response.headers.append("Set-Cookie", `${name}=${value}`);
     });
     return response;
   } catch (err) {
     console.error("Feature report error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

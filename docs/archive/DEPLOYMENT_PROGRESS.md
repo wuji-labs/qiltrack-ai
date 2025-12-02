@@ -12,6 +12,7 @@
 ### ✅ 第一阶段：代码实现与修复（COMPLETED）
 
 **9 个 Commits 已提交**:
+
 ```
 fcc6f97 ← NEW: docs: add deployment readiness summary and credential retrieval guide
 b1f68cc     docs/scripts: add self-execution guide and verification script
@@ -25,6 +26,7 @@ c4ea8bb     fix: address 3 blocking issues - anon key, credits contract, data pr
 ```
 
 **核心改动**:
+
 - ✅ Schema 迁移: `supabase/migrations/20251124000002_align_hosted_schema.sql` (安全的 ALTER TABLE 策略)
 - ✅ TypeScript 类型: `types/database.ts` 与 schema 完全对齐
 - ✅ API 端点修复: `/api/report/credits` 简化契约
@@ -34,6 +36,7 @@ c4ea8bb     fix: address 3 blocking issues - anon key, credits contract, data pr
 ### ✅ 第二阶段：代码质量验证（COMPLETED）
 
 **Quality Gates**:
+
 - ✅ **ESLint**: 0 errors, 15 warnings (pre-existing, non-blocking)
 - ✅ **Unit Tests**: 34/34 passing (6 test files)
   - `__tests__/api.test.ts`: 3 ✓
@@ -46,6 +49,7 @@ c4ea8bb     fix: address 3 blocking issues - anon key, credits contract, data pr
 ### ✅ 第三阶段：文档完成（COMPLETED）
 
 **生成的文档**:
+
 1. ✅ `README.md` - 6-step Hosted 部署指南（生产级）
 2. ✅ `CAVR.md` - 完整技术分析、3 个阻塞项修复、风险评估
 3. ✅ `deployment-execution-log.md` - 详细 CLI 命令与脚本
@@ -65,11 +69,11 @@ c4ea8bb     fix: address 3 blocking issues - anon key, credits contract, data pr
 
 从 https://app.supabase.com/project/inmtounwqcjwsxkfnsfd → Settings → API 获取：
 
-| 凭证 | 位置 | 安全等级 | 用途 |
-|------|------|--------|------|
-| Project URL | Settings → API (顶部) | ✅ 公开 | `NEXT_PUBLIC_SUPABASE_URL` |
-| Anon Key | Settings → API (Anon key 框) | ✅ 可分享 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
-| Service Role Key | Settings → API (Service role key 框) | ⚠️ 保密 | `SUPABASE_SERVICE_ROLE_KEY` |
+| 凭证             | 位置                                 | 安全等级  | 用途                            |
+| ---------------- | ------------------------------------ | --------- | ------------------------------- |
+| Project URL      | Settings → API (顶部)                | ✅ 公开   | `NEXT_PUBLIC_SUPABASE_URL`      |
+| Anon Key         | Settings → API (Anon key 框)         | ✅ 可分享 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+| Service Role Key | Settings → API (Service role key 框) | ⚠️ 保密   | `SUPABASE_SERVICE_ROLE_KEY`     |
 
 详见: `docs/reports/2025-11-24-credential-retrieval-guide.md`
 
@@ -112,6 +116,7 @@ curl "http://localhost:3000/api/report/history?testToken=test-token-12345"
 ## 📋 验证清单（部署就绪）
 
 ### 本地代码检查 ✅
+
 - ✅ 9 个 commits 已完成
 - ✅ 工作树干净 (`git status`)
 - ✅ ESLint: 0 errors
@@ -121,6 +126,7 @@ curl "http://localhost:3000/api/report/history?testToken=test-token-12345"
 - ✅ API 端点修复: `/api/report/credits` 简化契约
 
 ### 文档检查 ✅
+
 - ✅ README.md: 6-step Hosted 部署指南
 - ✅ CAVR: 完整技术分析
 - ✅ Deployment execution log: 详细步骤
@@ -130,11 +136,13 @@ curl "http://localhost:3000/api/report/history?testToken=test-token-12345"
 - ✅ Verification script: 自动化检查
 
 ### 待 Codex 操作 ⏸️
+
 - ⏸️ 从 Dashboard 获取 Anon Key
 - ⏸️ 从 Dashboard 获取 Service Role Key
 - ⏸️ 在 `.env.local` 中填入凭证（Claude 可帮助）
 
 ### 待凭证获取后的操作 ⏸️
+
 - ⏸️ `npx supabase link --project-ref inmtounwqcjwsxkfnsfd`
 - ⏸️ `npx supabase db push`
 - ⏸️ `npx supabase gen types ...`
@@ -150,6 +158,7 @@ curl "http://localhost:3000/api/report/history?testToken=test-token-12345"
 ## 📊 项目统计
 
 ### 代码改动
+
 ```
 Files changed: 15+
 Lines added: 1000+
@@ -159,6 +168,7 @@ Test coverage: 100% for modified code
 ```
 
 ### 文档生成
+
 ```
 Documentation files: 8
 Total documentation pages: 50+
@@ -167,6 +177,7 @@ Verification scripts: 2
 ```
 
 ### 质量指标
+
 ```
 ESLint errors: 0 ❌ → 0 ✅
 Test coverage: 34/34 passing ✅
@@ -180,12 +191,14 @@ API contracts: Simplified & documented ✅
 ## 🎯 后续行动
 
 ### 立即（用户 Codex）
+
 1. 从 Hosted Dashboard 获取凭证
    - 路径: https://app.supabase.com/project/inmtounwqcjwsxkfnsfd → Settings → API
    - 获取: Anon Key, Service Role Key
    - 详见: `docs/reports/2025-11-24-credential-retrieval-guide.md`
 
 ### 凭证到位后（Claude）
+
 1. 填入 `.env.local` 中的凭证
 2. 执行 Supabase CLI: `npx supabase link ...` → `npx supabase db push` → `npx supabase gen types ...`
 3. 创建存储桶 `report-assets`（Dashboard UI）
@@ -195,6 +208,7 @@ API contracts: Simplified & documented ✅
 7. 提交 PR: `feat/supabase-deployment → main`
 
 ### 时间估计
+
 - **凭证获取**: 5-10 分钟（手动从 Dashboard）
 - **CLI 执行**: 5-10 分钟（link, push, gen types）
 - **本地验证**: 5 分钟（lint, test, script）
@@ -206,16 +220,16 @@ API contracts: Simplified & documented ✅
 
 ## 📚 参考文档
 
-| 文档 | 用途 | 状态 |
-|------|------|------|
-| `README.md` | 生产部署指南 (6-step) | ✅ 完成 |
-| `CAVR.md` | 技术分析 & 3 阻塞项修复 | ✅ 完成 |
-| `deployment-execution-log.md` | 详细步骤 & CLI 命令 | ✅ 完成 |
-| `handoff-checklist.md` | Codex 执行清单 | ✅ 完成 |
-| `self-execution-guide.md` | Claude 独立执行指南 | ✅ 完成 |
-| `deployment-readiness-summary.md` | 就绪状态总结 | ✅ 完成 |
-| `credential-retrieval-guide.md` | 凭证安全指南 | ✅ 完成 |
-| `scripts/verify-hosted-deployment.sh` | 自动化验证脚本 | ✅ 完成 |
+| 文档                                  | 用途                    | 状态    |
+| ------------------------------------- | ----------------------- | ------- |
+| `README.md`                           | 生产部署指南 (6-step)   | ✅ 完成 |
+| `CAVR.md`                             | 技术分析 & 3 阻塞项修复 | ✅ 完成 |
+| `deployment-execution-log.md`         | 详细步骤 & CLI 命令     | ✅ 完成 |
+| `handoff-checklist.md`                | Codex 执行清单          | ✅ 完成 |
+| `self-execution-guide.md`             | Claude 独立执行指南     | ✅ 完成 |
+| `deployment-readiness-summary.md`     | 就绪状态总结            | ✅ 完成 |
+| `credential-retrieval-guide.md`       | 凭证安全指南            | ✅ 完成 |
+| `scripts/verify-hosted-deployment.sh` | 自动化验证脚本          | ✅ 完成 |
 
 ---
 
@@ -233,16 +247,16 @@ API contracts: Simplified & documented ✅
 
 ## 🚀 部署就绪指示
 
-| 检查项 | 状态 | 说明 |
-|-------|------|------|
-| 代码完成 | ✅ | 9 commits 已完成 |
-| 测试通过 | ✅ | 34/34 passing |
-| Lint 通过 | ✅ | 0 errors |
-| 迁移就绪 | ✅ | 使用安全的 ALTER TABLE |
-| 类型对齐 | ✅ | Schema 与 TypeScript types 一致 |
-| 文档完成 | ✅ | 8 份文档，50+ 页 |
-| 验证脚本 | ✅ | 自动化检查准备好 |
-| **凭证就绪** | ⏸️ | **等待 Codex 从 Dashboard 获取** |
+| 检查项       | 状态 | 说明                             |
+| ------------ | ---- | -------------------------------- |
+| 代码完成     | ✅   | 9 commits 已完成                 |
+| 测试通过     | ✅   | 34/34 passing                    |
+| Lint 通过    | ✅   | 0 errors                         |
+| 迁移就绪     | ✅   | 使用安全的 ALTER TABLE           |
+| 类型对齐     | ✅   | Schema 与 TypeScript types 一致  |
+| 文档完成     | ✅   | 8 份文档，50+ 页                 |
+| 验证脚本     | ✅   | 自动化检查准备好                 |
+| **凭证就绪** | ⏸️   | **等待 Codex 从 Dashboard 获取** |
 
 **部署状态**: 就绪，仅需凭证 ⏸️
 
@@ -273,4 +287,3 @@ Claude: 已收到凭证，开始执行 Hosted 部署...
 **当前时间**: 2025-11-24 16:15 UTC
 **分支**: feat/supabase-deployment (9 commits)
 **下一步**: 等待 Codex 提供 Hosted Dashboard 凭证
-

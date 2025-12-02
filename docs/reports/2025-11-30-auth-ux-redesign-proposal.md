@@ -1,4 +1,5 @@
 # 认证系统 UX 重构提案
+
 # Auth System UX Redesign Proposal
 
 **日期 Date**: 2025-11-30
@@ -17,6 +18,7 @@
 > "那它云端没有密码它点修改密码咋办 还有谷歌登陆的 没法也没必要改密码吧 模块逻辑是不是不对 还有你的登陆注册 密码等等 也不够大厂风格 太繁琐 不清爽 不主流 不高级"
 
 **核心问题 Core Issues**:
+
 1. ❌ **无密码用户困境**: OAuth/Magic Link 用户无法使用密码重置功能，但系统没有告知
 2. ❌ **功能错配**: Google 登录用户无需密码，但可能看到密码相关选项
 3. ❌ **不符合主流**: 未遵循 GitHub/Vercel/Linear 等大厂的认证 UX 模式
@@ -25,6 +27,7 @@
 ### 当前架构分析 Current Architecture Analysis
 
 **认证方式 Auth Methods**:
+
 - ✅ **Google OAuth** - 通过 `signInWithProvider("google")`
 - ✅ **Magic Link (无密码)** - 通过 `signInWithEmail()` → `signInWithOtp()`
 - ❌ **传统密码登录** - **完全不支持！**
@@ -34,11 +37,13 @@
 #### 1. 当前系统没有密码登录！
 
 查看 `app/(auth)/login/page.tsx`:
+
 - Line 159-169: Google OAuth 按钮
 - Line 177-203: 邮箱输入 → Magic Link 发送
 - **没有密码输入框**
 
 查看 `hooks/useSupabaseAuth.ts`:
+
 - Line 121-147: `signInWithEmail()` → 调用 `signInWithOtp()`（Magic Link）
 - Line 149-170: `signInWithProvider()` → OAuth 登录
 - **没有 `signInWithPassword()` 函数**
@@ -46,6 +51,7 @@
 #### 2. 账号页面缺少认证方法识别
 
 查看 `app/account/page.tsx`:
+
 - Line 215-245: "Security" 区块仅显示通用文本
 - **没有显示用户的登录方式**（OAuth vs Magic Link）
 - **没有区分功能可用性**（如密码修改仅对有密码用户可用）
@@ -53,6 +59,7 @@
 #### 3. 用户遇到的实际问题
 
 **场景**: `xiuluart@foxmail.com` 通过 OAuth/Magic Link 注册
+
 - Supabase `auth.users` 表中 `encrypted_password` = NULL
 - 用户尝试"修改密码" → 系统提示"密码错误" → 用户困惑
 
@@ -65,16 +72,19 @@
 ### 参考案例 Reference Cases
 
 #### GitHub
+
 - **登录页**: 仅显示邮箱/密码输入框，OAuth 按钮放在底部
 - **账号安全页**: 明确显示 "Signed in with Google" 徽章
 - **密码管理**: OAuth 用户看到 "You're signed in via GitHub.com, password is not required"
 
 #### Vercel
+
 - **登录页**: 默认 Magic Link（无密码），OAuth 按钮并列
 - **账号页**: "Connected Accounts" 区块显示所有 OAuth 提供商
 - **密码设置**: 仅在用户选择"设置密码"后显示
 
 #### Linear
+
 - **登录页**: 单一邮箱输入框 → 自动检测账号类型 → 引导正确流程
 - **账号页**: "Authentication" 区块列出所有登录方式，可添加/移除
 
@@ -119,7 +129,7 @@ export function useSupabaseAuth() {
 
       if (identities && identities.length > 0) {
         setOauthProviders(
-          identities.map(id => ({
+          identities.map((id) => ({
             provider: id.provider,
             connected_at: id.created_at,
           }))
@@ -306,6 +316,7 @@ $$;
 #### 2.1 当前问题分析
 
 **登录页现状** (`app/(auth)/login/page.tsx`):
+
 - Line 113-130: 左侧英雄区（可删除，浪费空间）
 - Line 132-233: 右侧表单（过于复杂）
 - Line 144-155: Banner 区（状态提示）
@@ -315,6 +326,7 @@ $$;
 - Line 204-218: Inbucket 本地提示
 
 **问题点**:
+
 1. 表单太大（占屏幕 50%），不够聚焦
 2. 左侧英雄区重复信息（badge、title 都重复）
 3. 缺少密码登录选项（如果未来需要）
@@ -501,6 +513,7 @@ function LoginContent() {
 ```
 
 **改进点总结**:
+
 - ✅ 去除左右分栏，改为居中单卡片（聚焦）
 - ✅ Google 登录突出显示（主要方式）
 - ✅ Magic Link 折叠显示（减少视觉干扰）
@@ -738,24 +751,24 @@ export default function ChangePasswordPage() {
 
 ### 时间估算 Time Estimate
 
-| Phase | Task | Estimate | Priority |
-|-------|------|----------|----------|
-| **Phase 1** | 认证方法识别与展示 | 3-4 小时 | P0 |
-| 1.1 | 增强 useSupabaseAuth Hook | 1 小时 | P0 |
-| 1.2 | 创建数据库 RPC 函数 | 30 分钟 | P0 |
-| 1.3 | 改造账号页 UI | 1.5 小时 | P0 |
-| 1.4 | 添加国际化文本 | 30 分钟 | P0 |
-| 1.5 | 测试验证 | 30 分钟 | P0 |
-| **Phase 2** | 简化登录流程 | 2-3 小时 | P1 |
-| 2.1 | 重构登录页布局 | 1.5 小时 | P1 |
-| 2.2 | Magic Link 折叠交互 | 30 分钟 | P1 |
-| 2.3 | 响应式适配 | 30 分钟 | P1 |
-| 2.4 | 测试验证 | 30 分钟 | P1 |
-| **Phase 3** | 密码管理功能（可选） | 3-4 小时 | P2 |
-| 3.1 | 密码登录 Hook | 1 小时 | P2 |
-| 3.2 | 密码修改页面 | 2 小时 | P2 |
-| 3.3 | 测试验证 | 1 小时 | P2 |
-| **总计** | | **8-11 小时** | |
+| Phase       | Task                      | Estimate      | Priority |
+| ----------- | ------------------------- | ------------- | -------- |
+| **Phase 1** | 认证方法识别与展示        | 3-4 小时      | P0       |
+| 1.1         | 增强 useSupabaseAuth Hook | 1 小时        | P0       |
+| 1.2         | 创建数据库 RPC 函数       | 30 分钟       | P0       |
+| 1.3         | 改造账号页 UI             | 1.5 小时      | P0       |
+| 1.4         | 添加国际化文本            | 30 分钟       | P0       |
+| 1.5         | 测试验证                  | 30 分钟       | P0       |
+| **Phase 2** | 简化登录流程              | 2-3 小时      | P1       |
+| 2.1         | 重构登录页布局            | 1.5 小时      | P1       |
+| 2.2         | Magic Link 折叠交互       | 30 分钟       | P1       |
+| 2.3         | 响应式适配                | 30 分钟       | P1       |
+| 2.4         | 测试验证                  | 30 分钟       | P1       |
+| **Phase 3** | 密码管理功能（可选）      | 3-4 小时      | P2       |
+| 3.1         | 密码登录 Hook             | 1 小时        | P2       |
+| 3.2         | 密码修改页面              | 2 小时        | P2       |
+| 3.3         | 测试验证                  | 1 小时        | P2       |
+| **总计**    |                           | **8-11 小时** |          |
 
 ### 依赖关系 Dependencies
 
@@ -768,12 +781,12 @@ graph TD
 
 ### 风险评估 Risk Assessment
 
-| 风险 | 影响 | 概率 | 缓解措施 |
-|------|------|------|---------|
-| Supabase RPC 权限问题 | 中 | 低 | 使用 SECURITY DEFINER + 测试 RLS |
-| OAuth identities 接口变化 | 高 | 低 | 查阅 Supabase 官方文档确认稳定性 |
-| 国际化文本遗漏 | 低 | 中 | 代码审查时检查所有 t() 调用 |
-| 破坏现有登录流程 | 高 | 中 | 分支开发 + 完整回归测试 |
+| 风险                      | 影响 | 概率 | 缓解措施                         |
+| ------------------------- | ---- | ---- | -------------------------------- |
+| Supabase RPC 权限问题     | 中   | 低   | 使用 SECURITY DEFINER + 测试 RLS |
+| OAuth identities 接口变化 | 高   | 低   | 查阅 Supabase 官方文档确认稳定性 |
+| 国际化文本遗漏            | 低   | 中   | 代码审查时检查所有 t() 调用      |
+| 破坏现有登录流程          | 高   | 中   | 分支开发 + 完整回归测试          |
 
 ---
 
@@ -799,12 +812,12 @@ graph TD
 
 ### A. 当前代码问题清单
 
-| 文件 | 行号 | 问题 | 优先级 |
-|------|------|------|--------|
-| `app/account/page.tsx` | 215-245 | Security 区块未区分认证方法 | P0 |
-| `app/(auth)/login/page.tsx` | 110-233 | 布局过于复杂，占用空间大 | P1 |
-| `hooks/useSupabaseAuth.ts` | 全文 | 缺少 authMethod 识别逻辑 | P0 |
-| `lib/i18n-config.ts` | 全文 | 缺少认证方法相关翻译 | P0 |
+| 文件                        | 行号    | 问题                        | 优先级 |
+| --------------------------- | ------- | --------------------------- | ------ |
+| `app/account/page.tsx`      | 215-245 | Security 区块未区分认证方法 | P0     |
+| `app/(auth)/login/page.tsx` | 110-233 | 布局过于复杂，占用空间大    | P1     |
+| `hooks/useSupabaseAuth.ts`  | 全文    | 缺少 authMethod 识别逻辑    | P0     |
+| `lib/i18n-config.ts`        | 全文    | 缺少认证方法相关翻译        | P0     |
 
 ### B. 参考资料
 

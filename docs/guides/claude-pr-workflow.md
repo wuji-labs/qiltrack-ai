@@ -82,6 +82,7 @@ git branch
 ```
 
 **分支命名规范**：
+
 - `feature/<topic>` — 新功能
 - `fix/<topic>` — 缺陷修复
 - `refactor/<topic>` — 重构
@@ -116,6 +117,7 @@ npm run build
 **提前失败原则**：如果 lint/test 失败，必须修复后才能推送。不要把问题留给 CI。
 
 **常见错误及快速修复**：
+
 ```bash
 # Lint 错误：代码风格不符合规范
 npm run lint -- --fix
@@ -148,6 +150,7 @@ Optional detailed explanation here."
 ```
 
 **提交信息规范**：
+
 - `feat:` — 新功能
 - `fix:` — 缺陷修复
 - `refactor:` — 重构
@@ -209,11 +212,13 @@ gh pr create \
 #### **方案 B：访问 GitHub 网页创建 PR**
 
 Git 推送时会输出链接：
+
 ```
 https://github.com/explore0012/ai-report/pull/new/feature/your-feature-name
 ```
 
 访问该链接，GitHub 会自动：
+
 1. 检测到你的分支
 2. 加载 `.github/pull_request_template.md` 模板
 3. 让你填写 CAVR、验证、风险等信息
@@ -240,6 +245,7 @@ git pr
 
 ```markdown
 ## Summary
+
 - Snapshot / Decision doc: docs/decisions/2025-11-26-your-topic.md
 - Feature branch: feature/your-topic
 - Primary report doc: docs/reports/2025-11-26-your-topic-cavr.md
@@ -247,19 +253,23 @@ git pr
 ## CAVR
 
 ### Context
+
 背景要点、范围界定、依赖/约束
 
 ### Actions
+
 - [ ] 主要实现步骤 1
 - [ ] 主要实现步骤 2
 - [ ] 运行 lint + test
 
 ### Verification
+
 - [ ] npm run lint → ✓ 通过 / ❌ 失败（列出问题）
 - [ ] npm test → ✓ 通过 / ❌ 失败（列出问题）
 - [ ] 手动验证 → 链接到 docs/reports 中的截图
 
 ### Risks
+
 - 剩余风险 / 待补验证 / 需 Codex 指派事项
 ```
 
@@ -278,16 +288,16 @@ Next: 请审阅 PR 并反馈或合并
 
 ## 4. 工具链完整对照表
 
-| 步骤 | 工具 | 状态 | 命令示例 |
-|------|------|------|---------|
-| 分支管理 | Git | ✅ 必有 | `git checkout -b feature/xxx` |
-| 修改编辑 | VS Code / IDE | ✅ 必有 | 编辑器打开文件 |
-| Lint 检查 | npm (ESLint) | ✅ 必有 | `npm run lint` |
-| 单元测试 | npm (Vitest) | ✅ 必有 | `npm test` |
-| 提交代码 | Git | ✅ 必有 | `git commit -m "..."` |
-| 推送分支 | Git + SSH | ✅ 必有 | `git push origin feature/xxx` |
-| 创建 PR | GitHub CLI 或 网页 | ⚠️ 二选一 | `gh pr create --fill` 或 浏览器 |
-| PR 模板 | GitHub | ✅ 必有 | `.github/pull_request_template.md` |
+| 步骤      | 工具               | 状态      | 命令示例                           |
+| --------- | ------------------ | --------- | ---------------------------------- |
+| 分支管理  | Git                | ✅ 必有   | `git checkout -b feature/xxx`      |
+| 修改编辑  | VS Code / IDE      | ✅ 必有   | 编辑器打开文件                     |
+| Lint 检查 | npm (ESLint)       | ✅ 必有   | `npm run lint`                     |
+| 单元测试  | npm (Vitest)       | ✅ 必有   | `npm test`                         |
+| 提交代码  | Git                | ✅ 必有   | `git commit -m "..."`              |
+| 推送分支  | Git + SSH          | ✅ 必有   | `git push origin feature/xxx`      |
+| 创建 PR   | GitHub CLI 或 网页 | ⚠️ 二选一 | `gh pr create --fill` 或 浏览器    |
+| PR 模板   | GitHub             | ✅ 必有   | `.github/pull_request_template.md` |
 
 **说明**：✅ 必有 = 项目已配置，必须可用；⚠️ 二选一 = 至少一种可用
 
@@ -300,6 +310,7 @@ Next: 请审阅 PR 并反馈或合并
 **原因**：SSH 密钥未配置或 GitHub 不信任该密钥。
 
 **解决方案**：
+
 ```bash
 # 验证 SSH 连接
 ssh -T git@github.com
@@ -319,6 +330,7 @@ cat ~/.ssh/id_ed25519.pub
 **原因**：代码不符合项目规范或依赖缺失。
 
 **解决方案**：
+
 ```bash
 # 清除 node_modules 并重新安装
 rm -rf node_modules package-lock.json
@@ -340,6 +352,7 @@ npm test
 **原因**：本地分支与 main 有代码冲突。
 
 **解决方案**：
+
 ```bash
 # 查看冲突文件
 git status
@@ -361,6 +374,7 @@ git rebase --abort
 **原因**：常见于 push 命令在终端被意外中断（Ctrl+C、SSH 会话断开），或网络缓慢导致长时间无输出。
 
 **解决方案**：
+
 ```bash
 # 1. 确认当前分支仍有需要推送的提交
 git status
@@ -383,6 +397,7 @@ ssh -T git@github.com
 ### 6.1 安装 GitHub CLI（推荐）
 
 **Windows 用户**：
+
 ```bash
 # 用 Scoop
 scoop install gh
@@ -395,11 +410,13 @@ gh --version
 ```
 
 **Mac 用户**：
+
 ```bash
 brew install gh
 ```
 
 **Linux 用户**：
+
 ```bash
 # Ubuntu/Debian
 sudo apt install gh
@@ -408,6 +425,7 @@ sudo apt install gh
 ```
 
 **首次认证**：
+
 ```bash
 gh auth login --web
 # 或交互式
@@ -455,6 +473,7 @@ echo "✅ All checks passed"
 ```
 
 使其可执行：
+
 ```bash
 chmod +x .git/hooks/pre-commit
 ```
@@ -482,6 +501,7 @@ echo "https://github.com/explore0012/ai-report/pull/new/$BRANCH"
 ```
 
 使用：
+
 ```bash
 bash scripts/pr-push.sh
 ```
@@ -636,5 +656,5 @@ git push origin feature/xxx -f
 ---
 
 **最后更新**：2025-11-26
-**适用分支**：feature/* / main
+**适用分支**：feature/\* / main
 **维护者**：Codex + Claude

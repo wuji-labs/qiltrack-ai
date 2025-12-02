@@ -1,4 +1,5 @@
 # Footer Refresh - Implementation Plan
+
 **Date:** 2025-11-28
 **Status:** Ready for Implementation
 **Dependencies:** All validated ✓
@@ -9,17 +10,18 @@
 
 ### ✓ Confirmed Compatibility
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| **Tailwind v4** | ✓ Verified | v4 with `@theme inline` + CSS variables already in use; supports `var()` in classes |
-| **CSS Variables** | ✓ Available | All 30+ variables pre-defined in `globals.css`; ready to extend |
-| **i18n System** | ✓ Ready | React Context + `useLanguage()` hook; 5 languages (en, ja, ko, zh-Hant, zh-Hans) |
-| **Link Component** | ✓ Standard | Next.js `Link` + `aria-label` patterns established |
-| **SVG Assets** | ✓ `/public` | `globe.svg`, `file.svg` available; text "Investor AI" for wordmark (no custom logo yet) |
-| **Responsive Breakpoints** | ✓ Defaults | Tailwind v4 defaults (sm: 640px, md: 768px, lg: 1024px) align with design |
-| **a11y Patterns** | ✓ Established | Focus rings, aria-labels, 44px min touch targets all in use |
+| Component                  | Status        | Notes                                                                                   |
+| -------------------------- | ------------- | --------------------------------------------------------------------------------------- |
+| **Tailwind v4**            | ✓ Verified    | v4 with `@theme inline` + CSS variables already in use; supports `var()` in classes     |
+| **CSS Variables**          | ✓ Available   | All 30+ variables pre-defined in `globals.css`; ready to extend                         |
+| **i18n System**            | ✓ Ready       | React Context + `useLanguage()` hook; 5 languages (en, ja, ko, zh-Hant, zh-Hans)        |
+| **Link Component**         | ✓ Standard    | Next.js `Link` + `aria-label` patterns established                                      |
+| **SVG Assets**             | ✓ `/public`   | `globe.svg`, `file.svg` available; text "Investor AI" for wordmark (no custom logo yet) |
+| **Responsive Breakpoints** | ✓ Defaults    | Tailwind v4 defaults (sm: 640px, md: 768px, lg: 1024px) align with design               |
+| **a11y Patterns**          | ✓ Established | Focus rings, aria-labels, 44px min touch targets all in use                             |
 
 ### Libraries Already Imported in Project
+
 ```typescript
 // Ready to use:
 - next/link
@@ -29,6 +31,7 @@
 ```
 
 ### No New Dependencies Required ✓
+
 - Tailwind v4 covers all styling needs
 - CSS Utilities already defined (`glass-card`, `frosted-bar`, `btn-gradient`)
 - i18n architecture supports complex nested structures
@@ -43,13 +46,13 @@
 // app/sections/FooterSection.tsx - Root Component
 interface FooterSectionProps {
   // Allow future page-specific customization
-  brandTitle?: string;           // Default: "Investor AI"
-  brandCaption?: string;         // Default: from i18n
-  showBrand?: boolean;           // Default: true
-  showLinks?: boolean;           // Default: true
-  showDownload?: boolean;        // Default: true
-  showMeta?: boolean;            // Default: true
-  customLinks?: FooterLinks;     // Optional override
+  brandTitle?: string; // Default: "Investor AI"
+  brandCaption?: string; // Default: from i18n
+  showBrand?: boolean; // Default: true
+  showLinks?: boolean; // Default: true
+  showDownload?: boolean; // Default: true
+  showMeta?: boolean; // Default: true
+  customLinks?: FooterLinks; // Optional override
 }
 
 interface FooterLinks {
@@ -68,7 +71,7 @@ interface LinkGroup {
 interface FooterLink {
   label: string;
   href: string;
-  badge?: string;  // e.g., "NEW" or "BETA"
+  badge?: string; // e.g., "NEW" or "BETA"
 }
 
 interface FooterMeta {
@@ -81,13 +84,14 @@ interface FooterMeta {
 interface SocialLink {
   platform: "instagram" | "youtube" | "twitter" | "linkedin" | "bilibili";
   href: string;
-  label: string;  // aria-label
+  label: string; // aria-label
 }
 ```
 
 ### UI Component Breakdown
 
 #### **Slice 1: Brand Block (Left, Desktop)**
+
 ```typescript
 // Components/FooterBrand.tsx
 <div className="flex flex-col gap-4">
@@ -106,6 +110,7 @@ interface SocialLink {
 ```
 
 **Responsive Behavior:**
+
 - Desktop (lg+): Fixed width ~240px, left column
 - Tablet (md): Full width, moved above links
 - Mobile: Full width, moved above links
@@ -113,6 +118,7 @@ interface SocialLink {
 ---
 
 #### **Slice 2: Link Columns (Center, All Sizes)**
+
 ```typescript
 // Components/FooterLinks.tsx
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -141,6 +147,7 @@ interface SocialLink {
 ```
 
 **Responsive Behavior:**
+
 - Desktop (lg+): 4 columns (Product, Solutions, Company, Resources, Compare = may wrap to 5)
 - Tablet (md): 2 columns
 - Mobile (sm): 1 column (unless stacked differently)
@@ -149,6 +156,7 @@ interface SocialLink {
 ---
 
 #### **Slice 3: Download/CTA Card (Right, Desktop)**
+
 ```typescript
 // Components/FooterDownloadCard.tsx
 <div className="rounded-lg bg-[var(--bg-layer)] border border-[var(--stroke-soft)] p-4 sm:p-6">
@@ -174,6 +182,7 @@ interface SocialLink {
 ```
 
 **Responsive Behavior:**
+
 - Desktop (lg+): Right side, fixed width ~200px
 - Tablet (md): Below links, full width
 - Mobile: Below links, full width
@@ -181,6 +190,7 @@ interface SocialLink {
 ---
 
 #### **Slice 4: Meta Information Bar (Bottom)**
+
 ```typescript
 // Components/FooterMeta.tsx
 <div className="border-t border-[var(--stroke-soft)] pt-4 mt-6">
@@ -229,6 +239,7 @@ interface SocialLink {
 ```
 
 **Responsive Behavior:**
+
 - Desktop: Horizontal layout (Legal left, Social + Copyright right)
 - Mobile: Stacked vertical, centered
 
@@ -541,6 +552,7 @@ export default function FooterSection({
 ### Implementation Notes for i18n
 
 1. **Array Structure for Link Groups**: Since i18n keys are flat strings, use one of two approaches:
+
    ```typescript
    // Option A: Separate keys for each item (verbose but simple)
    "footer.links.product.item.generator": { en: "Report Generator", ... }
@@ -555,9 +567,11 @@ export default function FooterSection({
    }
    // Then in component: JSON.parse(t("footer.links.product.items"))
    ```
+
    **Recommendation:** Option B (JSON string) to keep i18n organized
 
 2. **Chinese Variants**: Use `withChineseVariants()` helper for Simplified/Traditional differences:
+
    ```typescript
    withChineseVariants({
      en: "Report Generator",
@@ -566,8 +580,8 @@ export default function FooterSection({
      zh: {
        hant: "報告生成器",
        hans: "报告生成器",
-     }
-   })
+     },
+   });
    ```
 
 3. **Social Platform Labels**: Store full aria-label text (not just platform name):
@@ -581,12 +595,12 @@ export default function FooterSection({
 
 ### Layout Modes
 
-| Viewport | Grid Layout | Link Columns | Brand Position | Download Card | Vertical Stack |
-|----------|-------------|--------------|-----------------|---------------|-----------------|
-| **320–639px** (Mobile) | 1-column flex | 1 column | Full width, top | Full width | Yes |
-| **640–767px** (Small Tablet) | 2-column grid | 2 columns | Full width | Full width | Yes |
-| **768–1023px** (Tablet) | 2-column grid | 2 columns | Full width | Full width | Yes |
-| **1024px+** (Desktop) | 5-column grid | 4 columns | Left column | Right column | No |
+| Viewport                     | Grid Layout   | Link Columns | Brand Position  | Download Card | Vertical Stack |
+| ---------------------------- | ------------- | ------------ | --------------- | ------------- | -------------- |
+| **320–639px** (Mobile)       | 1-column flex | 1 column     | Full width, top | Full width    | Yes            |
+| **640–767px** (Small Tablet) | 2-column grid | 2 columns    | Full width      | Full width    | Yes            |
+| **768–1023px** (Tablet)      | 2-column grid | 2 columns    | Full width      | Full width    | Yes            |
+| **1024px+** (Desktop)        | 5-column grid | 4 columns    | Left column     | Right column  | No             |
 
 ### Tailwind Classes for Responsive Design
 
@@ -651,23 +665,27 @@ className="
 ### Breakpoint-Specific Details
 
 **Mobile (320-639px)**
+
 - All sections stack vertically
 - Full width content
 - Touch targets: min 44px height
 - Padding: 16px horizontal, 24px vertical
 
 **Small Tablet (640-767px)**
+
 - 2-column link grid appears
 - Brand section still full width
 - Download card still full width (below links)
 - Increased gap between sections (24px)
 
 **Tablet (768-1023px)**
+
 - Same as small tablet
 - Slightly larger padding (24px horizontal)
 - Increased vertical padding (48px)
 
 **Desktop (1024px+)**
+
 - 5-column grid: Brand(1) | Links(3) | Download(1)
 - Horizontal layout activated
 - Gap between sections: 32px
@@ -677,29 +695,15 @@ className="
 
 ```css
 /* Colors */
---bg-base: #0a0a0c                 /* Footer background */
---bg-layer: rgba(255,255,255,0.03) /* Card backgrounds */
---bg-frosted: rgba(255,255,255,0.07) /* Hover states */
---color-foreground: #f4f4f7        /* Headings */
---text-dim: rgba(244,244,247,0.76) /* Body text */
---text-subtle: rgba(244,244,247,0.54) /* Secondary text */
---stroke-soft: rgba(255,255,255,0.08) /* Borders */
---accent-emerald: #5be0b0          /* CTAs, hover */
-
-/* Spacing (Tailwind units) */
-gap-4: 16px
-gap-6: 24px
-gap-8: 32px
-py-6 / py-12 / py-16: 24px / 48px / 64px
-px-4 / px-6 / px-10: 16px / 24px / 40px
-
-/* Typography (Tailwind scales) */
-text-xs: 12px
-text-sm: 14px
-text-base: 16px
-text-lg: 18px
-font-semibold: 600 weight
-font-medium: 500 weight
+--bg-base: #0a0a0c /* Footer background */ --bg-layer: rgba(255, 255, 255, 0.03)
+  /* Card backgrounds */ --bg-frosted: rgba(255, 255, 255, 0.07) /* Hover states */
+  --color-foreground: #f4f4f7 /* Headings */ --text-dim: rgba(244, 244, 247, 0.76) /* Body text */
+  --text-subtle: rgba(244, 244, 247, 0.54) /* Secondary text */
+  --stroke-soft: rgba(255, 255, 255, 0.08) /* Borders */ --accent-emerald: #5be0b0 /* CTAs, hover */
+  /* Spacing (Tailwind units) */ gap-4: 16px gap-6: 24px gap-8: 32px py-6 / py-12 / py-16: 24px /
+  48px / 64px px-4 / px-6 / px-10: 16px / 24px / 40px /* Typography (Tailwind scales) */
+  text-xs: 12px text-sm: 14px text-base: 16px text-lg: 18px font-semibold: 600 weight
+  font-medium: 500 weight;
 ```
 
 ---
@@ -709,6 +713,7 @@ font-medium: 500 weight
 ### 5.1 Accessibility Requirements
 
 #### **Color Contrast (WCAG AA)**
+
 - [ ] All text vs. background meets 4.5:1 ratio
   - Verify `text-[var(--text-dim)]` on `bg-[var(--bg-base)]`: **4.5+** ✓
   - Verify `text-[var(--text-subtle)]` on `bg-[var(--bg-base)]`: **3.2** ⚠️ (May need lightening for small text)
@@ -716,6 +721,7 @@ font-medium: 500 weight
 - [ ] Hover/focus states maintain 4.5:1 ratio
 
 #### **Keyboard Navigation**
+
 - [ ] All interactive elements focusable:
   - Links have visible focus ring (2px ring with `focus-visible:ring-[var(--accent-emerald)]`)
   - Buttons have visible focus ring
@@ -725,6 +731,7 @@ font-medium: 500 weight
 - [ ] Focus ring visible at all zoom levels (up to 200%)
 
 #### **Semantics & ARIA**
+
 - [ ] Proper heading hierarchy:
   - Footer title: Could use `<h2>` or stay div + semantic nav
   - Link group titles: `<h4>` with `uppercase tracking-wide`
@@ -743,6 +750,7 @@ font-medium: 500 weight
   ```
 
 #### **Mobile & Touch**
+
 - [ ] Touch targets ≥ 44px (height + width recommended)
   - Links: Add `min-h-[44px] flex items-center` if needed
   - Social buttons: `w-10 h-10` = 40px (slightly below, ok if padding adds height)
@@ -751,6 +759,7 @@ font-medium: 500 weight
 - [ ] No hover-only content
 
 #### **Dynamic Content & i18n**
+
 - [ ] Text doesn't overflow on long translations:
   - German (long): Test with `overflow-hidden` or `truncate`
   - Chinese (compact): No issues expected
@@ -761,6 +770,7 @@ font-medium: 500 weight
 ### 5.2 Responsive Testing Checklist
 
 #### **Viewport Sizes to Test**
+
 ```
 [x] 320px   (iPhone SE)
 [x] 375px   (iPhone 12)
@@ -775,6 +785,7 @@ font-medium: 500 weight
 #### **Layout Checks by Breakpoint**
 
 **Mobile (320px)**
+
 - [ ] Brand section visible, full width
 - [ ] Link columns: 1 column, no horizontal scroll
 - [ ] Download card: Below links, full width
@@ -783,18 +794,21 @@ font-medium: 500 weight
 - [ ] 16px padding respected (not crushed)
 
 **Tablet (768px)**
+
 - [ ] Link columns: 2 columns
 - [ ] Brand + Links + Download: All visible, no overflow
 - [ ] Gap spacing: 24px between sections
 - [ ] Download card: Beside or below links (check design)
 
 **Desktop (1024px+)**
+
 - [ ] 5-column grid: Brand | Links(4 cols) | Download
 - [ ] Left-right balance: Brand width ~240px, Links stretch, Download ~200px
 - [ ] Gap: 32px between sections
 - [ ] Meta bar: Horizontal (Legal left, Social/Copyright right)
 
 #### **Text & Font Checks**
+
 - [ ] All fonts load (Geist Sans as fallback)
 - [ ] Line height sufficient (1.5x for body text)
 - [ ] Heading sizes match design:
@@ -804,6 +818,7 @@ font-medium: 500 weight
 - [ ] No text truncation (except intentional)
 
 #### **Interactive Element Checks**
+
 - [ ] CTA button:
   - Clickable on mobile (touch target ≥ 44px)
   - Hover state visible (background lightens to `var(--bg-frosted)`)
@@ -825,6 +840,7 @@ font-medium: 500 weight
 ### 5.3 i18n Regression Testing
 
 #### **Language Switch Coverage**
+
 - [ ] **English**: All keys display, no truncation
 - [ ] **Japanese (ja)**: Shorter text, verify no weird spacing
 - [ ] **Korean (ko)**: Check text wrapping in narrow columns
@@ -832,6 +848,7 @@ font-medium: 500 weight
 - [ ] **Simplified Chinese (zh-Hans)**: Full text, verify layout
 
 #### **Specific i18n Tests**
+
 - [ ] Legal link titles appear (Terms, Privacy, Acceptable Use, Legal)
 - [ ] Social platform aria-labels correct for each language
 - [ ] Download section: Title + Caption both appear
@@ -840,6 +857,7 @@ font-medium: 500 weight
 - [ ] CTA button text: Matches `footer.brand.cta.label`
 
 #### **Edge Cases**
+
 - [ ] Very long translation (German "Datenschutzerklärung"): Doesn't overflow
 - [ ] Very short translation (Chinese ideographs): Verifies alignment
 - [ ] RTL languages (if ever added): Test structure
@@ -847,6 +865,7 @@ font-medium: 500 weight
 ### 5.4 Visual & Performance Checks
 
 #### **Visual Verification**
+
 - [ ] Footer background: `--bg-base` (#0a0a0c), darker than main content
 - [ ] Top border: Thin line with `--stroke-soft`, possibly gradient accent
 - [ ] Card borders: `--stroke-soft` on download card
@@ -855,6 +874,7 @@ font-medium: 500 weight
 - [ ] No harsh contrast (blacks + whites OK, grays properly toned)
 
 #### **Performance Checks**
+
 - [ ] Lighthouse Performance score ≥ 90
 - [ ] No layout shifts (CLS = 0)
 - [ ] Images/SVGs optimized (if any added)
@@ -862,6 +882,7 @@ font-medium: 500 weight
 - [ ] Bundle size: Footer component < 5KB minified
 
 #### **Browser Compatibility**
+
 - [ ] Chrome / Edge (latest 2 versions)
 - [ ] Firefox (latest 2 versions)
 - [ ] Safari (latest 2 versions)
@@ -869,6 +890,7 @@ font-medium: 500 weight
 - [ ] Chrome Mobile (Android 10+)
 
 #### **Print & PDF**
+
 - [ ] Footer doesn't break across pages
 - [ ] Links readable in print (no hidden colors)
 - [ ] QR codes (if any) clear in print
@@ -930,28 +952,33 @@ font-medium: 500 weight
 ## NEXT STEPS (Implementation Sequence)
 
 ### Phase 1: Foundation
+
 1. [ ] Update `lib/i18n.tsx` with all new footer keys
 2. [ ] Create Footer sub-components (Brand, Links, DownloadCard, Meta)
 3. [ ] Update `FooterSection.tsx` with new structure & props
 
 ### Phase 2: Styling
+
 4. [ ] Add Tailwind classes for responsive layout
 5. [ ] Verify CSS variable usage (no hardcoded colors)
 6. [ ] Test gradient top border effect
 
 ### Phase 3: Testing
+
 7. [ ] Run responsive tests at 5 breakpoints
 8. [ ] Verify a11y: focus rings, aria-labels, contrast
 9. [ ] Run axe DevTools scan, fix issues
 10. [ ] Test all 5 languages, verify text fit
 
 ### Phase 4: Refinement
+
 11. [ ] Adjust spacing/sizing based on visual QA
 12. [ ] Optimize for mobile touch targets
 13. [ ] Final accessibility audit
 14. [ ] Performance check (Lighthouse)
 
 ### Phase 5: Deployment
+
 15. [ ] Create PR with all changes
 16. [ ] Request design review
 17. [ ] Merge to main branch
@@ -961,6 +988,7 @@ font-medium: 500 weight
 ## APPENDIX: Reference Files
 
 **Files to Read Before Starting:**
+
 - `app/sections/FooterSection.tsx` (current, 20 lines)
 - `app/sections/HeroSection.tsx` (responsive pattern reference)
 - `lib/i18n.tsx` (translations, 2600+ lines)
@@ -968,10 +996,12 @@ font-medium: 500 weight
 - `docs/decisions/2025-11-28-footer-refresh.md` (design requirements)
 
 **Files to Create/Modify:**
+
 - `app/sections/FooterSection.tsx` (replace current, ~200-250 lines)
 - `lib/i18n.tsx` (add ~40-50 new keys)
 
 **Optional Components (split for reusability):**
+
 - `app/components/FooterBrand.tsx`
 - `app/components/FooterLinks.tsx`
 - `app/components/FooterDownloadCard.tsx`
@@ -981,14 +1011,14 @@ font-medium: 500 weight
 
 ## Summary Table: Status ✓
 
-| Item | Status | Notes |
-|------|--------|-------|
-| Environment | ✓ Ready | Tailwind v4, i18n, CSS vars all in place |
-| Design | ✓ Clear | 5-slice architecture, 3+ breakpoints, a11y requirements |
-| i18n | ✓ Planned | 40-50 new keys, 5 languages, structured data |
-| Components | ✓ Designed | 4 sub-slices + root component, prop-based |
-| Testing | ✓ Checklist | 50+ test items across a11y, responsive, i18n, visual |
-| **GO/NO-GO** | **✓ GO** | **Ready to implement** |
+| Item         | Status      | Notes                                                   |
+| ------------ | ----------- | ------------------------------------------------------- |
+| Environment  | ✓ Ready     | Tailwind v4, i18n, CSS vars all in place                |
+| Design       | ✓ Clear     | 5-slice architecture, 3+ breakpoints, a11y requirements |
+| i18n         | ✓ Planned   | 40-50 new keys, 5 languages, structured data            |
+| Components   | ✓ Designed  | 4 sub-slices + root component, prop-based               |
+| Testing      | ✓ Checklist | 50+ test items across a11y, responsive, i18n, visual    |
+| **GO/NO-GO** | **✓ GO**    | **Ready to implement**                                  |
 
 ---
 

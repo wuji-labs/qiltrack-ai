@@ -47,7 +47,10 @@ export async function GET(request: NextRequest) {
       .single();
 
     if (profileError || !profile) {
-      const response = NextResponse.json({ error: "Failed to verify admin status" }, { status: 500 });
+      const response = NextResponse.json(
+        { error: "Failed to verify admin status" },
+        { status: 500 }
+      );
       responseCookies.forEach(({ name, value }) => {
         response.headers.append("Set-Cookie", `${name}=${value}`);
       });
@@ -55,10 +58,14 @@ export async function GET(request: NextRequest) {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const isAdmin = (profile as any).plan === "admin" || (profile as any).email?.endsWith("@investor.ai");
+    const isAdmin =
+      (profile as any).plan === "admin" || (profile as any).email?.endsWith("@investor.ai");
 
     if (!isAdmin) {
-      const response = NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
+      const response = NextResponse.json(
+        { error: "Forbidden: Admin access required" },
+        { status: 403 }
+      );
       responseCookies.forEach(({ name, value }) => {
         response.headers.append("Set-Cookie", `${name}=${value}`);
       });
@@ -76,7 +83,10 @@ export async function GET(request: NextRequest) {
     // Build query
     let query = supabase
       .from("report_runs")
-      .select("id, user_id, symbol, created_at, status, is_featured, lang, mode, markdown_path, docx_path, pdf_path, reused_from_run_id", { count: "exact" })
+      .select(
+        "id, user_id, symbol, created_at, status, is_featured, lang, mode, markdown_path, docx_path, pdf_path, reused_from_run_id",
+        { count: "exact" }
+      )
       .order("created_at", { ascending: false });
 
     if (olderThanDays) {
@@ -95,10 +105,7 @@ export async function GET(request: NextRequest) {
 
     if (queryError) {
       console.error("Failed to fetch report runs:", queryError);
-      const response = NextResponse.json(
-        { error: "Failed to fetch report runs" },
-        { status: 500 }
-      );
+      const response = NextResponse.json({ error: "Failed to fetch report runs" }, { status: 500 });
       responseCookies.forEach(({ name, value }) => {
         response.headers.append("Set-Cookie", `${name}=${value}`);
       });
@@ -122,9 +129,6 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (err) {
     console.error("Admin runs list error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

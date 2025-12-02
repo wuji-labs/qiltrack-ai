@@ -63,28 +63,19 @@ export default function AdminDashboard() {
 
     try {
       // 获取基础统计数据
-      const [usersResult, reportsResult, creditsResult, todayReportsResult] =
-        await Promise.all([
-          supabase.from("profiles").select("*", { count: "exact", head: true }),
-          supabase
-            .from("report_runs")
-            .select("*", { count: "exact", head: true }),
-          supabase.from("report_credit_events").select("credits_amount"),
-          supabase
-            .from("report_runs")
-            .select("*", { count: "exact", head: true })
-            .gte(
-              "created_at",
-              new Date(new Date().setHours(0, 0, 0, 0)).toISOString()
-            ),
-        ]);
+      const [usersResult, reportsResult, creditsResult, todayReportsResult] = await Promise.all([
+        supabase.from("profiles").select("*", { count: "exact", head: true }),
+        supabase.from("report_runs").select("*", { count: "exact", head: true }),
+        supabase.from("report_credit_events").select("credits_amount"),
+        supabase
+          .from("report_runs")
+          .select("*", { count: "exact", head: true })
+          .gte("created_at", new Date(new Date().setHours(0, 0, 0, 0)).toISOString()),
+      ]);
 
       // 计算总积分消耗
       const totalCreditsUsed =
-        creditsResult.data?.reduce(
-          (sum, item) => sum + (item.credits_amount || 0),
-          0
-        ) || 0;
+        creditsResult.data?.reduce((sum, item) => sum + (item.credits_amount || 0), 0) || 0;
 
       // 获取活跃用户数 (最近7天有报告生成的用户)
       const sevenDaysAgo = new Date();
@@ -94,13 +85,11 @@ export default function AdminDashboard() {
         .select("user_id")
         .gte("created_at", sevenDaysAgo.toISOString());
 
-      const activeUsers = new Set(
-        activeUsersData?.map((r) => r.user_id) || []
-      ).size;
+      const activeUsers = new Set(activeUsersData?.map((r) => r.user_id) || []).size;
 
       const avgReportsPerUser =
         usersResult.count && usersResult.count > 0
-          ? Math.round((reportsResult.count || 0) / usersResult.count * 10) / 10
+          ? Math.round(((reportsResult.count || 0) / usersResult.count) * 10) / 10
           : 0;
 
       setStats({
@@ -158,10 +147,7 @@ export default function AdminDashboard() {
       ]);
 
       const credits =
-        creditsData.data?.reduce(
-          (sum, item) => sum + (item.credits_amount || 0),
-          0
-        ) || 0;
+        creditsData.data?.reduce((sum, item) => sum + (item.credits_amount || 0), 0) || 0;
 
       return {
         date: format(date, "MM/dd", { locale: zhCN }),
@@ -193,7 +179,7 @@ export default function AdminDashboard() {
       .limit(10);
 
     if (recentRuns) {
-      const activities: RecentActivity[] = recentRuns.map((run: ReportRun) => ({
+      const activities: RecentActivity[] = recentRuns.map((run: any) => ({
         id: run.id,
         type: run.status === "completed" ? "success" : "warning",
         user_email: run.profiles?.email || "未知用户",
@@ -267,9 +253,7 @@ export default function AdminDashboard() {
         <h1 className="text-3xl font-bold" style={{ color: "var(--color-foreground)" }}>
           仪表盘
         </h1>
-        <p className="mt-2 text-sm text-dim">
-          Investor AI 平台数据总览
-        </p>
+        <p className="mt-2 text-sm text-dim">Investor AI 平台数据总览</p>
       </div>
 
       {/* 统计卡片网格 */}
@@ -282,20 +266,12 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <div className="text-sm text-dim mb-1">{card.label}</div>
-                <div
-                  className="text-3xl font-bold"
-                  style={{ color: card.color }}
-                >
+                <div className="text-3xl font-bold" style={{ color: card.color }}>
                   {card.value.toLocaleString()}
                 </div>
-                {card.subtext && (
-                  <div className="text-xs text-subtle mt-1">{card.subtext}</div>
-                )}
+                {card.subtext && <div className="text-xs text-subtle mt-1">{card.subtext}</div>}
               </div>
-              <div
-                className="text-4xl p-4 rounded-2xl"
-                style={{ backgroundColor: card.bgColor }}
-              >
+              <div className="text-4xl p-4 rounded-2xl" style={{ backgroundColor: card.bgColor }}>
                 {card.icon}
               </div>
             </div>
@@ -378,18 +354,12 @@ export default function AdminDashboard() {
                     className={`w-2 h-2 rounded-full`}
                     style={{
                       backgroundColor:
-                        activity.type === "success"
-                          ? "var(--accent-emerald)"
-                          : "#f59e0b",
+                        activity.type === "success" ? "var(--accent-emerald)" : "#f59e0b",
                     }}
                   />
                   <div>
-                    <div style={{ color: "var(--color-foreground)" }}>
-                      {activity.user_email}
-                    </div>
-                    <div className="text-sm text-dim">
-                      {activity.description}
-                    </div>
+                    <div style={{ color: "var(--color-foreground)" }}>{activity.user_email}</div>
+                    <div className="text-sm text-dim">{activity.description}</div>
                   </div>
                 </div>
                 <div className="text-sm text-subtle">

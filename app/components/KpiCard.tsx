@@ -43,15 +43,30 @@ const trendMeta: Record<TrendDirection, { label: string; icon: string; className
   flat: { label: "Flat", icon: "■", className: "text-subtle" },
 };
 
-export default function KpiCard({ label, value, icon, tone = "neutral", helper, trend }: KpiCardProps) {
+export default function KpiCard({
+  label,
+  value,
+  icon,
+  tone = "neutral",
+  helper,
+  trend,
+}: KpiCardProps) {
   const toneClasses = toneClassNames[tone];
   const trendInfo = trend ? trendMeta[trend] : null;
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl border px-4 py-3 sm:py-4 transition-all duration-200 ease-out ${toneClasses.container}`}>
+    <div
+      className={`relative overflow-hidden rounded-2xl border px-4 py-3 sm:py-4 transition-all duration-200 ease-out ${toneClasses.container}`}
+    >
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-6 top-0 h-20 w-20 rounded-full bg-[var(--accent-emerald)]/12 blur-[80px]" aria-hidden />
-        <div className="absolute right-0 bottom-0 h-20 w-20 rounded-full bg-[var(--accent-blue)]/10 blur-[70px]" aria-hidden />
+        <div
+          className="absolute -left-6 top-0 h-20 w-20 rounded-full bg-[var(--accent-emerald)]/12 blur-[80px]"
+          aria-hidden
+        />
+        <div
+          className="absolute right-0 bottom-0 h-20 w-20 rounded-full bg-[var(--accent-blue)]/10 blur-[70px]"
+          aria-hidden
+        />
       </div>
       <div className="relative flex items-start justify-between gap-2">
         <div className="flex items-center gap-2">
@@ -59,7 +74,9 @@ export default function KpiCard({ label, value, icon, tone = "neutral", helper, 
           <span className="text-xs uppercase tracking-[0.22em] text-subtle">{label}</span>
         </div>
         {helper ? (
-          <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] ${toneClasses.badge}`}>
+          <span
+            className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] ${toneClasses.badge}`}
+          >
             {helper}
           </span>
         ) : null}
@@ -67,7 +84,9 @@ export default function KpiCard({ label, value, icon, tone = "neutral", helper, 
       <div className="relative mt-3 flex items-baseline justify-between gap-2">
         <div className={`text-2xl font-semibold ${toneClasses.accent}`}>{value}</div>
         {trendInfo ? (
-          <span className={`inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)]/60 bg-[var(--bg-layer)]/70 px-2 py-1 text-xs font-semibold ${trendInfo.className}`}>
+          <span
+            className={`inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)]/60 bg-[var(--bg-layer)]/70 px-2 py-1 text-xs font-semibold ${trendInfo.className}`}
+          >
             <span aria-hidden>{trendInfo.icon}</span>
             {trendInfo.label}
           </span>

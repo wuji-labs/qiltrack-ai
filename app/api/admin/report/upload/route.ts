@@ -23,20 +23,14 @@ export async function POST(request: NextRequest) {
     }
 
     if (file.size > MAX_UPLOAD_SIZE) {
-      const response = NextResponse.json(
-        { error: "File too large (max 20MB)" },
-        { status: 400 }
-      );
+      const response = NextResponse.json({ error: "File too large (max 20MB)" }, { status: 400 });
       return context.applyCookies(response);
     }
 
     const targetUserId = (formData.get("userId") as string) || userId;
     const title = (formData.get("title") as string) || file.name || "Admin upload";
     const note = (formData.get("note") as string) || null;
-    const parsedVersion = Number.parseInt(
-      (formData.get("version") as string) || "",
-      10
-    );
+    const parsedVersion = Number.parseInt((formData.get("version") as string) || "", 10);
     const version = Number.isFinite(parsedVersion) ? parsedVersion : 1;
     const statusValue = (formData.get("status") as string) || "approved";
     const status = VALID_STATUSES.includes(statusValue as (typeof VALID_STATUSES)[number])
@@ -47,12 +41,7 @@ export async function POST(request: NextRequest) {
     const storagePath = `admin-uploads/${targetUserId}/${Date.now()}-${sanitizedName}`;
 
     const serviceClient = createServiceRoleClient();
-    const signedUrl = await uploadToStorage(
-      serviceClient,
-      "report-assets",
-      storagePath,
-      file
-    );
+    const signedUrl = await uploadToStorage(serviceClient, "report-assets", storagePath, file);
 
     const { data, error } = await serviceClient
       .from("user_report_uploads")
@@ -82,10 +71,7 @@ export async function POST(request: NextRequest) {
     return context.applyCookies(response);
   } catch (err) {
     console.error("Error in admin upload:", err);
-    const response = NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    const response = NextResponse.json({ error: "Internal server error" }, { status: 500 });
     return context.applyCookies(response);
   }
 }
