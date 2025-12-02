@@ -193,8 +193,7 @@ export default function AdminDashboard() {
       .limit(10);
 
     if (recentRuns) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const activities: RecentActivity[] = recentRuns.map((run: any) => ({
+      const activities: RecentActivity[] = recentRuns.map((run: ReportRun) => ({
         id: run.id,
         type: run.status === "completed" ? "success" : "warning",
         user_email: run.profiles?.email || "未知用户",
