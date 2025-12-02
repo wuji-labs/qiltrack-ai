@@ -10,11 +10,9 @@ interface User {
   id: string;
   email: string;
   display_name: string | null;
-  full_name: string | null;
+  name: string | null;
   role: string | null;
   plan: string | null;
-  quota_limit: number | null;
-  reports_used: number | null;
   created_at: string | null;
   avatar_url: string | null;
 }
@@ -25,7 +23,7 @@ interface UserCredits {
 }
 
 const PLAN_CONFIGS = {
-  free: { name: "免费版", quota: 10, color: "#6b7280", price: 0 },
+  free: { name: "免费版", quota: 30, color: "#6b7280", price: 0 },
   basic: { name: "基础版", quota: 50, color: "#3b82f6", price: 99 },
   pro: { name: "专业版", quota: 200, color: "#8b5cf6", price: 299 },
   enterprise: { name: "企业版", quota: 999, color: "#f59e0b", price: 999 },
@@ -50,7 +48,7 @@ export default function UsersPage() {
     full_name: "",
     role: "user",
     plan: "free",
-    quota_limit: 10,
+    initial_credits: 30,
   });
 
   // 编辑用户
@@ -151,7 +149,7 @@ export default function UsersPage() {
         full_name: "",
         role: "user",
         plan: "free",
-        quota_limit: 10,
+        initial_credits: 30,
       });
       fetchUsers();
     } catch (error: unknown) {
@@ -176,10 +174,9 @@ export default function UsersPage() {
         body: JSON.stringify({
           userId: editingUser.id,
           display_name: editingUser.display_name,
-          full_name: editingUser.full_name,
+          full_name: editingUser.name,
           role: editingUser.role,
           plan: editingUser.plan,
-          quota_limit: editingUser.quota_limit,
         }),
       });
 
@@ -293,12 +290,10 @@ export default function UsersPage() {
           break;
 
         case "plan":
-          const planConfig = PLAN_CONFIGS[value as keyof typeof PLAN_CONFIGS];
           await supabase
             .from("profiles")
             .update({
               plan: value,
-              quota_limit: planConfig.quota,
               updated_at: new Date().toISOString(),
             })
             .in("id", userIds);
@@ -544,7 +539,7 @@ export default function UsersPage() {
                         {user.email}
                       </td>
                       <td className="px-4 py-3 text-sm text-dim">
-                        {user.display_name || user.full_name || "-"}
+                        {user.display_name || user.name || "-"}
                       </td>
                       <td className="px-4 py-3">
                         <span
@@ -579,7 +574,7 @@ export default function UsersPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-dim">
-                        {user.reports_used || 0} / {user.quota_limit || planInfo.quota}
+                        {planInfo.quota} 积分/月
                       </td>
                       <td className="px-4 py-3 text-sm text-subtle">
                         {user.created_at
@@ -700,7 +695,7 @@ export default function UsersPage() {
                 setCreateData({
                   ...createData,
                   plan: e.target.value,
-                  quota_limit: PLAN_CONFIGS[planKey].quota,
+                  initial_credits: PLAN_CONFIGS[planKey].quota,
                 });
               }}
               options={[
@@ -711,10 +706,10 @@ export default function UsersPage() {
               ]}
             />
             <InputField
-              label="报告配额"
+              label="初始积分"
               type="number"
-              value={createData.quota_limit.toString()}
-              onChange={(e) => setCreateData({ ...createData, quota_limit: Number(e.target.value) })}
+              value={createData.initial_credits.toString()}
+              onChange={(e) => setCreateData({ ...createData, initial_credits: Number(e.target.value) })}
             />
             <div className="flex gap-3 pt-4">
               <button
@@ -753,8 +748,8 @@ export default function UsersPage() {
             />
             <InputField
               label="全名"
-              value={editingUser.full_name || ""}
-              onChange={(e) => setEditingUser({ ...editingUser, full_name: e.target.value })}
+              value={editingUser.name || ""}
+              onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
             />
             <SelectField
               label="角色"
@@ -774,7 +769,6 @@ export default function UsersPage() {
                 setEditingUser({
                   ...editingUser,
                   plan: e.target.value,
-                  quota_limit: PLAN_CONFIGS[planKey].quota,
                 });
               }}
               options={[
@@ -783,12 +777,6 @@ export default function UsersPage() {
                 { value: "pro", label: `专业版 (${PLAN_CONFIGS.pro.quota}篇)` },
                 { value: "enterprise", label: `企业版 (${PLAN_CONFIGS.enterprise.quota}篇)` },
               ]}
-            />
-            <InputField
-              label="报告配额"
-              type="number"
-              value={editingUser.quota_limit?.toString() || "10"}
-              onChange={(e) => setEditingUser({ ...editingUser, quota_limit: Number(e.target.value) })}
             />
             <div className="flex gap-3 pt-4">
               <button
@@ -857,7 +845,7 @@ export default function UsersPage() {
             <DetailRow label="用户ID" value={detailUser.id} />
             <DetailRow label="邮箱" value={detailUser.email} />
             <DetailRow label="显示名称" value={detailUser.display_name || "-"} />
-            <DetailRow label="全名" value={detailUser.full_name || "-"} />
+            <DetailRow label="全名" value={detailUser.name || "-"} />
             <DetailRow
               label="角色"
               value={
@@ -868,10 +856,6 @@ export default function UsersPage() {
             <DetailRow
               label="会员套餐"
               value={getPlanInfo(detailUser.plan).name}
-            />
-            <DetailRow
-              label="报告使用"
-              value={`${detailUser.reports_used || 0} / ${detailUser.quota_limit || 0}`}
             />
             {userCredits && (
               <>
