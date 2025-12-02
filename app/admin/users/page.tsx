@@ -289,9 +289,9 @@ export default function UsersPage() {
     try {
       switch (action) {
         case "role":
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await supabase
             .from("profiles")
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .update({ role: value as any, updated_at: new Date().toISOString() })
             .in("id", userIds);
           alert(`成功修改 ${userIds.length} 个用户的角色`);
