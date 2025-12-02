@@ -2,6 +2,7 @@
   "name": "investor-ai",
   "version": "0.1.0",
   "private": true,
+  "_comment_port_warning": "⚠️ DO NOT modify 'dev' script! Port is managed via .env.local. See docs/AI_INSTRUCTIONS.md",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

@@ -154,9 +154,9 @@ export default function UsersPage() {
         quota_limit: 10,
       });
       fetchUsers();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Create user failed:", error);
-      alert(`创建用户失败: ${error.message || "未知错误"}`);
+      alert(`创建用户失败: ${error instanceof Error ? error.message : "未知错误"}`);
     } finally {
       setProcessing(false);
     }
@@ -193,9 +193,9 @@ export default function UsersPage() {
       setShowEditModal(false);
       setEditingUser(null);
       fetchUsers();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Update user failed:", error);
-      alert(`更新失败: ${error.message}`);
+      alert(`更新失败: ${error instanceof Error ? error.message : "未知错误"}`);
     } finally {
       setProcessing(false);
     }
@@ -245,9 +245,9 @@ export default function UsersPage() {
       setShowPasswordModal(false);
       setPasswordEmail("");
       setNewPassword("");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Reset password failed:", error);
-      alert(`重置密码失败: ${error.message}`);
+      alert(`重置密码失败: ${error instanceof Error ? error.message : "未知错误"}`);
     } finally {
       setProcessing(false);
     }
@@ -272,7 +272,7 @@ export default function UsersPage() {
     }
   }
 
-  async function handleBatchOperation(action: string, value: any) {
+  async function handleBatchOperation(action: string, value: unknown) {
     if (selectedUsers.size === 0) {
       alert("请先选择用户");
       return;
@@ -337,9 +337,9 @@ export default function UsersPage() {
       setSelectedUsers(new Set());
       setShowBatchModal(false);
       fetchUsers();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Batch operation failed:", error);
-      alert(`批量操作失败: ${error.message}`);
+      alert(`批量操作失败: ${error instanceof Error ? error.message : "未知错误"}`);
     } finally {
       setProcessing(false);
     }

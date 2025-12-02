@@ -4,6 +4,18 @@
 
 > 本文件为主版本，根目录保留 `CODEX_CLAUDE_COLLAB.md` 作为跳转 stub 指向此处。
 
+> **⚠️ 特别提醒：端口配置保护**
+>
+> 本项目使用 `.env.local` 管理多 worktree 端口配置，经过长时间调试优化。
+>
+> **禁止修改：**
+> - `package.json` 中的 `"dev": "next dev"` 脚本
+> - `scripts/worktree-ports.json` 配置文件
+> - `scripts/setup-worktree-port.js` 设置脚本
+> - 不要建议"优化"或"改进"端口管理
+>
+> **详见：** `docs/AI_INSTRUCTIONS.md` 和 `docs/guides/worktree-port-management.md`
+
 ## 1. 目的与范围
 - 确保每个需求从清晰的架构意图出发，最终以经过审查与测试的代码交付。
 - 保持产品目标 → 设计笔记 → PR → 发布说明的全链路可追踪。
