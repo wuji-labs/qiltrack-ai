@@ -23,6 +23,24 @@ export interface LLMGenerationOptions {
 }
 
 /**
+ * Token usage information from LLM API response
+ */
+export interface TokenUsage {
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_tokens: number;
+}
+
+/**
+ * LLM response with content and usage
+ * @internal
+ */
+interface LLMResponse {
+  content: string;
+  usage?: TokenUsage;
+}
+
+/**
  * LLM Service handles all AI model interactions
  *
  * Supports both Helicone and OpenRouter with automatic failover
@@ -83,17 +101,36 @@ export class LLMService {
       try {
         const span = trace?.span({
           name: "llm.helicone",
-          input: { systemPrompt, userPrompt, options },
+          input: {
+            systemPromptLength: systemPrompt.length,
+            userPromptLength: userPrompt.length,
+            model: this.heliconeConfig.model,
+          },
         });
 
-        const result = await this.callHelicone(
+        const response = await this.callHelicone(
           systemPrompt,
           userPrompt,
           options
         );
 
-        span?.end({ output: { length: result.length } });
-        return result;
+        // Record token usage and cost
+        if (response.usage) {
+          const cost = this.calculateCost(
+            response.usage,
+            this.heliconeConfig.model
+          );
+          span?.update({
+            metadata: {
+              ...response.usage,
+              estimated_cost_usd: cost,
+              model: this.heliconeConfig.model,
+            },
+          });
+        }
+
+        span?.end({ output: { contentLength: response.content.length } });
+        return response.content;
       } catch (error) {
         console.warn("Helicone failed, falling back to OpenRouter:", error);
         trace?.event({
@@ -108,32 +145,118 @@ export class LLMService {
       try {
         const span = trace?.span({
           name: "llm.openrouter",
-          input: { systemPrompt, userPrompt, options },
+          input: {
+            systemPromptLength: systemPrompt.length,
+            userPromptLength: userPrompt.length,
+            model: this.openRouterConfig.model,
+          },
         });
 
-        const result = await this.callOpenRouter(
+        const response = await this.callOpenRouter(
           systemPrompt,
           userPrompt,
           options
         );
 
-        span?.end({ output: { length: result.length } });
-        return result;
+        // Record token usage and cost
+        if (response.usage) {
+          const cost = this.calculateCost(
+            response.usage,
+            this.openRouterConfig.model
+          );
+          span?.update({
+            metadata: {
+              ...response.usage,
+              estimated_cost_usd: cost,
+              model: this.openRouterConfig.model,
+            },
+          });
+        }
+
+        span?.end({ output: { contentLength: response.content.length } });
+        return response.content;
       } catch (error) {
         trace?.event({
           name: "openrouter-failed",
           metadata: { error: String(error) },
         });
-        throw new ExternalServiceError(
-          "All LLM providers failed",
-          { error: String(error) }
-        );
+        throw new ExternalServiceError("All LLM providers failed", {
+          error: String(error),
+        });
       }
     }
 
-    throw new ExternalServiceError(
-      "No LLM provider configured"
-    );
+    throw new ExternalServiceError("No LLM provider configured");
+  }
+
+  /**
+   * Calculate estimated cost for LLM API call
+   *
+   * Pricing as of 2025-12 (subject to change)
+   *
+   * @param usage - Token usage information
+   * @param model - Model identifier
+   * @returns Estimated cost in USD
+   * @private
+   */
+  private calculateCost(usage: TokenUsage, model: string): number {
+    // Pricing per 1M tokens (as of 2025-12)
+    const pricing: Record<
+      string,
+      { prompt: number; completion: number }
+    > = {
+      "gpt-4o-mini": {
+        prompt: 0.15, // $0.15 / 1M tokens
+        completion: 0.6, // $0.60 / 1M tokens
+      },
+      "gpt-4o": {
+        prompt: 2.5, // $2.50 / 1M tokens
+        completion: 10.0, // $10.00 / 1M tokens
+      },
+      "gpt-4-turbo": {
+        prompt: 10.0,
+        completion: 30.0,
+      },
+      "claude-3.5-sonnet": {
+        prompt: 3.0,
+        completion: 15.0,
+      },
+      "claude-3-opus": {
+        prompt: 15.0,
+        completion: 75.0,
+      },
+      // OpenRouter models
+      "openai/gpt-4o-mini": {
+        prompt: 0.15,
+        completion: 0.6,
+      },
+      "openai/gpt-4o": {
+        prompt: 2.5,
+        completion: 10.0,
+      },
+      "openai/gpt-5.1": {
+        prompt: 2.5, // Estimated, adjust when official pricing available
+        completion: 10.0,
+      },
+      "anthropic/claude-3.5-sonnet": {
+        prompt: 3.0,
+        completion: 15.0,
+      },
+      "anthropic/claude-3-opus": {
+        prompt: 15.0,
+        completion: 75.0,
+      },
+    };
+
+    // Default to gpt-4o-mini pricing if model not found
+    const modelPricing = pricing[model] || pricing["gpt-4o-mini"];
+
+    // Calculate cost (pricing is per 1M tokens, so divide by 1,000,000)
+    const promptCost = (usage.prompt_tokens * modelPricing.prompt) / 1_000_000;
+    const completionCost =
+      (usage.completion_tokens * modelPricing.completion) / 1_000_000;
+
+    return promptCost + completionCost;
   }
 
   /**
@@ -144,7 +267,7 @@ export class LLMService {
     systemPrompt: string,
     userPrompt: string,
     options?: LLMGenerationOptions
-  ): Promise<string> {
+  ): Promise<LLMResponse> {
     if (!this.heliconeConfig) {
       throw new Error("Helicone not configured");
     }
@@ -184,7 +307,10 @@ export class LLMService {
       throw new Error("Invalid response from Helicone");
     }
 
-    return content;
+    return {
+      content,
+      usage: data.usage as TokenUsage | undefined,
+    };
   }
 
   /**
@@ -195,7 +321,7 @@ export class LLMService {
     systemPrompt: string,
     userPrompt: string,
     options?: LLMGenerationOptions
-  ): Promise<string> {
+  ): Promise<LLMResponse> {
     if (!this.openRouterConfig) {
       throw new Error("OpenRouter not configured");
     }
@@ -237,7 +363,10 @@ export class LLMService {
       throw new Error("Invalid response from OpenRouter");
     }
 
-    return content;
+    return {
+      content,
+      usage: data.usage as TokenUsage | undefined,
+    };
   }
 
   /**
