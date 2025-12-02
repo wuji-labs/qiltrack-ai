@@ -1,0 +1,19 @@
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:performance": "vitest run __tests__/performance",
+    "test:e2e": "playwright test",
+    "queue:worker": "node lib/queue/workers/start-workers.ts",
+    "db:types": "npx supabase gen types typescript --linked --schema public > types/database.ts",
+    "db:migrate": "npx supabase db push",
+    "db:reset": "npx supabase db reset"
+  }
+}
