@@ -4,15 +4,23 @@ import { LLMService } from "@/lib/services/llm";
 import { MarketDataService } from "@/lib/services/market-data";
 import { ContentSanitizer } from "./content-sanitizer";
 import { ReportGenerationError } from "../errors";
-import type { GenerateReportParams, GeneratedReport, ReportTone, ReportMetadata } from "./types";
+import type {
+  GenerateReportParams,
+  GeneratedReport,
+  ReportTone,
+  ReportMetadata,
+} from "./types";
 import { getLangfuseClient } from "@/lib/observability/langfuse";
+import { reportCache, marketDataCache } from "@/lib/cache/redis";
 
 /**
  * Tone directives for different report styles
  */
 const TONE_DIRECTIVES: Record<ReportTone, string> = {
-  baseline: "以 Investor AI 标准流程输出,保持证据优先与结构化描述,不加入夸张语气。",
-  buffett: "采用价值投资视角:强调护城河、现金流、治理质量与估值安全边际,解释为何可以長期持有。",
+  baseline:
+    "以 Investor AI 标准流程输出,保持证据优先与结构化描述,不加入夸张语气。",
+  buffett:
+    "采用价值投资视角:强调护城河、现金流、治理质量与估值安全边际,解释为何可以長期持有。",
   musk: "以科技乐观主义者的语气描写:突出创新、TAM、技术迭代与可能的 10 倍成长机会,同时保留理性提醒。",
   muddy:
     "站在做空机构/反脆弱角度:主力拆解风险、会计或治理疑点、监管黑天鹅,语气保持审慎甚至略偏 Bear。",
@@ -49,7 +57,8 @@ export class ReportGenerator {
     sanitizer?: ContentSanitizer;
   }) {
     this.llmService = options?.llmService || new LLMService();
-    this.marketDataService = options?.marketDataService || new MarketDataService();
+    this.marketDataService =
+      options?.marketDataService || new MarketDataService();
     this.sanitizer = options?.sanitizer || new ContentSanitizer();
   }
 
@@ -79,18 +88,60 @@ export class ReportGenerator {
         },
       });
 
-      // 1. Fetch market data
+      // 1. Check cache for existing report
+      const cacheCheckSpan = trace?.span({
+        name: "cache-check",
+        input: { symbol: params.symbol, language, tone },
+      });
+
+      const cachedReport = await reportCache.get({
+        symbol: params.symbol,
+        language,
+        tone,
+      });
+
+      if (cachedReport) {
+        cacheCheckSpan?.end({ output: { cacheHit: true } });
+        trace?.update({
+          output: { success: true, cached: true },
+          metadata: { generationTimeMs: Date.now() - startTime }
+        });
+
+        console.info(
+          `[ReportGenerator] Cache hit for ${params.symbol} (${language}/${tone})`
+        );
+
+        return cachedReport;
+      }
+
+      cacheCheckSpan?.end({ output: { cacheHit: false } });
+
+      // 2. Check market data cache
       const marketDataSpan = trace?.span({
         name: "fetch-market-data",
         input: { symbol: params.symbol },
       });
 
-      const marketData = await this.marketDataService.fetchCompanyData(params.symbol);
+      let marketData = await marketDataCache.get(params.symbol);
 
-      marketDataSpan?.end({ output: { hasData: true } });
+      if (!marketData) {
+        // Fetch fresh market data
+        marketData = await this.marketDataService.fetchCompanyData(
+          params.symbol
+        );
+
+        // Cache market data for 1 hour
+        await marketDataCache.set(params.symbol, marketData);
+      }
+
+      marketDataSpan?.end({ output: { hasData: true, cached: !!marketData } });
 
       // 2. Build prompts
-      const { systemPrompt, userPrompt } = this.buildPrompts(marketData, language, tone);
+      const { systemPrompt, userPrompt } = this.buildPrompts(
+        marketData,
+        language,
+        tone
+      );
 
       // 3. Generate report using LLM
       const llmSpan = trace?.span({
@@ -98,11 +149,15 @@ export class ReportGenerator {
         input: { promptLength: systemPrompt.length + userPrompt.length },
       });
 
-      const rawContent = await this.llmService.generateReport(systemPrompt, userPrompt, {
-        temperature: 0.7,
-        maxTokens: 4096,
-        metadata: { symbol: params.symbol, language, tone },
-      });
+      const rawContent = await this.llmService.generateReport(
+        systemPrompt,
+        userPrompt,
+        {
+          temperature: 0.7,
+          maxTokens: 4096,
+          metadata: { symbol: params.symbol, language, tone },
+        }
+      );
 
       llmSpan?.end({
         output: { contentLength: rawContent.length },
@@ -123,21 +178,53 @@ export class ReportGenerator {
         generationTimeMs,
       };
 
-      trace?.update({ output: { success: true } });
-
-      return {
+      const generatedReport: GeneratedReport = {
         content: sanitizedContent,
         marketData,
         metadata,
       };
+
+      // 6. Cache the generated report
+      await reportCache.set(
+        {
+          symbol: params.symbol,
+          language,
+          tone,
+        },
+        generatedReport
+      );
+
+      // 7. Enqueue embeddings generation (async, non-blocking)
+      const { enqueueEmbeddingsJob } = await import('@/lib/queue/embeddings.queue');
+      await enqueueEmbeddingsJob({
+        reportRunId: metadata.reportRunId || crypto.randomUUID(),
+        reportContent: sanitizedContent,
+        language,
+        tone,
+        userId: params.userId,
+      }).catch((err) => {
+        // Queue failure should not block report generation
+        console.error('[ReportGenerator] Failed to enqueue embeddings job:', err);
+      });
+
+      trace?.update({ output: { success: true, cached: false } });
+
+      console.info(
+        `[ReportGenerator] Generated and cached report for ${params.symbol} (${language}/${tone}) in ${generationTimeMs}ms, embeddings job enqueued`
+      );
+
+      return generatedReport;
     } catch (error) {
       const generationTimeMs = Date.now() - startTime;
 
-      throw new ReportGenerationError(`Failed to generate report for ${params.symbol}: ${error}`, {
-        symbol: params.symbol,
-        error: String(error),
-        generationTimeMs,
-      });
+      throw new ReportGenerationError(
+        `Failed to generate report for ${params.symbol}: ${error}`,
+        {
+          symbol: params.symbol,
+          error: String(error),
+          generationTimeMs,
+        }
+      );
     }
   }
 

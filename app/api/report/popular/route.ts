@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(50, parseInt(searchParams.get("limit") || "20"));
 
     // Call the database function to get popular symbols
-    const { data, error } = await supabase.rpc("fn_get_popular_symbols" as any, {
+    const { data, error } = await supabase.rpc("fn_get_popular_symbols", {
       p_range_days: range,
       p_limit: limit,
     });
