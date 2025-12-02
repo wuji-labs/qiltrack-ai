@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useLanguage } from "@/lib/i18n";
@@ -16,7 +16,7 @@ type Status = "verifying" | "success" | "error";
  * Handles Supabase recovery links that return tokens in URL hash (#access_token / #code).
  * On success, stores session and redirects to /account/change-password?type=recovery.
  */
-export default function ResetPasswordRedirect() {
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { supabase } = useSupabaseAuth();
@@ -141,5 +141,13 @@ export default function ResetPasswordRedirect() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordRedirect() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

@@ -104,7 +104,7 @@ export default function ReportsPage() {
         return;
       }
       const profile = await auth.getUserProfile();
-      const plan = profile?.plan || null;
+      const plan = (profile as any)?.plan || null;
       setUserPlan(plan);
       const isAdminPlan = plan === "admin";
       const isAdminEmail = auth.user?.email?.endsWith("@investor.ai");
@@ -123,7 +123,7 @@ export default function ReportsPage() {
         if (sortMode === "popular") {
           const data = await fetchPopularReports({
             limit: 50,
-            lang: selectedLang === "all" ? undefined : selectedLang,
+            lang: selectedLang === "all" ? undefined : (selectedLang as any),
           });
           if (cancelled) return;
           const symbolList = data.reports.map((r) => r.symbol);
@@ -140,6 +140,8 @@ export default function ReportsPage() {
             theme: "Featured",
             cover: "linear-gradient(135deg, rgba(91, 224, 176, 0.1), rgba(0, 0, 0, 0.3))",
             lang: selectedLang === "all" ? "en" : selectedLang,
+            readTime: "5 min",
+            body: [],
           }));
           setReports(cards);
           setIsApiData(true);

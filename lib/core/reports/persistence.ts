@@ -56,11 +56,12 @@ export class ReportPersistence {
       .insert({
         report_run_id: reportRunId,
         user_id: userId,
-        symbol: report.symbol,
+        // symbol: report.symbol, // Not in table schema
         title: report.title,
         slug: slug,
-        content: report.content,
-        storage_url: storageResult.publicUrl,
+        // content: report.content, // Use body field instead
+        body: report.content,
+        // storage_url: storageResult.publicUrl, // Not in table schema
         tone: report.tone,
         lang: report.language,
         status: "draft",
@@ -76,14 +77,14 @@ export class ReportPersistence {
       id: data.id,
       slug: data.slug,
       report_run_id: reportRunId,
-      symbol: data.symbol,
+      symbol: report.symbol, // Use from input since table doesn't return it
       title: data.title,
-      content: data.content,
-      cover_url: data.cover_url,
-      storage_url: data.storage_url,
-      tone: data.tone as any,
+      content: data.body ?? data.summary ?? "", // Use body or summary as content
+      cover_url: data.cover ?? undefined,
+      storage_url: undefined, // Not in schema
+      tone: report.tone as any,
       language: data.lang as any,
-      created_at: data.created_at,
+      created_at: data.created_at ?? new Date().toISOString(),
     };
   }
 
@@ -127,15 +128,15 @@ export class ReportPersistence {
     return {
       id: data.id,
       slug: data.slug,
-      report_run_id: data.report_run_id,
-      symbol: data.symbol,
+      report_run_id: (data as any).report_run_id ?? "",
+      symbol: (data as any).symbol ?? symbol,
       title: data.title,
-      content: data.content,
-      cover_url: data.cover_url,
-      storage_url: data.storage_url,
-      tone: data.tone as any,
+      content: (data as any).content ?? data.body ?? data.summary ?? "",
+      cover_url: (data as any).cover_url ?? data.cover ?? undefined,
+      storage_url: (data as any).storage_url ?? undefined,
+      tone: tone as any,
       language: data.lang as any,
-      created_at: data.created_at,
+      created_at: data.created_at ?? new Date().toISOString(),
     };
   }
 
@@ -154,7 +155,7 @@ export class ReportPersistence {
   async recordAudit(userId: string, action: string, details: Record<string, any>): Promise<void> {
     const supabase = await createClient();
 
-    await supabase.from("audit_logs").insert({
+    await (supabase as any).from("audit_logs").insert({
       user_id: userId,
       action,
       table_name: "report_posts",

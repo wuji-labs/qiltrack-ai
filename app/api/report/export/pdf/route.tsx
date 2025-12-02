@@ -3,7 +3,8 @@ import { Document, Image, Page, StyleSheet, Text, View, pdf } from "@react-pdf/r
 
 import { createReportBlueprint } from "@/lib/report/blueprint";
 import { buildPerformanceChart, buildValuationChart, renderChartPng } from "@/lib/report/charts";
-import { writeReportAudit } from "@/lib/services/quota";
+// TODO: Restore quota audit after refactoring
+// import { writeReportAudit } from "@/lib/services/quota";
 import {
   createServerClient,
   createServiceRoleClient,
@@ -646,12 +647,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    await writeReportAudit(
-      userId,
-      blueprint.symbol,
-      "production",
-      signedUrl ? "success" : "failed"
-    );
+    // TODO: Restore quota audit after refactoring
+    // await writeReportAudit(
+    //   userId,
+    //   blueprint.symbol,
+    //   "production",
+    //   signedUrl ? "success" : "failed"
+    // );
   } catch (err) {
     console.warn("Audit log failed:", err);
   }

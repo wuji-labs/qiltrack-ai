@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Call the database function to find reusable report
-    const { data, error } = await supabase.rpc("fn_find_reusable_report", {
+    const { data, error } = await supabase.rpc("fn_find_reusable_report" as any, {
       p_symbol: symbol,
       p_lang: lang,
       p_mode: mode,

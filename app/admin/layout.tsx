@@ -6,11 +6,12 @@ import { supabaseDataProvider } from "@/lib/admin/data-provider";
 import { authProvider } from "@/lib/admin/auth-provider";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 
 /**
  * 后台管理系统布局 - 中文版
  */
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const navItems = [
@@ -124,5 +125,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">{children}</main>
       </div>
     </Refine>
+  );
+}
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
+    </Suspense>
   );
 }

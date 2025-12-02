@@ -42,7 +42,7 @@ export default function CreditsPage() {
           credits_available,
           credits_used,
           updated_at,
-          profiles!inner(email, display_name, full_name)
+          profiles!inner(email, display_name)
         `
         )
         .order("updated_at", { ascending: false });
@@ -53,10 +53,10 @@ export default function CreditsPage() {
         data?.map((item) => ({
           user_id: item.user_id,
           email: item.profiles.email,
-          display_name: item.profiles.display_name || item.profiles.full_name,
-          credits_available: item.credits_available,
-          credits_used: item.credits_used,
-          last_updated: item.updated_at,
+          display_name: item.profiles.display_name || item.profiles.email,
+          credits_available: item.credits_available ?? 0,
+          credits_used: item.credits_used ?? 0,
+          last_updated: item.updated_at ?? new Date().toISOString(),
         })) || [];
 
       setCredits(formatted);

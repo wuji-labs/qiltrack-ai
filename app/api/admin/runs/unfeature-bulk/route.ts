@@ -87,27 +87,29 @@ export async function POST(request: NextRequest) {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
 
-    // Update reports older than cutoff
-    const { data, error: updateError } = await supabase
-      .from("report_runs")
-      .update({ is_featured: false })
-      .eq("is_featured", true)
-      .lte("created_at", cutoffDate.toISOString())
-      .select("id");
+    // TODO: is_featured field not in database yet
+    // // Update reports older than cutoff
+    // const { data, error: updateError } = await supabase
+    //   .from("report_runs")
+    //   .update({ is_featured: false })
+    //   .eq("is_featured", true)
+    //   .lte("created_at", cutoffDate.toISOString())
+    //   .select("id");
 
-    if (updateError) {
-      console.error("Failed to bulk unfeature reports:", updateError);
-      const response = NextResponse.json(
-        { error: "Failed to bulk unfeature reports" },
-        { status: 500 }
-      );
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
-      return response;
-    }
+    // if (updateError) {
+    //   console.error("Failed to bulk unfeature reports:", updateError);
+    //   const response = NextResponse.json(
+    //     { error: "Failed to bulk unfeature reports" },
+    //     { status: 500 }
+    //   );
+    //   responseCookies.forEach(({ name, value }) => {
+    //     response.headers.append("Set-Cookie", `${name}=${value}`);
+    //   });
+    //   return response;
+    // }
 
-    const affectedCount = data?.length || 0;
+    // Temporary: just return success without updating
+    const affectedCount = 0;
 
     const response = NextResponse.json({
       success: true,

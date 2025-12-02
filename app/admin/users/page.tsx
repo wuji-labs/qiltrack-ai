@@ -10,7 +10,6 @@ interface User {
   id: string;
   email: string;
   display_name: string | null;
-  full_name?: string | null; // Optional: not in database schema
   role: string | null;
   plan: string | null;
   quota_limit: number | null;
@@ -47,7 +46,6 @@ export default function UsersPage() {
     email: "",
     password: "",
     display_name: "",
-    full_name: "",
     role: "user",
     plan: "free",
     quota_limit: 10,
@@ -70,6 +68,8 @@ export default function UsersPage() {
   // 批量操作
   const [showBatchModal, setShowBatchModal] = useState(false);
   const [batchAction, setBatchAction] = useState<"grant" | "revoke" | "role" | "plan">("grant");
+  const [batchRole, setBatchRole] = useState("user");
+  const [batchPlan, setBatchPlan] = useState("free");
   const [processing, setProcessing] = useState(false);
 
   const pageSize = 10;
@@ -90,9 +90,7 @@ export default function UsersPage() {
         .range((page - 1) * pageSize, page * pageSize - 1);
 
       if (search) {
-        query = query.or(
-          `email.ilike.%${search}%,display_name.ilike.%${search}%,full_name.ilike.%${search}%`
-        );
+        query = query.or(`email.ilike.%${search}%,display_name.ilike.%${search}%`);
       }
 
       if (roleFilter !== "all") {
@@ -154,7 +152,6 @@ export default function UsersPage() {
         email: "",
         password: "",
         display_name: "",
-        full_name: "",
         role: "user",
         plan: "free",
         quota_limit: 10,
@@ -182,7 +179,6 @@ export default function UsersPage() {
         body: JSON.stringify({
           userId: editingUser.id,
           display_name: editingUser.display_name,
-          full_name: editingUser.full_name,
           role: editingUser.role,
           plan: editingUser.plan,
           quota_limit: editingUser.quota_limit,
@@ -304,7 +300,7 @@ export default function UsersPage() {
           await supabase
             .from("profiles")
             .update({
-              plan: value,
+              plan: value as string,
               quota_limit: planConfig.quota,
               updated_at: new Date().toISOString(),
             })
@@ -552,7 +548,7 @@ export default function UsersPage() {
                         {user.email}
                       </td>
                       <td className="px-4 py-3 text-sm text-dim">
-                        {user.display_name || user.full_name || "-"}
+                        {user.display_name || "-"}
                       </td>
                       <td className="px-4 py-3">
                         <span
@@ -685,12 +681,6 @@ export default function UsersPage() {
               onChange={(e) => setCreateData({ ...createData, display_name: e.target.value })}
               placeholder="用户昵称"
             />
-            <InputField
-              label="全名"
-              value={createData.full_name}
-              onChange={(e) => setCreateData({ ...createData, full_name: e.target.value })}
-              placeholder="真实姓名"
-            />
             <SelectField
               label="角色"
               value={createData.role}
@@ -756,11 +746,6 @@ export default function UsersPage() {
               label="显示名称"
               value={editingUser.display_name || ""}
               onChange={(e) => setEditingUser({ ...editingUser, display_name: e.target.value })}
-            />
-            <InputField
-              label="全名"
-              value={editingUser.full_name || ""}
-              onChange={(e) => setEditingUser({ ...editingUser, full_name: e.target.value })}
             />
             <SelectField
               label="角色"
@@ -857,7 +842,6 @@ export default function UsersPage() {
             <DetailRow label="用户ID" value={detailUser.id} />
             <DetailRow label="邮箱" value={detailUser.email} />
             <DetailRow label="显示名称" value={detailUser.display_name || "-"} />
-            <DetailRow label="全名" value={detailUser.full_name || "-"} />
             <DetailRow
               label="角色"
               value={
@@ -875,8 +859,8 @@ export default function UsersPage() {
             />
             {userCredits && (
               <>
-                <DetailRow label="可用积分" value={userCredits.credits_available.toString()} />
-                <DetailRow label="已用积分" value={userCredits.credits_used.toString()} />
+                <DetailRow label="可用积分" value={(userCredits.credits_available ?? 0).toString()} />
+                <DetailRow label="已用积分" value={(userCredits.credits_used ?? 0).toString()} />
               </>
             )}
             <DetailRow

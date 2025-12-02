@@ -6,22 +6,23 @@ import { createClient } from "@/lib/supabase/client";
 interface ReportRun {
   id: string;
   user_id: string;
-  symbol: string;
-  tone?: string;
-  language?: string;
-  status: string;
-  model?: string;
-  duration_ms?: number;
-  error?: string;
-  markdown_path?: string;
-  docx_path?: string;
-  created_at: string;
-  updated_at: string;
+  template_id?: string;
+  symbol: string | null;
+  tone?: string | null;
+  language?: string | null;
+  status: string | null;
+  model?: string | null;
+  duration_ms?: number | null;
+  error?: string | null;
+  markdown_path?: string | null;
+  docx_path?: string | null;
+  created_at: string | null;
+  updated_at: string | null;
   profiles?: {
     email: string;
-    display_name?: string;
+    display_name?: string | null;
   };
-  company_snapshot?: Record<string, unknown>;
+  company_snapshot?: unknown;
 }
 
 export default function ReportRunsPage() {
@@ -77,7 +78,7 @@ export default function ReportRunsPage() {
     if (!searchTerm) return true;
     const searchLower = searchTerm.toLowerCase();
     return (
-      run.symbol.toLowerCase().includes(searchLower) ||
+      run.symbol?.toLowerCase().includes(searchLower) ||
       run.profiles?.email.toLowerCase().includes(searchLower) ||
       run.profiles?.display_name?.toLowerCase().includes(searchLower)
     );
@@ -85,7 +86,7 @@ export default function ReportRunsPage() {
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  function getStatusColor(status: string) {
+  function getStatusColor(status: string | null) {
     switch (status) {
       case "completed":
         return "bg-green-100 text-green-800";
@@ -100,7 +101,7 @@ export default function ReportRunsPage() {
     }
   }
 
-  function formatDuration(ms?: number) {
+  function formatDuration(ms?: number | null) {
     if (!ms) return "-";
     if (ms < 1000) return `${ms}ms`;
     if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
@@ -248,7 +249,7 @@ export default function ReportRunsPage() {
                           {formatDuration(run.duration_ms)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(run.created_at).toLocaleString("zh-CN")}
+                          {run.created_at ? new Date(run.created_at).toLocaleString("zh-CN") : "-"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <button
@@ -389,35 +390,42 @@ export default function ReportRunsPage() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700">创建时间</label>
                     <p className="mt-1 text-sm text-gray-900">
-                      {new Date(selectedRun.created_at).toLocaleString("zh-CN")}
+                      {selectedRun.created_at
+                        ? new Date(selectedRun.created_at).toLocaleString("zh-CN")
+                        : "-"}
                     </p>
                   </div>
                 </div>
 
                 {/* 文件路径 */}
-                {(selectedRun.markdown_path || selectedRun.docx_path) && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">生成文件</label>
-                    <div className="space-y-2">
-                      {selectedRun.markdown_path && (
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs text-gray-500">Markdown:</span>
-                          <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                            {selectedRun.markdown_path}
-                          </code>
-                        </div>
-                      )}
-                      {selectedRun.docx_path && (
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs text-gray-500">DOCX:</span>
-                          <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                            {selectedRun.docx_path}
-                          </code>
-                        </div>
-                      )}
+                {(() => {
+                  const hasFiles = Boolean(selectedRun.markdown_path) || Boolean(selectedRun.docx_path);
+                  if (!hasFiles) return null;
+
+                  return (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">生成文件</label>
+                      <div className="space-y-2">
+                        {selectedRun.markdown_path && (
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs text-gray-500">Markdown:</span>
+                            <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                              {String(selectedRun.markdown_path)}
+                            </code>
+                          </div>
+                        )}
+                        {selectedRun.docx_path && (
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs text-gray-500">DOCX:</span>
+                            <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                              {String(selectedRun.docx_path)}
+                            </code>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
 
                 {/* 错误信息 */}
                 {selectedRun.error && (
@@ -432,7 +440,7 @@ export default function ReportRunsPage() {
                 )}
 
                 {/* 公司快照数据 */}
-                {selectedRun.company_snapshot && (
+                {Boolean(selectedRun.company_snapshot) && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       公司快照数据

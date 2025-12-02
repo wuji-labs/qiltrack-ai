@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useLanguage } from "@/lib/i18n";
 
-export default function ChangePasswordPage() {
+function ChangePasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated, authMethod, oauthProviders } = useSupabaseAuth();
@@ -327,5 +327,13 @@ export default function ChangePasswordPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function ChangePasswordPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ChangePasswordContent />
+    </Suspense>
   );
 }

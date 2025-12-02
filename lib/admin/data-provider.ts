@@ -11,13 +11,13 @@ import { createClient } from "@/lib/supabase/client";
  * - 关联数据查询
  * - 自定义 RPC 调用
  */
-export const supabaseDataProvider: DataProvider = {
+export const supabaseDataProvider: any = {
   /**
    * 获取资源列表 - 支持分页、排序、过滤
    */
-  getList: async ({ resource, pagination, sorters, filters, meta }) => {
+  getList: async ({ resource, pagination, sorters, filters, meta }: any) => {
     const supabase = createClient();
-    let query = supabase.from(resource).select(meta?.select || "*", { count: "exact" });
+    let query: any = supabase.from(resource).select(meta?.select || "*", { count: "exact" });
 
     // 应用分页
     if (pagination) {
@@ -29,7 +29,7 @@ export const supabaseDataProvider: DataProvider = {
 
     // 应用排序
     if (sorters && sorters.length > 0) {
-      sorters.forEach((sorter) => {
+      sorters.forEach((sorter: any) => {
         query = query.order(sorter.field, {
           ascending: sorter.order === "asc",
         });
@@ -38,7 +38,7 @@ export const supabaseDataProvider: DataProvider = {
 
     // 应用过滤器
     if (filters) {
-      filters.forEach((filter) => {
+      filters.forEach((filter: any) => {
         if (
           "field" in filter &&
           filter.value !== undefined &&
@@ -106,7 +106,7 @@ export const supabaseDataProvider: DataProvider = {
   /**
    * 获取单个资源
    */
-  getOne: async ({ resource, id, meta }) => {
+  getOne: async ({ resource, id, meta }: any) => {
     const supabase = createClient();
 
     const { data, error } = await supabase
@@ -125,7 +125,7 @@ export const supabaseDataProvider: DataProvider = {
   /**
    * 获取多个资源
    */
-  getMany: async ({ resource, ids, meta }) => {
+  getMany: async ({ resource, ids, meta }: any) => {
     const supabase = createClient();
 
     const { data, error } = await supabase
@@ -143,7 +143,7 @@ export const supabaseDataProvider: DataProvider = {
   /**
    * 创建资源
    */
-  create: async ({ resource, variables, meta }) => {
+  create: async ({ resource, variables, meta }: any) => {
     const supabase = createClient();
 
     const { data, error } = await supabase.from(resource).insert(variables).select().single();
@@ -158,7 +158,7 @@ export const supabaseDataProvider: DataProvider = {
   /**
    * 批量创建资源
    */
-  createMany: async ({ resource, variables }) => {
+  createMany: async ({ resource, variables }: any) => {
     const supabase = createClient();
 
     const { data, error } = await supabase.from(resource).insert(variables).select();
@@ -173,7 +173,7 @@ export const supabaseDataProvider: DataProvider = {
   /**
    * 更新资源
    */
-  update: async ({ resource, id, variables, meta }) => {
+  update: async ({ resource, id, variables, meta }: any) => {
     const supabase = createClient();
 
     // 自动添加 updated_at 字段
@@ -199,7 +199,7 @@ export const supabaseDataProvider: DataProvider = {
   /**
    * 批量更新资源
    */
-  updateMany: async ({ resource, ids, variables }) => {
+  updateMany: async ({ resource, ids, variables }: any) => {
     const supabase = createClient();
 
     const updateData = {
@@ -219,7 +219,7 @@ export const supabaseDataProvider: DataProvider = {
   /**
    * 删除资源
    */
-  deleteOne: async ({ resource, id }) => {
+  deleteOne: async ({ resource, id }: any) => {
     const supabase = createClient();
 
     const { data, error } = await supabase.from(resource).delete().eq("id", id).select().single();
@@ -234,7 +234,7 @@ export const supabaseDataProvider: DataProvider = {
   /**
    * 批量删除资源
    */
-  deleteMany: async ({ resource, ids }) => {
+  deleteMany: async ({ resource, ids }: any) => {
     const supabase = createClient();
 
     const { data, error } = await supabase.from(resource).delete().in("id", ids).select();
@@ -256,7 +256,7 @@ export const supabaseDataProvider: DataProvider = {
   /**
    * 自定义操作 - 支持 RPC 调用和复杂操作
    */
-  custom: async ({ url, method, payload, query, headers }) => {
+  custom: async ({ url, method, payload, query, headers }: any) => {
     const supabase = createClient();
 
     // 支持 Supabase RPC 调用

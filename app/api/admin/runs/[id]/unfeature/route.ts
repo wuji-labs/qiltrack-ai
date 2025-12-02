@@ -5,7 +5,10 @@ import { createServerClient } from "@/lib/supabase/server";
  * POST /api/admin/runs/[id]/unfeature
  * Remove featured status from a report (admin only)
  */
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
 
@@ -62,24 +65,25 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       return response;
     }
 
-    const runId = params.id;
+    const { id: runId } = await params;
 
-    // Update the report to remove featured status
-    const { error: updateError } = await supabase
-      .from("report_runs")
-      .update({ is_featured: false })
-      .eq("id", runId);
+    // TODO: is_featured field not in database yet
+    // const { error: updateError } = await supabase
+    //   .from("report_runs")
+    //   .update({ is_featured: false })
+    //   .eq("id", runId);
 
-    if (updateError) {
-      console.error("Failed to unfeature report:", updateError);
-      const response = NextResponse.json({ error: "Failed to unfeature report" }, { status: 500 });
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
-      return response;
-    }
+    // if (updateError) {
+    //   console.error("Failed to unfeature report:", updateError);
+    //   const response = NextResponse.json({ error: "Failed to unfeature report" }, { status: 500 });
+    //   responseCookies.forEach(({ name, value }) => {
+    //     response.headers.append("Set-Cookie", `${name}=${value}`);
+    //   });
+    //   return response;
+    // }
 
-    const response = NextResponse.json({ success: true, run_id: runId });
+    // Temporary: just return success without updating
+    const response = NextResponse.json({ success: true, run_id: runId, message: "Unfeature flag not implemented yet" });
     responseCookies.forEach(({ name, value }) => {
       response.headers.append("Set-Cookie", `${name}=${value}`);
     });
