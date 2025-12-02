@@ -11,6 +11,7 @@ import type {
   ReportMetadata,
 } from "./types";
 import { getLangfuseClient } from "@/lib/observability/langfuse";
+import { reportCache, marketDataCache } from "@/lib/cache/redis";
 
 /**
  * Tone directives for different report styles
@@ -87,17 +88,53 @@ export class ReportGenerator {
         },
       });
 
-      // 1. Fetch market data
+      // 1. Check cache for existing report
+      const cacheCheckSpan = trace?.span({
+        name: "cache-check",
+        input: { symbol: params.symbol, language, tone },
+      });
+
+      const cachedReport = await reportCache.get({
+        symbol: params.symbol,
+        language,
+        tone,
+      });
+
+      if (cachedReport) {
+        cacheCheckSpan?.end({ output: { cacheHit: true } });
+        trace?.update({
+          output: { success: true, cached: true },
+          metadata: { generationTimeMs: Date.now() - startTime }
+        });
+
+        console.info(
+          `[ReportGenerator] Cache hit for ${params.symbol} (${language}/${tone})`
+        );
+
+        return cachedReport;
+      }
+
+      cacheCheckSpan?.end({ output: { cacheHit: false } });
+
+      // 2. Check market data cache
       const marketDataSpan = trace?.span({
         name: "fetch-market-data",
         input: { symbol: params.symbol },
       });
 
-      const marketData = await this.marketDataService.fetchCompanyData(
-        params.symbol
-      );
+      let marketData = await marketDataCache.get(params.symbol);
 
-      marketDataSpan?.end({ output: { hasData: true } });
+      if (!marketData) {
+        // Fetch fresh market data
+        marketData = await this.marketDataService.fetchCompanyData(
+          params.symbol
+        );
+
+        // Cache market data for 1 hour
+        await marketDataCache.set(params.symbol, marketData);
+      }
+
+      marketDataSpan?.end({ output: { hasData: true, cached: !!marketData } });
 
       // 2. Build prompts
       const { systemPrompt, userPrompt } = this.buildPrompts(
@@ -141,13 +178,42 @@ export class ReportGenerator {
         generationTimeMs,
       };
 
-      trace?.update({ output: { success: true } });
-
-      return {
+      const generatedReport: GeneratedReport = {
         content: sanitizedContent,
         marketData,
         metadata,
       };
+
+      // 6. Cache the generated report
+      await reportCache.set(
+        {
+          symbol: params.symbol,
+          language,
+          tone,
+        },
+        generatedReport
+      );
+
+      // 7. Enqueue embeddings generation (async, non-blocking)
+      const { enqueueEmbeddingsJob } = await import('@/lib/queue/embeddings.queue');
+      await enqueueEmbeddingsJob({
+        reportRunId: metadata.reportRunId || crypto.randomUUID(),
+        reportContent: sanitizedContent,
+        language,
+        tone,
+        userId: params.userId,
+      }).catch((err) => {
+        // Queue failure should not block report generation
+        console.error('[ReportGenerator] Failed to enqueue embeddings job:', err);
+      });
+
+      trace?.update({ output: { success: true, cached: false } });
+
+      console.info(
+        `[ReportGenerator] Generated and cached report for ${params.symbol} (${language}/${tone}) in ${generationTimeMs}ms, embeddings job enqueued`
+      );
+
+      return generatedReport;
     } catch (error) {
       const generationTimeMs = Date.now() - startTime;
 
