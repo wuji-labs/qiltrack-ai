@@ -8,7 +8,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 /**
- * Admin layout with Refine configuration
+ * 后台管理系统布局 - 中文版
  */
 export default function AdminLayout({
   children,
@@ -18,11 +18,11 @@ export default function AdminLayout({
   const pathname = usePathname();
 
   const navItems = [
-    { href: "/admin", label: "Dashboard", icon: "📊" },
-    { href: "/admin/users", label: "Users", icon: "👤" },
-    { href: "/admin/credits", label: "Credits", icon: "💰" },
-    { href: "/admin/reports", label: "Reports", icon: "📄" },
-    { href: "/admin/audit", label: "Audit Logs", icon: "📋" },
+    { href: "/admin", label: "仪表盘", icon: "📊" },
+    { href: "/admin/users", label: "用户管理", icon: "👥" },
+    { href: "/admin/credits", label: "积分管理", icon: "💰" },
+    { href: "/admin/reports", label: "报告管理", icon: "📄" },
+    { href: "/admin/runs", label: "生成记录", icon: "🔄" },
   ];
 
   return (
@@ -37,8 +37,8 @@ export default function AdminLayout({
           edit: "/admin/users/:id/edit",
           show: "/admin/users/:id",
           meta: {
-            label: "Users",
-            icon: "👤",
+            label: "用户",
+            icon: "👥",
           },
         },
         {
@@ -46,7 +46,7 @@ export default function AdminLayout({
           list: "/admin/credits",
           edit: "/admin/credits/:id/edit",
           meta: {
-            label: "Credits",
+            label: "积分",
             icon: "💰",
           },
         },
@@ -56,33 +56,35 @@ export default function AdminLayout({
           edit: "/admin/reports/:id/edit",
           show: "/admin/reports/:id",
           meta: {
-            label: "Reports",
+            label: "报告",
             icon: "📄",
           },
         },
         {
-          name: "audit_logs",
-          list: "/admin/audit",
+          name: "report_runs",
+          list: "/admin/runs",
+          show: "/admin/runs/:id",
           meta: {
-            label: "Audit Logs",
-            icon: "📋",
+            label: "生成记录",
+            icon: "🔄",
           },
         },
       ]}
       options={{
         syncWithLocation: true,
         warnWhenUnsavedChanges: true,
+        disableTelemetry: true,
       }}
     >
-      <div className="min-h-screen bg-gray-50">
-        {/* Navigation Bar */}
-        <nav className="bg-white shadow">
+      <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
+        {/* 顶部导航栏 */}
+        <nav className="frosted-bar sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16">
               <div className="flex">
                 <div className="flex-shrink-0 flex items-center">
-                  <h1 className="text-xl font-bold text-gray-900">
-                    Investor AI Admin
+                  <h1 className="text-xl font-bold" style={{ color: "var(--color-foreground)" }}>
+                    Investor AI 管理后台
                   </h1>
                 </div>
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
@@ -94,9 +96,13 @@ export default function AdminLayout({
                         href={item.href}
                         className={`${
                           isActive
-                            ? "border-indigo-500 text-gray-900"
-                            : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                        } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+                            ? "border-b-2"
+                            : "border-transparent text-dim hover:text-foreground"
+                        } inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors`}
+                        style={{
+                          borderColor: isActive ? "var(--accent-emerald)" : "transparent",
+                          color: isActive ? "var(--color-foreground)" : "var(--text-dim)",
+                        }}
                       >
                         <span className="mr-2">{item.icon}</span>
                         {item.label}
@@ -105,19 +111,20 @@ export default function AdminLayout({
                   })}
                 </div>
               </div>
-              <div className="flex items-center">
+              <div className="flex items-center space-x-4">
                 <Link
                   href="/"
-                  className="text-sm text-gray-500 hover:text-gray-700"
+                  className="text-sm hover:text-foreground transition-colors"
+                  style={{ color: "var(--text-dim)" }}
                 >
-                  ← Back to Site
+                  ← 返回网站
                 </Link>
               </div>
             </div>
           </div>
         </nav>
 
-        {/* Main Content */}
+        {/* 主内容区域 */}
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           {children}
         </main>
