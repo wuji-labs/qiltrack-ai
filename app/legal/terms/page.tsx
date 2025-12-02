@@ -83,7 +83,9 @@ export default function TermsPage() {
           {sections.map((section) => (
             <section key={section.title} className="space-y-3">
               <h2 className="text-xl font-semibold">{section.title}</h2>
-              {section.body && <p className="text-sm text-slate-300 leading-relaxed">{section.body}</p>}
+              {section.body && (
+                <p className="text-sm text-slate-300 leading-relaxed">{section.body}</p>
+              )}
               {section.items && (
                 <ul className="list-disc pl-5 text-sm text-slate-300 space-y-2">
                   {section.items.map((item) => (
@@ -97,7 +99,11 @@ export default function TermsPage() {
 
         <div className="text-xs text-slate-500 space-y-2">
           <p>
-            如对条款有疑问，请邮件 <a className="text-emerald-300" href="mailto:legal@investor.ai">legal@investor.ai</a> 与我们联系。
+            如对条款有疑问，请邮件{" "}
+            <a className="text-emerald-300" href="mailto:legal@investor.ai">
+              legal@investor.ai
+            </a>{" "}
+            与我们联系。
           </p>
           <div className="inline-flex flex-wrap items-center gap-2 text-emerald-300 text-xs">
             <span aria-hidden className="text-sm opacity-80">

@@ -22,31 +22,20 @@ export async function POST(request: NextRequest) {
     }
 
     if (file.size > MAX_UPLOAD_SIZE) {
-      const response = NextResponse.json(
-        { error: "File too large (max 10MB)" },
-        { status: 400 }
-      );
+      const response = NextResponse.json({ error: "File too large (max 10MB)" }, { status: 400 });
       return context.applyCookies(response);
     }
 
     const title = (formData.get("title") as string) || file.name || "User upload";
     const note = (formData.get("note") as string) || null;
-    const parsedVersion = Number.parseInt(
-      (formData.get("version") as string) || "",
-      10
-    );
+    const parsedVersion = Number.parseInt((formData.get("version") as string) || "", 10);
     const version = Number.isFinite(parsedVersion) ? parsedVersion : 1;
 
     const sanitizedName = file.name.replace(/[^\w.\-]+/g, "-");
     const storagePath = `uploads/${userId}/${Date.now()}-${sanitizedName}`;
 
     const serviceClient = createServiceRoleClient();
-    const signedUrl = await uploadToStorage(
-      serviceClient,
-      "report-assets",
-      storagePath,
-      file
-    );
+    const signedUrl = await uploadToStorage(serviceClient, "report-assets", storagePath, file);
 
     const { data, error } = await serviceClient
       .from("user_report_uploads")
@@ -69,17 +58,11 @@ export async function POST(request: NextRequest) {
       return context.applyCookies(response);
     }
 
-    const response = NextResponse.json(
-      { upload: data, signedUrl },
-      { status: 201 }
-    );
+    const response = NextResponse.json({ upload: data, signedUrl }, { status: 201 });
     return context.applyCookies(response);
   } catch (err) {
     console.error("Error uploading user report:", err);
-    const response = NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    const response = NextResponse.json({ error: "Internal server error" }, { status: 500 });
     return context.applyCookies(response);
   }
 }

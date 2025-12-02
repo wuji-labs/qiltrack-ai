@@ -9,13 +9,16 @@
 ## 🎯 修复的问题
 
 ### 1. 密码重置链路失败
+
 **症状**: 点击邮件重置链接后显示"登录暂不可用"
 
 **根本原因**:
+
 - Recovery 流程误判：任何带 `token_hash` 的链接都被当作 recovery
 - 魔术链接和注册确认也有 `token_hash`，导致被错误重定向
 
 **修复**:
+
 ```typescript
 // 修复前（Bug）
 const isRecovery = type === "recovery" || tokenHash !== null;
@@ -25,14 +28,17 @@ const isRecovery = type === "recovery" && tokenHash !== null; // 必须同时满
 ```
 
 ### 2. 多 Worktree 端口混乱
+
 **症状**: g2 邮件跳到 g1，g1 邮件跳到 g2
 
 **根本原因**:
+
 - Next.js `next dev` 自动选择可用端口（3000 → 3001 → 3002...）
 - 你以为 g2 在 3002，实际可能在 3001
 - `window.location.origin` 记录实际端口，导致邮件链接错乱
 
 **修复**: 每个 worktree 固定端口
+
 ```json
 // g1/package.json
 "dev": "next dev -p 3001"
@@ -50,28 +56,28 @@ const isRecovery = type === "recovery" && tokenHash !== null; // 必须同时满
 
 ### 代码修改
 
-| 文件 | 修改内容 | 目的 |
-|------|----------|------|
-| `app/api/auth/callback/route.ts` | Recovery 检测改为 AND 逻辑 + 详细日志 | 修复误判 |
-| `app/account/reset-password/page.tsx` | 支持 token_hash 解析 + 错误文案一致性 | 完善 token 处理 |
-| `hooks/useSupabaseAuth.ts` | 智能端口检测函数 `getAuthRedirectBase()` | 支持多端口 |
-| `lib/auth/parseRecoveryTokens.ts` | Token 解析工具 + 15 个单元测试 | 可复用逻辑 |
-| `package.json` (g1-g5) | 固定端口配置 | 解决端口混乱 |
+| 文件                                  | 修改内容                                 | 目的            |
+| ------------------------------------- | ---------------------------------------- | --------------- |
+| `app/api/auth/callback/route.ts`      | Recovery 检测改为 AND 逻辑 + 详细日志    | 修复误判        |
+| `app/account/reset-password/page.tsx` | 支持 token_hash 解析 + 错误文案一致性    | 完善 token 处理 |
+| `hooks/useSupabaseAuth.ts`            | 智能端口检测函数 `getAuthRedirectBase()` | 支持多端口      |
+| `lib/auth/parseRecoveryTokens.ts`     | Token 解析工具 + 15 个单元测试           | 可复用逻辑      |
+| `package.json` (g1-g5)                | 固定端口配置                             | 解决端口混乱    |
 
 ### 新增工具
 
-| 脚本 | 用途 |
-|------|------|
-| `scripts/set-worktree-port.ps1` | 为单个 worktree 设置端口 |
-| `scripts/configure-all-ports.ps1` | 批量配置所有 worktree |
+| 脚本                              | 用途                     |
+| --------------------------------- | ------------------------ |
+| `scripts/set-worktree-port.ps1`   | 为单个 worktree 设置端口 |
+| `scripts/configure-all-ports.ps1` | 批量配置所有 worktree    |
 
 ### 新增文档
 
-| 文档 | 内容 |
-|------|------|
-| `docs/reports/2025-12-01-auth-system-diagnosis.md` | 系统性诊断报告 |
-| `docs/reports/2025-12-01-auth-test-checklist.md` | 手动测试清单 |
-| `docs/guides/worktree-env-management.md` | Worktree 环境管理指南 |
+| 文档                                               | 内容                  |
+| -------------------------------------------------- | --------------------- |
+| `docs/reports/2025-12-01-auth-system-diagnosis.md` | 系统性诊断报告        |
+| `docs/reports/2025-12-01-auth-test-checklist.md`   | 手动测试清单          |
+| `docs/guides/worktree-env-management.md`           | Worktree 环境管理指南 |
 
 ---
 
@@ -93,19 +99,20 @@ grep '"dev"' D:/Projects/investor-ai-g*/package.json
 
 ### 功能验证
 
-| 场景 | 预期结果 | 状态 |
-|------|----------|------|
-| 密码注册 | 发送确认邮件 → 点击确认 → 登录成功 | ✅ |
-| 密码登录 | 直接登录成功 | ✅ |
-| 魔术链接 | 点击邮件 → 跳转到**首页**（不是 reset-password） | ✅ |
+| 场景     | 预期结果                                            | 状态      |
+| -------- | --------------------------------------------------- | --------- |
+| 密码注册 | 发送确认邮件 → 点击确认 → 登录成功                  | ✅        |
+| 密码登录 | 直接登录成功                                        | ✅        |
+| 魔术链接 | 点击邮件 → 跳转到**首页**（不是 reset-password）    | ✅        |
 | 密码重置 | 点击邮件 → 跳转到 change-password 页面 → 设置新密码 | ⚠️ 需测试 |
-| 端口隔离 | g2 邮件 → 3002，g1 邮件 → 3001 | ✅ |
+| 端口隔离 | g2 邮件 → 3002，g1 邮件 → 3001                      | ✅        |
 
 ---
 
 ## 🚀 部署清单
 
 ### 1. 重启所有 dev 服务器
+
 ```bash
 # 停止所有运行的 dev 服务器
 # 然后每个 worktree 重新启动
@@ -117,12 +124,14 @@ cd D:\Projects\investor-ai-g5 && npm run dev  # → 3005
 ```
 
 ### 2. 验证端口监听
+
 ```bash
 netstat -ano | findstr "300[1-5]"
 # 应看到每个端口都在 LISTENING 状态
 ```
 
 ### 3. 测试密码重置（关键）
+
 1. 访问 http://localhost:3002/login
 2. 点击"忘记密码"
 3. 输入邮箱并发送
@@ -134,18 +143,18 @@ netstat -ano | findstr "300[1-5]"
 
 ## 📊 提交记录
 
-| Commit | 说明 |
-|--------|------|
-| `fabd3e2` | fix(dev): set fixed port 3002 for g2 worktree |
-| `78d6351` | feat(scripts): add worktree port management |
-| `3765386` | feat(scripts): add batch port configuration |
-| `b321c95` | fix(auth): resolve recovery misdetection and enhance logging |
+| Commit    | 说明                                                            |
+| --------- | --------------------------------------------------------------- |
+| `fabd3e2` | fix(dev): set fixed port 3002 for g2 worktree                   |
+| `78d6351` | feat(scripts): add worktree port management                     |
+| `3765386` | feat(scripts): add batch port configuration                     |
+| `b321c95` | fix(auth): resolve recovery misdetection and enhance logging    |
 | `ce8a235` | refactor(auth): smart redirect URL detection for multi-worktree |
-| `0e1af71` | docs: add worktree env management guide |
-| `24315d4` | fix(dev): set fixed port 3001 for g1 worktree |
-| `8eb468d` | fix(dev): set fixed port 3003 for g3 worktree |
-| `53358b5` | fix(dev): set fixed port 3004 for g4 worktree |
-| `415f174` | fix(dev): set fixed port 3005 for g5 worktree |
+| `0e1af71` | docs: add worktree env management guide                         |
+| `24315d4` | fix(dev): set fixed port 3001 for g1 worktree                   |
+| `8eb468d` | fix(dev): set fixed port 3003 for g3 worktree                   |
+| `53358b5` | fix(dev): set fixed port 3004 for g4 worktree                   |
+| `415f174` | fix(dev): set fixed port 3005 for g5 worktree                   |
 
 ---
 
@@ -174,6 +183,7 @@ netstat -ano | findstr "300[1-5]"
 ### 问题：邮件链接仍跳转错误
 
 **检查**:
+
 ```bash
 # 1. 验证端口配置
 cat package.json | grep '"dev"'
@@ -194,6 +204,7 @@ netstat -ano | findstr :3002
 
 **原因**: 脚本从总部复制 `package.json`
 **解决**: 重新运行端口配置脚本
+
 ```powershell
 .\scripts\set-worktree-port.ps1 -Name g2 -Port 3002
 ```
@@ -203,6 +214,7 @@ netstat -ano | findstr :3002
 ## 🎉 总结
 
 经过完整诊断和修复，登录系统现已支持：
+
 - ✅ 密码注册/登录
 - ✅ 魔术链接（OTP）
 - ✅ 密码重置

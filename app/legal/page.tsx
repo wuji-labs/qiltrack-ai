@@ -32,7 +32,8 @@ export default function LegalPage() {
           <p className="text-xs uppercase tracking-[0.35em] text-emerald-300">Investor AI</p>
           <h1 className="mt-3 text-3xl font-semibold">法律与合规</h1>
           <p className="mt-3 text-sm text-slate-400">
-            以下文档说明使用 Investor AI 时的权利义务、隐私保护与可接受使用范围。请根据需要查阅详细条款。
+            以下文档说明使用 Investor AI
+            时的权利义务、隐私保护与可接受使用范围。请根据需要查阅详细条款。
           </p>
           <p className="mt-2 text-xs text-slate-500">最近更新：2025-11-30</p>
         </div>
@@ -46,7 +47,9 @@ export default function LegalPage() {
             >
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-slate-50">{link.title}</h2>
-                <span className="text-emerald-300 text-sm group-hover:translate-x-1 transition-transform">→</span>
+                <span className="text-emerald-300 text-sm group-hover:translate-x-1 transition-transform">
+                  →
+                </span>
               </div>
               <p className="mt-2 text-sm text-slate-300 leading-relaxed">{link.description}</p>
             </Link>
@@ -64,7 +67,11 @@ export default function LegalPage() {
 
         <div className="text-xs text-slate-500 space-y-2">
           <p>
-            如对上述条款或政策有疑问，请邮件 <a className="text-emerald-300" href="mailto:legal@investor.ai">legal@investor.ai</a> 与我们联系。
+            如对上述条款或政策有疑问，请邮件{" "}
+            <a className="text-emerald-300" href="mailto:legal@investor.ai">
+              legal@investor.ai
+            </a>{" "}
+            与我们联系。
           </p>
           <div className="inline-flex flex-wrap items-center gap-2 text-emerald-300 text-xs">
             <span aria-hidden className="text-sm opacity-80">

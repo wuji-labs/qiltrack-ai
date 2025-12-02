@@ -4,22 +4,15 @@ import { LLMService } from "@/lib/services/llm";
 import { MarketDataService } from "@/lib/services/market-data";
 import { ContentSanitizer } from "./content-sanitizer";
 import { ReportGenerationError } from "../errors";
-import type {
-  GenerateReportParams,
-  GeneratedReport,
-  ReportTone,
-  ReportMetadata,
-} from "./types";
+import type { GenerateReportParams, GeneratedReport, ReportTone, ReportMetadata } from "./types";
 import { getLangfuseClient } from "@/lib/observability/langfuse";
 
 /**
  * Tone directives for different report styles
  */
 const TONE_DIRECTIVES: Record<ReportTone, string> = {
-  baseline:
-    "以 Investor AI 标准流程输出,保持证据优先与结构化描述,不加入夸张语气。",
-  buffett:
-    "采用价值投资视角:强调护城河、现金流、治理质量与估值安全边际,解释为何可以長期持有。",
+  baseline: "以 Investor AI 标准流程输出,保持证据优先与结构化描述,不加入夸张语气。",
+  buffett: "采用价值投资视角:强调护城河、现金流、治理质量与估值安全边际,解释为何可以長期持有。",
   musk: "以科技乐观主义者的语气描写:突出创新、TAM、技术迭代与可能的 10 倍成长机会,同时保留理性提醒。",
   muddy:
     "站在做空机构/反脆弱角度:主力拆解风险、会计或治理疑点、监管黑天鹅,语气保持审慎甚至略偏 Bear。",
@@ -56,8 +49,7 @@ export class ReportGenerator {
     sanitizer?: ContentSanitizer;
   }) {
     this.llmService = options?.llmService || new LLMService();
-    this.marketDataService =
-      options?.marketDataService || new MarketDataService();
+    this.marketDataService = options?.marketDataService || new MarketDataService();
     this.sanitizer = options?.sanitizer || new ContentSanitizer();
   }
 
@@ -93,18 +85,12 @@ export class ReportGenerator {
         input: { symbol: params.symbol },
       });
 
-      const marketData = await this.marketDataService.fetchCompanyData(
-        params.symbol
-      );
+      const marketData = await this.marketDataService.fetchCompanyData(params.symbol);
 
       marketDataSpan?.end({ output: { hasData: true } });
 
       // 2. Build prompts
-      const { systemPrompt, userPrompt } = this.buildPrompts(
-        marketData,
-        language,
-        tone
-      );
+      const { systemPrompt, userPrompt } = this.buildPrompts(marketData, language, tone);
 
       // 3. Generate report using LLM
       const llmSpan = trace?.span({
@@ -112,15 +98,11 @@ export class ReportGenerator {
         input: { promptLength: systemPrompt.length + userPrompt.length },
       });
 
-      const rawContent = await this.llmService.generateReport(
-        systemPrompt,
-        userPrompt,
-        {
-          temperature: 0.7,
-          maxTokens: 4096,
-          metadata: { symbol: params.symbol, language, tone },
-        }
-      );
+      const rawContent = await this.llmService.generateReport(systemPrompt, userPrompt, {
+        temperature: 0.7,
+        maxTokens: 4096,
+        metadata: { symbol: params.symbol, language, tone },
+      });
 
       llmSpan?.end({
         output: { contentLength: rawContent.length },
@@ -151,14 +133,11 @@ export class ReportGenerator {
     } catch (error) {
       const generationTimeMs = Date.now() - startTime;
 
-      throw new ReportGenerationError(
-        `Failed to generate report for ${params.symbol}: ${error}`,
-        {
-          symbol: params.symbol,
-          error: String(error),
-          generationTimeMs,
-        }
-      );
+      throw new ReportGenerationError(`Failed to generate report for ${params.symbol}: ${error}`, {
+        symbol: params.symbol,
+        error: String(error),
+        generationTimeMs,
+      });
     }
   }
 

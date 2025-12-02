@@ -10,11 +10,7 @@ import { usePathname } from "next/navigation";
 /**
  * 后台管理系统布局 - 中文版
  */
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const navItems = [
@@ -125,9 +121,7 @@ export default function AdminLayout({
         </nav>
 
         {/* 主内容区域 */}
-        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          {children}
-        </main>
+        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">{children}</main>
       </div>
     </Refine>
   );

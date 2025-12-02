@@ -15,6 +15,7 @@
 ### 2️⃣ 验证迁移 (1 分钟)
 
 在 SQL Editor 运行:
+
 ```sql
 SELECT column_default FROM information_schema.columns WHERE table_name='profiles' AND column_name='quota_limit';
 -- 应该显示: 30 ✅
@@ -32,13 +33,13 @@ SELECT column_default FROM information_schema.columns WHERE table_name='profiles
 
 ## 📝 关键文件位置
 
-| 用途 | 文件 | 说明 |
-|------|------|------|
-| **实施步骤** | `docs/IMPLEMENTATION_CHECKLIST.md` | 👈 从这里开始 |
-| 技术详情 | `docs/TECHNICAL_SUMMARY.md` | 代码和架构 |
-| 数据库迁移 | `supabase/migrations/20251130000001_init_user_credits_30.sql` | 核心修改 |
-| 每日奖励 API | `app/api/report/daily-reward/route.ts` | 新端点 |
-| 前端服务 | `lib/services/api.ts` | claimDailyReward() 函数 |
+| 用途         | 文件                                                          | 说明                    |
+| ------------ | ------------------------------------------------------------- | ----------------------- |
+| **实施步骤** | `docs/IMPLEMENTATION_CHECKLIST.md`                            | 👈 从这里开始           |
+| 技术详情     | `docs/TECHNICAL_SUMMARY.md`                                   | 代码和架构              |
+| 数据库迁移   | `supabase/migrations/20251130000001_init_user_credits_30.sql` | 核心修改                |
+| 每日奖励 API | `app/api/report/daily-reward/route.ts`                        | 新端点                  |
+| 前端服务     | `lib/services/api.ts`                                         | claimDailyReward() 函数 |
 
 ---
 
@@ -61,8 +62,11 @@ A: 确认迁移已执行。清除缓存，用新邮箱重新注册。
 
 **Q: 看不到"领取"按钮？**
 A: 按钮是可选的，API 已经工作。可以直接在控制台测试：
+
 ```javascript
-fetch('/api/report/daily-reward', {method:'POST'}).then(r=>r.json()).then(d=>console.log(d))
+fetch("/api/report/daily-reward", { method: "POST" })
+  .then((r) => r.json())
+  .then((d) => console.log(d));
 ```
 
 ---

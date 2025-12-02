@@ -7,6 +7,7 @@
 ## ✅ 发现的优点
 
 ### 1. 文档结构清晰
+
 - ✅ 核心协作手册 `CODEX_CLAUDE_COLLAB.md` (110行) - 完整详细
 - ✅ 组织架构 `organization-structure.md` (78行) - 角色明确
 - ✅ Worktree 指南 `worktree-multi-team.md` (86行) - 操作具体
@@ -14,12 +15,14 @@
 - ✅ Snapshot 示例 `2025-11-27-supabase-local-auth.md` (67行) - 结构完整
 
 ### 2. 协作规范明确
+
 - ✅ 三行汇报格式（Report/Status/Next）
 - ✅ 文档引用规则（不粘贴长文本）
 - ✅ PR 流程和模板
 - ✅ Git worktree 管理
 
 ### 3. 角色定义清楚
+
 - ✅ 老板、HQ、Codex、Claude 的职责
 - ✅ 信息流向（谁跟谁说话）
 - ✅ 工作组命名规范（G1-G5）
@@ -33,6 +36,7 @@
 #### 1. **文档重复和混淆**
 
 **问题**：根目录有太多类似的文档
+
 ```
 CODEX_CLAUDE_COLLAB.md          ← 主协作手册
 docs/guides/codex-claude-collaboration.md  ← 旧版？
@@ -40,15 +44,19 @@ docs/guides/codex-claude-quickstart.md     ← 快速版？
 ```
 
 **影响**：
+
 - AI 不知道该看哪个
 - 信息不一致时会困惑
 - 老板也不确定哪个是最新的
 
 **解决方案**：
+
 ```markdown
 # 在 CODEX_CLAUDE_COLLAB.md 开头加：
+
 > **注意**：本文档是唯一权威版本。如与其他文档冲突，以本文档为准。
 > 相关文档：
+>
 > - `docs/guides/codex-claude-quickstart.md` - 1 页速查版
 > - `docs/guides/organization-structure.md` - 组织架构详解
 ```
@@ -59,10 +67,12 @@ docs/guides/codex-claude-quickstart.md     ← 快速版？
 
 ```markdown
 ## 10. ????
+
 - HQ ????? `docs/plans/workstreams.md`...
 ```
 
 **影响**：
+
 - 这段完全不可读
 - AI 无法理解这部分内容
 - 可能是关键的工作流说明
@@ -74,12 +84,17 @@ docs/guides/codex-claude-quickstart.md     ← 快速版？
 **位置**：`scripts/prep-group.ps1` 生成的 GROUP.md
 
 **当前内容**：
-```markdown
+
+````markdown
 ## 启动模板
+
 ```\n@G1-Codex 请阅读...
+
 ```
+````
 
 **问题**：
+
 - Markdown 代码块用了 `\n` 转义，显示不正确
 - 复制粘贴时会包含多余的反引号
 
@@ -90,14 +105,17 @@ docs/guides/codex-claude-quickstart.md     ← 快速版？
 #### 4. **文档更新不同步**
 
 **现象**：
+
 - `CODEX_CLAUDE_COLLAB.md` 提到 `docs/guides/codex-claude-quickstart.md`
 - 但 quickstart 可能是旧版本，没有 HQ 的说明
 
 **影响**：
+
 - 新加入的 HQ 角色，旧文档没更新
 - AI 看到矛盾信息会困惑
 
 **解决方案**：
+
 1. 确定哪些文档需要更新
 2. 统一提到 HQ 的角色和流程
 3. 或者标记旧文档为 deprecated
@@ -105,10 +123,12 @@ docs/guides/codex-claude-quickstart.md     ← 快速版？
 #### 5. **Snapshot 模板不完整**
 
 **当前状态**：
+
 - `2025-11-27-supabase-local-auth.md` 是个好例子
 - 但没有 **空白模板** 给 AI 参考
 
 **影响**：
+
 - Codex 每次写 Snapshot 都要从头想结构
 - 格式不统一，老板看着累
 
@@ -118,10 +138,12 @@ docs/guides/codex-claude-quickstart.md     ← 快速版？
 #### 6. **CAVR 模板缺失**
 
 **当前状态**：
+
 - 文档说要写 CAVR（Context/Actions/Verification/Risks）
 - 但没有具体格式示例
 
 **影响**：
+
 - Claude 不知道每个部分该写什么
 - 报告质量参差不齐
 
@@ -133,6 +155,7 @@ docs/guides/codex-claude-quickstart.md     ← 快速版？
 #### 7. **根目录文档太多**
 
 **现象**：
+
 ```
 AGENTS.md
 CDP_SUCCESS_GUIDE.md
@@ -148,16 +171,19 @@ QUICK_REFERENCE.md
 ```
 
 **影响**：
+
 - AI 不知道从哪里开始读
 - 有些可能是历史遗留（部署相关、Stage2 相关）
 
 **解决方案**：
+
 1. 归档到 `docs/archive/` 或 `docs/history/`
 2. 在 README.md 明确列出 "必读文档 Top 5"
 
 #### 8. **workstreams.md 太简单**
 
 **当前内容**（8 行）：
+
 ```markdown
 | ID | Group | Branch | Scope | Status | Due | Notes |
 | WS-G1-LOCAL-AUTH | G1 | ... | Pending kickoff | ... |
@@ -165,21 +191,26 @@ QUICK_REFERENCE.md
 ```
 
 **问题**：
+
 - 没有已完成任务的历史
 - 没有任务依赖关系
 - 没有优先级
 
 **解决方案**：
+
 ```markdown
 ## 进行中
+
 | ID | Status | Progress | Owner | Due |
 |... |... |... |... |... |
 
 ## 已完成
+
 | ID | Completed | PR | Notes |
 |... |... |... |... |
 
 ## 待办
+
 | ID | Priority | Dependencies | Notes |
 |... |... |... |... |
 ```
@@ -191,18 +222,22 @@ QUICK_REFERENCE.md
 ### HQ（Codex 插件）
 
 **能理解的**：
+
 - ✅ 自己是总指挥
 - ✅ 需要拆解任务、更新 workstreams.md
 - ✅ 审查 PR
 
 **可能困惑的**：
+
 - ⚠️ 如何创建 worktree（脚本在哪？参数是什么？）
 - ⚠️ 乱码部分（第 10 节）
 
 **建议**：
 在 `CODEX_CLAUDE_COLLAB.md` 加一个 HQ 专属章节：
+
 ```markdown
 ## 12. HQ 特别说明
+
 - 你是 VS Code Codex 插件，运行在总部
 - 创建 worktree：`powershell -File scripts/prep-group.ps1 -Name gX -Branch gX/xxx`
 - 分配任务时，给老板可复制的 fenced block
@@ -211,11 +246,13 @@ QUICK_REFERENCE.md
 ### Gx-Codex（架构师）
 
 **能理解的**：
+
 - ✅ 自己负责组内设计
 - ✅ 需要读 Snapshot、写组内计划
 - ✅ 指导 Claude、审查代码
 
 **可能困惑的**：
+
 - ⚠️ Snapshot 格式（没有模板）
 - ⚠️ 如何看到其他组的进度（workstreams.md 太简单）
 
@@ -225,18 +262,22 @@ QUICK_REFERENCE.md
 ### Gx-Claude（程序员）
 
 **能理解的**：
+
 - ✅ 自己负责写代码和测试
 - ✅ 向本组 Codex 汇报
 - ✅ 使用 worktree
 
 **可能困惑的**：
+
 - ⚠️ CAVR 格式不明确
 - ⚠️ 如何运行测试（worktree 里 npm 命令怎么用？）
 
 **建议**：
 在 `worktree-multi-team.md` 加一个 "Claude 速查" 章节：
-```markdown
+
+````markdown
 ## Claude 常用命令
+
 ```bash
 # 当前工作区
 pwd  # D:\Projects\investor-ai-gX
@@ -253,7 +294,10 @@ git add .
 git commit -m "feat: xxx"
 git push origin gX/branch-name
 ```
+````
+
 \```
+
 ```
 
 ---
@@ -315,21 +359,26 @@ git push origin gX/branch-name
 
 **场景 1：HQ 第一次启动**
 ```
+
 模拟输入：我是 HQ，刚加入这个项目，我应该做什么？
 
 测试文档：
+
 - CODEX_CLAUDE_COLLAB.md 是否有 HQ 的职责说明？
 - organization-structure.md 是否说明 HQ 的位置？
 - 能否找到如何创建 worktree 的命令？
 
 预期输出：
+
 - 理解自己是总指挥
 - 知道要维护 workstreams.md
 - 知道如何分配任务给各组
+
 ```
 
 **场景 2：G1-Codex 收到任务**
 ```
+
 模拟输入：
 @G1-Codex
 Report: docs/decisions/2025-11-27-supabase-local-auth.md
@@ -337,18 +386,22 @@ Status: 新任务，请创建组内 Snapshot
 Next: 阅读文档并制定计划
 
 测试文档：
+
 - 能否打开并理解 Snapshot？
 - 知道要创建什么格式的组内计划？
 - 知道如何指导 G1-Claude？
 
 预期输出：
+
 - 理解需求
 - 写出清晰的组内计划
 - 给 G1-Claude 可执行的指令
+
 ```
 
 **场景 3：G1-Claude 开始编码**
 ```
+
 模拟输入：
 @G1-Claude
 Report: docs/plans/g1-local-auth.md
@@ -356,14 +409,17 @@ Status: 请实现 lib/config/supabaseEnv.ts
 Next: 编写代码和测试
 
 测试文档：
+
 - 知道自己在哪个目录（worktree）？
 - 知道如何运行测试？
 - 知道 CAVR 格式？
 
 预期输出：
+
 - 写出代码
 - 运行测试
 - 提交清晰的 CAVR 报告
+
 ```
 
 ---
@@ -392,18 +448,22 @@ Next: 编写代码和测试
 
 ### Before（当前）
 ```
+
 AI: "我不确定 Snapshot 该写什么格式..."
 AI: "CAVR 的 Verification 部分要多详细？"
 AI: "这段文字是乱码，我跳过了"
 AI: "有 3 个协作手册，我该看哪个？"
+
 ```
 
 ### After（修复后）
 ```
+
 AI: "参考 TEMPLATE-snapshot.md，我写了结构化的 Snapshot"
 AI: "按照 TEMPLATE-cavr.md 的格式，我提供了详细的验证步骤"
 AI: "CODEX_CLAUDE_COLLAB.md 是唯一权威文档，我以它为准"
 AI: "在 worktree 里运行 npm test --prefix，测试通过"
+
 ```
 
 ---
@@ -433,3 +493,4 @@ AI: "在 worktree 里运行 npm test --prefix，测试通过"
 
 *审查完成：2025-11-27*
 *审查人：Claude Sonnet 4.5*
+```

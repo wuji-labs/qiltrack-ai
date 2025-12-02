@@ -10,6 +10,7 @@
 ## 已完成的工作
 
 ### 代码与文档
+
 - ✅ 6 个 commits 完成（Schema 对齐、3 阻塞项修复、文档补齐）
 - ✅ 34/34 测试通过，ESLint 0 错误
 - ✅ 迁移文件就绪（`supabase/migrations/20251124000002_align_hosted_schema.sql`）
@@ -38,6 +39,7 @@
 ```
 
 **预期的 .env.local 配置：**
+
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://inmtounwqcjwsxkfnsfd.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<Anon key from Dashboard>
@@ -196,6 +198,7 @@ curl "http://localhost:3000/api/report/history?testToken=test-token-12345"
 ## 验证清单
 
 ### Schema 迁移
+
 - [ ] `npx supabase db push` 成功
 - [ ] 迁移日志显示两个迁移文件被应用
 - [ ] Hosted Studio 中确认新列存在：
@@ -204,16 +207,19 @@ curl "http://localhost:3000/api/report/history?testToken=test-token-12345"
   - [ ] `v_user_quota` 视图含 `user_id`、`remaining_credits`
 
 ### 类型生成
+
 - [ ] `npx supabase gen types` 完成
 - [ ] 生成的 `types/database.ts` 与现有版本相同或只有预期变更
 - [ ] 若有变更，已提交 commit
 
 ### 存储桶
+
 - [ ] Dashboard 中确认 `report-assets` 桶存在
 - [ ] 桶设为 Private（私有）
 - [ ] RLS 策略已配置（Service Role 可操作）
 
 ### 本地验证
+
 - [ ] `npm run lint` → 0 errors
 - [ ] `npm run test` → 34/34 passing
 - [ ] `/api/report` 端点可调用（成功或 LLM 提示）
@@ -225,11 +231,13 @@ curl "http://localhost:3000/api/report/history?testToken=test-token-12345"
 ## 后续动作
 
 ### 若全部验证通过
+
 1. 更新最终 CAVR（已验证的步骤与结果）
 2. 提交 PR（6 commits + 验证记录）
 3. 审核与合并到 main
 
 ### 若遇到问题
+
 1. 记录错误信息与日志
 2. 检查迁移日志（`supabase db push` 输出）
 3. 验证凭证正确性（Dashboard 与 .env.local 一致）

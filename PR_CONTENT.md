@@ -15,6 +15,7 @@
 ### Work Completed
 
 #### Stage 1: Schema Alignment & Code Fixes (13 commits)
+
 - ✅ Schema migration: `supabase/migrations/20251124000002_align_hosted_schema.sql` (safe ALTER TABLE)
 - ✅ Fixed 3 blockers: Anon key naming, Credits contract simplification, data protection
 - ✅ Updated TypeScript types (`types/database.ts`) - fully aligned with schema
@@ -22,6 +23,7 @@
 - ✅ Comprehensive documentation: 8 deployment guides + CAVR + README updates
 
 #### Stage 2: Hosted Deployment Execution (3 commits)
+
 - ✅ Manual migration guide for Dashboard SQL Editor
 - ✅ Comprehensive schema fixup guide with two scenarios (empty table / with data)
 - ✅ SQL statements verified and executed in Hosted instance
@@ -31,20 +33,21 @@
   - `fn_consume_report_credit`: RPC function updated for new contract
 
 #### Stage 3: Verification (1 commit)
+
 - ✅ Hosted credentials configured to `.env.local` (not committed, in .gitignore)
 - ✅ Local verification: `npm run lint` → 0 errors, `npm test` → 34/34 passing
 - ✅ TypeScript types: already aligned, no changes needed
 
 ### Quality Metrics
 
-| Category | Status |
-|----------|--------|
-| ESLint | ✅ 0 errors, 15 warnings (pre-existing) |
-| Tests | ✅ 34/34 passing (6 test files) |
-| Migration | ✅ Safe ALTER TABLE strategy, data protection |
-| Types | ✅ Fully aligned with Hosted schema |
-| Documentation | ✅ 8 guides, CAVR, README updates |
-| API Contracts | ✅ Simplified (remaining_credits only) |
+| Category      | Status                                        |
+| ------------- | --------------------------------------------- |
+| ESLint        | ✅ 0 errors, 15 warnings (pre-existing)       |
+| Tests         | ✅ 34/34 passing (6 test files)               |
+| Migration     | ✅ Safe ALTER TABLE strategy, data protection |
+| Types         | ✅ Fully aligned with Hosted schema           |
+| Documentation | ✅ 8 guides, CAVR, README updates             |
+| API Contracts | ✅ Simplified (remaining_credits only)        |
 
 ### Test Plan
 
@@ -77,14 +80,17 @@
 ### Files Changed
 
 **Code & Types**:
+
 - `types/database.ts` - Already aligned (no changes needed)
 - `app/api/report/credits/route.ts` - Fixed for simplified contract
 - `lib/services/api.ts` - Simplified CreditsResponse type
 
 **Migrations**:
+
 - `supabase/migrations/20251124000002_align_hosted_schema.sql` - Hosted deployment migration
 
 **Documentation (New)**:
+
 - `MANUAL_MIGRATION_STEPS.md` - Manual SQL execution guide
 - `HOSTED_SCHEMA_FIXUP.md` - Complete schema correction guide
 - `QUICK_REFERENCE.md` - Rapid execution card
@@ -92,10 +98,12 @@
 - `docs/reports/2025-11-24-*.md` (7 files) - Comprehensive deployment guides
 
 **Updated**:
+
 - `README.md` - 6-step Hosted deployment guide
 - `docs/reports/2025-11-24-supabase-deployment-cavr.md` - Complete technical analysis & verification
 
 **Scripts**:
+
 - `scripts/verify-hosted-deployment.sh` - Automated verification
 - `scripts/deploy-hosted.mjs` - Type generation helper
 - `scripts/generate-types.mjs` - REST API type generation
@@ -105,6 +113,7 @@
 ### Deployment Status
 
 ✅ **Completed**:
+
 - Schema migration executed in Hosted instance (project ref: inmtounwqcjwsxkfnsfd)
 - Types synchronized and verified
 - Local lint & test validation passed
@@ -112,6 +121,7 @@
 - 14 new commits with comprehensive documentation
 
 ⏳ **Pending** (requires Codex):
+
 - Create private storage bucket `report-assets` (Dashboard UI)
 - Configure RLS policies (authenticated users read own, service_role write/delete)
 - Run final integration tests (3 API endpoints)
@@ -130,4 +140,3 @@
 - RLS policies protect user data at database level
 - Documentation covers both CLI and alternative execution paths
 - Ready for production deployment once storage bucket is created
-

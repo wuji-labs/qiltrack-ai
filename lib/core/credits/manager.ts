@@ -101,9 +101,7 @@ export class CreditManager {
       }
 
       if (!data || data.length === 0 || !data[0]?.success) {
-        throw new InsufficientCreditsError(
-          `积分不足，需要 ${amount} 积分，但余额不足`
-        );
+        throw new InsufficientCreditsError(`积分不足，需要 ${amount} 积分，但余额不足`);
       }
 
       return {
@@ -187,18 +185,16 @@ export class CreditManager {
     }
 
     // Record transaction event
-    const { error: eventError } = await supabase
-      .from("report_credit_events")
-      .insert({
-        user_id: targetUserId,
-        event_type: "granted",
-        credits_amount: amount,
-        reason,
-        delta: amount,
-        metadata: {
-          granted_by: adminId,
-        },
-      });
+    const { error: eventError } = await supabase.from("report_credit_events").insert({
+      user_id: targetUserId,
+      event_type: "granted",
+      credits_amount: amount,
+      reason,
+      delta: amount,
+      metadata: {
+        granted_by: adminId,
+      },
+    });
 
     if (eventError) {
       console.error("Failed to record credit event:", eventError);
@@ -233,9 +229,7 @@ export class CreditManager {
    * @param userId - User ID claiming the reward
    * @returns Operation result with remaining credits
    */
-  async claimDailyReward(
-    userId: string
-  ): Promise<CreditOperationResult> {
+  async claimDailyReward(userId: string): Promise<CreditOperationResult> {
     const supabase = await createClient();
 
     const { data, error } = await supabase.rpc("fn_claim_daily_reward", {
@@ -266,10 +260,7 @@ export class CreditManager {
    * @param limit - Maximum number of transactions to return (default: 50)
    * @returns Array of credit transactions
    */
-  async getTransactionHistory(
-    userId: string,
-    limit: number = 50
-  ): Promise<CreditTransaction[]> {
+  async getTransactionHistory(userId: string, limit: number = 50): Promise<CreditTransaction[]> {
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -313,10 +304,7 @@ export class CreditManager {
    * @param initialCredits - Initial credit amount (default: 30)
    * @internal
    */
-  async initializeCredits(
-    userId: string,
-    initialCredits: number = 30
-  ): Promise<void> {
+  async initializeCredits(userId: string, initialCredits: number = 30): Promise<void> {
     const supabase = await createClient();
 
     const { error } = await supabase.from("report_credits").insert({

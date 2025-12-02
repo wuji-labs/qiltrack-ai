@@ -36,26 +36,28 @@ export default function CreditsPage() {
     try {
       const { data, error } = await supabase
         .from("report_credits")
-        .select(`
+        .select(
+          `
           user_id,
           credits_available,
           credits_used,
           updated_at,
           profiles!inner(email, display_name, full_name)
-        `)
+        `
+        )
         .order("updated_at", { ascending: false });
 
       if (error) throw error;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const formatted = data?.map((item: any) => ({
-        user_id: item.user_id,
-        email: item.profiles.email,
-        display_name: item.profiles.display_name || item.profiles.full_name,
-        credits_available: item.credits_available,
-        credits_used: item.credits_used,
-        last_updated: item.updated_at,
-      })) || [];
+      const formatted =
+        data?.map((item) => ({
+          user_id: item.user_id,
+          email: item.profiles.email,
+          display_name: item.profiles.display_name || item.profiles.full_name,
+          credits_available: item.credits_available,
+          credits_used: item.credits_used,
+          last_updated: item.updated_at,
+        })) || [];
 
       setCredits(formatted);
     } catch (error) {
@@ -88,7 +90,9 @@ export default function CreditsPage() {
       } else {
         // 单个授予积分
         const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
         if (!user) {
           alert("You must be logged in to grant credits");
@@ -109,7 +113,7 @@ export default function CreditsPage() {
       await fetchCredits();
     } catch (error) {
       console.error("Failed to grant credits:", error);
-      alert(`Failed to grant credits: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      alert(`Failed to grant credits: ${error instanceof Error ? error.message : "Unknown error"}`);
     } finally {
       setGrantingCredits(false);
     }
@@ -121,7 +125,11 @@ export default function CreditsPage() {
       return;
     }
 
-    if (!confirm(`Are you sure you want to revoke ${amount} credits from ${selectedUsers.size} users?`)) {
+    if (
+      !confirm(
+        `Are you sure you want to revoke ${amount} credits from ${selectedUsers.size} users?`
+      )
+    ) {
       return;
     }
 
@@ -136,7 +144,9 @@ export default function CreditsPage() {
       await fetchCredits();
     } catch (error) {
       console.error("Failed to revoke credits:", error);
-      alert(`Failed to revoke credits: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      alert(
+        `Failed to revoke credits: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
     } finally {
       setGrantingCredits(false);
     }
@@ -156,11 +166,11 @@ export default function CreditsPage() {
     if (selectedUsers.size === filteredCredits.length) {
       setSelectedUsers(new Set());
     } else {
-      setSelectedUsers(new Set(filteredCredits.map(c => c.user_id)));
+      setSelectedUsers(new Set(filteredCredits.map((c) => c.user_id)));
     }
   }
 
-  const filteredCredits = credits.filter(credit => {
+  const filteredCredits = credits.filter((credit) => {
     if (!searchTerm) return true;
     const searchLower = searchTerm.toLowerCase();
     return (
@@ -173,9 +183,7 @@ export default function CreditsPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">积分管理</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          查看和管理用户积分,支持批量授予和撤销
-        </p>
+        <p className="mt-2 text-sm text-gray-600">查看和管理用户积分,支持批量授予和撤销</p>
       </div>
 
       {/* 操作模式切换 */}
@@ -200,17 +208,13 @@ export default function CreditsPage() {
               setSelectedUser("");
             }}
             className={`px-4 py-2 rounded-lg font-medium ${
-              batchMode
-                ? "bg-indigo-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              batchMode ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
             批量操作
           </button>
           {batchMode && selectedUsers.size > 0 && (
-            <span className="text-sm text-gray-600">
-              已选择 {selectedUsers.size} 个用户
-            </span>
+            <span className="text-sm text-gray-600">已选择 {selectedUsers.size} 个用户</span>
           )}
         </div>
       </div>
@@ -223,9 +227,7 @@ export default function CreditsPage() {
         <form onSubmit={handleGrantCredits} className="space-y-4">
           {!batchMode && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                选择用户
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">选择用户</label>
               <select
                 value={selectedUser}
                 onChange={(e) => setSelectedUser(e.target.value)}
@@ -243,9 +245,7 @@ export default function CreditsPage() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              积分数量
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">积分数量</label>
             <input
               type="number"
               value={amount}
@@ -258,9 +258,7 @@ export default function CreditsPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              原因说明
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">原因说明</label>
             <input
               type="text"
               value={reason}
@@ -274,10 +272,18 @@ export default function CreditsPage() {
           <div className="flex space-x-4">
             <button
               type="submit"
-              disabled={grantingCredits || (!batchMode && !selectedUser) || (batchMode && selectedUsers.size === 0)}
+              disabled={
+                grantingCredits ||
+                (!batchMode && !selectedUser) ||
+                (batchMode && selectedUsers.size === 0)
+              }
               className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              {grantingCredits ? "处理中..." : batchMode ? `授予 ${selectedUsers.size} 个用户` : "授予积分"}
+              {grantingCredits
+                ? "处理中..."
+                : batchMode
+                  ? `授予 ${selectedUsers.size} 个用户`
+                  : "授予积分"}
             </button>
 
             {batchMode && selectedUsers.size > 0 && (
@@ -319,7 +325,9 @@ export default function CreditsPage() {
                   <th className="px-6 py-3 text-left">
                     <input
                       type="checkbox"
-                      checked={selectedUsers.size === filteredCredits.length && filteredCredits.length > 0}
+                      checked={
+                        selectedUsers.size === filteredCredits.length && filteredCredits.length > 0
+                      }
                       onChange={toggleAllUsers}
                       className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
@@ -353,7 +361,7 @@ export default function CreditsPage() {
                 filteredCredits.map((credit) => (
                   <tr
                     key={credit.user_id}
-                    className={`hover:bg-gray-50 ${selectedUsers.has(credit.user_id) ? 'bg-indigo-50' : ''}`}
+                    className={`hover:bg-gray-50 ${selectedUsers.has(credit.user_id) ? "bg-indigo-50" : ""}`}
                   >
                     {batchMode && (
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -385,7 +393,7 @@ export default function CreditsPage() {
                       {credit.credits_available + credit.credits_used}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(credit.last_updated).toLocaleString('zh-CN')}
+                      {new Date(credit.last_updated).toLocaleString("zh-CN")}
                     </td>
                   </tr>
                 ))

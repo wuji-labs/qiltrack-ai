@@ -1,4 +1,5 @@
 # Footer Refresh Phase 1 - CAVR Report
+
 **Date:** 2025-11-28
 **Phase:** Phase 1 (i18n + Component Skeleton)
 **Status:** Complete
@@ -6,6 +7,7 @@
 ---
 
 ## Context
+
 Footer 刷新架构评估已完成（见 `docs/decisions/2025-11-28-footer-refresh-implementation-plan.md`）。Phase 1 目标：补充 40+ i18n 键值并搭建 FooterSection 组件骨架（5 层 UI 切片）。
 
 ---
@@ -13,10 +15,12 @@ Footer 刷新架构评估已完成（见 `docs/decisions/2025-11-28-footer-refre
 ## Actions
 
 ### 1. i18n Keys Addition (`lib/i18n.tsx`)
+
 **范围:** 2470-2796 行
 **新增:** 46 个多语言翻译键值（5 语言）
 
 **键值清单：**
+
 - `footer.brand.*` (3 keys): 品牌标题、描述、CTA 文案
 - `footer.links.{product,solutions,company,resources,compare}.*` (10 keys): 5 组链接 + 标题，每组 3-5 项，JSON 格式存储
 - `footer.download.*` (2 keys): 下载应用标题、说明
@@ -31,8 +35,10 @@ Footer 刷新架构评估已完成（见 `docs/decisions/2025-11-28-footer-refre
 ---
 
 ### 2. FooterSection 组件重构 (`app/sections/FooterSection.tsx`)
+
 **范围:** 全文件替换（原 20 行 → 新 322 行）
 **架构:**
+
 - `"use client"` directive（需要 useLanguage hook）
 - 5 层子组件：
   1. **FooterBrand**: 品牌区、tagline、CTA 按钮
@@ -42,6 +48,7 @@ Footer 刷新架构评估已完成（见 `docs/decisions/2025-11-28-footer-refre
   5. **FooterSection** (root): 组装上述切片，5 列 grid 布局（Desktop: Brand(1) | Links(3) | Download(1)）
 
 **响应式设计:**
+
 - Mobile (1 col): 所有元素垂直堆叠
 - Tablet (sm: 640px+): Links 2 列，Brand/Download 全宽
 - Desktop (lg: 1024px+): 5 列 grid，Brand 左侧固定宽，Links 展开，Download 右侧卡片
@@ -49,12 +56,14 @@ Footer 刷新架构评估已完成（见 `docs/decisions/2025-11-28-footer-refre
 **i18n 集成:** 所有文本通过 `t()` 获取，支持 JSON 格式的 link items 自动解析
 
 **a11y 特性:**
+
 - 所有链接 + 按钮: `aria-label` + focus ring (2px emerald)
 - 社交图标: 圆形按钮 (8x8 = 32px)，标签为平台首字母 (I/Y/T/L)
 - 触控目标: ≥ 32px (App Store/Play 按钮 40px)
 - 语义: `<footer>`, `<nav>`, `<h3>`/`<h4>` 正确嵌套
 
 **CSS 变量使用:**
+
 - `--bg-base`, `--bg-layer`, `--bg-frosted`
 - `--color-foreground`, `--text-dim`, `--text-subtle`
 - `--stroke-soft`, `--accent-emerald`
@@ -67,26 +76,31 @@ Footer 刷新架构评估已完成（见 `docs/decisions/2025-11-28-footer-refre
 ## Verification
 
 ### Lint Results
+
 ```
 ✓ npm run lint
 Status: PASS (0 errors, 0 warnings)
 ```
 
 ### Test Results
+
 ```
 ✓ npm test
 Status: PASS (51 tests, 8 files, 5.46s)
 ```
+
 所有现有测试继续通过，无新增失败
 
 ### Type Check
-- FooterSection props 接口定义完整（含 show* flags 用于可配置性）
+
+- FooterSection props 接口定义完整（含 show\* flags 用于可配置性）
 - 子组件 interface 明确 (FooterLink, LinkGroup, SocialLink, LegalLink)
 - JSON.parse with fallback (catch → return [])
 
 ### Manual Verification Checklist
+
 - [x] i18n keys 全部添加到 lib/i18n.tsx
-- [x] 所有 footer.* 键可被 t() 解析
+- [x] 所有 footer.\* 键可被 t() 解析
 - [x] FooterSection 已搭建，4 个子函数组件清晰可用
 - [x] Tailwind 类已按照设计方案应用（responsive, colors, spacing）
 - [x] 无 ESLint 错误，符合项目 lint 规则
@@ -97,6 +111,7 @@ Status: PASS (51 tests, 8 files, 5.46s)
 ## Risks & Known Issues
 
 ### 无当前阻塞风险
+
 1. Social 链接 hrefs 为占位符 (instagram.com/investorai 等)
    - **影响:** 链接不可用
    - **解决:** Codex 需提供真实社交账号 URL，或待后续配置
@@ -122,13 +137,16 @@ Status: PASS (51 tests, 8 files, 5.46s)
 ## Artifacts
 
 ### Files Modified
-1. `lib/i18n.tsx`: +46 footer.* keys (2470-2796 lines)
+
+1. `lib/i18n.tsx`: +46 footer.\* keys (2470-2796 lines)
 2. `app/sections/FooterSection.tsx`: 完全重构 (20 → 322 lines)
 
 ### Files Created
+
 - `docs/reports/2025-11-28-footer-refresh-phase1-cavr.md` (本文件)
 
 ### No New Dependencies
+
 项目现有栈足以支持实现，无需新增 npm packages
 
 ---

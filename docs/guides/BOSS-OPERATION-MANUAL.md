@@ -8,6 +8,7 @@
 ## 🎯 核心概念
 
 ### 你的工作环境
+
 ```
 D:\Projects\investor-ai          ← 总部（main 分支）
 ├─ investor-ai-g1               ← G1 工作区（g1/* 分支）
@@ -18,6 +19,7 @@ D:\Projects\investor-ai          ← 总部（main 分支）
 ```
 
 ### AI 团队结构
+
 ```
 老板（你）
     ↓ 提需求
@@ -31,6 +33,7 @@ HQ（VS Code Codex 插件）
 ```
 
 ### 系统访问权限（默认已开通）
+
 - Codex/Claude 默认具备 GitHub、Supabase、MCP DevTools、LLM（OpenRouter/Finnhub/Helicone）完整访问，禁止再以“未登录/无权限”为由拒绝执行，细节见 `CODEX_CLAUDE_COLLAB.md` 3.1。
 - GitHub：SSH + `gh` 已登录（explore0012），可直接 `gh pr view/checks/run view/create/merge/comment`。
 - Supabase：`.env.local` 已含项目 `inmtounwqcjwsxkfnsfd` 凭证，可用 Dashboard/CLI/REST/脚本管理 Auth/Storage/DB。
@@ -38,6 +41,7 @@ HQ（VS Code Codex 插件）
 - 第三方：OpenRouter/Finnhub/Helicone Key 已配置，可直接调用与验证。
 
 ### VS Code 终端设置
+
 - **总部终端**：用于跟 HQ 对话（Codex 插件在这里）
 - **G1 终端 × 2**：一个给 G1-Codex，一个给 G1-Claude
 - **G2 终端 × 2**：一个给 G2-Codex，一个给 G2-Claude
@@ -90,6 +94,7 @@ git worktree list
 #### 1.2 HQ 会做什么？
 
 HQ 会自动：
+
 1. 分析需求
 2. 拆解成任务
 3. 更新 `docs/plans/workstreams.md`
@@ -105,6 +110,7 @@ Next: 确认后我开始分配
 ```
 
 **你回复**：
+
 ```
 @HQ 确认，开始吧
 ```
@@ -153,11 +159,13 @@ git worktree list
 #### 3.1 在 VS Code 打开多个终端
 
 **方法**：
+
 1. 按 `Ctrl+Shift+` ` （打开终端面板）
 2. 点击右上角 `+` 图标多次，创建 5 个终端
 3. 重命名每个终端：右键终端标签 → Rename → 输入名字
 
 **终端设置**：
+
 ```
 终端1: HQ            → cd D:\Projects\investor-ai
 终端2: G1-Codex      → cd D:\Projects\investor-ai-g1
@@ -170,15 +178,16 @@ git worktree list
 
 **重要**：在每个终端里打开不同的 AI 对话
 
-| 终端 | AI 工具 | 模型建议 |
-|------|---------|----------|
-| HQ | VS Code Codex 插件 | Claude Sonnet（已内置） |
-| G1-Codex | Claude.ai 网页版 | GPT-4 或 Claude Opus |
-| G1-Claude | Cursor AI | Claude Sonnet |
-| G2-Codex | Claude.ai 网页版 | GPT-4 或 Claude Opus |
-| G2-Claude | Cursor AI | Claude Sonnet |
+| 终端      | AI 工具            | 模型建议                |
+| --------- | ------------------ | ----------------------- |
+| HQ        | VS Code Codex 插件 | Claude Sonnet（已内置） |
+| G1-Codex  | Claude.ai 网页版   | GPT-4 或 Claude Opus    |
+| G1-Claude | Cursor AI          | Claude Sonnet           |
+| G2-Codex  | Claude.ai 网页版   | GPT-4 或 Claude Opus    |
+| G2-Claude | Cursor AI          | Claude Sonnet           |
 
 **技巧**：
+
 - 每个 AI 在**不同的浏览器标签页**或**不同的应用窗口**
 - 建议用**不同的模型**，避免混淆
 
@@ -198,6 +207,7 @@ Next: 阅读 docs/decisions/2025-11-27-supabase-local-auth.md 并创建组内 Sn
 ```
 
 **你的操作**：
+
 1. **复制**上面这段话
 2. **切换到 G1-Codex 终端**（网页版 Claude）
 3. **粘贴**并发送
@@ -212,6 +222,7 @@ Next: 阅读 docs/decisions/2025-11-27-supabase-local-auth.md 并创建组内 Sn
 ```
 
 **你的操作**：
+
 1. 复制
 2. 切换到 **G2-Codex 终端**
 3. 粘贴并发送
@@ -232,6 +243,7 @@ Next: 实现 lib/config/supabaseEnv.ts 和 login 页面 Banner，详见 Snapshot
 ```
 
 **你的操作**：
+
 1. **复制** G1-Codex 的回复
 2. **切换到 G1-Claude 终端**
 3. **粘贴**并发送
@@ -248,6 +260,7 @@ Next: 完成后通知你审查
 ```
 
 **你的操作**：
+
 1. **复制** G1-Claude 的回复
 2. **切换回 G1-Codex 终端**
 3. **粘贴**并发送
@@ -255,6 +268,7 @@ Next: 完成后通知你审查
 #### 5.3 重复转发
 
 **规律**：
+
 - G1-Codex 说话 → 复制 → 粘贴给 G1-Claude
 - G1-Claude 说话 → 复制 → 粘贴给 G1-Codex
 - G2 同理
@@ -268,6 +282,7 @@ Next: 完成后通知你审查
 #### 6.1 看文件变化
 
 在 VS Code 左侧 **Source Control** 面板：
+
 - 可以看到哪些文件被修改了
 - 点击文件可以看 diff（改了什么）
 
@@ -279,11 +294,12 @@ code docs/plans/workstreams.md
 ```
 
 **内容示例**：
+
 ```markdown
-| ID | Group | Status | Notes |
-|----|-------|--------|-------|
-| WS-G1-LOCAL-AUTH | G1 | In Progress 60% | UI 完成，测试中 |
-| WS-G2-CLI-ENV | G2 | In Progress 30% | 脚本已完成 |
+| ID               | Group | Status          | Notes           |
+| ---------------- | ----- | --------------- | --------------- |
+| WS-G1-LOCAL-AUTH | G1    | In Progress 60% | UI 完成，测试中 |
+| WS-G2-CLI-ENV    | G2    | In Progress 30% | 脚本已完成      |
 ```
 
 ---
@@ -300,6 +316,7 @@ Next: 请审查并决定是否提 PR
 ```
 
 **你的操作**：
+
 1. 复制
 2. 粘贴给 G1-Codex
 
@@ -315,6 +332,7 @@ Next: 提交 PR，使用模板 .github/pull_request_template.md
 ```
 
 **你的操作**：
+
 1. 复制
 2. 粘贴给 G1-Claude
 
@@ -340,6 +358,7 @@ Next: 请审查并决定是否合并
 ```
 
 **你的操作**：
+
 1. 复制
 2. 切换到 **HQ 终端**（总部）
 3. 粘贴
@@ -351,6 +370,7 @@ Next: 请审查并决定是否合并
 #### 8.1 HQ 审查 PR
 
 HQ 会检查：
+
 - 代码改动
 - 测试结果
 - 文档完整性
@@ -365,6 +385,7 @@ Next: 确认合并吗？
 ```
 
 **你回复**：
+
 ```
 @HQ 确认合并
 ```
@@ -378,9 +399,10 @@ gh pr merge 37 --squash
 #### 8.4 更新 workstreams.md
 
 HQ 会更新状态：
+
 ```markdown
-| ID | Status | Notes |
-|----|--------|-------|
+| ID               | Status  | Notes         |
+| ---------------- | ------- | ------------- |
 | WS-G1-LOCAL-AUTH | ✅ Done | 已合并到 main |
 ```
 
@@ -398,6 +420,7 @@ Next: 可以重置 G1 工作区准备下一个任务了
 ```
 
 **你确认**：
+
 ```
 @HQ 重置 G1
 ```
@@ -426,18 +449,21 @@ Next: 可以重置 G1 工作区准备下一个任务了
 **5 个 worktree 长期保留，不删除**。每次新任务前重置即可。
 
 **优点**：
+
 - 终端一直开着，不用重复建
 - AI 对话历史保留
 - 独立 `node_modules`，避免 Turbopack 冲突
 - 可以同时运行多个 `npm run dev`
 
 **每次新任务前运行**：
+
 ```powershell
 # 重置工作区到最新 main
 .\scripts\reset-worktree.ps1 -Name g1
 ```
 
 这个脚本会自动：
+
 1. `git fetch origin` - 获取最新代码
 2. `git reset --hard origin/main` - 重置到 main
 3. `git clean -fd` - 清理（保留 node_modules、.env.local）
@@ -449,30 +475,32 @@ Next: 可以重置 G1 工作区准备下一个任务了
 
 ### 总部文件（所有组都能看到）
 
-| 文件 | 作用 | 谁维护 |
-|------|------|--------|
-| `docs/plans/workstreams.md` | 任务看板 | HQ |
-| `docs/decisions/<date>-<topic>.md` | 需求 Snapshot | HQ |
-| `docs/guides/` | 协作手册 | HQ |
-| `CODEX_CLAUDE_COLLAB.md` | 协作规范 | HQ |
+| 文件                               | 作用          | 谁维护 |
+| ---------------------------------- | ------------- | ------ |
+| `docs/plans/workstreams.md`        | 任务看板      | HQ     |
+| `docs/decisions/<date>-<topic>.md` | 需求 Snapshot | HQ     |
+| `docs/guides/`                     | 协作手册      | HQ     |
+| `CODEX_CLAUDE_COLLAB.md`           | 协作规范      | HQ     |
 
 ### 工作区文件（每个组独立）
 
-| 文件 | 作用 | 谁维护 |
-|------|------|--------|
-| `GROUP.md` | 组信息和启动模板 | 自动生成 |
-| `.env.local` | 环境变量 | 自动生成 |
-| `docs/reports/<date>-gX-*-cavr.md` | 组内进度报告 | Claude |
-| `docs/plans/gX-*.md` | 组内计划 | Codex |
+| 文件                               | 作用             | 谁维护   |
+| ---------------------------------- | ---------------- | -------- |
+| `GROUP.md`                         | 组信息和启动模板 | 自动生成 |
+| `.env.local`                       | 环境变量         | 自动生成 |
+| `docs/reports/<date>-gX-*-cavr.md` | 组内进度报告     | Claude   |
+| `docs/plans/gX-*.md`               | 组内计划         | Codex    |
 
 ### 重要：worktree 里的 AI 能看到什么？
 
 **能看到**：
+
 - ✅ 所有代码文件（app, lib, hooks, scripts, types）
 - ✅ 所有文档（docs/, CODEX_CLAUDE_COLLAB.md 等）
 - ✅ 配置文件（package.json, tsconfig.json 等）
 
 **看不到**：
+
 - ❌ 其他分支的改动（除非 git fetch）
 - ❌ 总部 .gitignore 的文件（如 .env.local）
 
@@ -551,12 +579,14 @@ git push
 ### Q3: 复制粘贴太麻烦？
 
 **解决**：
+
 1. 使用 Windows PowerToys 的 Keyboard Manager 设置快捷键
 2. 或者让 HQ 自动化转发（需要开发脚本）
 
 ### Q4: worktree 文件丢失？
 
 **解决**：
+
 ```powershell
 # 使用重置脚本
 .\scripts\reset-worktree.ps1 -Name gX
@@ -570,6 +600,7 @@ git sparse-checkout set app docs hooks lib supabase types __tests__ scripts
 ### Q5: 分支冲突？
 
 **解决**：
+
 ```powershell
 cd D:\Projects\investor-ai-gX
 git fetch origin
@@ -580,6 +611,7 @@ git rebase origin/main
 ### Q6: 如何暂停一个任务？
 
 **方法：保留 worktree，提交到远程**
+
 ```powershell
 cd D:\Projects\investor-ai-g1
 git add .
@@ -593,6 +625,7 @@ git pull
 ### Q7: Turbopack/npm run dev 报错？
 
 **解决**：独立安装 node_modules
+
 ```powershell
 cd D:\Projects\investor-ai-g1
 
@@ -606,6 +639,7 @@ npm ci
 ### Q8: 多个 worktree 同时运行 dev server？
 
 **解决**：每个用不同端口
+
 ```powershell
 # G1
 cd D:\Projects\investor-ai-g1
@@ -758,4 +792,4 @@ HQ: 已合并，功能已上线
 
 **下一步**：保存这个文档，打印出来放旁边，每次开工看一眼！
 
-*最后更新：2025-11-27*
+_最后更新：2025-11-27_

@@ -18,17 +18,11 @@ export async function POST(request: Request) {
     const { userId, password } = body;
 
     if (!userId || !password) {
-      return NextResponse.json(
-        { error: "用户ID和密码为必填项" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "用户ID和密码为必填项" }, { status: 400 });
     }
 
     if (password.length < 6) {
-      return NextResponse.json(
-        { error: "密码至少6位" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "密码至少6位" }, { status: 400 });
     }
 
     // 使用Admin API重置密码
@@ -38,10 +32,7 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("Reset password error:", error);
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     return NextResponse.json({

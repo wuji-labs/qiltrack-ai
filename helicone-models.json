@@ -9,12 +9,8 @@
       "name": "Qwen2.5 Coder 7B fast",
       "provider": "alibaba",
       "contextLength": 32000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -22,12 +18,8 @@
       "name": "Qwen3 32B",
       "provider": "alibaba",
       "contextLength": 131072,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -35,12 +27,8 @@
       "name": "Qwen3 Coder 30B A3B Instruct",
       "provider": "alibaba",
       "contextLength": 262144,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -48,14 +36,8 @@
       "name": "Qwen3 VL 235B A22B Instruct",
       "provider": "alibaba",
       "contextLength": 256000,
-      "inputModalities": [
-        "text",
-        "image",
-        "video"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image", "video"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -63,13 +45,8 @@
       "name": "Anthropic: Claude 3 Haiku",
       "provider": "anthropic",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -77,13 +54,8 @@
       "name": "Anthropic: Claude 3.5 Haiku",
       "provider": "anthropic",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -91,13 +63,8 @@
       "name": "Anthropic: Claude 3.5 Sonnet v2",
       "provider": "anthropic",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -105,13 +72,8 @@
       "name": "Anthropic: Claude 3.7 Sonnet",
       "provider": "anthropic",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -119,13 +81,8 @@
       "name": "Anthropic: Claude 4.5 Haiku",
       "provider": "anthropic",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -133,13 +90,8 @@
       "name": "Anthropic: Claude Sonnet 4.5",
       "provider": "anthropic",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -147,13 +99,8 @@
       "name": "Anthropic: Claude 4.5 Haiku (20251001)",
       "provider": "anthropic",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -161,13 +108,8 @@
       "name": "Anthropic: Claude Opus 4",
       "provider": "anthropic",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -175,13 +117,8 @@
       "name": "Anthropic: Claude Opus 4.1",
       "provider": "anthropic",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -189,13 +126,8 @@
       "name": "Anthropic: Claude Opus 4.1 (20250805)",
       "provider": "anthropic",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -203,13 +135,8 @@
       "name": "Anthropic: Claude Sonnet 4",
       "provider": "anthropic",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -217,13 +144,8 @@
       "name": "Anthropic: Claude Sonnet 4.5 (20250929)",
       "provider": "anthropic",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -231,12 +153,8 @@
       "name": "Baidu Ernie 4.5 21B A3B Thinking",
       "provider": "baidu",
       "contextLength": 128000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -244,12 +162,8 @@
       "name": "DeepSeek R1 Distill Llama 70B",
       "provider": "deepseek",
       "contextLength": 128000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -257,12 +171,8 @@
       "name": "DeepSeek Reasoner",
       "provider": "deepseek",
       "contextLength": 128000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -270,12 +180,8 @@
       "name": "DeepSeek TNG R1T2 Chimera",
       "provider": "deepseek",
       "contextLength": 130000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -283,12 +189,8 @@
       "name": "DeepSeek V3",
       "provider": "deepseek",
       "contextLength": 128000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -296,12 +198,8 @@
       "name": "DeepSeek V3.1 Terminus",
       "provider": "deepseek",
       "contextLength": 128000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -309,12 +207,8 @@
       "name": "DeepSeek V3.2",
       "provider": "deepseek",
       "contextLength": 163840,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -322,13 +216,8 @@
       "name": "Google Gemini 2.5 Flash",
       "provider": "google",
       "contextLength": 1048576,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -336,13 +225,8 @@
       "name": "Google Gemini 2.5 Flash Lite",
       "provider": "google",
       "contextLength": 1048576,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -350,13 +234,8 @@
       "name": "Google Gemini 2.5 Pro",
       "provider": "google",
       "contextLength": 1048576,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -364,15 +243,8 @@
       "name": "Google Gemini 3 Pro Preview",
       "provider": "google",
       "contextLength": 1048576,
-      "inputModalities": [
-        "text",
-        "image",
-        "audio",
-        "video"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image", "audio", "video"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -380,13 +252,8 @@
       "name": "Google Gemma 3 12B",
       "provider": "google",
       "contextLength": 131072,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -394,12 +261,8 @@
       "name": "Google Gemma 2",
       "provider": "google",
       "contextLength": 8192,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -407,12 +270,8 @@
       "name": "Hermes 2 Pro Llama 3 8B",
       "provider": "meta-llama",
       "contextLength": 131072,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -420,12 +279,8 @@
       "name": "Meta Llama 3.1 8B Instant",
       "provider": "meta-llama",
       "contextLength": 131072,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -433,12 +288,8 @@
       "name": "Meta Llama 3.1 8B Instruct",
       "provider": "meta-llama",
       "contextLength": 16384,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -446,12 +297,8 @@
       "name": "Meta Llama 3.1 8B Instruct Turbo",
       "provider": "meta-llama",
       "contextLength": 128000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -459,12 +306,8 @@
       "name": "Meta Llama 3.3 70B Instruct",
       "provider": "meta-llama",
       "contextLength": 128000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -472,12 +315,8 @@
       "name": "Meta Llama 3.3 70B Versatile",
       "provider": "meta-llama",
       "contextLength": 131072,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -485,13 +324,8 @@
       "name": "Meta Llama 4 Maverick 17B 128E",
       "provider": "meta-llama",
       "contextLength": 131072,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -499,13 +333,8 @@
       "name": "Meta Llama 4 Scout 17B 16E",
       "provider": "meta-llama",
       "contextLength": 131072,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -513,13 +342,8 @@
       "name": "Meta Llama Guard 4 12B",
       "provider": "meta-llama",
       "contextLength": 131072,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -527,12 +351,8 @@
       "name": "Meta Llama Prompt Guard 2 22M",
       "provider": "meta-llama",
       "contextLength": 512,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -540,12 +360,8 @@
       "name": "Meta Llama Prompt Guard 2 86M",
       "provider": "meta-llama",
       "contextLength": 512,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -553,12 +369,8 @@
       "name": "Mistral-Large",
       "provider": "mistral",
       "contextLength": 128000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -566,13 +378,8 @@
       "name": "Mistral Nemo",
       "provider": "mistral",
       "contextLength": 128000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -580,13 +387,8 @@
       "name": "Mistral Small",
       "provider": "mistral",
       "contextLength": 128000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -594,12 +396,8 @@
       "name": "Kimi K2 (07/11)",
       "provider": "moonshotai",
       "contextLength": 131072,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -607,12 +405,8 @@
       "name": "Kimi K2 (09/05)",
       "provider": "moonshotai",
       "contextLength": 262144,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -620,12 +414,8 @@
       "name": "Kimi K2 Thinking",
       "provider": "moonshotai",
       "contextLength": 256000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -633,13 +423,8 @@
       "name": "OpenAI ChatGPT-4o",
       "provider": "openai",
       "contextLength": 128000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -647,13 +432,8 @@
       "name": "OpenAI Codex Mini Latest",
       "provider": "openai",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -661,13 +441,8 @@
       "name": "OpenAI GPT-4.1",
       "provider": "openai",
       "contextLength": 1047576,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -675,13 +450,8 @@
       "name": "OpenAI GPT-4.1 Mini",
       "provider": "openai",
       "contextLength": 1047576,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -689,13 +459,8 @@
       "name": "OpenAI GPT-4.1 Nano",
       "provider": "openai",
       "contextLength": 1047576,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -703,13 +468,8 @@
       "name": "OpenAI GPT-4o",
       "provider": "openai",
       "contextLength": 128000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -717,13 +477,8 @@
       "name": "OpenAI GPT-4o-mini",
       "provider": "openai",
       "contextLength": 128000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -731,13 +486,8 @@
       "name": "OpenAI GPT-5",
       "provider": "openai",
       "contextLength": 400000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -745,13 +495,8 @@
       "name": "OpenAI GPT-5 Chat Latest",
       "provider": "openai",
       "contextLength": 128000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -759,12 +504,8 @@
       "name": "OpenAI: GPT-5 Codex",
       "provider": "openai",
       "contextLength": 400000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -772,13 +513,8 @@
       "name": "OpenAI GPT-5 Mini",
       "provider": "openai",
       "contextLength": 400000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -786,13 +522,8 @@
       "name": "OpenAI GPT-5 Nano",
       "provider": "openai",
       "contextLength": 400000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -800,12 +531,8 @@
       "name": "OpenAI: GPT-5 Pro",
       "provider": "openai",
       "contextLength": 128000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -813,14 +540,8 @@
       "name": "OpenAI GPT-5.1",
       "provider": "openai",
       "contextLength": 400000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text",
-        "image"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text", "image"],
       "tags": []
     },
     {
@@ -828,14 +549,8 @@
       "name": "OpenAI GPT-5.1 Chat",
       "provider": "openai",
       "contextLength": 128000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text",
-        "image"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text", "image"],
       "tags": []
     },
     {
@@ -843,14 +558,8 @@
       "name": "OpenAI: GPT-5.1 Codex",
       "provider": "openai",
       "contextLength": 400000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text",
-        "image"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text", "image"],
       "tags": []
     },
     {
@@ -858,14 +567,8 @@
       "name": "OpenAI: GPT-5.1 Codex Mini",
       "provider": "openai",
       "contextLength": 400000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text",
-        "image"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text", "image"],
       "tags": []
     },
     {
@@ -873,12 +576,8 @@
       "name": "OpenAI GPT-OSS 120b",
       "provider": "openai",
       "contextLength": 131072,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -886,12 +585,8 @@
       "name": "OpenAI GPT-OSS 20b",
       "provider": "openai",
       "contextLength": 131072,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -899,12 +594,8 @@
       "name": "OpenAI: o1",
       "provider": "openai",
       "contextLength": 200000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -912,12 +603,8 @@
       "name": "OpenAI: o1-mini",
       "provider": "openai",
       "contextLength": 128000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -925,13 +612,8 @@
       "name": "OpenAI o3",
       "provider": "openai",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -939,12 +621,8 @@
       "name": "OpenAI o3 Mini",
       "provider": "openai",
       "contextLength": 200000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -952,13 +630,8 @@
       "name": "OpenAI o3 Pro",
       "provider": "openai",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -966,13 +639,8 @@
       "name": "OpenAI o4 Mini",
       "provider": "openai",
       "contextLength": 200000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -980,12 +648,8 @@
       "name": "Perplexity Sonar",
       "provider": "perplexity",
       "contextLength": 127000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -993,12 +657,8 @@
       "name": "Perplexity Sonar Deep Research",
       "provider": "perplexity",
       "contextLength": 127000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -1006,12 +666,8 @@
       "name": "Perplexity Sonar Pro",
       "provider": "perplexity",
       "contextLength": 200000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -1019,12 +675,8 @@
       "name": "Perplexity Sonar Reasoning",
       "provider": "perplexity",
       "contextLength": 127000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -1032,12 +684,8 @@
       "name": "Perplexity Sonar Reasoning Pro",
       "provider": "perplexity",
       "contextLength": 127000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -1045,14 +693,8 @@
       "name": "Qwen3 235B A22B Thinking",
       "provider": "qwen",
       "contextLength": 262144,
-      "inputModalities": [
-        "text",
-        "image",
-        "video"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image", "video"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -1060,13 +702,8 @@
       "name": "Qwen3 30B A3B",
       "provider": "qwen",
       "contextLength": 41000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -1074,15 +711,8 @@
       "name": "Qwen3 Coder 480B A35B Instruct Turbo",
       "provider": "qwen",
       "contextLength": 262144,
-      "inputModalities": [
-        "text",
-        "image",
-        "audio",
-        "video"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image", "audio", "video"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -1090,14 +720,8 @@
       "name": "Qwen3 Next 80B A3B Instruct",
       "provider": "qwen",
       "contextLength": 262000,
-      "inputModalities": [
-        "text",
-        "image",
-        "video"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image", "video"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -1105,12 +729,8 @@
       "name": "xAI Grok 3",
       "provider": "xai",
       "contextLength": 131072,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -1118,12 +738,8 @@
       "name": "xAI Grok 3 Mini",
       "provider": "xai",
       "contextLength": 131072,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -1131,12 +747,8 @@
       "name": "xAI Grok 4",
       "provider": "xai",
       "contextLength": 256000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -1144,14 +756,8 @@
       "name": "xAI Grok 4 Fast Non-Reasoning",
       "provider": "xai",
       "contextLength": 2000000,
-      "inputModalities": [
-        "text",
-        "image",
-        "audio"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image", "audio"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -1159,13 +765,8 @@
       "name": "xAI: Grok 4 Fast Reasoning",
       "provider": "xai",
       "contextLength": 2000000,
-      "inputModalities": [
-        "text",
-        "image"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text", "image"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -1173,12 +774,8 @@
       "name": "xAI Grok Code Fast 1",
       "provider": "xai",
       "contextLength": 256000,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     },
     {
@@ -1186,12 +783,8 @@
       "name": "Zai GLM-4.6",
       "provider": "zai",
       "contextLength": 204800,
-      "inputModalities": [
-        "text"
-      ],
-      "outputModalities": [
-        "text"
-      ],
+      "inputModalities": ["text"],
+      "outputModalities": ["text"],
       "tags": []
     }
   ]

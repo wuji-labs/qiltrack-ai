@@ -9,27 +9,35 @@ vi.mock("@/lib/supabase/server", () => ({
   uploadToStorage: vi.fn(),
 }));
 
+vi.mock("@/lib/services/quota", () => ({
+  consumeReportCredit: vi.fn(),
+  writeReportAudit: vi.fn(),
+}));
+
 vi.mock("@/lib/observability/langfuse", () => ({
   getLangfuseClient: vi.fn(() => null),
 }));
 
 // Mock langfuse dependency to avoid requiring external package
-vi.mock(
-  "langfuse",
-  () => ({
-    Langfuse: vi.fn(() => ({
-      track: vi.fn(),
-      flush: vi.fn(),
-    })),
-  })
-);
+vi.mock("langfuse", () => ({
+  Langfuse: vi.fn(() => ({
+    track: vi.fn(),
+    flush: vi.fn(),
+  })),
+}));
 
 // Mock global fetch for Finnhub/LLM
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 import { GET } from "@/app/api/report/route";
-import { createServerClient, createClient, createServiceRoleClient, uploadToStorage } from "@/lib/supabase/server";
+import {
+  createServerClient,
+  createClient,
+  createServiceRoleClient,
+  uploadToStorage,
+} from "@/lib/supabase/server";
+import { writeReportAudit } from "@/lib/services/quota";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 describe("API: /api/report - Supabase Integration", () => {
@@ -53,7 +61,7 @@ describe("API: /api/report - Supabase Integration", () => {
           error: null,
         }),
       },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     vi.mocked(createServerClient).mockImplementation(() => {
@@ -82,12 +90,18 @@ describe("API: /api/report - Supabase Integration", () => {
       // metrics
       { ok: true, json: async () => ({ metric: { peTTM: 25.5 } }) },
       // news
-      { ok: true, json: async () => ([]) },
+      { ok: true, json: async () => [] },
       // LLM (Helicone)
       {
         ok: true,
         json: async () => ({
-          choices: [{ message: { content: "# [Investor AI] Apple Report\n\n## Test\n\nThis is a test report." } }],
+          choices: [
+            {
+              message: {
+                content: "# [Investor AI] Apple Report\n\n## Test\n\nThis is a test report.",
+              },
+            },
+          ],
         }),
       },
     ];
@@ -145,18 +159,16 @@ describe("API: /api/report - Supabase Integration", () => {
     };
 
     const createMockFrom = () => ({
-      insert: vi.fn().mockReturnValue(createChainableMock({
-        id: "run-test-123",
-        symbol: "AAPL",
-        title: "Apple Inc. Report",
-        report_run_id: "run-test-123"
-      })),
-      select: vi.fn().mockReturnValue(
-        createChainableMock({ remaining_credits: 10 })
+      insert: vi.fn().mockReturnValue(
+        createChainableMock({
+          id: "run-test-123",
+          symbol: "AAPL",
+          title: "Apple Inc. Report",
+          report_run_id: "run-test-123",
+        })
       ),
-      delete: vi.fn().mockReturnValue(
-        createChainableMock()
-      ),
+      select: vi.fn().mockReturnValue(createChainableMock({ remaining_credits: 10 })),
+      delete: vi.fn().mockReturnValue(createChainableMock()),
     });
 
     const mockSupabaseClient = {
@@ -173,11 +185,11 @@ describe("API: /api/report - Supabase Integration", () => {
       }),
       storage: {
         from: vi.fn(() => ({
-          upload: vi.fn().mockResolvedValue({ data: {path: 'test.json'}, error: null }),
-          getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: 'https://signed.url' }}),
+          upload: vi.fn().mockResolvedValue({ data: { path: "test.json" }, error: null }),
+          getPublicUrl: vi.fn().mockReturnValue({ data: { publicUrl: "https://signed.url" } }),
         })),
       },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     vi.mocked(createServerClient).mockImplementation((cookieGetter, cookieSetter) => {
@@ -194,7 +206,7 @@ describe("API: /api/report - Supabase Integration", () => {
     // Mock createServiceRoleClient for StorageService
     vi.mocked(createServiceRoleClient).mockReturnValue(mockSupabaseClient);
     vi.mocked(uploadToStorage).mockResolvedValue("https://signed.url");
-    // Note: writeReportAudit removed - audit logging now handled by CreditManager RPC
+    vi.mocked(writeReportAudit).mockResolvedValue(undefined);
 
     const request = new NextRequest(
       "http://localhost:3000/api/report?symbol=AAPL&testToken=test-token",
@@ -239,7 +251,7 @@ describe("API: /api/report - Supabase Integration", () => {
         data: [{ success: true, remaining_credits: 10 }],
         error: null,
       }),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     vi.mocked(createServerClient).mockImplementation(() => {
@@ -292,7 +304,7 @@ describe("API: /api/report - Supabase Integration", () => {
         data: [{ success: false, remaining_credits: 0 }],
         error: null,
       }),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     vi.mocked(createServerClient).mockImplementation(() => {

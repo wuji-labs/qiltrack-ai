@@ -77,7 +77,7 @@ import { handleApiError } from "@/lib/api/error-handler";
 try {
   // ... 业务逻辑
 } catch (error) {
-  return handleApiError(error);  // 自动格式化错误响应
+  return handleApiError(error); // 自动格式化错误响应
 }
 ```
 
@@ -227,7 +227,10 @@ import { UnauthorizedError } from "@/lib/core/errors";
 async function authenticate(request: NextRequest) {
   const supabase = createServerClient(request.cookies);
 
-  const { data: { session }, error } = await supabase.auth.getSession();
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
 
   if (error || !session?.user?.id) {
     throw new UnauthorizedError("Session not found");
@@ -245,11 +248,7 @@ import { ForbiddenError } from "@/lib/core/errors";
 async function checkAdmin(userId: string) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", userId)
-    .single();
+  const { data, error } = await supabase.from("profiles").select("role").eq("id", userId).single();
 
   if (error || !data || data.role !== "admin") {
     throw new ForbiddenError("Admin access required");
@@ -276,9 +275,7 @@ describe("MyService", () => {
 
   it("should throw error on invalid input", async () => {
     const service = new MyService();
-    await expect(
-      service.doSomething({ param: "" })
-    ).rejects.toThrow("Invalid parameter");
+    await expect(service.doSomething({ param: "" })).rejects.toThrow("Invalid parameter");
   });
 });
 ```
@@ -318,6 +315,7 @@ describe("GET /api/my-endpoint", () => {
 ### 1. 保持 API Route 简洁
 
 ❌ **不好的做法**:
+
 ```typescript
 export async function POST(request: Request) {
   // 200 行业务逻辑混在 route 中
@@ -329,6 +327,7 @@ export async function POST(request: Request) {
 ```
 
 ✅ **好的做法**:
+
 ```typescript
 export async function POST(request: Request) {
   try {
@@ -348,6 +347,7 @@ export async function POST(request: Request) {
 ### 2. 使用依赖注入
 
 ✅ **推荐**:
+
 ```typescript
 export class ReportGenerator {
   constructor(
@@ -367,6 +367,7 @@ export class ReportGenerator {
 ### 3. 参数验证
 
 ✅ **始终验证输入**:
+
 ```typescript
 function validateParams(searchParams: URLSearchParams) {
   const symbol = searchParams.get("symbol")?.toUpperCase().trim();
@@ -386,6 +387,7 @@ function validateParams(searchParams: URLSearchParams) {
 ### 4. 使用类型定义
 
 ✅ **定义清晰的类型**:
+
 ```typescript
 // types.ts
 export interface CreateReportParams {
@@ -476,7 +478,10 @@ export async function GET(request: NextRequest) {
   try {
     // 1. 认证
     const supabase = createServerClient(request.cookies);
-    const { data: { session }, error } = await supabase.auth.getSession();
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
 
     if (error || !session?.user?.id) {
       throw new UnauthorizedError();

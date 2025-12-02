@@ -12,11 +12,13 @@
 由于无法在此环境中交互式执行 `supabase login`，我将采用以下方案：
 
 ### 方案 A：直接使用凭证配置（推荐）
+
 1. 从 Dashboard 获取凭证后直接写入 `.env.local`
 2. 使用 Supabase Admin API 或 SQL 直接验证
 3. 本地测试确认连接正常
 
 ### 方案 B：生成预检查脚本
+
 1. 生成可复用的验证脚本
 2. 列出需要手动验证的步骤
 3. 记录所有预期结果
@@ -28,21 +30,23 @@
 ### 从 Supabase Dashboard 获取
 
 **步骤：**
+
 1. 打开 https://app.supabase.com/project/inmtounwqcjwsxkfnsfd
 2. 导航 Settings → API
 3. 复制以下值：
 
-| 字段 | 位置 | 用途 | 示例 |
-|------|------|------|------|
-| Project URL | Settings → API | NEXT_PUBLIC_SUPABASE_URL | `https://inmtounwqcjwsxkfnsfd.supabase.co` |
-| Anon key | Settings → API → Anon key (public) | NEXT_PUBLIC_SUPABASE_ANON_KEY | `eyJ...` |
-| Service Role key | Settings → API → Service role key (secret) | SUPABASE_SERVICE_ROLE_KEY | `eyJ...` |
+| 字段             | 位置                                       | 用途                          | 示例                                       |
+| ---------------- | ------------------------------------------ | ----------------------------- | ------------------------------------------ |
+| Project URL      | Settings → API                             | NEXT_PUBLIC_SUPABASE_URL      | `https://inmtounwqcjwsxkfnsfd.supabase.co` |
+| Anon key         | Settings → API → Anon key (public)         | NEXT_PUBLIC_SUPABASE_ANON_KEY | `eyJ...`                                   |
+| Service Role key | Settings → API → Service role key (secret) | SUPABASE_SERVICE_ROLE_KEY     | `eyJ...`                                   |
 
 ---
 
 ## 本地配置验证
 
 ### 已完成
+
 - ✅ `.env.local` 模板已准备（Hosted URL 占位符）
 - ✅ 迁移文件已就绪
 - ✅ 代码与测试通过
@@ -50,6 +54,7 @@
 ### 待执行
 
 #### 1. 配置凭证到 `.env.local`
+
 ```bash
 # .env.local 中修改以下行：
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<从 Dashboard 复制>
@@ -57,16 +62,17 @@ SUPABASE_SERVICE_ROLE_KEY=<从 Dashboard 复制>
 ```
 
 #### 2. 验证连接（可选脚本）
+
 ```javascript
 // verify-supabase-connection.js
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!url || !anonKey || !serviceRoleKey) {
-  console.error('Missing Supabase credentials in .env.local');
+  console.error("Missing Supabase credentials in .env.local");
   process.exit(1);
 }
 
@@ -75,12 +81,12 @@ const client = createClient(url, serviceRoleKey);
 // 验证连接
 const { data, error } = await client.auth.admin.listUsers();
 if (error) {
-  console.error('Connection failed:', error.message);
+  console.error("Connection failed:", error.message);
   process.exit(1);
 }
 
-console.log('✓ Supabase connection verified');
-console.log('✓ Users count:', data.users.length);
+console.log("✓ Supabase connection verified");
+console.log("✓ Users count:", data.users.length);
 ```
 
 ---
@@ -88,10 +94,12 @@ console.log('✓ Users count:', data.users.length);
 ## Supabase CLI 操作
 
 ### 约束
+
 - 需要 `supabase login`（交互式，本环境无法直接执行）
 - 替代方案：使用 API 令牌或预配置文件
 
 ### 预检查
+
 ```bash
 # 1. 检查 CLI 版本
 npx supabase --version
@@ -107,6 +115,7 @@ ls -la supabase/migrations/
 ### 需要执行的命令
 
 **若能交互式登录：**
+
 ```bash
 npx supabase link --project-ref inmtounwqcjwsxkfnsfd
 npx supabase db push
@@ -134,12 +143,14 @@ curl -X POST https://inmtounwqcjwsxkfnsfd.supabase.co/rest/v1/rpc/pg_execute \
 ## 存储桶创建与 RLS
 
 ### 通过 Dashboard UI（推荐）
+
 1. Storage → Create new bucket
 2. Name: `report-assets`
 3. Visibility: Private
 4. Create bucket
 
 ### 验证 RLS
+
 ```sql
 -- SQL Editor 中执行
 SELECT * FROM storage.buckets WHERE name = 'report-assets';
@@ -154,6 +165,7 @@ WHERE bucket_id = 'report-assets';
 ## 本地测试准备
 
 ### 环境就绪检查
+
 ```bash
 # 1. 检查 .env.local 配置
 test -f .env.local && echo "✓ .env.local exists" || echo "✗ Missing .env.local"
@@ -171,6 +183,7 @@ npm test        # 预期：34/34 passing
 ### API 端点手测
 
 **API 1：生成报告**
+
 ```bash
 # 启动开发服务
 npm run dev &
@@ -195,6 +208,7 @@ kill $DEV_PID
 ```
 
 **API 2：查询额度**
+
 ```bash
 curl -s "http://localhost:3000/api/report/credits?testToken=test-token-12345" | jq .
 
@@ -208,6 +222,7 @@ curl -s "http://localhost:3000/api/report/credits?testToken=test-token-12345" | 
 ```
 
 **API 3：历史报告**
+
 ```bash
 curl -s "http://localhost:3000/api/report/history?testToken=test-token-12345" | jq .
 
@@ -228,6 +243,7 @@ curl -s "http://localhost:3000/api/report/history?testToken=test-token-12345" | 
 ## 验证结果记录
 
 ### Schema 迁移验证
+
 ```
 来自 Supabase Dashboard → SQL Editor 执行：
 
@@ -250,6 +266,7 @@ Expected: user_id, email, plan, quota_limit, reports_used, remaining_credits
 ```
 
 ### 本地测试结果
+
 ```
 # npm run lint
 [预期输出]
@@ -261,6 +278,7 @@ Tests       34 passed (34)
 ```
 
 ### API 响应验证
+
 ```
 # /api/report
 Status: 200 or 500 (若 LLM 未配置)
@@ -280,12 +298,12 @@ Response: { reports: [], pagination: { page, pageSize, total, pages } }
 
 ## 风险与缓解
 
-| 风险 | 概率 | 缓解 |
-|------|------|------|
-| CLI login 失败 | 高 | 使用 API 或 SQL Editor 替代 |
-| 迁移冲突 | 低 | ALTER TABLE 幂等性保证 |
-| RLS 配置遗漏 | 中 | Dashboard 检查清单 |
-| 凭证泄漏 | 低 | .env.local 不提交 git |
+| 风险           | 概率 | 缓解                        |
+| -------------- | ---- | --------------------------- |
+| CLI login 失败 | 高   | 使用 API 或 SQL Editor 替代 |
+| 迁移冲突       | 低   | ALTER TABLE 幂等性保证      |
+| RLS 配置遗漏   | 中   | Dashboard 检查清单          |
+| 凭证泄漏       | 低   | .env.local 不提交 git       |
 
 ---
 

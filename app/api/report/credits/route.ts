@@ -9,7 +9,9 @@ export async function GET(request: NextRequest) {
     const testToken = process.env.TEST_REPORT_TOKEN || "local-test-token";
     const tokenFromHeader = request.headers.get("x-test-token");
     const tokenFromQuery = new URL(request.url).searchParams.get("testToken");
-    const isTestBypass = Boolean(testToken && (tokenFromHeader === testToken || tokenFromQuery === testToken));
+    const isTestBypass = Boolean(
+      testToken && (tokenFromHeader === testToken || tokenFromQuery === testToken)
+    );
 
     let userId: string | null = null;
 
@@ -27,10 +29,7 @@ export async function GET(request: NextRequest) {
 
       if (sessionError || !session?.user?.id) {
         console.warn(`[UNAUTHORIZED_SESSION] error: ${sessionError?.message || "no session"}`);
-        return NextResponse.json(
-          { error: "Unauthorized", code: "unauthorized" },
-          { status: 401 }
-        );
+        return NextResponse.json({ error: "Unauthorized", code: "unauthorized" }, { status: 401 });
       }
 
       userId = session.user.id;
@@ -70,9 +69,6 @@ export async function GET(request: NextRequest) {
     }
   } catch (err) {
     console.error("Credits API error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

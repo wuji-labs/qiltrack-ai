@@ -5,12 +5,7 @@ import { createServerClient } from "@/lib/supabase/server";
  * POST /api/admin/runs/[id]/feature
  * Mark a report as featured (admin only)
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id: runId } = await params;
-
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
 
@@ -42,7 +37,10 @@ export async function POST(
       .single();
 
     if (profileError || !profile) {
-      const response = NextResponse.json({ error: "Failed to verify admin status" }, { status: 500 });
+      const response = NextResponse.json(
+        { error: "Failed to verify admin status" },
+        { status: 500 }
+      );
       responseCookies.forEach(({ name, value }) => {
         response.headers.append("Set-Cookie", `${name}=${value}`);
       });
@@ -50,15 +48,21 @@ export async function POST(
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const isAdmin = (profile as any).plan === "admin" || (profile as any).email?.endsWith("@investor.ai");
+    const isAdmin =
+      (profile as any).plan === "admin" || (profile as any).email?.endsWith("@investor.ai");
 
     if (!isAdmin) {
-      const response = NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
+      const response = NextResponse.json(
+        { error: "Forbidden: Admin access required" },
+        { status: 403 }
+      );
       responseCookies.forEach(({ name, value }) => {
         response.headers.append("Set-Cookie", `${name}=${value}`);
       });
       return response;
     }
+
+    const runId = params.id;
 
     // Update the report to mark as featured
     const { error: updateError } = await supabase
@@ -68,10 +72,7 @@ export async function POST(
 
     if (updateError) {
       console.error("Failed to feature report:", updateError);
-      const response = NextResponse.json(
-        { error: "Failed to feature report" },
-        { status: 500 }
-      );
+      const response = NextResponse.json({ error: "Failed to feature report" }, { status: 500 });
       responseCookies.forEach(({ name, value }) => {
         response.headers.append("Set-Cookie", `${name}=${value}`);
       });
@@ -85,9 +86,6 @@ export async function POST(
     return response;
   } catch (err) {
     console.error("Feature report error:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

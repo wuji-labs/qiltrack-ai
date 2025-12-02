@@ -126,9 +126,7 @@ export class MarketDataService {
     const data = await this.fetchJson(url);
 
     if (!data || !data.ticker) {
-      throw new ExternalServiceError(
-        `No profile data found for symbol: ${symbol}`
-      );
+      throw new ExternalServiceError(`No profile data found for symbol: ${symbol}`);
     }
 
     return {
@@ -148,16 +146,12 @@ export class MarketDataService {
    * Get stock quote
    */
   async getQuote(symbol: string): Promise<StockQuote> {
-    const url = `${FINNHUB_BASE}/quote?symbol=${encodeURIComponent(
-      symbol
-    )}&token=${this.apiKey}`;
+    const url = `${FINNHUB_BASE}/quote?symbol=${encodeURIComponent(symbol)}&token=${this.apiKey}`;
 
     const data = await this.fetchJson(url);
 
     if (!data || data.c === undefined) {
-      throw new ExternalServiceError(
-        `No quote data found for symbol: ${symbol}`
-      );
+      throw new ExternalServiceError(`No quote data found for symbol: ${symbol}`);
     }
 
     return {
@@ -196,8 +190,7 @@ export class MarketDataService {
       quickRatioAnnual: metric.quickRatioAnnual,
       roeTTM: metric.roeTTM,
       roaRfy: metric.roaRfy,
-      dividendYieldIndicatedAnnual:
-        metric.dividendYieldIndicatedAnnual,
+      dividendYieldIndicatedAnnual: metric.dividendYieldIndicatedAnnual,
       "52WeekHigh": metric["52WeekHigh"],
       "52WeekLow": metric["52WeekLow"],
     };
@@ -249,17 +242,15 @@ export class MarketDataService {
 
       if (!res.ok) {
         const errorText = await res.text();
-        throw new Error(
-          `Request failed: ${res.status} ${res.statusText} - ${errorText}`
-        );
+        throw new Error(`Request failed: ${res.status} ${res.statusText} - ${errorText}`);
       }
 
       return await res.json();
     } catch (error) {
-      throw new ExternalServiceError(
-        `Finnhub API request failed: ${error}`,
-        { url, error: String(error) }
-      );
+      throw new ExternalServiceError(`Finnhub API request failed: ${error}`, {
+        url,
+        error: String(error),
+      });
     }
   }
 }

@@ -7,11 +7,13 @@
 ## 实施变更
 
 ### 1. 状态提升（app/page.tsx）
+
 - **导入 useProgress hook**：在 Home 组件顶级引入 useProgress
 - **实例化状态**：创建 `const progress = useProgress()` 实例
 - **传递至 ReportGeneratorSection**：通过 props 传递 progress 对象和所有控制函数
 
 ### 2. Workflow 区块重构（app/page.tsx）
+
 - **动态状态卡**：根据 `progress.status` 判定显示（idle/syncing/ready）
 - **实时步号显示**：使用 `progress.currentStep` 动态更新当前进度步数（01-04）
 - **步骤列表联动**：
@@ -22,6 +24,7 @@
 - **样式改进**：Active/Completed 步骤使用翠绿色(accent-emerald)突出强调
 
 ### 3. ReportGeneratorSection 重构
+
 - **移除本地 hook**：删除了 `const progress = useProgress()` 本地创建
 - **接收 progress 作为 prop**：通过 props 接收完整的 progress 对象和控制函数
 - **类型更新**：
@@ -29,25 +32,31 @@
   - 组件 props 类型完整定义 progress 的状态和方法
 
 ### 4. useProgress Hook 类型导出
+
 - **扩展 ProgressState 类型**：将所有控制函数（start/complete/fail/reset/forceComplete）纳入类型定义
 - **向下兼容**：保持现有 hook 实现不变，仅调整类型导出
 
 ## 验证结果
 
 ### Lint 检查
+
 ✅ 通过（仅对修改文件检查）
+
 ```
 app/page.tsx: 5 warnings（预先存在）
 app/sections/ReportGeneratorSection.tsx: 1 warning（预先存在）
 ```
 
 ### 测试执行
+
 ✅ 所有测试通过
+
 - Test Files: 6 passed (6)
 - Tests: 34 passed (34)
 - useProgress.test.tsx: 2 tests 通过
 
 ### 改动统计
+
 ```
 app/page.tsx                            | 70 ++++++++++++++++++++-------------
 app/sections/ReportGeneratorSection.tsx | 12 ++++--
@@ -58,6 +67,7 @@ hooks/useProgress.ts                    |  6 +++
 ## i18n 验证
 
 复用现有翻译 key，无需新增：
+
 - ✅ `workflow.status.idle` (第 2347 行)
 - ✅ `workflow.status.syncing` (第 2333 行)
 - ✅ `workflow.status.ready` (第 2340 行)

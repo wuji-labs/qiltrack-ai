@@ -16,10 +16,12 @@
 **问题**：初始加载时 `remainingQuota=0`（未加载）会误阻首份报告
 
 **解决**：
+
 - 新增 `AuthInfo.quotaLoaded?: boolean` 标记额度是否已同步加载
 - 修改 `isQuotaExhausted` 判断条件：
   ```typescript
-  const isQuotaExhausted = !canBypassAuth && auth.isAuthenticated && auth.quotaLoaded && auth.remainingQuota <= 0;
+  const isQuotaExhausted =
+    !canBypassAuth && auth.isAuthenticated && auth.quotaLoaded && auth.remainingQuota <= 0;
   ```
 - **前置阻断**（客户端）：仅当 `quotaLoaded=true && remainingQuota≤0` 时显示额度用尽提示，阻止提交
 - **后端兜底**（API）：若 `quotaLoaded=false`，允许请求通过，后端返回 429 处理
@@ -28,15 +30,15 @@
 
 新增 8 个多语言 key，覆盖英/日/韓/繁体中文/简体中文：
 
-| Key | 用途 |
-|-----|------|
-| `quota.action.login` | 登录按钮 |
-| `quota.action.upgrade` | 升级按钮 |
-| `quota.action.refresh` | 刷新额度按钮 |
-| `quota.action.retry` | 重试按钮 |
-| `quota.badge.exhausted` | 已用尽徽章 |
+| Key                        | 用途         |
+| -------------------------- | ------------ |
+| `quota.action.login`       | 登录按钮     |
+| `quota.action.upgrade`     | 升级按钮     |
+| `quota.action.refresh`     | 刷新额度按钮 |
+| `quota.action.retry`       | 重试按钮     |
+| `quota.badge.exhausted`    | 已用尽徽章   |
 | `quota.error.unauthorized` | 401 错误文案 |
-| `quota.error.generic` | 通用错误文案 |
+| `quota.error.generic`      | 通用错误文案 |
 
 #### 3. API 服务测试（lib/services/api.test.ts）
 
@@ -54,7 +56,7 @@
 - `fetchCredits` 非 JSON 响应 → 抛出默认错误
 - `fetchCredits` 端点校验 → 调用正确的 `/api/report/credits`
 
-#### 4. UI 组件测试（__tests__/ReportGeneratorSection.test.tsx）
+#### 4. UI 组件测试（**tests**/ReportGeneratorSection.test.tsx）
 
 **6 个测试，全部通过** ✅：
 
@@ -69,23 +71,23 @@
 
 以下功能已在当前代码中实现：
 
-| 功能 | 状态 |
-|------|------|
-| 401 错误处理（阻断+登录 CTA） | ✅ 已实现 |
-| 429 错误处理（显示刷新/升级选项） | ✅ 已实现 |
-| testToken 绕过认证 | ✅ 已实现 |
+| 功能                                             | 状态      |
+| ------------------------------------------------ | --------- |
+| 401 错误处理（阻断+登录 CTA）                    | ✅ 已实现 |
+| 429 错误处理（显示刷新/升级选项）                | ✅ 已实现 |
+| testToken 绕过认证                               | ✅ 已实现 |
 | 成功后同步 `refreshSession()` + `refreshQuota()` | ✅ 已实现 |
-| 错误清除后允许重试 | ✅ 已实现 |
+| 错误清除后允许重试                               | ✅ 已实现 |
 
 ## 质量指标
 
-| 检查项 | 结果 |
-|--------|------|
-| Lint | ✅ PASS（0 errors / 0 warnings） |
-| API 服务测试 | ✅ PASS（11/11） |
-| UI 测试 | ✅ PASS（6/6） |
-| 型别检查 | ⚪ 未单独执行（依赖 Next 构建） |
-| 工作区 | ✅ CLEAN（改动已纳入本提交） |
+| 检查项       | 结果                             |
+| ------------ | -------------------------------- |
+| Lint         | ✅ PASS（0 errors / 0 warnings） |
+| API 服务测试 | ✅ PASS（11/11）                 |
+| UI 测试      | ✅ PASS（6/6）                   |
+| 型别检查     | ⚪ 未单独执行（依赖 Next 构建）  |
+| 工作区       | ✅ CLEAN（改动已纳入本提交）     |
 
 ## 测试执行记录
 
@@ -103,12 +105,14 @@ $ npm test -- --run
 ## 变更清单
 
 ### 新增文件
+
 - `lib/services/api.test.ts` - API 服务单元测试
 - `__tests__/ReportGeneratorSection.test.tsx` - UI 组件测试
 - `docs/decisions/2025-11-26-t1-quota-credits.md` - 架构快照
 - `docs/reports/2025-11-26-t1-quota-implementation.md` - 本报告
 
 ### 修改文件
+
 - `lib/i18n.tsx` - 新增 8 个翻译 key
 - `app/sections/ReportGeneratorSection.tsx` - 修正额度校验逻辑 + AuthInfo 类型扩展
 - `package.json` / `package-lock.json` - 增加 `@testing-library/user-event` 依赖（UI 测试需要）

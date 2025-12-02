@@ -39,19 +39,16 @@ export class ReportPersistence {
     const slug = this.generateSlug(report.symbol, report.language);
 
     // Upload report JSON to storage
-    const storageResult = await this.storageService.uploadReportJson(
-      reportRunId,
-      {
-        content: report.content,
-        marketData: report.marketData,
-        metadata: {
-          symbol: report.symbol,
-          language: report.language,
-          tone: report.tone,
-          generatedAt: new Date().toISOString(),
-        },
-      }
-    );
+    const storageResult = await this.storageService.uploadReportJson(reportRunId, {
+      content: report.content,
+      marketData: report.marketData,
+      metadata: {
+        symbol: report.symbol,
+        language: report.language,
+        tone: report.tone,
+        generatedAt: new Date().toISOString(),
+      },
+    });
 
     // Save to database
     const { data, error } = await supabase
@@ -154,11 +151,7 @@ export class ReportPersistence {
   /**
    * Record audit log for report generation
    */
-  async recordAudit(
-    userId: string,
-    action: string,
-    details: Record<string, any>
-  ): Promise<void> {
+  async recordAudit(userId: string, action: string, details: Record<string, any>): Promise<void> {
     const supabase = await createClient();
 
     await supabase.from("audit_logs").insert({

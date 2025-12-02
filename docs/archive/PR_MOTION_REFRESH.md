@@ -6,26 +6,28 @@ Implement comprehensive lightweight motion effects across the entire investor-ai
 
 ## Motion Effects Coverage
 
-| Component | Location | Effects | Status |
-|-----------|----------|---------|--------|
-| **Navigation** | HeroSection | Hover bottom-line gradient animation; CTA button lift + shadow | ✅ Complete |
-| **Hero CTA** | HeroSection | Hover lift + shadow enhancement; Active press feedback | ✅ Complete |
-| **Modes Cards** | ModesSection | Active state lift + border emphasis; Hover effects | ✅ Complete |
-| **Report Generator** | ReportGeneratorSection | Container focus glow; Submit button hover/active/loading spinner | ✅ Complete |
-| **Template Cards** | app/page.tsx | Hover border brightness + lift effect | ✅ Complete |
-| **Pricing Cards** | app/page.tsx | Hover lift + shadow; Highlight card gradient; CTA animations | ✅ Complete |
-| **FAQ Accordion** | app/page.tsx | Details open transition; Answer fade-in-up animation | ✅ Complete |
-| **Accessibility** | Global (app/globals.css) | prefers-reduced-motion compliance + motion-safe: prefixes | ✅ Complete |
+| Component            | Location                 | Effects                                                          | Status      |
+| -------------------- | ------------------------ | ---------------------------------------------------------------- | ----------- |
+| **Navigation**       | HeroSection              | Hover bottom-line gradient animation; CTA button lift + shadow   | ✅ Complete |
+| **Hero CTA**         | HeroSection              | Hover lift + shadow enhancement; Active press feedback           | ✅ Complete |
+| **Modes Cards**      | ModesSection             | Active state lift + border emphasis; Hover effects               | ✅ Complete |
+| **Report Generator** | ReportGeneratorSection   | Container focus glow; Submit button hover/active/loading spinner | ✅ Complete |
+| **Template Cards**   | app/page.tsx             | Hover border brightness + lift effect                            | ✅ Complete |
+| **Pricing Cards**    | app/page.tsx             | Hover lift + shadow; Highlight card gradient; CTA animations     | ✅ Complete |
+| **FAQ Accordion**    | app/page.tsx             | Details open transition; Answer fade-in-up animation             | ✅ Complete |
+| **Accessibility**    | Global (app/globals.css) | prefers-reduced-motion compliance + motion-safe: prefixes        | ✅ Complete |
 
 ## Key Technical Changes
 
 ### 1. Global Animation Library (app/globals.css)
+
 - Added `@keyframes fade-in-up`: 200ms ease-out fade and slide up
 - Added `@keyframes spinner-rotate`: 800ms linear infinite rotation
 - Created `.animate-fadeInUp` and `.animate-spinner` utility classes
 - Enhanced global `prefers-reduced-motion` media query (0.01ms disable all animations/transitions)
 
 ### 2. Navigation & Hero (HeroSection.tsx)
+
 ```tsx
 // Nav links: Hover bottom-line scale animation (200ms)
 className="... transition-all duration-200 ease-out hover:-translate-y-0.5"
@@ -37,6 +39,7 @@ className="... transition-all duration-200 ease-out hover:-translate-y-1
 ```
 
 ### 3. Modes Card Selection (ModesSection.tsx)
+
 ```tsx
 className={`... transition-all duration-200 ease-out ${
   active
@@ -46,6 +49,7 @@ className={`... transition-all duration-200 ease-out ${
 ```
 
 ### 4. Report Generator Form (ReportGeneratorSection.tsx)
+
 ```tsx
 // Input container: focus glow via group-focus-within
 className="... group-focus-within:border-[var(--accent-emerald)]/70
@@ -58,6 +62,7 @@ className="... transition-all duration-200 ease-out hover:-translate-y-1
 ```
 
 ### 5. Template & Case Study Cards (app/page.tsx)
+
 ```tsx
 className="... transition-all duration-200 ease-out
   hover:border-[var(--stroke-glow)]/70 hover:shadow-[0_12px_32px_rgba(...)]
@@ -65,6 +70,7 @@ className="... transition-all duration-200 ease-out
 ```
 
 ### 6. FAQ Strict Accessibility (app/page.tsx)
+
 ```tsx
 // All animations use motion-safe: prefixes for strict compliance
 <details className="... motion-safe:transition-all motion-safe:duration-200 motion-safe:ease-out">
@@ -76,6 +82,7 @@ className="... transition-all duration-200 ease-out
 ## Quality Verification
 
 ### ESLint Results
+
 ```
 Total: 16 problems (2 errors, 14 warnings)
 - 2 errors: Pre-existing in helicone_test.js (require imports) ❌ NOT from this PR
@@ -84,6 +91,7 @@ Total: 16 problems (2 errors, 14 warnings)
 ```
 
 ### Test Results
+
 ```
 Test Files: 2 passed (2)
 Tests: 5 passed (5) ✅
@@ -94,6 +102,7 @@ Status: ALL GREEN ✅
 ```
 
 ### Animation Compliance Checklist
+
 - ✅ Duration: 160-220ms range (primary 200ms; spinner 800ms)
 - ✅ Easing: ease-out / ease-in-out functions
 - ✅ Properties: Only transform (translate, scale) and opacity
@@ -124,12 +133,12 @@ c4a02dd refactor: apply motion-safe prefixes to FAQ animations for strict access
 
 ## Risk Assessment
 
-| Risk | Probability | Mitigation |
-|------|-------------|-----------|
-| Browser compatibility | Low | Tailwind/PostCSS auto-prefixing; graceful degradation |
-| Performance impact | Very Low | GPU-accelerated properties only; 200ms durations |
-| Accessibility issues | Very Low | Comprehensive prefers-reduced-motion support + motion-safe: |
-| Visual regression | Low | Manual visual verification recommended |
+| Risk                  | Probability | Mitigation                                                  |
+| --------------------- | ----------- | ----------------------------------------------------------- |
+| Browser compatibility | Low         | Tailwind/PostCSS auto-prefixing; graceful degradation       |
+| Performance impact    | Very Low    | GPU-accelerated properties only; 200ms durations            |
+| Accessibility issues  | Very Low    | Comprehensive prefers-reduced-motion support + motion-safe: |
+| Visual regression     | Low         | Manual visual verification recommended                      |
 
 ## Ready for Review
 

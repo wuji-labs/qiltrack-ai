@@ -22,13 +22,12 @@ export async function GET(request: NextRequest) {
   const testToken = process.env.TEST_REPORT_TOKEN || "local-test-token";
   const tokenFromHeader = request.headers.get("x-test-token");
   const tokenFromQuery = searchParams.get("testToken");
-  const isTestBypass = Boolean(testToken && (tokenFromHeader === testToken || tokenFromQuery === testToken));
+  const isTestBypass = Boolean(
+    testToken && (tokenFromHeader === testToken || tokenFromQuery === testToken)
+  );
 
   if (!q) {
-    return NextResponse.json(
-      { error: "Missing q query parameter" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Missing q query parameter" }, { status: 400 });
   }
 
   // 测试 token 直接返回本地候选，不再访问 Finnhub，保证页面下拉可用
@@ -47,19 +46,14 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const url = `${FINNHUB_BASE}/search?q=${encodeURIComponent(
-      q
-    )}&token=${apiKey}`;
+    const url = `${FINNHUB_BASE}/search?q=${encodeURIComponent(q)}&token=${apiKey}`;
 
     const res = await fetch(url);
 
     if (!res.ok) {
       const text = await res.text();
       console.error("Finnhub search error:", res.status, text);
-      return NextResponse.json(
-        { error: "Failed to search symbol from Finnhub" },
-        { status: 502 }
-      );
+      return NextResponse.json({ error: "Failed to search symbol from Finnhub" }, { status: 502 });
     }
 
     const data = await res.json();
@@ -71,15 +65,11 @@ export async function GET(request: NextRequest) {
       type?: string;
     };
 
-    const rawResults = Array.isArray(data.result)
-      ? (data.result as FinnhubSearchItem[])
-      : [];
+    const rawResults = Array.isArray(data.result) ? (data.result as FinnhubSearchItem[]) : [];
 
     // 只取前 10 个有用结果
     const results = rawResults
-      .filter((item): item is FinnhubSearchItem =>
-        Boolean(item.symbol && item.description)
-      )
+      .filter((item): item is FinnhubSearchItem => Boolean(item.symbol && item.description))
       .slice(0, 10)
       .map((item) => ({
         symbol: String(item.symbol),
@@ -94,9 +84,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (err) {
     console.error("Unexpected error in /api/search:", err);
-    return NextResponse.json(
-      { error: "Unexpected server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Unexpected server error" }, { status: 500 });
   }
 }

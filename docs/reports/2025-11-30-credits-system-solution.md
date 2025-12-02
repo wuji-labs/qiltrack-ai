@@ -20,6 +20,7 @@
 - ✅ 新增 `fn_claim_daily_reward` 函数: 每日领取 10 积分
 
 **核心逻辑**:
+
 ```sql
 -- 新用户注册时自动获得 30 积分
 INSERT INTO report_credits (user_id, credits_available, credits_used)
@@ -48,11 +49,13 @@ POST /api/report/daily-reward
 **文件**: `lib/services/api.ts`
 
 新增函数:
+
 ```typescript
 export async function claimDailyReward(): Promise<DailyRewardResponse>;
 ```
 
 类型更新:
+
 ```typescript
 type DailyRewardResponse = {
   success: boolean;
@@ -65,20 +68,20 @@ type DailyRewardResponse = {
 
 ### 触发器与初始化
 
-| 文件 | 行号 | 功能 |
-|------|------|------|
-| 新迁移 | 24-37 | 注册时触发器 - 初始化 30 积分 |
-| 新迁移 | 40-55 | fn_initialize_profile - 创建 profile + credits |
-| 回调处理 | api/auth/callback/route.ts | 调用 fn_initialize_profile |
+| 文件     | 行号                       | 功能                                           |
+| -------- | -------------------------- | ---------------------------------------------- |
+| 新迁移   | 24-37                      | 注册时触发器 - 初始化 30 积分                  |
+| 新迁移   | 40-55                      | fn_initialize_profile - 创建 profile + credits |
+| 回调处理 | api/auth/callback/route.ts | 调用 fn_initialize_profile                     |
 
 ### 每日奖励流程
 
-| 步骤 | 代码位置 | 描述 |
-|------|---------|------|
-| 1 | app/api/report/daily-reward/route.ts | API 端点 |
-| 2 | 新迁移 68-130 | fn_claim_daily_reward 函数 |
-| 3 | lib/services/api.ts | claimDailyReward() 调用 |
-| 4 | app/account/page.tsx | 前端 UI（待添加按钮） |
+| 步骤 | 代码位置                             | 描述                       |
+| ---- | ------------------------------------ | -------------------------- |
+| 1    | app/api/report/daily-reward/route.ts | API 端点                   |
+| 2    | 新迁移 68-130                        | fn_claim_daily_reward 函数 |
+| 3    | lib/services/api.ts                  | claimDailyReward() 调用    |
+| 4    | app/account/page.tsx                 | 前端 UI（待添加按钮）      |
 
 ## 🚀 前端集成步骤（待完成）
 
@@ -93,12 +96,12 @@ const handleClaimDailyReward = async () => {
     if (result.success) {
       // 刷新配额显示
       await refreshQuota();
-      alert(t('quota.daily.claimed')); // 需要添加翻译
+      alert(t("quota.daily.claimed")); // 需要添加翻译
     } else {
       alert(result.message); // "Already claimed today" 或其他错误
     }
   } catch (err) {
-    alert(t('quota.daily.error'));
+    alert(t("quota.daily.error"));
   }
 };
 ```
@@ -209,11 +212,13 @@ select * from report_credit_events where user_id = 'user-id-here';
 ## 📝 文件清单
 
 ### 已创建/修改
+
 - ✅ `supabase/migrations/20251130000001_init_user_credits_30.sql` - 数据库迁移
 - ✅ `app/api/report/daily-reward/route.ts` - API 端点
 - ✅ `lib/services/api.ts` - 前端 API 服务
 
 ### 待完成
+
 - 🔄 `app/page.tsx` - 添加每日奖励按钮
 - 🔄 `app/account/page.tsx` - 显示领取状态
 - 🔄 `lib/i18n.tsx` - 添加多语言文本
@@ -251,6 +256,7 @@ A: 查询 `report_credit_events` 表，按 `user_id` 和 `created_at` 排序。
 ---
 
 **预期效果**:
+
 - ✅ 新用户注册 → 自动获得 30 积分
 - ✅ 首页显示的积分与数据库一致
 - ✅ 用户每天可主动领取 10 积分

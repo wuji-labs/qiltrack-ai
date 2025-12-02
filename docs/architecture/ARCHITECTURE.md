@@ -27,6 +27,7 @@
 Investor AI 是一个 **AI 驱动的投研报告生成平台**,为个人投资者提供"3分钟理解美股上市公司"的智能服务。
 
 **核心能力**:
+
 - 📊 实时市场数据聚合 (Finnhub API)
 - 🤖 AI 报告生成 (OpenAI/Anthropic via Helicone/OpenRouter)
 - 💳 积分系统与权限控制
@@ -74,6 +75,7 @@ Investor AI 是一个 **AI 驱动的投研报告生成平台**,为个人投资�
 #### 1.1 Supabase (核心数据平台)
 
 **组件**:
+
 - **PostgreSQL 15**: 关系型数据库
 - **Auth**: 用户认证 (Email/OAuth)
 - **Storage**: 对象存储 (报告文件)
@@ -216,21 +218,25 @@ match_reports_embeddings(
 #### 1.2 外部服务
 
 **Finnhub API** (市场数据)
+
 - 公司概况 (profile)
 - 实时报价 (quote)
 - 财务指标 (metrics)
 - 新闻动态 (news)
 
 **Helicone** (LLM 网关,优先)
+
 - OpenAI API 代理
 - 请求缓存
 - 可观测性
 
 **OpenRouter** (LLM 备份)
+
 - 多模型支持
 - 自动故障转移
 
 **Langfuse** (可观测性)
+
 - LLM 调用追踪
 - Token 使用统计
 - 成本分析
@@ -244,6 +250,7 @@ match_reports_embeddings(
 #### 2.1 LLM 服务 (`lib/services/llm.ts`)
 
 **职责**:
+
 - 统一 LLM 调用接口
 - 故障转移 (Helicone → OpenRouter)
 - Embedding 生成
@@ -257,15 +264,15 @@ interface LLMService {
     systemPrompt: string,
     userPrompt: string,
     options?: {
-      model?: string,
-      temperature?: number,
-      maxTokens?: number,
-      trace?: LangfuseTrace
+      model?: string;
+      temperature?: number;
+      maxTokens?: number;
+      trace?: LangfuseTrace;
     }
-  ): Promise<string>
+  ): Promise<string>;
 
   // 生成向量嵌入
-  generateEmbedding(input: string): Promise<number[]>
+  generateEmbedding(input: string): Promise<number[]>;
 }
 ```
 
@@ -294,6 +301,7 @@ export async function generateReport(...) {
 #### 2.2 市场数据服务 (`lib/services/market-data.ts`)
 
 **职责**:
+
 - 从 Finnhub 获取市场数据
 - 并行请求优化
 - 数据校验与转换
@@ -302,14 +310,14 @@ export async function generateReport(...) {
 
 ```typescript
 interface MarketDataService {
-  fetchCompanyData(symbol: string): Promise<MarketData>
+  fetchCompanyData(symbol: string): Promise<MarketData>;
 }
 
 interface MarketData {
-  profile: CompanyProfile    // 公司概况
-  quote: Quote               // 实时报价
-  metrics: Metrics           // 财务指标
-  news: NewsItem[]           // 新闻动态 (最近60天,最多10条)
+  profile: CompanyProfile; // 公司概况
+  quote: Quote; // 实时报价
+  metrics: Metrics; // 财务指标
+  news: NewsItem[]; // 新闻动态 (最近60天,最多10条)
 }
 ```
 
@@ -322,16 +330,17 @@ export async function fetchCompanyData(symbol: string) {
     getProfile(symbol),
     getQuote(symbol),
     getMetrics(symbol),
-    getNews(symbol, { from: '60daysAgo', limit: 10 })
-  ])
+    getNews(symbol, { from: "60daysAgo", limit: 10 }),
+  ]);
 
-  return { profile, quote, metrics, news }
+  return { profile, quote, metrics, news };
 }
 ```
 
 #### 2.3 存储服务 (`lib/services/storage.ts`)
 
 **职责**:
+
 - Supabase Storage 封装
 - 文件上传 (JSON/PDF/DOCX)
 - 签名 URL 生成
@@ -344,10 +353,10 @@ interface StorageService {
     userId: string,
     reportId: string,
     content: string,
-    type: 'json' | 'pdf' | 'docx'
-  ): Promise<string> // 返回文件路径
+    type: "json" | "pdf" | "docx"
+  ): Promise<string>; // 返回文件路径
 
-  getSignedUrl(path: string, expiresIn?: number): Promise<string>
+  getSignedUrl(path: string, expiresIn?: number): Promise<string>;
 }
 ```
 
@@ -363,33 +372,29 @@ interface StorageService {
 
 ```typescript
 export async function generateReport(params: {
-  symbol: string
-  userId: string
-  lang: string
-  tone: string
-  trace?: LangfuseTrace
+  symbol: string;
+  userId: string;
+  lang: string;
+  tone: string;
+  trace?: LangfuseTrace;
 }): Promise<Report> {
-  const { symbol, userId, lang, tone, trace } = params
+  const { symbol, userId, lang, tone, trace } = params;
 
   // 1. 检查可复用报告 (7天内相同参数)
-  const cached = await checkReusableReport(symbol, lang, tone)
-  if (cached) return cached
+  const cached = await checkReusableReport(symbol, lang, tone);
+  if (cached) return cached;
 
   // 2. 获取市场数据 (3-5秒)
-  const marketData = await fetchCompanyData(symbol)
+  const marketData = await fetchCompanyData(symbol);
 
   // 3. 构建 Prompt
-  const { systemPrompt, userPrompt } = buildPrompts(marketData, lang, tone)
+  const { systemPrompt, userPrompt } = buildPrompts(marketData, lang, tone);
 
   // 4. LLM 生成 (10-30秒)
-  const markdown = await llmService.generateReport(
-    systemPrompt,
-    userPrompt,
-    { trace }
-  )
+  const markdown = await llmService.generateReport(systemPrompt, userPrompt, { trace });
 
   // 5. 内容清洗
-  const sanitized = await sanitizeContent(markdown)
+  const sanitized = await sanitizeContent(markdown);
 
   // 6. 持久化
   const report = await saveReport({
@@ -398,13 +403,13 @@ export async function generateReport(params: {
     lang,
     tone,
     markdown: sanitized,
-    companySnapshot: marketData
-  })
+    companySnapshot: marketData,
+  });
 
   // 7. 后台生成嵌入 (不阻塞)
-  generateEmbeddingsAsync(report.id, sanitized)
+  generateEmbeddingsAsync(report.id, sanitized);
 
-  return report
+  return report;
 }
 ```
 
@@ -412,19 +417,19 @@ export async function generateReport(params: {
 
 ```typescript
 export async function saveReport(data: SaveReportInput) {
-  const supabase = createServerClient()
+  const supabase = createServerClient();
 
   // 1. 上传 JSON 到 Storage
   const jsonPath = await storageService.uploadReport(
     data.userId,
     data.reportId,
     JSON.stringify(data),
-    'json'
-  )
+    "json"
+  );
 
   // 2. 插入 report_posts 表
   const { data: post } = await supabase
-    .from('report_posts')
+    .from("report_posts")
     .insert({
       title: `${data.symbol} 投资分析报告`,
       slug: `${data.symbol}-${Date.now()}`,
@@ -432,51 +437,48 @@ export async function saveReport(data: SaveReportInput) {
       lang: data.lang,
       tags: [data.symbol, data.tone],
       author_id: data.userId,
-      status: 'published'
+      status: "published",
     })
     .select()
-    .single()
+    .single();
 
   // 3. 记录 audit_logs
   await recordAudit({
     userId: data.userId,
-    action: 'report_generated',
-    table_name: 'report_posts',
-    details: { symbol: data.symbol, postId: post.id }
-  })
+    action: "report_generated",
+    table_name: "report_posts",
+    details: { symbol: data.symbol, postId: post.id },
+  });
 
-  return post
+  return post;
 }
 ```
 
 **embeddings.ts** - 向量嵌入
 
 ```typescript
-export async function generateEmbeddingsAsync(
-  reportId: string,
-  content: string
-) {
+export async function generateEmbeddingsAsync(reportId: string, content: string) {
   // 1. 分块 (3500 字符/块, 400 字符重叠)
   const chunks = chunkReport(content, {
     chunkSize: 3500,
-    overlap: 400
-  })
+    overlap: 400,
+  });
 
   // 2. 批量生成 embedding
   const embeddings = await Promise.all(
     chunks.map(async (chunk, index) => {
-      const vector = await llmService.generateEmbedding(chunk)
+      const vector = await llmService.generateEmbedding(chunk);
       return {
         report_run_id: reportId,
         chunk_index: index,
-        embedding: vector
-      }
+        embedding: vector,
+      };
     })
-  )
+  );
 
   // 3. 批量插入
-  const supabase = createServerClient()
-  await supabase.from('reports_embeddings').insert(embeddings)
+  const supabase = createServerClient();
+  await supabase.from("reports_embeddings").insert(embeddings);
 }
 ```
 
@@ -485,25 +487,22 @@ export async function generateEmbeddingsAsync(
 ```typescript
 export function sanitizeContent(markdown: string): string {
   // 1. 移除敏感词汇 (买入/卖出/调仓)
-  const sensitiveWords = ['买入', '卖出', '强烈推荐', '立即购买']
-  let sanitized = markdown
+  const sensitiveWords = ["买入", "卖出", "强烈推荐", "立即购买"];
+  let sanitized = markdown;
 
   for (const word of sensitiveWords) {
-    sanitized = sanitized.replace(
-      new RegExp(word, 'gi'),
-      '[请自行判断]'
-    )
+    sanitized = sanitized.replace(new RegExp(word, "gi"), "[请自行判断]");
   }
 
   // 2. 规范化语言标识
-  sanitized = normalizeLanguage(sanitized)
+  sanitized = normalizeLanguage(sanitized);
 
   // 3. 验证 Markdown 格式
   if (!isValidMarkdown(sanitized)) {
-    throw new ValidationError('Invalid Markdown format')
+    throw new ValidationError("Invalid Markdown format");
   }
 
-  return sanitized
+  return sanitized;
 }
 ```
 
@@ -519,35 +518,30 @@ export class CreditManager {
     symbol: string,
     metadata?: Record<string, any>
   ): Promise<void> {
-    const supabase = createServerClient()
+    const supabase = createServerClient();
 
-    const { data, error } = await supabase.rpc(
-      'fn_consume_report_credit',
-      {
-        p_user_id: userId,
-        p_symbol: symbol,
-        p_metadata: metadata
-      }
-    )
+    const { data, error } = await supabase.rpc("fn_consume_report_credit", {
+      p_user_id: userId,
+      p_symbol: symbol,
+      p_metadata: metadata,
+    });
 
     if (error || !data.success) {
-      throw new InsufficientCreditsError(
-        `积分不足。当前余额: ${data.remaining_credits}`
-      )
+      throw new InsufficientCreditsError(`积分不足。当前余额: ${data.remaining_credits}`);
     }
   }
 
   // 获取积分余额
   async getBalance(userId: string): Promise<number> {
-    const supabase = createServerClient()
+    const supabase = createServerClient();
 
     const { data } = await supabase
-      .from('report_credits')
-      .select('credits_available')
-      .eq('user_id', userId)
-      .single()
+      .from("report_credits")
+      .select("credits_available")
+      .eq("user_id", userId)
+      .single();
 
-    return data?.credits_available ?? 0
+    return data?.credits_available ?? 0;
   }
 
   // 授予积分 (管理员)
@@ -557,45 +551,42 @@ export class CreditManager {
     reason: string,
     adminUserId: string
   ): Promise<void> {
-    const supabase = createServerClient()
+    const supabase = createServerClient();
 
-    await supabase.rpc('fn_grant_credits', {
+    await supabase.rpc("fn_grant_credits", {
       target_user_id: targetUserId,
       amount,
-      reason: `${reason} (by admin ${adminUserId})`
-    })
+      reason: `${reason} (by admin ${adminUserId})`,
+    });
   }
 
   // 领取每日奖励
   async claimDailyReward(userId: string): Promise<number> {
-    const supabase = createServerClient()
+    const supabase = createServerClient();
 
-    const { data } = await supabase.rpc('fn_claim_daily_reward', {
-      p_user_id: userId
-    })
+    const { data } = await supabase.rpc("fn_claim_daily_reward", {
+      p_user_id: userId,
+    });
 
     if (!data.success) {
-      throw new Error(data.message)
+      throw new Error(data.message);
     }
 
-    return data.credits_granted
+    return data.credits_granted;
   }
 
   // 获取积分历史
-  async getTransactionHistory(
-    userId: string,
-    limit = 50
-  ): Promise<CreditEvent[]> {
-    const supabase = createServerClient()
+  async getTransactionHistory(userId: string, limit = 50): Promise<CreditEvent[]> {
+    const supabase = createServerClient();
 
     const { data } = await supabase
-      .from('report_credit_events')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(limit)
+      .from("report_credit_events")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(limit);
 
-    return data ?? []
+    return data ?? [];
   }
 }
 ```
@@ -611,43 +602,39 @@ export class AppError extends Error {
     public statusCode: number = 500,
     public details?: Record<string, any>
   ) {
-    super(message)
-    this.name = this.constructor.name
+    super(message);
+    this.name = this.constructor.name;
   }
 }
 
 // 具体错误类型
 export class InsufficientCreditsError extends AppError {
   constructor(message: string) {
-    super(message, 'INSUFFICIENT_CREDITS', 402)
+    super(message, "INSUFFICIENT_CREDITS", 402);
   }
 }
 
 export class ReportGenerationError extends AppError {
   constructor(message: string, details?: Record<string, any>) {
-    super(message, 'REPORT_GENERATION_FAILED', 500, details)
+    super(message, "REPORT_GENERATION_FAILED", 500, details);
   }
 }
 
 export class UnauthorizedError extends AppError {
-  constructor(message = 'Unauthorized') {
-    super(message, 'UNAUTHORIZED', 401)
+  constructor(message = "Unauthorized") {
+    super(message, "UNAUTHORIZED", 401);
   }
 }
 
 export class ValidationError extends AppError {
   constructor(message: string, details?: Record<string, any>) {
-    super(message, 'VALIDATION_ERROR', 400, details)
+    super(message, "VALIDATION_ERROR", 400, details);
   }
 }
 
 export class ExternalServiceError extends AppError {
-  constructor(
-    service: string,
-    message: string,
-    details?: Record<string, any>
-  ) {
-    super(`${service}: ${message}`, 'EXTERNAL_SERVICE_ERROR', 502, details)
+  constructor(service: string, message: string, details?: Record<string, any>) {
+    super(`${service}: ${message}`, "EXTERNAL_SERVICE_ERROR", 502, details);
   }
 }
 ```
@@ -666,27 +653,27 @@ export class ExternalServiceError extends AppError {
 export async function GET(request: Request) {
   try {
     // 1. 认证
-    const user = await getCurrentUser()
-    if (!user) throw new UnauthorizedError()
+    const user = await getCurrentUser();
+    if (!user) throw new UnauthorizedError();
 
     // 2. 参数校验
-    const { symbol, lang, tone } = validateReportParams(request.url)
+    const { symbol, lang, tone } = validateReportParams(request.url);
 
     // 3. 检查积分并消费
-    await creditManager.checkAndConsume(user.id, symbol)
+    await creditManager.checkAndConsume(user.id, symbol);
 
     // 4. 生成报告
     const report = await generateReport({
       symbol,
       userId: user.id,
       lang,
-      tone
-    })
+      tone,
+    });
 
     // 5. 返回结果
-    return successResponse(report)
+    return successResponse(report);
   } catch (error) {
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }
 ```
@@ -696,17 +683,17 @@ export async function GET(request: Request) {
 ```typescript
 export async function GET() {
   try {
-    const user = await getCurrentUser()
-    if (!user) throw new UnauthorizedError()
+    const user = await getCurrentUser();
+    if (!user) throw new UnauthorizedError();
 
-    const balance = await creditManager.getBalance(user.id)
+    const balance = await creditManager.getBalance(user.id);
 
     return successResponse({
       userId: user.id,
-      credits: balance
-    })
+      credits: balance,
+    });
   } catch (error) {
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }
 ```
@@ -716,29 +703,29 @@ export async function GET() {
 ```typescript
 export async function GET(request: Request) {
   try {
-    const user = await getCurrentUser()
-    if (!user) throw new UnauthorizedError()
+    const user = await getCurrentUser();
+    if (!user) throw new UnauthorizedError();
 
-    const { page = 1, limit = 20 } = parseQueryParams(request.url)
+    const { page = 1, limit = 20 } = parseQueryParams(request.url);
 
-    const supabase = createServerClient()
+    const supabase = createServerClient();
     const { data, count } = await supabase
-      .from('report_posts')
-      .select('*', { count: 'exact' })
-      .eq('author_id', user.id)
-      .order('created_at', { ascending: false })
-      .range((page - 1) * limit, page * limit - 1)
+      .from("report_posts")
+      .select("*", { count: "exact" })
+      .eq("author_id", user.id)
+      .order("created_at", { ascending: false })
+      .range((page - 1) * limit, page * limit - 1);
 
     return successResponse({
       reports: data,
       pagination: {
         page,
         limit,
-        total: count
-      }
-    })
+        total: count,
+      },
+    });
   } catch (error) {
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }
 ```
@@ -748,23 +735,23 @@ export async function GET(request: Request) {
 ```typescript
 export async function GET(request: Request) {
   try {
-    const user = await getCurrentUser()
-    if (!user) throw new UnauthorizedError()
+    const user = await getCurrentUser();
+    if (!user) throw new UnauthorizedError();
 
-    const { reportId, lang, tone } = parseQueryParams(request.url)
+    const { reportId, lang, tone } = parseQueryParams(request.url);
 
-    const supabase = createServerClient()
-    const { data } = await supabase.rpc('match_reports_embeddings', {
+    const supabase = createServerClient();
+    const { data } = await supabase.rpc("match_reports_embeddings", {
       p_query_run_id: reportId,
       p_lang: lang,
       p_tone: tone,
       match_threshold: 0.7,
-      match_count: 5
-    })
+      match_count: 5,
+    });
 
-    return successResponse({ similar: data })
+    return successResponse({ similar: data });
   } catch (error) {
-    return handleApiError(error)
+    return handleApiError(error);
   }
 }
 ```
@@ -775,24 +762,34 @@ export async function GET(request: Request) {
 
 ```typescript
 // 创建用户
-POST /api/admin/users/create
+POST / api / admin / users / create;
 // 更新用户
-PATCH /api/admin/users/update
+PATCH / api / admin / users / update;
 // 删除用户
-DELETE /api/admin/users/delete
-// 重置密码
-POST /api/admin/users/reset-password
+DELETE /
+  api /
+  admin /
+  users /
+  delete (
+    // 重置密码
+    POST
+  ) /
+  api /
+  admin /
+  users /
+  reset -
+  password;
 ```
 
 **报告管理** - `app/api/admin/runs/`
 
 ```typescript
 // 查询所有报告生成记录
-GET /api/admin/runs
+GET / api / admin / runs;
 // 标记为特色报告
-POST /api/admin/runs/[id]/feature
+POST / api / admin / runs / [id] / feature;
 // 取消特色
-POST /api/admin/runs/[id]/unfeature
+POST / api / admin / runs / [id] / unfeature;
 ```
 
 #### 4.3 API 错误处理中间件
@@ -809,11 +806,11 @@ export function handleApiError(error: unknown): NextResponse {
         error: {
           code: error.code,
           message: error.message,
-          details: error.details
-        }
+          details: error.details,
+        },
       },
       { status: error.statusCode }
-    )
+    );
   }
 
   // 2. Supabase 错误
@@ -822,39 +819,36 @@ export function handleApiError(error: unknown): NextResponse {
       {
         success: false,
         error: {
-          code: 'DATABASE_ERROR',
-          message: error.message
-        }
+          code: "DATABASE_ERROR",
+          message: error.message,
+        },
       },
       { status: 500 }
-    )
+    );
   }
 
   // 3. 未知错误
-  logger.error('Unhandled error', error)
+  logger.error("Unhandled error", error);
   return NextResponse.json(
     {
       success: false,
       error: {
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'An unexpected error occurred'
-      }
+        code: "INTERNAL_SERVER_ERROR",
+        message: "An unexpected error occurred",
+      },
     },
     { status: 500 }
-  )
+  );
 }
 
-export function successResponse<T>(
-  data: T,
-  status = 200
-): NextResponse {
+export function successResponse<T>(data: T, status = 200): NextResponse {
   return NextResponse.json(
     {
       success: true,
-      data
+      data,
     },
     { status }
-  )
+  );
 }
 ```
 
@@ -904,11 +898,13 @@ app/components/
 #### 5.3 状态管理 (当前)
 
 **现状**:
+
 - ❌ 无全局状态管理
 - ✅ 使用 React 19 `useState`/`useEffect`
 - ⚠️ 用户信息、积分余额在多处重复查询
 
 **待改进** (Phase 2):
+
 - ✅ 引入 Zustand
 - ✅ 全局状态: `user`, `credits`, `theme`
 - ✅ React Query 数据缓存
@@ -969,51 +965,53 @@ export const supabaseDataProvider: DataProvider = {
 ```typescript
 export const authProvider: AuthProvider = {
   login: async ({ email, password }) => {
-    const supabase = createServerClient()
+    const supabase = createServerClient();
     const { error } = await supabase.auth.signInWithPassword({
       email,
-      password
-    })
-    if (error) throw error
+      password,
+    });
+    if (error) throw error;
   },
 
   logout: async () => {
-    const supabase = createServerClient()
-    await supabase.auth.signOut()
+    const supabase = createServerClient();
+    await supabase.auth.signOut();
   },
 
   check: async () => {
-    const supabase = createServerClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const supabase = createServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!user) throw new Error('Not authenticated')
+    if (!user) throw new Error("Not authenticated");
 
     // 检查管理员权限
     const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
 
-    if (!['admin', 'superadmin'].includes(profile.role)) {
-      throw new Error('Not authorized')
+    if (!["admin", "superadmin"].includes(profile.role)) {
+      throw new Error("Not authorized");
     }
   },
 
   getPermissions: async () => {
-    const user = await getCurrentUser()
-    return user.role
+    const user = await getCurrentUser();
+    return user.role;
   },
 
   getIdentity: async () => {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     return {
       id: user.id,
       name: user.display_name,
-      avatar: user.avatar_url
-    }
-  }
-}
+      avatar: user.avatar_url,
+    };
+  },
+};
 ```
 
 ---
@@ -1081,14 +1079,14 @@ sequenceDiagram
 
 ### 性能指标
 
-| 步骤 | 时间 | 说明 |
-|------|------|------|
-| 认证 + 积分校验 | 100-200ms | Supabase RPC |
-| 市场数据获取 | 3-5s | Finnhub 并行请求 |
-| LLM 生成 | 10-30s | 取决于模型和 token 数 |
-| 内容清洗 + 持久化 | 500ms-1s | 正则替换 + DB 写入 |
-| 嵌入生成 (异步) | 5-10s | 不阻塞主流程 |
-| **总计 (用户感知)** | **15-40s** | - |
+| 步骤                | 时间       | 说明                  |
+| ------------------- | ---------- | --------------------- |
+| 认证 + 积分校验     | 100-200ms  | Supabase RPC          |
+| 市场数据获取        | 3-5s       | Finnhub 并行请求      |
+| LLM 生成            | 10-30s     | 取决于模型和 token 数 |
+| 内容清洗 + 持久化   | 500ms-1s   | 正则替换 + DB 写入    |
+| 嵌入生成 (异步)     | 5-10s      | 不阻塞主流程          |
+| **总计 (用户感知)** | **15-40s** | -                     |
 
 ---
 
@@ -1097,6 +1095,7 @@ sequenceDiagram
 ### 决策 1: 为什么选择 Supabase?
 
 **理由**:
+
 - ✅ PostgreSQL + Auth + Storage + RLS 一体化
 - ✅ RLS 策略实现细粒度权限控制
 - ✅ pgvector 原生支持向量嵌入
@@ -1104,6 +1103,7 @@ sequenceDiagram
 - ✅ 开源,可自托管
 
 **替代方案**:
+
 - Firebase: 不支持关系型查询
 - PlanetScale: 缺少 Auth 和 Storage
 - 自建 PostgreSQL: 运维成本高
@@ -1111,12 +1111,14 @@ sequenceDiagram
 ### 决策 2: 为什么使用 Helicone + OpenRouter 双提供商?
 
 **理由**:
+
 - ✅ **弹性**: Helicone 宕机时自动切换 OpenRouter
 - ✅ **可观测性**: Helicone 提供缓存和追踪
 - ✅ **成本优化**: 相同请求缓存,节省 token
 - ✅ **模型灵活性**: OpenRouter 支持多种模型
 
 **风险**:
+
 - ⚠️ 双依赖增加复杂度
 - ⚠️ 需要同步配置两套 API Key
 
@@ -1125,6 +1127,7 @@ sequenceDiagram
 **现状**: 项目中安装了 `@prisma/client`,但实际使用 Supabase Client
 
 **理由**:
+
 - ✅ Supabase Client 直接支持 RLS
 - ✅ 不需要额外的 ORM 层
 - ✅ 减少依赖和构建时间
@@ -1134,6 +1137,7 @@ sequenceDiagram
 ### 决策 4: 为什么积分消费使用 RPC 而非 REST API?
 
 **理由**:
+
 - ✅ **原子性**: 数据库级事务保证
 - ✅ **性能**: 单次数据库调用,减少网络往返
 - ✅ **安全**: 逻辑在数据库层,不可被客户端绕过
@@ -1187,11 +1191,13 @@ $$ LANGUAGE plpgsql;
 ### 决策 5: 为什么报告嵌入生成是异步的?
 
 **理由**:
+
 - ✅ **用户体验**: 不阻塞报告返回 (15-40s → 15-40s,而非 +10s)
 - ✅ **解耦**: 嵌入失败不影响报告生成
 - ✅ **成本**: 可以批量处理,降低 LLM 调用成本
 
 **实现**:
+
 - 当前: `generateEmbeddingsAsync()` 直接调用 (await 但不返回)
 - 未来 (Phase 2): 使用 BullMQ 队列,由 Worker 处理
 
@@ -1215,12 +1221,12 @@ $$ LANGUAGE plpgsql;
 
 #### 1.2 角色权限
 
-| 角色 | 权限 |
-|------|------|
-| **user** | 生成报告、查看自己的数据、修改个人资料 |
-| **editor** | user 权限 + 发布报告、审核用户上传 |
-| **admin** | editor 权限 + 用户管理、积分管理、查看所有数据 |
-| **superadmin** | admin 权限 + 删除用户、修改系统配置 |
+| 角色           | 权限                                           |
+| -------------- | ---------------------------------------------- |
+| **user**       | 生成报告、查看自己的数据、修改个人资料         |
+| **editor**     | user 权限 + 发布报告、审核用户上传             |
+| **admin**      | editor 权限 + 用户管理、积分管理、查看所有数据 |
+| **superadmin** | admin 权限 + 删除用户、修改系统配置            |
 
 #### 1.3 RLS 策略示例
 
@@ -1260,12 +1266,12 @@ USING (author_id = auth.uid());
 
 #### 2.1 敏感数据加密
 
-| 数据类型 | 加密方式 |
-|---------|---------|
-| 密码 | Supabase Auth (bcrypt) |
-| Stripe Customer ID | 明文 (但不暴露给客户端) |
-| API Keys | 环境变量 (不入库) |
-| JWT Token | httpOnly Cookie, secure flag |
+| 数据类型           | 加密方式                     |
+| ------------------ | ---------------------------- |
+| 密码               | Supabase Auth (bcrypt)       |
+| Stripe Customer ID | 明文 (但不暴露给客户端)      |
+| API Keys           | 环境变量 (不入库)            |
+| JWT Token          | httpOnly Cookie, secure flag |
 
 #### 2.2 防 SQL 注入
 
@@ -1287,14 +1293,14 @@ USING (author_id = auth.uid());
 // 每用户每分钟最多 5 次报告生成请求
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(5, "1 m")
-})
+  limiter: Ratelimit.slidingWindow(5, "1 m"),
+});
 
 // 全局请求限流: 每 IP 每秒 20 次
 const globalRateLimit = new Ratelimit({
   redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(20, "1 s")
-})
+  limiter: Ratelimit.slidingWindow(20, "1 s"),
+});
 ```
 
 #### 3.2 CORS
@@ -1305,16 +1311,16 @@ export default {
   async headers() {
     return [
       {
-        source: '/api/:path*',
+        source: "/api/:path*",
         headers: [
-          { key: 'Access-Control-Allow-Origin', value: process.env.NEXTAUTH_URL },
-          { key: 'Access-Control-Allow-Methods', value: 'GET,POST,PUT,DELETE' },
-          { key: 'Access-Control-Allow-Credentials', value: 'true' }
-        ]
-      }
-    ]
-  }
-}
+          { key: "Access-Control-Allow-Origin", value: process.env.NEXTAUTH_URL },
+          { key: "Access-Control-Allow-Methods", value: "GET,POST,PUT,DELETE" },
+          { key: "Access-Control-Allow-Credentials", value: "true" },
+        ],
+      },
+    ];
+  },
+};
 ```
 
 #### 3.3 CSRF 保护
@@ -1328,13 +1334,13 @@ export default {
 
 ### 当前性能指标
 
-| 指标 | 当前值 | 目标值 (Phase 2) |
-|------|--------|------------------|
-| 报告生成 P95 | ~30s | <15s |
-| 首页 FCP | ~1.5s | <1.2s |
-| 首页 LCP | ~3.0s | <2.5s |
-| API 响应时间 (积分查询) | ~200ms | <100ms |
-| 缓存命中率 | 0% | >50% |
+| 指标                    | 当前值 | 目标值 (Phase 2) |
+| ----------------------- | ------ | ---------------- |
+| 报告生成 P95            | ~30s   | <15s             |
+| 首页 FCP                | ~1.5s  | <1.2s            |
+| 首页 LCP                | ~3.0s  | <2.5s            |
+| API 响应时间 (积分查询) | ~200ms | <100ms           |
+| 缓存命中率              | 0%     | >50%             |
 
 ### 性能优化策略
 
@@ -1342,40 +1348,36 @@ export default {
 
 ```typescript
 // lib/cache/redis.ts
-import { Redis } from '@upstash/redis'
+import { Redis } from "@upstash/redis";
 
-const redis = Redis.fromEnv()
+const redis = Redis.fromEnv();
 
 // 市场数据缓存 (1小时)
 export async function getCachedMarketData(symbol: string) {
-  const key = `market:${symbol}`
-  const cached = await redis.get(key)
+  const key = `market:${symbol}`;
+  const cached = await redis.get(key);
 
-  if (cached) return JSON.parse(cached)
+  if (cached) return JSON.parse(cached);
 
-  const data = await fetchCompanyData(symbol)
-  await redis.setex(key, 3600, JSON.stringify(data))
+  const data = await fetchCompanyData(symbol);
+  await redis.setex(key, 3600, JSON.stringify(data));
 
-  return data
+  return data;
 }
 
 // 报告复用缓存 (7天)
-export async function getCachedReport(params: {
-  symbol: string
-  lang: string
-  tone: string
-}) {
-  const key = `report:${params.symbol}:${params.lang}:${params.tone}`
-  const cached = await redis.get(key)
+export async function getCachedReport(params: { symbol: string; lang: string; tone: string }) {
+  const key = `report:${params.symbol}:${params.lang}:${params.tone}`;
+  const cached = await redis.get(key);
 
   if (cached) {
-    const report = JSON.parse(cached)
+    const report = JSON.parse(cached);
     if (Date.now() - report.createdAt < 7 * 24 * 3600 * 1000) {
-      return report
+      return report;
     }
   }
 
-  return null
+  return null;
 }
 ```
 
@@ -1436,13 +1438,13 @@ import Image from 'next/image'
 
 ```typescript
 // app/layout.tsx
-import { Inter } from 'next/font/google'
+import { Inter } from "next/font/google";
 
 const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  preload: true
-})
+  subsets: ["latin"],
+  display: "swap",
+  preload: true,
+});
 ```
 
 ---
@@ -1451,13 +1453,13 @@ const inter = Inter({
 
 ### 当前状态
 
-| 组件 | 状态 | 覆盖范围 |
-|------|------|---------|
-| Langfuse | ✅ 已集成 | LLM 调用追踪 |
-| Sentry | ❌ 未集成 | - |
-| 结构化日志 | ❌ 未实现 | - |
-| APM | ❌ 未实现 | - |
-| Uptime 监控 | ❌ 未实现 | - |
+| 组件        | 状态      | 覆盖范围     |
+| ----------- | --------- | ------------ |
+| Langfuse    | ✅ 已集成 | LLM 调用追踪 |
+| Sentry      | ❌ 未集成 | -            |
+| 结构化日志  | ❌ 未实现 | -            |
+| APM         | ❌ 未实现 | -            |
+| Uptime 监控 | ❌ 未实现 | -            |
 
 ### 目标架构 (Phase 3)
 
@@ -1490,33 +1492,33 @@ const inter = Inter({
 
 ```typescript
 // lib/logger.ts
-import pino from 'pino'
+import pino from "pino";
 
 const logger = pino({
-  level: process.env.LOG_LEVEL || 'info',
+  level: process.env.LOG_LEVEL || "info",
   formatters: {
-    level: (label) => ({ level: label })
-  }
-})
+    level: (label) => ({ level: label }),
+  },
+});
 
 // 使用示例
 logger.info(
   {
-    userId: 'user-123',
-    symbol: 'AAPL',
-    duration: 15230
+    userId: "user-123",
+    symbol: "AAPL",
+    duration: 15230,
   },
-  'Report generated successfully'
-)
+  "Report generated successfully"
+);
 
 logger.error(
   {
-    userId: 'user-123',
+    userId: "user-123",
     error: error.message,
-    stack: error.stack
+    stack: error.stack,
   },
-  'Report generation failed'
-)
+  "Report generation failed"
+);
 ```
 
 ### 追踪示例
@@ -1560,12 +1562,12 @@ trace.update({ output: report })
 
 ### 当前架构的扩展瓶颈
 
-| 瓶颈 | 当前限制 | 目标容量 |
-|------|---------|---------|
-| Serverless 超时 | 10分钟 (Vercel) | 支持长任务 |
-| 并发限制 | ~100 req/s | >1000 req/s |
-| LLM 调用同步 | 阻塞 API 响应 | 异步队列 |
-| 单一数据库 | Supabase 单实例 | 读写分离 |
+| 瓶颈            | 当前限制        | 目标容量    |
+| --------------- | --------------- | ----------- |
+| Serverless 超时 | 10分钟 (Vercel) | 支持长任务  |
+| 并发限制        | ~100 req/s      | >1000 req/s |
+| LLM 调用同步    | 阻塞 API 响应   | 异步队列    |
+| 单一数据库      | Supabase 单实例 | 读写分离    |
 
 ### 演进路径
 
@@ -1711,48 +1713,48 @@ STRIPE_WEBHOOK_SECRET=
 
 ### B. 数据库迁移列表
 
-| 文件名 | 描述 |
-|--------|------|
-| `20251123000001_init_schema.sql` | 初始化基础表结构 |
-| `20251124000002_align_hosted_schema.sql` | 对齐托管环境 |
-| `20251128000003_sync_quota_schema.sql` | 同步 quota 架构 |
-| `20251128000004_report_assets_rls.sql` | 报告资产 RLS |
-| `20251129000005_report_embeddings_and_template_nullable.sql` | 添加嵌入向量 |
-| `20251129000005_report_posts_and_uploads.sql` | 报告发布功能 |
-| `20251130000001_init_user_credits_30.sql` | 初始化 30 积分 |
-| `20251130000006_match_reports_embeddings.sql` | 相似报告 RPC |
-| `20251130_add_auth_helpers.sql` | 认证辅助函数 |
-| `20251201000000_unify_credits_system.sql` | 统一积分系统 |
-| `20251201000001_report_hub_refresh.sql` | 报告中心刷新 |
+| 文件名                                                       | 描述             |
+| ------------------------------------------------------------ | ---------------- |
+| `20251123000001_init_schema.sql`                             | 初始化基础表结构 |
+| `20251124000002_align_hosted_schema.sql`                     | 对齐托管环境     |
+| `20251128000003_sync_quota_schema.sql`                       | 同步 quota 架构  |
+| `20251128000004_report_assets_rls.sql`                       | 报告资产 RLS     |
+| `20251129000005_report_embeddings_and_template_nullable.sql` | 添加嵌入向量     |
+| `20251129000005_report_posts_and_uploads.sql`                | 报告发布功能     |
+| `20251130000001_init_user_credits_30.sql`                    | 初始化 30 积分   |
+| `20251130000006_match_reports_embeddings.sql`                | 相似报告 RPC     |
+| `20251130_add_auth_helpers.sql`                              | 认证辅助函数     |
+| `20251201000000_unify_credits_system.sql`                    | 统一积分系统     |
+| `20251201000001_report_hub_refresh.sql`                      | 报告中心刷新     |
 
 ### C. API 路由清单
 
-| 路径 | 方法 | 描述 |
-|------|------|------|
-| `/api/report` | GET | 生成报告 |
-| `/api/report/credits` | GET | 查询积分 |
-| `/api/report/history` | GET | 历史报告 |
-| `/api/report/popular` | GET | 热门报告 |
-| `/api/report/similar` | GET | 相似推荐 |
-| `/api/report/daily-reward` | POST | 领取每日奖励 |
-| `/api/report/posts` | GET | 报告列表 |
-| `/api/report/posts/[slug]` | GET | 报告详情 |
-| `/api/admin/users/create` | POST | 创建用户 |
-| `/api/admin/users/update` | PATCH | 更新用户 |
-| `/api/admin/users/delete` | DELETE | 删除用户 |
-| `/api/admin/runs` | GET | 生成记录 |
-| `/api/admin/runs/[id]/feature` | POST | 特色报告 |
+| 路径                           | 方法   | 描述         |
+| ------------------------------ | ------ | ------------ |
+| `/api/report`                  | GET    | 生成报告     |
+| `/api/report/credits`          | GET    | 查询积分     |
+| `/api/report/history`          | GET    | 历史报告     |
+| `/api/report/popular`          | GET    | 热门报告     |
+| `/api/report/similar`          | GET    | 相似推荐     |
+| `/api/report/daily-reward`     | POST   | 领取每日奖励 |
+| `/api/report/posts`            | GET    | 报告列表     |
+| `/api/report/posts/[slug]`     | GET    | 报告详情     |
+| `/api/admin/users/create`      | POST   | 创建用户     |
+| `/api/admin/users/update`      | PATCH  | 更新用户     |
+| `/api/admin/users/delete`      | DELETE | 删除用户     |
+| `/api/admin/runs`              | GET    | 生成记录     |
+| `/api/admin/runs/[id]/feature` | POST   | 特色报告     |
 
 ### D. 测试覆盖目标
 
-| 模块 | 当前覆盖 | 目标覆盖 |
-|------|---------|---------|
-| `lib/core/reports/` | 40% | >80% |
-| `lib/core/credits/` | 60% | >80% |
-| `lib/services/` | 20% | >70% |
-| `lib/api/` | 50% | >70% |
-| `app/api/` | 30% | >60% |
-| **整体** | **35%** | **>70%** |
+| 模块                | 当前覆盖 | 目标覆盖 |
+| ------------------- | -------- | -------- |
+| `lib/core/reports/` | 40%      | >80%     |
+| `lib/core/credits/` | 60%      | >80%     |
+| `lib/services/`     | 20%      | >70%     |
+| `lib/api/`          | 50%      | >70%     |
+| `app/api/`          | 30%      | >60%     |
+| **整体**            | **35%**  | **>70%** |
 
 ---
 
@@ -1763,10 +1765,11 @@ STRIPE_WEBHOOK_SECRET=
 **评审周期**: 每月一次架构评审会议
 
 **相关文档**:
+
 - [部署指南](../guides/supabase-report-stage2-cavr.md)
 - [协作规范](../../CODEX_CLAUDE_COLLAB.md)
 - [架构决策记录](../decisions/)
 
 ---
 
-*最后更新: 2025-12-02*
+_最后更新: 2025-12-02_

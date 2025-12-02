@@ -98,7 +98,9 @@ export async function GET(request: NextRequest) {
       // If this is a password recovery callback, redirect to change password page
       if (type === "recovery") {
         console.log("[AUTH] Redirecting to change password page");
-        return NextResponse.redirect(new URL("/account/change-password?type=recovery", requestUrl.origin));
+        return NextResponse.redirect(
+          new URL("/account/change-password?type=recovery", requestUrl.origin)
+        );
       }
 
       console.log("[AUTH] Redirecting to homepage");

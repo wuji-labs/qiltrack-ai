@@ -3,7 +3,9 @@
 ## 🚨 重要：每个 Worktree 必须固定端口
 
 ### 问题
+
 Next.js 的 `next dev` 会自动选择可用端口（3000 → 3001 → 3002...），导致：
+
 - **邮件链接跳转错乱**：g2 邮件跳到 g1，g1 邮件跳到 g2
 - **Session 混乱**：不同 worktree 的认证相互干扰
 
@@ -41,20 +43,21 @@ Next.js 的 `next dev` 会自动选择可用端口（3000 → 3001 → 3002...�
 
 #### 端口分配建议
 
-| Worktree | 端口 | 说明 |
-|----------|------|------|
+| Worktree    | 端口 | 说明    |
+| ----------- | ---- | ------- |
 | 总部 (main) | 3000 | 总部 HQ |
-| g1 | 3001 | Group 1 |
-| g2 | 3002 | Group 2 |
-| g3 | 3003 | Group 3 |
-| g4 | 3004 | Group 4 |
-| g5 | 3005 | Group 5 |
+| g1          | 3001 | Group 1 |
+| g2          | 3002 | Group 2 |
+| g3          | 3003 | Group 3 |
+| g4          | 3004 | Group 4 |
+| g5          | 3005 | Group 5 |
 
 ---
 
 ## Reset Worktree 与环境变量管理
 
 ## 问题
+
 `scripts/reset-worktree.ps1` 会从总部（`D:\Projects\investor-ai`）复制 `.env.local` 到各 worktree，可能覆盖本地配置。
 
 ## 解决方案
@@ -64,11 +67,13 @@ Next.js 的 `next dev` 会自动选择可用端口（3000 → 3001 → 3002...�
 我们的认证系统已支持自动端口检测，**无需在 `.env.local` 设置 `NEXT_PUBLIC_SITE_URL`**。
 
 **工作原理**：
+
 - 从 3001 访问 → 邮件链接自动返回 3001
 - 从 3002 访问 → 邮件链接自动返回 3002
 - 从 3003 访问 → 邮件链接自动返回 3003
 
 **优点**：
+
 - ✅ g1, g2, g3... 无需任何配置
 - ✅ `reset-worktree.ps1` 不影响功能
 - ✅ 开箱即用
@@ -85,6 +90,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3001  # 或其他固定端口
 这样 `reset-worktree.ps1` 会同步到所有 worktree。
 
 **缺点**：
+
 - ❌ 所有邮件链接都返回固定端口（如 3001）
 - ❌ 从 3002 触发的邮件点击后会跳到 3001
 
@@ -103,17 +109,21 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3001  # 或其他固定端口
 ## 最佳实践总结
 
 ### 开发环境（g1, g2, g3...）
+
 1. **不设置** `NEXT_PUBLIC_SITE_URL`（或注释掉）
 2. 让代码自动检测端口
 3. 随时运行 `reset-worktree.ps1` 无影响
 
 ### 生产环境
+
 在 Vercel/部署平台设置环境变量：
+
 ```bash
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
 ```
 
 ### 检查当前配置
+
 ```powershell
 # 在 worktree 中检查
 cat .env.local | grep NEXT_PUBLIC_SITE_URL
@@ -135,6 +145,7 @@ A: 不需要配置！代码会自动检测：访问 3002 → 返回 3002，访�
 
 **Q: 什么时候需要设置 `NEXT_PUBLIC_SITE_URL`？**
 A: 仅在以下场景：
+
 - 生产环境（必须）
 - 需要所有 worktree 共享 session（不推荐）
 - 本地开发时想固定某个端口（极少数情况）
@@ -144,6 +155,7 @@ A: 所有 worktree 在 reset 后会继承该配置，邮件链接会固定跳转
 
 **Q: 生产环境应该怎么配置？**
 A: 在部署平台（Vercel/Railway/AWS 等）设置环境变量，不要依赖 `.env.local`：
+
 ```
 NEXT_PUBLIC_SITE_URL=https://yourdomain.com
 ```

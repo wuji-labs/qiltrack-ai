@@ -39,7 +39,12 @@ export const supabaseDataProvider: DataProvider = {
     // 应用过滤器
     if (filters) {
       filters.forEach((filter) => {
-        if ("field" in filter && filter.value !== undefined && filter.value !== null && filter.value !== "") {
+        if (
+          "field" in filter &&
+          filter.value !== undefined &&
+          filter.value !== null &&
+          filter.value !== ""
+        ) {
           switch (filter.operator) {
             case "eq":
               query = query.eq(filter.field, filter.value);
@@ -63,10 +68,17 @@ export const supabaseDataProvider: DataProvider = {
               query = query.ilike(filter.field, `%${filter.value}%`);
               break;
             case "in":
-              query = query.in(filter.field, Array.isArray(filter.value) ? filter.value : [filter.value]);
+              query = query.in(
+                filter.field,
+                Array.isArray(filter.value) ? filter.value : [filter.value]
+              );
               break;
             case "nin":
-              query = query.not(filter.field, "in", `(${Array.isArray(filter.value) ? filter.value.join(",") : filter.value})`);
+              query = query.not(
+                filter.field,
+                "in",
+                `(${Array.isArray(filter.value) ? filter.value.join(",") : filter.value})`
+              );
               break;
             case "null":
               query = query.is(filter.field, null);
@@ -134,11 +146,7 @@ export const supabaseDataProvider: DataProvider = {
   create: async ({ resource, variables, meta }) => {
     const supabase = createClient();
 
-    const { data, error } = await supabase
-      .from(resource)
-      .insert(variables)
-      .select()
-      .single();
+    const { data, error } = await supabase.from(resource).insert(variables).select().single();
 
     if (error) {
       throw error;
@@ -153,10 +161,7 @@ export const supabaseDataProvider: DataProvider = {
   createMany: async ({ resource, variables }) => {
     const supabase = createClient();
 
-    const { data, error } = await supabase
-      .from(resource)
-      .insert(variables)
-      .select();
+    const { data, error } = await supabase.from(resource).insert(variables).select();
 
     if (error) {
       throw error;
@@ -202,11 +207,7 @@ export const supabaseDataProvider: DataProvider = {
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error } = await supabase
-      .from(resource)
-      .update(updateData)
-      .in("id", ids)
-      .select();
+    const { data, error } = await supabase.from(resource).update(updateData).in("id", ids).select();
 
     if (error) {
       throw error;
@@ -221,12 +222,7 @@ export const supabaseDataProvider: DataProvider = {
   deleteOne: async ({ resource, id }) => {
     const supabase = createClient();
 
-    const { data, error } = await supabase
-      .from(resource)
-      .delete()
-      .eq("id", id)
-      .select()
-      .single();
+    const { data, error } = await supabase.from(resource).delete().eq("id", id).select().single();
 
     if (error) {
       throw error;
@@ -241,11 +237,7 @@ export const supabaseDataProvider: DataProvider = {
   deleteMany: async ({ resource, ids }) => {
     const supabase = createClient();
 
-    const { data, error } = await supabase
-      .from(resource)
-      .delete()
-      .in("id", ids)
-      .select();
+    const { data, error } = await supabase.from(resource).delete().in("id", ids).select();
 
     if (error) {
       throw error;
@@ -291,11 +283,7 @@ export const supabaseDataProvider: DataProvider = {
 /**
  * 辅助函数:批量授予积分
  */
-export async function batchGrantCredits(
-  userIds: string[],
-  amount: number,
-  reason: string
-) {
+export async function batchGrantCredits(userIds: string[], amount: number, reason: string) {
   const supabase = createClient();
 
   const events = userIds.map((userId) => ({
@@ -340,11 +328,7 @@ export async function batchGrantCredits(
 /**
  * 辅助函数:批量扣除积分
  */
-export async function batchRevokeCredits(
-  userIds: string[],
-  amount: number,
-  reason: string
-) {
+export async function batchRevokeCredits(userIds: string[], amount: number, reason: string) {
   const supabase = createClient();
 
   const events = userIds.map((userId) => ({

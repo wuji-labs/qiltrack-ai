@@ -19,16 +19,21 @@ export async function POST(request: NextRequest) {
         { error: "Unauthorized", code: "unauthorized" },
         { status: 401 }
       );
-      responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));
+      responseCookies.forEach(({ name, value }) =>
+        response.headers.append("Set-Cookie", `${name}=${value}`)
+      );
       return response;
     }
 
     const userId = session.user.id;
 
     // Call fn_claim_daily_reward function
-    const { data, error } = await supabase.rpc("fn_claim_daily_reward" as never, {
-      p_user_id: userId,
-    } as never);
+    const { data, error } = await supabase.rpc(
+      "fn_claim_daily_reward" as never,
+      {
+        p_user_id: userId,
+      } as never
+    );
 
     if (error) {
       console.warn(`[DAILY_REWARD_ERROR] user_id: ${userId}, error: ${error.message}`);
@@ -36,7 +41,9 @@ export async function POST(request: NextRequest) {
         { error: "Failed to claim daily reward", code: "reward_claim_failed" },
         { status: 500 }
       );
-      responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));
+      responseCookies.forEach(({ name, value }) =>
+        response.headers.append("Set-Cookie", `${name}=${value}`)
+      );
       return response;
     }
 
@@ -49,7 +56,9 @@ export async function POST(request: NextRequest) {
       remainingCredits: (data as any)?.[0]?.remaining_credits ?? 0,
     });
 
-    responseCookies.forEach(({ name, value }) => response.headers.append("Set-Cookie", `${name}=${value}`));
+    responseCookies.forEach(({ name, value }) =>
+      response.headers.append("Set-Cookie", `${name}=${value}`)
+    );
     return response;
   } catch (err) {
     console.error("Daily reward API error:", err);

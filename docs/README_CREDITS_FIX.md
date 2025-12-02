@@ -19,6 +19,7 @@
 ```
 
 **根本原因**：
+
 1. 新用户注册时，`report_credits` 表没有正确初始化
 2. 初始值设得太小（5 而不是 30）
 3. 没有日常奖励机制让用户主动获取积分
@@ -29,12 +30,12 @@
 
 ### 📦 已自动化创建
 
-| 类别 | 文件 | 用途 |
-|------|------|------|
-| **DB 迁移** | `supabase/migrations/20251130000001_init_user_credits_30.sql` | 初始化 30 积分 + 每日奖励 |
-| **API 端点** | `app/api/report/daily-reward/route.ts` | 处理领取请求 |
-| **服务层** | `lib/services/api.ts` | 前端 API 调用 |
-| **文档** | 5 份详细文档 | 指导和参考 |
+| 类别         | 文件                                                          | 用途                      |
+| ------------ | ------------------------------------------------------------- | ------------------------- |
+| **DB 迁移**  | `supabase/migrations/20251130000001_init_user_credits_30.sql` | 初始化 30 积分 + 每日奖励 |
+| **API 端点** | `app/api/report/daily-reward/route.ts`                        | 处理领取请求              |
+| **服务层**   | `lib/services/api.ts`                                         | 前端 API 调用             |
+| **文档**     | 5 份详细文档                                                  | 指导和参考                |
 
 ### 🎬 三步快速启动
 
@@ -58,6 +59,7 @@ supabase migration up
 #### 2️⃣ 验证修改（1 分钟）
 
 在 Supabase SQL Editor 运行：
+
 ```sql
 -- 检查默认值已更新
 SELECT column_default FROM information_schema.columns
@@ -96,13 +98,13 @@ SELECT table_name FROM information_schema.tables WHERE table_name='daily_rewards
 
 ### 👨‍💻 开发者必读
 
-| 文档 | 内容 | 何时阅读 |
-|------|------|---------|
-| 📖 **ACTION_CHECKLIST.md** | 完整执行清单 + 故障排除 | **首先读这个** |
-| 📖 **CREDITS_SYSTEM_QUICK_FIX.md** | 5 分钟快速指南 | 想快速上手 |
-| 📖 **CREDITS_FIX_SUMMARY.md** | 详细总结 + FAQ | 想了解全貌 |
-| 📖 **ARCHITECTURE_AND_DATA_FLOW.md** | 架构图 + 数据流 | 想深入理解 |
-| 📖 **2025-11-30-credits-system-solution.md** | 完整设计文档 | 想看完整方案 |
+| 文档                                         | 内容                    | 何时阅读       |
+| -------------------------------------------- | ----------------------- | -------------- |
+| 📖 **ACTION_CHECKLIST.md**                   | 完整执行清单 + 故障排除 | **首先读这个** |
+| 📖 **CREDITS_SYSTEM_QUICK_FIX.md**           | 5 分钟快速指南          | 想快速上手     |
+| 📖 **CREDITS_FIX_SUMMARY.md**                | 详细总结 + FAQ          | 想了解全貌     |
+| 📖 **ARCHITECTURE_AND_DATA_FLOW.md**         | 架构图 + 数据流         | 想深入理解     |
+| 📖 **2025-11-30-credits-system-solution.md** | 完整设计文档            | 想看完整方案   |
 
 ### 📂 代码文件
 
@@ -123,6 +125,7 @@ lib/services/
 ## 🎯 预期效果
 
 ### 修复前 ❌
+
 ```
 新账号注册
   ├─ 首页: 0 积分
@@ -131,6 +134,7 @@ lib/services/
 ```
 
 ### 修复后 ✅
+
 ```
 新账号注册
   ├─ 首页: 30 积分
@@ -188,33 +192,37 @@ claimDailyReward(): Promise<DailyRewardResponse>
 
 ## 📊 技术指标
 
-| 指标 | 值 |
-|------|-----|
-| 代码行数 | ~200 行 SQL + 50 行 TS |
-| 新增表 | 1 个 (daily_rewards) |
-| 新增函数 | 2 个 (更新) + 1 个 (新) |
-| 新增 API 端点 | 1 个 |
-| 修改文件 | 2 个 |
-| 风险等级 | 🟢 低 |
-| 回滚难度 | 简单 (IF NOT EXISTS 保护) |
+| 指标          | 值                        |
+| ------------- | ------------------------- |
+| 代码行数      | ~200 行 SQL + 50 行 TS    |
+| 新增表        | 1 个 (daily_rewards)      |
+| 新增函数      | 2 个 (更新) + 1 个 (新)   |
+| 新增 API 端点 | 1 个                      |
+| 修改文件      | 2 个                      |
+| 风险等级      | 🟢 低                     |
+| 回滚难度      | 简单 (IF NOT EXISTS 保护) |
 
 ---
 
 ## 🚀 立即开始
 
 ### 第一步：阅读执行清单
+
 👉 **打开**: `docs/ACTION_CHECKLIST.md`
 
 ### 第二步：应用数据库迁移
+
 1. 打开 Supabase 仪表盘
 2. SQL Editor
 3. 运行迁移 SQL
 4. ✅ 完成
 
 ### 第三步（可选）：前端集成
+
 参考清单中的第 4 步，添加按钮
 
 ### 第四步：测试验证
+
 新账号注册 → 检查 30 积分 → ✅ 成功
 
 ---
@@ -224,16 +232,19 @@ claimDailyReward(): Promise<DailyRewardResponse>
 ### 三大机制
 
 #### 1️⃣ **初始化**
+
 ```
 注册 → fn_initialize_profile → 创建 profile + 30 积分 + 事件日志
 ```
 
 #### 2️⃣ **消耗**
+
 ```
 生成报告 → fn_consume_report_credit → 扣除 1 积分 + 记录
 ```
 
 #### 3️⃣ **获取**
+
 ```
 每日点击 → fn_claim_daily_reward → +10 积分 + 更新 streak
 ```

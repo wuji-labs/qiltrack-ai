@@ -8,23 +8,28 @@
 ## 修复记录
 
 ### Issue #1: 分页翻页后新卡片未被观察（高优）
+
 **描述**: 分页翻页时，新渲染的卡片不被 IntersectionObserver 观察，因为 hook 中 `items` 在首次渲染后固定不变，新分页的 DOM 节点无法进入 observer。
 **修复**:
-  - useVisibilityStagger 添加 `deps?: unknown[]` 参数
-  - page.tsx 调用时传入 `deps: [pageIndex, selectedCategory]`
-  - 当这些依赖变化时，hook 重新查询容器内所有 items 并重新初始化 observer
-  - 确保分页翻页后的新卡片能正确被观察和触发进场动画
+
+- useVisibilityStagger 添加 `deps?: unknown[]` 参数
+- page.tsx 调用时传入 `deps: [pageIndex, selectedCategory]`
+- 当这些依赖变化时，hook 重新查询容器内所有 items 并重新初始化 observer
+- 确保分页翻页后的新卡片能正确被观察和触发进场动画
 
 ### Issue #2: prefers-reduced-motion 下卡片隐藏（高优）
+
 **描述**: 无障碍模式下，hook 初始化时若 media query 不被检测，卡片可能保持隐藏。
 **修复**: hook 添加 `respectReducedMotion` 选项，初始化时显式检测 `prefers-reduced-motion`，无障碍模式下立即设置 `data-visible="true"`，跳过 observer。
 
 ### Issue #3: 文案编码错误导致乱码（高优）
+
 **描述**: 返回首页按钮文案显示为 "杩斿洖棣栭〉" 等乱码。
 **修复**:
-  - 将硬编码中文改为 i18n key `reports.page.hero.backHome`
-  - 在 lib/i18n.tsx 添加完整多语言翻译（EN/JA/KO/繁體/簡體）
-  - 确保文案编码正确，与其他按钮保持国际化一致性
+
+- 将硬编码中文改为 i18n key `reports.page.hero.backHome`
+- 在 lib/i18n.tsx 添加完整多语言翻译（EN/JA/KO/繁體/簡體）
+- 确保文案编码正确，与其他按钮保持国际化一致性
 
 ## 实现范围
 
@@ -62,6 +67,7 @@
 ## 代码变更
 
 ### 文件修改列表
+
 - **app/reports/hooks/useVisibilityStagger.ts**（更新）
   - 新增 `deps?: unknown[]` 参数，支持传入依赖项数组
   - 当 pageIndex/selectedCategory 等依赖变化时，hook 重新初始化 observer
@@ -76,12 +82,14 @@
   - 支持 5 种语言：EN、JA、KO、繁體中文、簡體中文
 
 ### CSS（无新增）
+
 - 所有 keyframes 和 utility 类已在 globals.css 中定义（Phase 1）
 - 仅在 page.tsx 中应用这些类
 
 ## 验收清单
 
 ### 手动测试（桌面 / 移动）
+
 - [ ] 访问 /reports，确认 Hero 标题等元素依次淡入
 - [ ] Mesh 背景在浏览器支持下轻微浮动
 - [ ] 点击筛选按钮，观察选中态光晕和缩放反馈
@@ -91,24 +99,29 @@
 - [ ] 点击 Hero CTA 跳转至 #archive，内容顶部不被导航条遮挡
 
 ### 无障碍检查
+
 - [ ] 系统设置 → 辅助功能 → 显示 → 减少动画 ✓
 - [ ] 刷新 /reports，所有动画应立即完成或禁用，内容仍可读
 - [ ] **分页翻页后，卡片应仍保持可见**（修复项）
 
 ### 工具检查
+
 - [ ] `npm run lint` 通过，无新增警告
+
   ```
   > investor-ai@0.1.0 lint
   > eslint app/reports/page.tsx app/reports/hooks/useVisibilityStagger.ts
 
   (no errors, no warnings)
   ```
+
 - [ ] 未新增外部依赖
 - [ ] 未改动 data.ts、路由或 i18n key
 
 ## 遗留风险与后续
 
 ### 已解决
+
 - ✅ **分页翻页后新卡片未被观察**（通过 hook deps 参数支持动态重初始化）
 - ✅ **reduce-motion 场景卡片隐藏**（hook 显式检测媒体查询并立即显示）
 - ✅ **文案乱码**（改用 i18n 国际化，确保 UTF-8 编码）
@@ -118,6 +131,7 @@
 - ✅ 分页和筛选后都支持无障碍立即显示
 
 ### 可选增强（不在本期范围）
+
 - 动效配置可考虑参数化（delay、duration、easin function），目前硬编码以保持简洁
 - useVisibilityStagger hook 可扩展支持自定义 unobserve 时机（目前持续观察）
 

@@ -41,10 +41,16 @@ function LoginContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailStatus, setEmailStatus] = useState<EmailStatus>("idle");
-  const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(
-    null
-  );
-  const { signInWithProvider, signInWithEmail, signInWithPassword, signUpWithPassword, resetPassword, loading, isAuthenticated } = useSupabaseAuth();
+  const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
+  const {
+    signInWithProvider,
+    signInWithEmail,
+    signInWithPassword,
+    signUpWithPassword,
+    resetPassword,
+    loading,
+    isAuthenticated,
+  } = useSupabaseAuth();
 
   const banner = useMemo(() => {
     if (message) return message;
@@ -91,9 +97,10 @@ function LoginContent() {
       setEmailStatus("error");
       setMessage({
         type: "error",
-        text: result.code === "invalid_credentials"
-          ? t("auth.error.invalidCredentials")
-          : t("auth.error.generic")
+        text:
+          result.code === "invalid_credentials"
+            ? t("auth.error.invalidCredentials")
+            : t("auth.error.generic"),
       });
       return;
     }
@@ -117,9 +124,10 @@ function LoginContent() {
       setEmailStatus("error");
       setMessage({
         type: "error",
-        text: result.code === "user_already_exists"
-          ? t("auth.error.userExists")
-          : t("auth.error.generic")
+        text:
+          result.code === "user_already_exists"
+            ? t("auth.error.userExists")
+            : t("auth.error.generic"),
       });
       return;
     }
@@ -170,7 +178,8 @@ function LoginContent() {
     setMessage({ type: "success", text: t("auth.resetPassword.emailSent") });
   };
 
-  const emailDisabled = emailStatus === "loading" || emailStatus === "sent" || emailStatus === "cooldown";
+  const emailDisabled =
+    emailStatus === "loading" || emailStatus === "sent" || emailStatus === "cooldown";
   const localSupabase = isLocalSupabase();
   const isSignInView = view === "signin" || view === "magic-link" || view === "reset-password";
 
@@ -208,9 +217,7 @@ function LoginContent() {
               <Link
                 href="/login?view=signin"
                 className={`flex-1 py-3 text-center font-semibold transition-colors relative ${
-                  view === "signin"
-                    ? "text-emerald-400"
-                    : "text-slate-400 hover:text-slate-300"
+                  view === "signin" ? "text-emerald-400" : "text-slate-400 hover:text-slate-300"
                 }`}
               >
                 {view === "signin" && (
@@ -221,9 +228,7 @@ function LoginContent() {
               <Link
                 href="/login?view=signup"
                 className={`flex-1 py-3 text-center font-semibold transition-colors relative ${
-                  view === "signup"
-                    ? "text-emerald-400"
-                    : "text-slate-400 hover:text-slate-300"
+                  view === "signup" ? "text-emerald-400" : "text-slate-400 hover:text-slate-300"
                 }`}
               >
                 {view === "signup" && (
@@ -316,7 +321,10 @@ function LoginContent() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="signup-password" className="block text-sm font-medium text-slate-300">
+                <label
+                  htmlFor="signup-password"
+                  className="block text-sm font-medium text-slate-300"
+                >
                   {t("auth.signup.password")}
                 </label>
                 <input
@@ -406,9 +414,7 @@ function LoginContent() {
           {/* Reset Password Form */}
           {view === "reset-password" && (
             <form onSubmit={handleResetPassword} className="space-y-4">
-              <p className="text-sm text-slate-400">
-                {t("auth.resetPassword.description")}
-              </p>
+              <p className="text-sm text-slate-400">{t("auth.resetPassword.description")}</p>
 
               <div className="space-y-2">
                 <label htmlFor="reset-email" className="block text-sm font-medium text-slate-300">

@@ -7,14 +7,14 @@
 
 ## 1. 环境要求速查表
 
-| 工具 | 最小版本 | 推荐/实际版本 | 检查命令 |
-|------|---------|---------|---------|
-| **Node.js** | 18.0.0 | v25.2.1+ ✅ | `node --version` |
-| **npm** | 8.0.0 | 11.6.2+ ✅ | `npm --version` |
-| **Git** | 2.40.0 | 2.52.0+ ✅ | `git --version` |
-| **Python** (可选) | 3.8.0 | 3.14.0+ ✅ | `python --version` |
-| **GitHub CLI** (可选) | 1.12.0 | 2.83.1+ ✅ | `gh --version` |
-| **Supabase CLI** (可选) | 1.0.0 | 2.62.10+ ✅ | `supabase --version` |
+| 工具                    | 最小版本 | 推荐/实际版本 | 检查命令             |
+| ----------------------- | -------- | ------------- | -------------------- |
+| **Node.js**             | 18.0.0   | v25.2.1+ ✅   | `node --version`     |
+| **npm**                 | 8.0.0    | 11.6.2+ ✅    | `npm --version`      |
+| **Git**                 | 2.40.0   | 2.52.0+ ✅    | `git --version`      |
+| **Python** (可选)       | 3.8.0    | 3.14.0+ ✅    | `python --version`   |
+| **GitHub CLI** (可选)   | 1.12.0   | 2.83.1+ ✅    | `gh --version`       |
+| **Supabase CLI** (可选) | 1.0.0    | 2.62.10+ ✅   | `supabase --version` |
 
 ---
 
@@ -96,6 +96,7 @@ npm --version --long
 ```
 
 **预期输出**：
+
 ```
 v20.19.5      (Node.js)
 10.8.2        (npm)
@@ -215,15 +216,15 @@ npm run dev
 
 ### 4.1 核心命令
 
-| 命令 | 说明 | 备注 |
-|------|------|------|
-| `npm run dev` | 启动开发服务器 | http://localhost:3000 |
-| `npm run build` | 生成生产构建 | 产物在 `.next` 目录 |
-| `npm start` | 运行生产构建 | 需先运行 `npm run build` |
-| `npm run lint` | 代码质量检查 | 基于 ESLint |
-| `npm test` | 单元测试 | 基于 Vitest |
-| `npm run test:ci` | CI 模式测试 | GitHub Actions 使用 |
-| `npm run env:check` | 环境检查 | 新增命令 |
+| 命令                | 说明           | 备注                     |
+| ------------------- | -------------- | ------------------------ |
+| `npm run dev`       | 启动开发服务器 | http://localhost:3000    |
+| `npm run build`     | 生成生产构建   | 产物在 `.next` 目录      |
+| `npm start`         | 运行生产构建   | 需先运行 `npm run build` |
+| `npm run lint`      | 代码质量检查   | 基于 ESLint              |
+| `npm test`          | 单元测试       | 基于 Vitest              |
+| `npm run test:ci`   | CI 模式测试    | GitHub Actions 使用      |
+| `npm run env:check` | 环境检查       | 新增命令                 |
 
 ### 4.2 扩展命令（建议）
 
@@ -382,6 +383,7 @@ cp .env.local.example .env.local
 项目使用 GitHub Actions 进行自动化测试和构建，配置文件位于 `.github/workflows/ci.yml`。
 
 **CI 流程**：
+
 1. 在 `main` 分支 push 或 PR 时触发
 2. Node.js 版本：20（与 package.json 对齐）
 3. 执行步骤：
@@ -493,21 +495,25 @@ investor-ai@0.1.0 /path/to/investor-ai
 **为什么装**：快速创建/管理 PR，不需打开浏览器。
 
 **Windows**：
+
 ```bash
 scoop install gh
 ```
 
 **Mac**：
+
 ```bash
 brew install gh
 ```
 
 **Linux**：
+
 ```bash
 sudo apt install gh  # Ubuntu/Debian
 ```
 
 **验证安装**：
+
 ```bash
 gh --version
 gh auth login
@@ -516,6 +522,7 @@ gh auth login
 ### 8.2 版本管理工具（nvm / Scoop）
 
 **使用 Scoop（Windows）**：
+
 ```bash
 # 安装 Scoop
 iwr -useb get.scoop.sh | iex
@@ -526,6 +533,7 @@ scoop update nodejs
 ```
 
 **使用 nvm（Linux/Mac）**：
+
 ```bash
 # 安装 nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
@@ -538,6 +546,7 @@ nvm use 20
 ### 8.3 调试工具
 
 **VS Code 调试**：
+
 - 在 `.vscode/launch.json` 中配置：
   ```json
   {
@@ -561,21 +570,25 @@ nvm use 20
 **为什么装**：管理 Supabase 项目、数据库迁移、本地开发。
 
 **Windows（使用 Scoop）**：
+
 ```bash
 scoop install supabase
 ```
 
 **Mac（使用 Homebrew）**：
+
 ```bash
 brew install supabase/tap/supabase
 ```
 
 **Linux（使用 npm）**：
+
 ```bash
 npm install -g supabase
 ```
 
 **验证安装**：
+
 ```bash
 supabase --version
 # 预期: supabase version 2.62.10 或更高
@@ -592,6 +605,7 @@ supabase projects list
 ```
 
 **常用命令**：
+
 ```bash
 # 初始化本地 Supabase 环境
 supabase init
@@ -621,6 +635,7 @@ A：项目支持 Node.js 18+，推荐使用 v20.19.5 或更高。GitHub Actions 
 
 **Q2：为什么本地通过，PR 在 CI 失败？**
 A：常见原因：
+
 - Node.js 版本不一致（本地用 18，CI 用 20）
 - npm 依赖版本波动（使用 `package-lock.json` 锁定版本）
 - 环境变量缺失（.env.local 本地有，CI 没有）
@@ -630,6 +645,7 @@ A：常见原因：
 
 **Q3：我该如何贡献新功能？**
 A：遵循 `docs/guides/claude-pr-workflow.md` 的步骤：
+
 1. 创建新分支（`feature/your-feature`）
 2. 本地修改和测试（`npm run lint && npm run test`）
 3. 推送到远程
@@ -638,6 +654,7 @@ A：遵循 `docs/guides/claude-pr-workflow.md` 的步骤：
 
 **Q4：如何快速验证我的改动不会破坏构建？**
 A：运行本地 PR 检查脚本：
+
 ```bash
 npm run pr:ready
 # 或逐步执行
@@ -646,6 +663,7 @@ npm run lint && npm run test && npm run build
 
 **Q5：我的电脑上有多个项目，如何避免 Node.js 版本冲突？**
 A：使用版本管理工具（nvm 或 Scoop）：
+
 ```bash
 # Scoop
 scoop install nodejs  # 安装最新版
@@ -680,18 +698,21 @@ nvm alias default 20
 每个 worktree 拥有**独立的 `node_modules`**，避免 Turbopack 缓存冲突。
 
 **创建 worktree**：
+
 ```powershell
 # 使用 prep 脚本（自动运行 npm ci）
 powershell -ExecutionPolicy Bypass -File scripts/prep-group.ps1 -Name g1 -Branch g1/feature-x
 ```
 
 **每次新任务前重置**：
+
 ```powershell
 # 重置到最新 main（保留 node_modules）
 .\scripts\reset-worktree.ps1 -Name g1
 ```
 
 **多 worktree 并行开发**：
+
 ```bash
 # 每个 worktree 用不同端口
 cd D:\Projects\investor-ai-g1 && npm run dev -- --port 3001
@@ -715,6 +736,7 @@ cd D:\Projects\investor-ai-g2 && npm run dev -- --port 3002
 **最后更新**：2025-11-27（已验证所有环境配置，补充 Supabase CLI）
 **维护者**：团队全体
 
-## 10. 服务状态环境关�?
-- GitHub CLI 已关联环境表�? explore0012，接受与 CI 可访问，可以直接使用 `gh` 接口查看/接口提供业务，老确保无需�? repo 提前登录信息�?
-- Supabase 参数在地设置，要止可能上传密钥�?�需从本地游例环境的 env 配置获取，私安全�?
+## 10. 服务状态环境关�?
+
+- GitHub CLI 已关联环境表�? explore0012，接受与 CI 可访问，可以直接使用 `gh` 接口查看/接口提供业务，老确保无需�? repo 提前登录信息�?
+- Supabase 参数在地设置，要止可能上传密钥�?�需从本地游例环境的 env 配置获取，私安全�?

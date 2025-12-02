@@ -27,50 +27,50 @@ export default function ResetPasswordRedirect() {
 
   useEffect(() => {
     const resolveRecovery = async () => {
-			try {
-				const hash = typeof window !== "undefined" ? window.location.hash : "";
-				const tokens = parseRecoveryTokens({ searchParams, hash });
+      try {
+        const hash = typeof window !== "undefined" ? window.location.hash : "";
+        const tokens = parseRecoveryTokens({ searchParams, hash });
 
-				// Missing all required parameters - show link expired
-				if (!hasRecoveryTokens(tokens)) {
-					setStatus("error");
-					setErrorMessage(t("auth.resetPassword.linkExpired"));
-					return;
-				}
+        // Missing all required parameters - show link expired
+        if (!hasRecoveryTokens(tokens)) {
+          setStatus("error");
+          setErrorMessage(t("auth.resetPassword.linkExpired"));
+          return;
+        }
 
-				// Attempt session restoration in priority order
-				if (tokens.code) {
-					const { error } = await supabase.auth.exchangeCodeForSession(tokens.code);
-					if (error) throw error;
-				} else if (tokens.accessToken && tokens.refreshToken) {
-					const { error } = await supabase.auth.setSession({
-						access_token: tokens.accessToken,
-						refresh_token: tokens.refreshToken,
-					});
-					if (error) throw error;
-				} else if (tokens.tokenHash) {
-					const { error } = await supabase.auth.verifyOtp({
-						type: "recovery",
-						token_hash: tokens.tokenHash,
-					});
-					if (error) throw error;
-				}
+        // Attempt session restoration in priority order
+        if (tokens.code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(tokens.code);
+          if (error) throw error;
+        } else if (tokens.accessToken && tokens.refreshToken) {
+          const { error } = await supabase.auth.setSession({
+            access_token: tokens.accessToken,
+            refresh_token: tokens.refreshToken,
+          });
+          if (error) throw error;
+        } else if (tokens.tokenHash) {
+          const { error } = await supabase.auth.verifyOtp({
+            type: "recovery",
+            token_hash: tokens.tokenHash,
+          });
+          if (error) throw error;
+        }
 
-				setStatus("success");
-				router.replace("/account/change-password?type=recovery");
-			} catch (err) {
-				console.error("Password recovery session error:", err);
-				setStatus("error");
-				// Prioritize expired link message for Supabase-specific expiration errors
-				const errObj = err as { code?: string; message?: string };
-				const msg = errObj?.message?.toLowerCase() || "";
-				const isExpired =
-					errObj?.code === "otp_expired" ||
-					msg.includes("expired") ||
-					msg.includes("invalid or expired");
-				setErrorMessage(isExpired ? t("auth.resetPassword.linkExpired") : t("auth.error.generic"));
-			}
-		};
+        setStatus("success");
+        router.replace("/account/change-password?type=recovery");
+      } catch (err) {
+        console.error("Password recovery session error:", err);
+        setStatus("error");
+        // Prioritize expired link message for Supabase-specific expiration errors
+        const errObj = err as { code?: string; message?: string };
+        const msg = errObj?.message?.toLowerCase() || "";
+        const isExpired =
+          errObj?.code === "otp_expired" ||
+          msg.includes("expired") ||
+          msg.includes("invalid or expired");
+        setErrorMessage(isExpired ? t("auth.resetPassword.linkExpired") : t("auth.error.generic"));
+      }
+    };
 
     void resolveRecovery();
   }, [router, searchParams, supabase, t]);

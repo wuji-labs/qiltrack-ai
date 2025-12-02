@@ -104,9 +104,7 @@ export class RewardsManager {
     // Calculate total days since first reward
     const created = new Date(data.created_at);
     const today = new Date();
-    const totalDays = Math.floor(
-      (today.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)
-    );
+    const totalDays = Math.floor((today.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
 
     return {
       streak_count: data.streak_count || 0,

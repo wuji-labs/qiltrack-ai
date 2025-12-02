@@ -17,6 +17,7 @@
 - **G4**: 基础设施与工具链
 
 **关键原则**:
+
 1. ✅ 任务之间**低耦合**,可独立开发和测试
 2. ✅ 每个任务都有**明确的验收标准**
 3. ✅ 优先修复**高风险问题**(🔴)
@@ -26,12 +27,12 @@
 
 ## 📊 任务总览
 
-| 工作组 | 主要职责 | Phase 1 任务数 | Phase 2 任务数 |
-|--------|---------|---------------|---------------|
-| **G1** | 前端层 | 3 | 2 |
-| **G2** | API 层 | 4 | 3 |
-| **G3** | 业务逻辑层 | 2 | 4 |
-| **G4** | 基础设施 | 2 | 2 |
+| 工作组 | 主要职责   | Phase 1 任务数 | Phase 2 任务数 |
+| ------ | ---------- | -------------- | -------------- |
+| **G1** | 前端层     | 3              | 2              |
+| **G2** | API 层     | 4              | 3              |
+| **G3** | 业务逻辑层 | 2              | 4              |
+| **G4** | 基础设施   | 2              | 2              |
 
 ---
 
@@ -42,12 +43,14 @@
 **分支**: `g1/phase1-frontend-refactor`
 
 #### 任务 1.1: 拆分 ReportGeneratorSection 组件 🔴
+
 **优先级**: P0 (高风险,必须先做)
 **预计时间**: 8 小时
 
 **目标**: 将 1300 行的巨型组件拆分为 7 个子组件
 
 **拆分方案**:
+
 ```
 app/components/report-generator/
 ├── ReportForm.tsx              (~200行) - 输入表单
@@ -62,6 +65,7 @@ app/components/report-generator/
 ```
 
 **验收标准**:
+
 - [ ] 每个子组件 <300 行
 - [ ] 每个子组件有独立的 TypeScript 接口
 - [ ] 每个子组件有对应的测试文件
@@ -73,12 +77,14 @@ app/components/report-generator/
 ---
 
 #### 任务 1.2: 添加全局错误边界 🔴
+
 **优先级**: P1
 **预计时间**: 2 小时
 
 **目标**: 捕获前端运行时错误,避免白屏
 
 **实现**:
+
 ```typescript
 // app/components/ErrorBoundary.tsx
 import { Component, ReactNode } from 'react'
@@ -127,6 +133,7 @@ export class ErrorBoundary extends Component<Props, State> {
 ```
 
 **集成到 app/layout.tsx**:
+
 ```typescript
 import { ErrorBoundary } from './components/ErrorBoundary'
 
@@ -144,6 +151,7 @@ export default function RootLayout({ children }) {
 ```
 
 **验收标准**:
+
 - [ ] 抛出错误时显示友好页面
 - [ ] 控制台记录详细错误信息
 - [ ] 用户可以刷新恢复
@@ -154,18 +162,22 @@ export default function RootLayout({ children }) {
 ---
 
 #### 任务 1.3: 代码格式化统一 🟢
+
 **优先级**: P2
 **预计时间**: 1 小时
 
 **目标**: 统一代码风格,提升可读性
 
 **步骤**:
+
 1. 安装 Prettier
+
    ```bash
    npm install -D prettier
    ```
 
 2. 创建 `.prettierrc`
+
    ```json
    {
      "semi": true,
@@ -178,6 +190,7 @@ export default function RootLayout({ children }) {
    ```
 
 3. 添加脚本到 `package.json`
+
    ```json
    {
      "scripts": {
@@ -193,6 +206,7 @@ export default function RootLayout({ children }) {
    ```
 
 **验收标准**:
+
 - [ ] 所有文件格式一致
 - [ ] `npm run format:check` 无错误
 - [ ] VS Code 保存时自动格式化
@@ -206,30 +220,37 @@ export default function RootLayout({ children }) {
 **分支**: `g2/phase1-api-hardening`
 
 #### 任务 2.1: 同步数据库类型定义 🔴
+
 **优先级**: P0 (最高优先级,阻塞其他任务)
 **预计时间**: 1 小时
 
 **目标**: 修复 TypeScript 类型与数据库 schema 不一致的问题
 
 **步骤**:
+
 1. 确认 Supabase CLI 已登录
+
    ```bash
    npx supabase login
    npx supabase link --project-ref inmtounwqcjwsxkfnsfd
    ```
 
 2. 重新生成类型定义
+
    ```bash
    npx supabase gen types typescript --linked --schema public > types/database.ts
    ```
 
 3. 验证变更
+
    ```bash
    git diff types/database.ts
    ```
+
    **期望**: `quota_limit` 和 `reports_used` 字段已移除
 
 4. 更新所有引用 (如果有)
+
    ```bash
    # 搜索所有引用旧字段的代码
    git grep "quota_limit"
@@ -243,6 +264,7 @@ export default function RootLayout({ children }) {
    ```
 
 **验收标准**:
+
 - [ ] `types/database.ts` 与 Supabase schema 100% 一致
 - [ ] `npm run build` 无 TypeScript 错误
 - [ ] `git grep "quota_limit"` 无结果(除了迁移文件)
@@ -252,6 +274,7 @@ export default function RootLayout({ children }) {
 ---
 
 #### 任务 2.2: 添加 API 限流中间件 🔴
+
 **优先级**: P0
 **预计时间**: 4 小时
 
@@ -267,6 +290,7 @@ export default function RootLayout({ children }) {
    - 复制 `UPSTASH_REDIS_REST_URL` 和 `UPSTASH_REDIS_REST_TOKEN`
 
 2. **配置环境变量**
+
    ```bash
    # .env.local
    UPSTASH_REDIS_REST_URL=https://xxx.upstash.io
@@ -274,53 +298,53 @@ export default function RootLayout({ children }) {
    ```
 
 3. **安装依赖**
+
    ```bash
    npm install @upstash/ratelimit @upstash/redis
    ```
 
 4. **创建限流模块**
+
    ```typescript
    // lib/api/rate-limit.ts
-   import { Ratelimit } from '@upstash/ratelimit'
-   import { Redis } from '@upstash/redis'
+   import { Ratelimit } from "@upstash/ratelimit";
+   import { Redis } from "@upstash/redis";
 
-   const redis = Redis.fromEnv()
+   const redis = Redis.fromEnv();
 
    // 报告生成限流: 每用户每分钟 5 次
    export const reportGenerationRateLimit = new Ratelimit({
      redis,
-     limiter: Ratelimit.slidingWindow(5, '1 m'),
+     limiter: Ratelimit.slidingWindow(5, "1 m"),
      analytics: true,
-     prefix: 'ratelimit:report'
-   })
+     prefix: "ratelimit:report",
+   });
 
    // 全局 API 限流: 每 IP 每秒 20 次
    export const globalRateLimit = new Ratelimit({
      redis,
-     limiter: Ratelimit.slidingWindow(20, '1 s'),
+     limiter: Ratelimit.slidingWindow(20, "1 s"),
      analytics: true,
-     prefix: 'ratelimit:global'
-   })
+     prefix: "ratelimit:global",
+   });
 
    // 辅助函数: 检查并返回限流响应
-   export async function checkRateLimit(
-     identifier: string,
-     ratelimit: Ratelimit
-   ) {
-     const { success, limit, remaining, reset } = await ratelimit.limit(identifier)
+   export async function checkRateLimit(identifier: string, ratelimit: Ratelimit) {
+     const { success, limit, remaining, reset } = await ratelimit.limit(identifier);
 
      return {
        success,
        headers: {
-         'X-RateLimit-Limit': limit.toString(),
-         'X-RateLimit-Remaining': remaining.toString(),
-         'X-RateLimit-Reset': reset.toString()
-       }
-     }
+         "X-RateLimit-Limit": limit.toString(),
+         "X-RateLimit-Remaining": remaining.toString(),
+         "X-RateLimit-Reset": reset.toString(),
+       },
+     };
    }
    ```
 
 5. **集成到 API 路由**
+
    ```typescript
    // app/api/report/route.ts
    import { reportGenerationRateLimit, checkRateLimit } from '@/lib/api/rate-limit'
@@ -355,28 +379,30 @@ export default function RootLayout({ children }) {
    ```
 
 6. **添加测试**
+
    ```typescript
    // __tests__/api/rate-limit.test.ts
-   import { reportGenerationRateLimit } from '@/lib/api/rate-limit'
+   import { reportGenerationRateLimit } from "@/lib/api/rate-limit";
 
-   describe('Rate Limit', () => {
-     it('should allow 5 requests per minute', async () => {
-       const userId = 'test-user-123'
+   describe("Rate Limit", () => {
+     it("should allow 5 requests per minute", async () => {
+       const userId = "test-user-123";
 
        // 前 5 次应该成功
        for (let i = 0; i < 5; i++) {
-         const { success } = await reportGenerationRateLimit.limit(userId)
-         expect(success).toBe(true)
+         const { success } = await reportGenerationRateLimit.limit(userId);
+         expect(success).toBe(true);
        }
 
        // 第 6 次应该失败
-       const { success } = await reportGenerationRateLimit.limit(userId)
-       expect(success).toBe(false)
-     })
-   })
+       const { success } = await reportGenerationRateLimit.limit(userId);
+       expect(success).toBe(false);
+     });
+   });
    ```
 
 **验收标准**:
+
 - [ ] 同一用户 1 分钟内请求 6 次,第 6 次返回 429
 - [ ] 响应头包含 `X-RateLimit-*` 信息
 - [ ] 测试覆盖关键场景
@@ -387,105 +413,102 @@ export default function RootLayout({ children }) {
 ---
 
 #### 任务 2.3: 添加配置验证 🔴
+
 **优先级**: P1
 **预计时间**: 2 小时
 
 **目标**: 启动时检查必需环境变量,避免运行时错误
 
 **实现**:
+
 ```typescript
 // lib/config/validate.ts
-import { logger } from '@/lib/logger'
+import { logger } from "@/lib/logger";
 
 interface ConfigValidation {
-  key: string
-  required: boolean
-  validator?: (value: string) => boolean
-  errorMessage?: string
+  key: string;
+  required: boolean;
+  validator?: (value: string) => boolean;
+  errorMessage?: string;
 }
 
 const requiredConfig: ConfigValidation[] = [
   {
-    key: 'NEXT_PUBLIC_SUPABASE_URL',
+    key: "NEXT_PUBLIC_SUPABASE_URL",
     required: true,
-    validator: (v) => v.startsWith('https://'),
-    errorMessage: 'Must start with https://'
+    validator: (v) => v.startsWith("https://"),
+    errorMessage: "Must start with https://",
   },
   {
-    key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
-    required: true
+    key: "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    required: true,
   },
   {
-    key: 'SUPABASE_SERVICE_ROLE_KEY',
-    required: true
+    key: "SUPABASE_SERVICE_ROLE_KEY",
+    required: true,
   },
   {
-    key: 'FINNHUB_API_KEY',
-    required: true
+    key: "FINNHUB_API_KEY",
+    required: true,
   },
   {
-    key: 'NEXTAUTH_SECRET',
+    key: "NEXTAUTH_SECRET",
     required: true,
     validator: (v) => v.length >= 32,
-    errorMessage: 'Must be at least 32 characters'
-  }
-]
+    errorMessage: "Must be at least 32 characters",
+  },
+];
 
 // 至少需要一个 LLM 提供商
-const llmProviders = [
-  'HELICONE_API_KEY',
-  'OPENROUTER_API_KEY'
-]
+const llmProviders = ["HELICONE_API_KEY", "OPENROUTER_API_KEY"];
 
 export function validateConfig() {
-  const errors: string[] = []
+  const errors: string[] = [];
 
   // 检查必需变量
   for (const config of requiredConfig) {
-    const value = process.env[config.key]
+    const value = process.env[config.key];
 
     if (!value) {
-      errors.push(`Missing required environment variable: ${config.key}`)
-      continue
+      errors.push(`Missing required environment variable: ${config.key}`);
+      continue;
     }
 
     if (config.validator && !config.validator(value)) {
-      errors.push(
-        `Invalid ${config.key}: ${config.errorMessage || 'Validation failed'}`
-      )
+      errors.push(`Invalid ${config.key}: ${config.errorMessage || "Validation failed"}`);
     }
   }
 
   // 检查 LLM 提供商
-  const hasLLMProvider = llmProviders.some(key => !!process.env[key])
+  const hasLLMProvider = llmProviders.some((key) => !!process.env[key]);
   if (!hasLLMProvider) {
-    errors.push(
-      `At least one LLM provider required: ${llmProviders.join(' or ')}`
-    )
+    errors.push(`At least one LLM provider required: ${llmProviders.join(" or ")}`);
   }
 
   if (errors.length > 0) {
-    logger.error('Configuration validation failed:')
-    errors.forEach(err => logger.error(`  - ${err}`))
-    throw new Error('Invalid configuration. Check logs for details.')
+    logger.error("Configuration validation failed:");
+    errors.forEach((err) => logger.error(`  - ${err}`));
+    throw new Error("Invalid configuration. Check logs for details.");
   }
 
-  logger.info('Configuration validated successfully')
+  logger.info("Configuration validated successfully");
 }
 ```
 
 **集成到启动流程**:
+
 ```typescript
 // app/layout.tsx 或 middleware.ts
-import { validateConfig } from '@/lib/config/validate'
+import { validateConfig } from "@/lib/config/validate";
 
 // 在服务端启动时验证
-if (typeof window === 'undefined') {
-  validateConfig()
+if (typeof window === "undefined") {
+  validateConfig();
 }
 ```
 
 **验收标准**:
+
 - [ ] 缺少必需变量时启动失败
 - [ ] 变量格式错误时启动失败
 - [ ] 错误信息清晰,指出具体问题
@@ -496,17 +519,20 @@ if (typeof window === 'undefined') {
 ---
 
 #### 任务 2.4: 统一 API 响应格式 🟡
+
 **优先级**: P2
 **预计时间**: 2 小时
 
 **目标**: 标准化所有 API 的响应格式
 
 **当前问题**:
+
 - 有些 API 返回 `{ data: ... }`
 - 有些直接返回对象
 - 错误格式不统一
 
 **目标格式**:
+
 ```typescript
 // 成功响应
 {
@@ -534,48 +560,46 @@ if (typeof window === 'undefined') {
 ```
 
 **实现**:
+
 ```typescript
 // lib/api/response.ts
-import { NextResponse } from 'next/server'
-import { v4 as uuidv4 } from 'uuid'
+import { NextResponse } from "next/server";
+import { v4 as uuidv4 } from "uuid";
 
 interface SuccessResponse<T> {
-  success: true
-  data: T
+  success: true;
+  data: T;
   meta: {
-    timestamp: string
-    requestId: string
-  }
+    timestamp: string;
+    requestId: string;
+  };
 }
 
 interface ErrorResponse {
-  success: false
+  success: false;
   error: {
-    code: string
-    message: string
-    details?: Record<string, any>
-  }
+    code: string;
+    message: string;
+    details?: Record<string, any>;
+  };
   meta: {
-    timestamp: string
-    requestId: string
-  }
+    timestamp: string;
+    requestId: string;
+  };
 }
 
-export function successResponse<T>(
-  data: T,
-  status = 200
-): NextResponse<SuccessResponse<T>> {
+export function successResponse<T>(data: T, status = 200): NextResponse<SuccessResponse<T>> {
   return NextResponse.json(
     {
       success: true,
       data,
       meta: {
         timestamp: new Date().toISOString(),
-        requestId: uuidv4()
-      }
+        requestId: uuidv4(),
+      },
     },
     { status }
-  )
+  );
 }
 
 export function errorResponse(
@@ -590,24 +614,26 @@ export function errorResponse(
       error: { code, message, details },
       meta: {
         timestamp: new Date().toISOString(),
-        requestId: uuidv4()
-      }
+        requestId: uuidv4(),
+      },
     },
     { status }
-  )
+  );
 }
 ```
 
 **迁移所有 API**:
+
 ```typescript
 // 修改前
-return NextResponse.json({ userId, credits })
+return NextResponse.json({ userId, credits });
 
 // 修改后
-return successResponse({ userId, credits })
+return successResponse({ userId, credits });
 ```
 
 **验收标准**:
+
 - [ ] 所有 API 响应格式统一
 - [ ] 包含 `requestId` 可追踪
 - [ ] 前端可以根据 `success` 字段判断成功/失败
@@ -622,18 +648,21 @@ return successResponse({ userId, credits })
 **分支**: `g3/phase1-business-logic-cleanup`
 
 #### 任务 3.1: 删除遗留代码 🟢
+
 **优先级**: P2
 **预计时间**: 1 小时
 
 **目标**: 清理已被替代的旧代码
 
 **清理清单**:
+
 1. `lib/services/quota.ts` - 已被 `lib/core/credits/manager.ts` 替代
 2. `@prisma/client` 依赖 - 项目使用 Supabase Client,不需要 Prisma
 
 **步骤**:
 
 1. 确认无引用
+
    ```bash
    git grep "quota.ts"
    git grep "@prisma/client"
@@ -641,23 +670,26 @@ return successResponse({ userId, credits })
    ```
 
 2. 删除文件
+
    ```bash
    rm lib/services/quota.ts
    ```
 
 3. 卸载依赖
+
    ```bash
    npm uninstall @prisma/client prisma
    ```
 
 4. 更新 imports (如果有遗留)
+
    ```typescript
    // 修改前
-   import { checkQuota } from '@/lib/services/quota'
+   import { checkQuota } from "@/lib/services/quota";
 
    // 修改后
-   import { CreditManager } from '@/lib/core/credits/manager'
-   const creditManager = new CreditManager()
+   import { CreditManager } from "@/lib/core/credits/manager";
+   const creditManager = new CreditManager();
    ```
 
 5. 提交
@@ -667,6 +699,7 @@ return successResponse({ userId, credits })
    ```
 
 **验收标准**:
+
 - [ ] `lib/services/quota.ts` 已删除
 - [ ] `package.json` 中无 `prisma` 相关依赖
 - [ ] `npm run build` 成功
@@ -677,6 +710,7 @@ return successResponse({ userId, credits })
 ---
 
 #### 任务 3.2: 添加业务逻辑测试 🟡
+
 **优先级**: P1
 **预计时间**: 6 小时
 
@@ -685,108 +719,105 @@ return successResponse({ userId, credits })
 **测试清单**:
 
 1. **积分管理器** (`lib/core/credits/manager.test.ts`)
+
    ```typescript
-   describe('CreditManager', () => {
-     let manager: CreditManager
-     let mockSupabase: any
+   describe("CreditManager", () => {
+     let manager: CreditManager;
+     let mockSupabase: any;
 
      beforeEach(() => {
-       mockSupabase = createMockSupabaseClient()
-       manager = new CreditManager(mockSupabase)
-     })
+       mockSupabase = createMockSupabaseClient();
+       manager = new CreditManager(mockSupabase);
+     });
 
-     describe('checkAndConsume', () => {
-       it('should consume credit when balance is sufficient', async () => {
+     describe("checkAndConsume", () => {
+       it("should consume credit when balance is sufficient", async () => {
          mockSupabase.rpc.mockResolvedValue({
-           data: { success: true, remaining_credits: 24 }
-         })
+           data: { success: true, remaining_credits: 24 },
+         });
 
-         await expect(
-           manager.checkAndConsume('user-123', 'AAPL')
-         ).resolves.not.toThrow()
-       })
+         await expect(manager.checkAndConsume("user-123", "AAPL")).resolves.not.toThrow();
+       });
 
-       it('should throw InsufficientCreditsError when balance is 0', async () => {
+       it("should throw InsufficientCreditsError when balance is 0", async () => {
          mockSupabase.rpc.mockResolvedValue({
-           data: { success: false, remaining_credits: 0 }
-         })
+           data: { success: false, remaining_credits: 0 },
+         });
 
-         await expect(
-           manager.checkAndConsume('user-123', 'AAPL')
-         ).rejects.toThrow(InsufficientCreditsError)
-       })
-     })
+         await expect(manager.checkAndConsume("user-123", "AAPL")).rejects.toThrow(
+           InsufficientCreditsError
+         );
+       });
+     });
 
-     describe('claimDailyReward', () => {
-       it('should grant 5 credits on first claim', async () => {
+     describe("claimDailyReward", () => {
+       it("should grant 5 credits on first claim", async () => {
          mockSupabase.rpc.mockResolvedValue({
-           data: { success: true, credits_granted: 5 }
-         })
+           data: { success: true, credits_granted: 5 },
+         });
 
-         const credits = await manager.claimDailyReward('user-123')
-         expect(credits).toBe(5)
-       })
+         const credits = await manager.claimDailyReward("user-123");
+         expect(credits).toBe(5);
+       });
 
-       it('should throw error if already claimed today', async () => {
+       it("should throw error if already claimed today", async () => {
          mockSupabase.rpc.mockResolvedValue({
-           data: { success: false, message: '今日已领取' }
-         })
+           data: { success: false, message: "今日已领取" },
+         });
 
-         await expect(
-           manager.claimDailyReward('user-123')
-         ).rejects.toThrow()
-       })
-     })
-   })
+         await expect(manager.claimDailyReward("user-123")).rejects.toThrow();
+       });
+     });
+   });
    ```
 
 2. **内容清洗器** (`lib/core/reports/content-sanitizer.test.ts`)
+
    ```typescript
-   describe('ContentSanitizer', () => {
-     describe('sanitizeContent', () => {
-       it('should remove sensitive trading recommendations', () => {
-         const input = '强烈建议买入此股票,立即购买!'
-         const output = sanitizeContent(input)
-         expect(output).not.toContain('买入')
-         expect(output).toContain('[请自行判断]')
-       })
+   describe("ContentSanitizer", () => {
+     describe("sanitizeContent", () => {
+       it("should remove sensitive trading recommendations", () => {
+         const input = "强烈建议买入此股票,立即购买!";
+         const output = sanitizeContent(input);
+         expect(output).not.toContain("买入");
+         expect(output).toContain("[请自行判断]");
+       });
 
-       it('should preserve normal analysis text', () => {
-         const input = '该公司市盈率为 25,处于行业中等水平'
-         const output = sanitizeContent(input)
-         expect(output).toBe(input)
-       })
+       it("should preserve normal analysis text", () => {
+         const input = "该公司市盈率为 25,处于行业中等水平";
+         const output = sanitizeContent(input);
+         expect(output).toBe(input);
+       });
 
-       it('should throw ValidationError for invalid markdown', () => {
-         const input = '# Title\n\n[Invalid Link]('
-         expect(() => sanitizeContent(input)).toThrow(ValidationError)
-       })
-     })
-   })
+       it("should throw ValidationError for invalid markdown", () => {
+         const input = "# Title\n\n[Invalid Link](";
+         expect(() => sanitizeContent(input)).toThrow(ValidationError);
+       });
+     });
+   });
    ```
 
 3. **错误类** (`lib/core/errors.test.ts`)
-   ```typescript
-   describe('AppError', () => {
-     it('should create InsufficientCreditsError with correct code', () => {
-       const error = new InsufficientCreditsError('余额不足')
-       expect(error.code).toBe('INSUFFICIENT_CREDITS')
-       expect(error.statusCode).toBe(402)
-       expect(error.message).toBe('余额不足')
-     })
 
-     it('should create ReportGenerationError with details', () => {
-       const error = new ReportGenerationError(
-         'LLM failed',
-         { provider: 'helicone' }
-       )
-       expect(error.code).toBe('REPORT_GENERATION_FAILED')
-       expect(error.details).toEqual({ provider: 'helicone' })
-     })
-   })
+   ```typescript
+   describe("AppError", () => {
+     it("should create InsufficientCreditsError with correct code", () => {
+       const error = new InsufficientCreditsError("余额不足");
+       expect(error.code).toBe("INSUFFICIENT_CREDITS");
+       expect(error.statusCode).toBe(402);
+       expect(error.message).toBe("余额不足");
+     });
+
+     it("should create ReportGenerationError with details", () => {
+       const error = new ReportGenerationError("LLM failed", { provider: "helicone" });
+       expect(error.code).toBe("REPORT_GENERATION_FAILED");
+       expect(error.details).toEqual({ provider: "helicone" });
+     });
+   });
    ```
 
 **验收标准**:
+
 - [ ] 核心模块测试覆盖率 >60%
 - [ ] 所有测试通过 `npm run test`
 - [ ] 关键业务逻辑有边界测试
@@ -800,12 +831,14 @@ return successResponse({ userId, credits })
 **分支**: `g4/phase1-infrastructure-tooling`
 
 #### 任务 4.1: 添加数据库备份脚本 🟡
+
 **优先级**: P1
 **预计时间**: 3 小时
 
 **目标**: 定期备份 Supabase 数据库
 
 **实现**:
+
 ```bash
 # scripts/backup-database.sh
 #!/bin/bash
@@ -838,6 +871,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
 ```
 
 **添加到 package.json**:
+
 ```json
 {
   "scripts": {
@@ -847,6 +881,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
 ```
 
 **验收标准**:
+
 - [ ] 运行 `npm run backup:db` 生成备份文件
 - [ ] 备份文件包含所有表和数据
 - [ ] 自动清理旧备份
@@ -857,6 +892,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
 ---
 
 #### 任务 4.2: 改进开发者体验工具 🟢
+
 **优先级**: P2
 **预计时间**: 2 小时
 
@@ -865,6 +901,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
 **改进清单**:
 
 1. **添加环境变量检查脚本**
+
    ```bash
    # scripts/check-env.sh
    #!/bin/bash
@@ -897,6 +934,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
    ```
 
 2. **添加快速启动脚本**
+
    ```bash
    # scripts/dev-start.sh
    #!/bin/bash
@@ -917,6 +955,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
    ```
 
 3. **添加 VS Code 推荐配置**
+
    ```json
    // .vscode/extensions.json
    {
@@ -941,6 +980,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
    ```
 
 **验收标准**:
+
 - [ ] `npm run env:check` 可以检查环境变量
 - [ ] `bash scripts/dev-start.sh` 一键启动
 - [ ] VS Code 打开项目时提示安装推荐扩展
@@ -954,6 +994,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
 ### 每周五集成日
 
 **流程**:
+
 1. 各组完成当周任务并自测
 2. 提交 PR 到 main 分支
 3. HQ 审查所有 PR
@@ -962,6 +1003,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
 6. 部署到 staging 环境验证
 
 **PR 命名规范**:
+
 ```
 [G1/Phase1] 拆分 ReportGeneratorSection 组件
 [G2/Phase1] 添加 API 限流中间件
@@ -972,6 +1014,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
 ### 冲突解决策略
 
 **预防**:
+
 - 每天早上同步 main 到各 worktree
   ```bash
   cd D:\Projects\investor-ai-g1
@@ -980,6 +1023,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
   ```
 
 **发生冲突时**:
+
 1. G1-Claude 尝试自动解决
 2. 无法解决时通知 G1-Codex
 3. G1-Codex 分析冲突并给出解决方案
@@ -991,21 +1035,22 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
 
 ### 看板状态
 
-| 任务 ID | 组别 | 任务名称 | 状态 | 负责人 | 预计完成 |
-|---------|------|---------|------|--------|---------|
-| G1-1.1 | G1 | 拆分 ReportGeneratorSection | ⏳ Todo | G1-Claude | Week 1 |
-| G1-1.2 | G1 | 添加全局错误边界 | ⏳ Todo | G1-Claude | Week 1 |
-| G1-1.3 | G1 | 代码格式化统一 | ⏳ Todo | G1-Claude | Week 1 |
-| G2-2.1 | G2 | 同步数据库类型 | ⏳ Todo | G2-Claude | Week 1 |
-| G2-2.2 | G2 | API 限流 | ⏳ Todo | G2-Claude | Week 1 |
-| G2-2.3 | G2 | 配置验证 | ⏳ Todo | G2-Claude | Week 1 |
-| G2-2.4 | G2 | 统一 API 响应 | ⏳ Todo | G2-Claude | Week 2 |
-| G3-3.1 | G3 | 删除遗留代码 | ⏳ Todo | G3-Claude | Week 1 |
-| G3-3.2 | G3 | 业务逻辑测试 | ⏳ Todo | G3-Claude | Week 2 |
-| G4-4.1 | G4 | 数据库备份 | ⏳ Todo | G4-Claude | Week 1 |
-| G4-4.2 | G4 | 开发工具改进 | ⏳ Todo | G4-Claude | Week 1 |
+| 任务 ID | 组别 | 任务名称                    | 状态    | 负责人    | 预计完成 |
+| ------- | ---- | --------------------------- | ------- | --------- | -------- |
+| G1-1.1  | G1   | 拆分 ReportGeneratorSection | ⏳ Todo | G1-Claude | Week 1   |
+| G1-1.2  | G1   | 添加全局错误边界            | ⏳ Todo | G1-Claude | Week 1   |
+| G1-1.3  | G1   | 代码格式化统一              | ⏳ Todo | G1-Claude | Week 1   |
+| G2-2.1  | G2   | 同步数据库类型              | ⏳ Todo | G2-Claude | Week 1   |
+| G2-2.2  | G2   | API 限流                    | ⏳ Todo | G2-Claude | Week 1   |
+| G2-2.3  | G2   | 配置验证                    | ⏳ Todo | G2-Claude | Week 1   |
+| G2-2.4  | G2   | 统一 API 响应               | ⏳ Todo | G2-Claude | Week 2   |
+| G3-3.1  | G3   | 删除遗留代码                | ⏳ Todo | G3-Claude | Week 1   |
+| G3-3.2  | G3   | 业务逻辑测试                | ⏳ Todo | G3-Claude | Week 2   |
+| G4-4.1  | G4   | 数据库备份                  | ⏳ Todo | G4-Claude | Week 1   |
+| G4-4.2  | G4   | 开发工具改进                | ⏳ Todo | G4-Claude | Week 1   |
 
 **状态说明**:
+
 - ⏳ Todo: 未开始
 - 🔄 In Progress: 进行中
 - 🔍 In Review: 代码审查中
@@ -1021,6 +1066,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
 **老板 (你) 的操作**:
 
 1. **重置所有工作区**
+
    ```powershell
    .\scripts\reset-worktree.ps1 -Name g1
    .\scripts\reset-worktree.ps1 -Name g2
@@ -1029,6 +1075,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
    ```
 
 2. **创建任务分支**
+
    ```powershell
    cd D:\Projects\investor-ai-g1
    git checkout -b g1/phase1-frontend-refactor
@@ -1046,6 +1093,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
 3. **分配任务给各组 Codex**
 
    **给 G1-Codex**:
+
    ```
    @G1-Codex
    Report: docs/plans/architecture-evolution-workstreams.md
@@ -1054,6 +1102,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
    ```
 
    **给 G2-Codex**:
+
    ```
    @G2-Codex
    Report: docs/plans/architecture-evolution-workstreams.md
@@ -1062,6 +1111,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
    ```
 
    **给 G3-Codex**:
+
    ```
    @G3-Codex
    Report: docs/plans/architecture-evolution-workstreams.md
@@ -1070,6 +1120,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
    ```
 
    **给 G4-Codex**:
+
    ```
    @G4-Codex
    Report: docs/plans/architecture-evolution-workstreams.md
@@ -1100,4 +1151,4 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
 
 ---
 
-*最后更新: 2025-12-02*
+_最后更新: 2025-12-02_

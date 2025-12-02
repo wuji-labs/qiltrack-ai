@@ -62,7 +62,10 @@ export function PricePerformanceChart({ companyData }: PricePerformanceChartProp
         </div>
         <div className="flex flex-wrap gap-2">
           <StatPill label="Open" value={quote.open ? `$${formatNumber(quote.open)}` : "N/A"} />
-          <StatPill label="Prev" value={quote.prevClose ? `$${formatNumber(quote.prevClose)}` : "N/A"} />
+          <StatPill
+            label="Prev"
+            value={quote.prevClose ? `$${formatNumber(quote.prevClose)}` : "N/A"}
+          />
         </div>
       </div>
 
@@ -71,7 +74,8 @@ export function PricePerformanceChart({ companyData }: PricePerformanceChartProp
           <div className="flex justify-between text-xs text-subtle">
             <span>Day Range</span>
             <span>
-              {dayLow ? `$${formatNumber(dayLow)}` : "N/A"} - {dayHigh ? `$${formatNumber(dayHigh)}` : "N/A"}
+              {dayLow ? `$${formatNumber(dayLow)}` : "N/A"} -{" "}
+              {dayHigh ? `$${formatNumber(dayHigh)}` : "N/A"}
             </span>
           </div>
           <div className="relative h-3 rounded-full bg-[var(--bg-base)]/60">
@@ -90,7 +94,8 @@ export function PricePerformanceChart({ companyData }: PricePerformanceChartProp
           <div className="flex justify-between text-xs text-subtle">
             <span>52W Range</span>
             <span>
-              {weekLow ? `$${formatNumber(weekLow)}` : "N/A"} - {weekHigh ? `$${formatNumber(weekHigh)}` : "N/A"}
+              {weekLow ? `$${formatNumber(weekLow)}` : "N/A"} -{" "}
+              {weekHigh ? `$${formatNumber(weekHigh)}` : "N/A"}
             </span>
           </div>
           <div className="relative h-3 rounded-full bg-[var(--bg-base)]/60">
@@ -126,7 +131,9 @@ export function ValuationMetricsChart({ companyData }: ValuationMetricsChartProp
     <div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/75 p-4 space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.22em] text-emerald-300">Valuation & Quality</p>
+          <p className="text-xs uppercase tracking-[0.22em] text-emerald-300">
+            Valuation & Quality
+          </p>
           <p className="text-sm text-subtle">Key multiples and profitability</p>
         </div>
       </div>
@@ -134,8 +141,13 @@ export function ValuationMetricsChart({ companyData }: ValuationMetricsChartProp
       <div className="space-y-2">
         {metricRows.map((row) => {
           const valueText =
-            row.value === undefined || row.value === null ? "N/A" : `${row.value.toFixed(2)}${row.helper ?? ""}`;
-          const percent = row.value !== undefined && row.value !== null ? Math.min(Math.abs(row.value) / (row.max ?? 50), 1) * 100 : 0;
+            row.value === undefined || row.value === null
+              ? "N/A"
+              : `${row.value.toFixed(2)}${row.helper ?? ""}`;
+          const percent =
+            row.value !== undefined && row.value !== null
+              ? Math.min(Math.abs(row.value) / (row.max ?? 50), 1) * 100
+              : 0;
           return (
             <div key={row.label} className="space-y-1">
               <div className="flex items-center justify-between text-sm text-[var(--color-foreground)]">
@@ -194,7 +206,9 @@ export function NewsTimelineWidget({ companyData, maxItems = 4 }: NewsTimelineWi
             className="group block rounded-xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-3 transition hover:border-emerald-300/70 hover:-translate-y-0.5"
           >
             <div className="flex items-center justify-between gap-3">
-              <p className="text-xs uppercase tracking-[0.18em] text-subtle">{item.source ?? "News"}</p>
+              <p className="text-xs uppercase tracking-[0.18em] text-subtle">
+                {item.source ?? "News"}
+              </p>
               <span className="text-xs text-subtle">{formatDate(item)}</span>
             </div>
             <p className="mt-1 text-sm font-semibold text-[var(--color-foreground)] group-hover:text-emerald-200">

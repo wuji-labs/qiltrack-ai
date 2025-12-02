@@ -1,12 +1,14 @@
 # Supabase 报告工作流 Stage 2 Snapshot（2025-11-24）
 
 ## 背景 / 问题
+
 - Stage 1 已完成 Supabase Schema + Auth Hook + CLI 初始化，但 `/api/report` 仍使用 NextAuth + Prisma + SQLite，导致额度扣减、日志与历史记录无法落在 Supabase 的“单一事实源”。
 - 报告生成 API 缺少原子化额度消费（`fn_consume_report_credit`）与 Storage 写入，Quota UI 与历史页也无法读取最新 Supabase 数据；当前实现无法满足 Snapshot 中对审计、跨设备同步的要求。
 - 现有 `TEST_REPORT_TOKEN` 旁路逻辑、LLM/Finnhub 调用、Markdown/DOCX 生成流程需要与 Supabase RPC/Storage 协同，必须重新设计 service 层，避免把 Supabase 逻辑散落在组件内。
 - Stage 2 需要把报告 API、额度查询、历史读取切换到 Supabase，同时保留 `useSupabaseAuth` 已实现的 session 状态，作为 Stage 3（内容模块）与 Stage 4（支付/审计）的基础。
 
 ## 设计目标
+
 1. `/api/report` 完整改造：使用 Supabase server client + RPC `fn_consume_report_credit` 扣点，成功时写入 `report_runs`、`report_documents` 并上传 Markdown/DOCX 到 Storage `report-assets/`.
 2. 新增 `/api/report/history`（GET）与 `/api/report/credits`（GET）：利用 Supabase RLS 直接读取 `report_runs` / `v_user_quota`，供前端展示剩余额度与最近报告。
 3. 服务端与客户端共享统一的 Supabase service：封装 `createServerClient(cookies)`、`createServiceRoleClient()`、Storage 上传、签名 URL 生成，避免重复实例化。
@@ -14,6 +16,7 @@
 5. 维持现有 LLM / Finnhub 流程（Helicone/OpenRouter + Finnhub API），在 Supabase 持久化公司快照、生成摘要和剩余额度，确保报表历史可追溯。
 
 ## 技术约束
+
 - Next.js 16（App Router）、React 19，API Route 默认 Node runtime；Supabase SDK 必须使用 `@supabase/ssr`（server）+ `@supabase/supabase-js`（client），禁止在 route handler 里直接创建匿名 client。
 - `fn_consume_report_credit`、`fn_record_report_run`、`report_credit_events` 依赖 Supabase RLS，除 service role 以外必须通过用户 session；API handler 只能通过 `createServerClient({ cookies })` 获取 session，service role key 仅限扣点与审计写入。
 - Storage Bucket：`report-assets`（private），Markdown/DOCX 需以 `{user_id}/{run_id}.md|.docx` 命名；需返回签名 URL 或路径供客户端下载。
@@ -21,6 +24,7 @@
 - 需兼容现有 Helicone/OpenRouter/Finnhub 速率限制，确保 Supabase 写入失败时能回滚（使用事务或顺序保障），避免扣点成功但报告写入失败。
 
 ## 文案 / UI Key
+
 - `history.banner.title`: `Supabase 已为你保留最近的报告`
 - `history.banner.subtitle`: `每次生成都会写入审计日志与 Storage，可随时回溯`
 - `quota.refresh.cta`: `刷新额度`
@@ -29,6 +33,7 @@
 - History 空状态：`"暂未生成报告"`、`"登录后 Supabase 将展示完整历史"`
 
 ## 测试要求
+
 1. **Unit（Vitest）**
    - `lib/supabase/server.ts`: mock `@supabase/ssr`，校验 env 缺失、cookies 注入、service role 分支。
    - `lib/services/quota.ts`: mock Supabase RPC，验证成功/失败/旁路模式的额度计算。

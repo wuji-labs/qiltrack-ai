@@ -18,10 +18,7 @@ export async function POST(request: Request) {
     const { userId, display_name, full_name, role, plan, quota_limit } = body;
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "用户ID为必填项" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "用户ID为必填项" }, { status: 400 });
     }
 
     // 更新profiles表
@@ -39,10 +36,7 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("Update user error:", error);
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     return NextResponse.json({

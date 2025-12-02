@@ -1,4 +1,5 @@
 # 认证系统 UX 重构实施清单
+
 # Auth UX Redesign Implementation Checklist
 
 **文档版本**: v1.0
@@ -11,6 +12,7 @@
 ## 🎯 目标 Objectives
 
 解决用户反馈的核心问题：
+
 1. OAuth 用户尝试修改密码时遇到困惑
 2. 系统未区分不同认证方式（OAuth/Magic Link/Password）
 3. 登录页流程繁琐，不符合主流大厂风格
@@ -28,7 +30,7 @@
 #### 1.1 数据库层
 
 - [ ] **创建迁移文件**
-  路径: `supabase/migrations/20251130_add_auth_helpers.sql`
+      路径: `supabase/migrations/20251130_add_auth_helpers.sql`
 
   ```sql
   CREATE OR REPLACE FUNCTION fn_user_has_password()
@@ -48,13 +50,14 @@
   ```
 
 - [ ] **执行迁移**
+
   ```bash
   cd /d/Projects/investor-ai
   npx supabase migration up
   ```
 
 - [ ] **验证函数**
-  在 Supabase Studio 执行:
+      在 Supabase Studio 执行:
   ```sql
   SELECT fn_user_has_password();
   ```
@@ -62,9 +65,10 @@
 #### 1.2 Hooks 层
 
 - [ ] **增强 `useSupabaseAuth.ts`**
-  路径: `D:\Projects\investor-ai-g2\hooks\useSupabaseAuth.ts`
+      路径: `D:\Projects\investor-ai-g2\hooks\useSupabaseAuth.ts`
 
   **新增类型**:
+
   ```typescript
   type AuthMethod = "password" | "oauth" | "magic_link" | "unknown";
 
@@ -75,19 +79,21 @@
   ```
 
 - [ ] **添加状态管理**
+
   ```typescript
   const [authMethod, setAuthMethod] = useState<AuthMethod>("unknown");
   const [oauthProviders, setOauthProviders] = useState<AuthProviderInfo[]>([]);
   ```
 
 - [ ] **实现 `getAuthMethod` 函数**
-  逻辑:
+      逻辑:
   1. 调用 `supabase.auth.getUserIdentities()` 获取 OAuth 身份
   2. 如果有 identities → 提取 provider 信息
   3. 调用 `supabase.rpc("fn_user_has_password")` 检查密码
   4. 返回 authMethod: "oauth" / "magic_link" / "password"
 
 - [ ] **添加 useEffect 监听**
+
   ```typescript
   useEffect(() => {
     if (user) {
@@ -109,15 +115,17 @@
 #### 1.3 UI 层 - 账号页改造
 
 - [ ] **修改 `app/account/page.tsx`**
-  路径: `D:\Projects\investor-ai-g2\app\account\page.tsx`
+      路径: `D:\Projects\investor-ai-g2\app\account\page.tsx`
 
 - [ ] **导入 authMethod 和 oauthProviders**
+
   ```typescript
-  const { isAuthenticated, user, authMethod, oauthProviders, getReportCredits, signOut } = useSupabaseAuth();
+  const { isAuthenticated, user, authMethod, oauthProviders, getReportCredits, signOut } =
+    useSupabaseAuth();
   ```
 
 - [ ] **在 Line 192 之前插入新区块**
-  位置: 在 "Notifications" 区块之前
+      位置: 在 "Notifications" 区块之前
 
   ```typescript
   {/* Authentication Methods 区块 */}
@@ -167,6 +175,7 @@
 - [ ] **修改 `lib/i18n-config.ts`**
 
   **中文翻译**:
+
   ```typescript
   "account.page.authMethodsLabel": "登录方式",
   "account.page.provider.google": "Google 账号",
@@ -179,6 +188,7 @@
   ```
 
   **英文翻译**:
+
   ```typescript
   "account.page.authMethodsLabel": "Authentication Methods",
   "account.page.provider.google": "Google Account",
@@ -193,6 +203,7 @@
 #### 1.5 测试验证
 
 - [ ] **启动开发服务器**
+
   ```bash
   cd /d/Projects/investor-ai && npm run dev
   ```
@@ -242,11 +253,13 @@
   5. 保留: Logo + Title (居中)
 
 - [ ] **Magic Link 折叠交互**
+
   ```typescript
   const [showMagicLinkForm, setShowMagicLinkForm] = useState(false);
   ```
 
   **折叠状态**:
+
   ```tsx
   <button
     type="button"
@@ -258,6 +271,7 @@
   ```
 
   **展开状态**:
+
   ```tsx
   <form onSubmit={handleMagicLinkSubmit} className="space-y-3">
     <input type="email" ... />
@@ -271,14 +285,16 @@
   ```
 
 - [ ] **突出 Google 登录**
-  保持现有样式，确保视觉突出:
+      保持现有样式，确保视觉突出:
   ```tsx
-  className="w-full inline-flex items-center justify-center gap-3 rounded-2xl bg-white text-slate-900 px-4 py-3 text-base font-semibold shadow-lg hover:shadow-xl transition-shadow"
+  className =
+    "w-full inline-flex items-center justify-center gap-3 rounded-2xl bg-white text-slate-900 px-4 py-3 text-base font-semibold shadow-lg hover:shadow-xl transition-shadow";
   ```
 
 #### 2.3 国际化文本
 
 - [ ] **添加新文本**
+
   ```typescript
   // 中文
   "auth.email.useEmail": "使用邮箱登录",
@@ -320,9 +336,10 @@
 #### 3.1 创建密码修改页面
 
 - [ ] **新建文件**
-  路径: `D:\Projects\investor-ai-g2\app\account\change-password\page.tsx`
+      路径: `D:\Projects\investor-ai-g2\app\account\change-password\page.tsx`
 
 - [ ] **实现 OAuth 用户拦截**
+
   ```typescript
   if (authMethod === "oauth") {
     return (
@@ -338,7 +355,7 @@
   ```
 
 - [ ] **实现密码修改表单**
-  字段:
+      字段:
   - Current Password (currentPassword)
   - New Password (newPassword)
   - Confirm Password (confirmPassword)
@@ -351,6 +368,7 @@
 #### 3.2 国际化文本
 
 - [ ] **添加密码页面文本**
+
   ```typescript
   // 中文
   "account.password.oauthUserBlocked.title": "OAuth 用户无需密码",
@@ -464,24 +482,28 @@
 ## 🚀 部署前检查 Pre-Deployment Checklist
 
 - [ ] **代码质量**
+
   ```bash
   npm run lint
   # 无错误
   ```
 
 - [ ] **类型检查**
+
   ```bash
   npm run type-check
   # 无 TypeScript 错误
   ```
 
 - [ ] **构建测试**
+
   ```bash
   npm run build
   # 构建成功
   ```
 
 - [ ] **迁移执行**
+
   ```bash
   npx supabase migration up
   # 迁移成功
@@ -497,6 +519,7 @@
 ## 📝 完成后操作 Post-Completion Actions
 
 1. **创建 Pull Request**
+
    ```bash
    git checkout -b feature/auth-ux-redesign-g2
    git add .
@@ -506,20 +529,25 @@
 
 2. **填写 PR 描述**
    参考模板:
+
    ```markdown
    ## Summary
+
    重构认证系统 UX，解决 OAuth 用户密码困惑、登录页复杂等问题
 
    ## Changes
+
    - Phase 1: 认证方法识别与展示
    - Phase 2: 简化登录流程
 
    ## Testing
+
    - [x] 手动测试通过
    - [x] Lint 通过
    - [x] 类型检查通过
 
    ## Screenshots
+
    [附上截图]
    ```
 
@@ -536,6 +564,7 @@
 如果出现问题，按以下步骤回滚：
 
 1. **代码回滚**
+
    ```bash
    git checkout main
    git branch -D feature/auth-ux-redesign-g2
@@ -543,6 +572,7 @@
 
 2. **数据库回滚**
    删除 RPC 函数:
+
    ```sql
    DROP FUNCTION IF EXISTS fn_user_has_password();
    ```

@@ -9,6 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "test": "vitest --environment jsdom --pool=forks",
     "test:ci": "cross-env CI=true vitest --environment jsdom --pool=forks run",
     "helicone:sync-models": "node scripts/update-helicone-models.js",
@@ -60,6 +62,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
     "jsdom": "^26.0.0",
+    "prettier": "^3.7.3",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^2.1.8"

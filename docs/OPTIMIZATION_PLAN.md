@@ -3,6 +3,7 @@
 ## 📊 当前状态总结
 
 ### ✅ 已完成功能
+
 1. **报告生成系统**
    - 支持多种语言（英语、日语、韩语、繁中、简中）
    - 支持多种分析风格（baseline、buffett、musk、muddy）
@@ -23,6 +24,7 @@
    - 积分审计日志
 
 ### ❌ 已知问题
+
 1. **本地开发环境不稳定**
    - Supabase local session经常失效
    - 数据库状态不一致
@@ -46,9 +48,11 @@
 ## 🎯 Phase 1: 基础设施稳定化（优先级：P0）
 
 ### 1.1 切换到Supabase托管模式
+
 **目标：** 避免本地环境问题，提供稳定的开发和测试环境
 
 **任务：**
+
 - [ ] 获取Supabase Cloud项目credentials
 - [ ] 更新 `.env.local` 配置
 - [ ] 推送所有migrations到云端 (`npx supabase db push`)
@@ -67,6 +71,7 @@
 ### 2.1 调整积分消耗逻辑
 
 **当前策略：**
+
 ```
 新用户: 30积分
 每次报告: -1积分
@@ -74,6 +79,7 @@
 ```
 
 **目标策略：**
+
 ```
 新用户: 30积分
 每次报告: -10积分（🔄 改为10倍）
@@ -83,6 +89,7 @@
 **实施步骤：**
 
 #### 2.1.1 更新数据库函数
+
 修改 `supabase/migrations/` 中的 `fn_consume_report_credit` 函数：
 
 ```sql
@@ -132,11 +139,13 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 #### 2.1.2 更新UI提示文案
+
 - 首页：生成按钮旁边显示 "消耗10积分"
 - 账户页面：明确说明 "每次报告消耗10积分"
 - 生成确认弹窗：显示当前积分和消耗后剩余
 
 #### 2.1.3 更新测试
+
 修改 `__tests__/api.test.ts` 中的积分相关测试
 
 **预计时间：** 2-3小时
@@ -146,6 +155,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ### 2.2 优化每日领取UI
 
 **任务：**
+
 - [ ] 账户页面添加醒目的"每日领取"按钮
 - [ ] 添加领取动画和成功提示
 - [ ] 显示连续签到天数（streak）
@@ -153,6 +163,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 - [ ] 首页顶部添加"每日领取"入口
 
 **UI设计建议：**
+
 ```tsx
 // 大按钮，渐变色，带icon
 <button className="btn-daily-reward">
@@ -171,6 +182,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ### 3.1 添加密码登录
 
 **任务：**
+
 - [ ] 更新登录页面UI：添加"邮箱+密码"选项卡
 - [ ] 实现注册流程（邮箱+密码+确认密码）
 - [ ] 实现密码登录API (`/api/auth/login`)
@@ -179,6 +191,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 - [ ] 更新 `useSupabaseAuth` hook支持密码登录
 
 **UI草图：**
+
 ```
 ┌─────────────────────────┐
 │  登录 Investor AI       │
@@ -194,6 +207,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 **Supabase API调用：**
+
 ```typescript
 // 注册
 const { data, error } = await supabase.auth.signUp({
@@ -226,19 +240,20 @@ const { error } = await supabase.auth.resetPasswordForEmail(email, {
 
 #### 套餐详情
 
-| Feature | Free | Monthly ($9.99/月) | Annual ($99/年) |
-|---------|------|-------------------|----------------|
-| 初始积分 | 30 | 200 | 2500 (≈208/月) |
-| 每日领取 | 10 | 20 | 30 |
-| 报告消耗 | 10 | 10 | 10 |
-| 生成优先级 | 普通 | 高 | 最高 |
-| 历史报告保存 | 7天 | 30天 | 永久 |
-| PDF导出 | ✓ | ✓ | ✓ |
-| 高级图表 | ✗ | ✓ | ✓ |
-| API访问 | ✗ | ✗ | ✓ |
-| 支持 | 社区 | 邮件 | 优先+电话 |
+| Feature      | Free | Monthly ($9.99/月) | Annual ($99/年) |
+| ------------ | ---- | ------------------ | --------------- |
+| 初始积分     | 30   | 200                | 2500 (≈208/月)  |
+| 每日领取     | 10   | 20                 | 30              |
+| 报告消耗     | 10   | 10                 | 10              |
+| 生成优先级   | 普通 | 高                 | 最高            |
+| 历史报告保存 | 7天  | 30天               | 永久            |
+| PDF导出      | ✓    | ✓                  | ✓               |
+| 高级图表     | ✗    | ✓                  | ✓               |
+| API访问      | ✗    | ✗                  | ✓               |
+| 支持         | 社区 | 邮件               | 优先+电话       |
 
 #### Value Proposition
+
 - **Free**: "试用体验，适合偶尔使用"
 - **Monthly**: "个人投资者，每月20份报告够用"
 - **Annual**: "专业投资者，省17%，解锁高级功能"
@@ -310,6 +325,7 @@ CREATE TABLE public.payment_transactions (
 ### 4.3 支付集成（Stripe）
 
 **任务：**
+
 - [ ] 注册Stripe账号
 - [ ] 创建产品和价格
 - [ ] 安装 `@stripe/stripe-js` 和 `stripe` (Node)
@@ -318,6 +334,7 @@ CREATE TABLE public.payment_transactions (
 - [ ] 订阅管理页面（升级/取消/更改支付方式）
 
 **Stripe产品设置：**
+
 ```javascript
 // Monthly Plan
 {
@@ -347,13 +364,14 @@ CREATE TABLE public.payment_transactions (
 ```
 
 **API实现示例：**
+
 ```typescript
 // app/api/stripe/create-checkout/route.ts
 export async function POST(request: NextRequest) {
   const { priceId } = await request.json();
   const session = await stripe.checkout.sessions.create({
-    mode: 'subscription',
-    payment_method_types: ['card'],
+    mode: "subscription",
+    payment_method_types: ["card"],
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${origin}/account?success=true`,
     cancel_url: `${origin}/pricing?canceled=true`,
@@ -365,17 +383,17 @@ export async function POST(request: NextRequest) {
 
 // app/api/stripe/webhook/route.ts
 export async function POST(request: NextRequest) {
-  const sig = request.headers.get('stripe-signature');
+  const sig = request.headers.get("stripe-signature");
   const event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
 
   switch (event.type) {
-    case 'checkout.session.completed':
+    case "checkout.session.completed":
       // 创建subscription记录
       break;
-    case 'invoice.payment_succeeded':
+    case "invoice.payment_succeeded":
       // 续期，增加积分
       break;
-    case 'customer.subscription.deleted':
+    case "customer.subscription.deleted":
       // 取消订阅
       break;
   }
@@ -389,6 +407,7 @@ export async function POST(request: NextRequest) {
 ### 4.4 创建定价页面 (`/pricing`)
 
 **UI结构：**
+
 ```
 ┌──────────────────────────────────────┐
 │          选择适合你的套餐             │
@@ -415,6 +434,7 @@ export async function POST(request: NextRequest) {
 ```
 
 **任务：**
+
 - [ ] 创建 `app/pricing/page.tsx`
 - [ ] 套餐卡片组件 (`PricingCard.tsx`)
 - [ ] FAQ手风琴组件
@@ -430,6 +450,7 @@ export async function POST(request: NextRequest) {
 ### 5.1 首页优化
 
 **任务：**
+
 - [ ] 顶部导航栏添加"剩余积分"显示（带icon）
 - [ ] 生成按钮旁边显示"消耗10积分"提示
 - [ ] 积分不足时：禁用生成按钮 + 显示"积分不足，去充值"
@@ -440,6 +461,7 @@ export async function POST(request: NextRequest) {
 ### 5.2 账户页面优化
 
 **当前布局优化：**
+
 ```
 ┌─────────────────────────────────────┐
 │  账户设置                           │
@@ -458,6 +480,7 @@ export async function POST(request: NextRequest) {
 ```
 
 **任务：**
+
 - [ ] 重新设计卡片布局
 - [ ] 添加积分使用历史图表（最近7天）
 - [ ] 显示套餐到期时间（付费用户）
@@ -470,6 +493,7 @@ export async function POST(request: NextRequest) {
 ### 5.3 报告生成优化
 
 **任务：**
+
 - [ ] 添加生成确认弹窗（显示当前积分和消耗）
 - [ ] 生成中显示进度条和预计时间
 - [ ] 生成失败时显示详细错误和建议操作
@@ -482,6 +506,7 @@ export async function POST(request: NextRequest) {
 ## 📱 Phase 6: 移动端优化（优先级：P2）
 
 **任务：**
+
 - [ ] 响应式导航栏（汉堡菜单）
 - [ ] 移动端优化首页表单布局
 - [ ] 报告页面移动端滚动优化
@@ -495,12 +520,14 @@ export async function POST(request: NextRequest) {
 ## 🚀 Phase 7: 性能和安全（优先级：P2）
 
 ### 7.1 性能优化
+
 - [ ] 实现报告缓存机制（Redis）
 - [ ] 图片CDN加速
 - [ ] 代码分割和懒加载
 - [ ] SSR优化（关键页面）
 
 ### 7.2 安全加固
+
 - [ ] 添加Rate Limiting（防止滥用）
 - [ ] API密钥管理（环境变量加密）
 - [ ] SQL注入防护审查
@@ -513,16 +540,16 @@ export async function POST(request: NextRequest) {
 
 ## 📊 总时间估算
 
-| Phase | 优先级 | 预计时间 | 依赖 |
-|-------|-------|---------|-----|
-| Phase 1: 基础设施 | P0 | 1-2小时 | 用户提供credentials |
-| Phase 2: 积分系统 | P0 | 5-7小时 | Phase 1 |
-| Phase 3: 密码登录 | P1 | 6-8小时 | Phase 1 |
-| Phase 4: 订阅支付 | P1 | 18-22小时 | Phase 1, Phase 2 |
-| Phase 5: UI/UX | P2 | 18-24小时 | Phase 2, Phase 3 |
-| Phase 6: 移动端 | P2 | 8-10小时 | Phase 5 |
-| Phase 7: 性能安全 | P2 | 10-12小时 | Phase 4 |
-| **总计** | | **66-85小时** | |
+| Phase             | 优先级 | 预计时间      | 依赖                |
+| ----------------- | ------ | ------------- | ------------------- |
+| Phase 1: 基础设施 | P0     | 1-2小时       | 用户提供credentials |
+| Phase 2: 积分系统 | P0     | 5-7小时       | Phase 1             |
+| Phase 3: 密码登录 | P1     | 6-8小时       | Phase 1             |
+| Phase 4: 订阅支付 | P1     | 18-22小时     | Phase 1, Phase 2    |
+| Phase 5: UI/UX    | P2     | 18-24小时     | Phase 2, Phase 3    |
+| Phase 6: 移动端   | P2     | 8-10小时      | Phase 5             |
+| Phase 7: 性能安全 | P2     | 10-12小时     | Phase 4             |
+| **总计**          |        | **66-85小时** |                     |
 
 ---
 
@@ -531,11 +558,13 @@ export async function POST(request: NextRequest) {
 **目标：2周内上线核心付费功能**
 
 ### Week 1
+
 - ✅ Day 1-2: Phase 1（基础设施）+ Phase 2（积分系统）
 - ✅ Day 3-4: Phase 3（密码登录）
 - ✅ Day 5-7: Phase 4（订阅支付）前半部分（Schema + Stripe集成）
 
 ### Week 2
+
 - ✅ Day 8-10: Phase 4（订阅支付）后半部分（Webhook + UI）
 - ✅ Day 11-12: Phase 5（UI优化）核心页面
 - ✅ Day 13-14: 测试 + Bug修复 + 上线
