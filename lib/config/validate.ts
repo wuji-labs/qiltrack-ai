@@ -52,6 +52,30 @@ const requiredConfig: ConfigValidation[] = [
     required: true,
     validator: (v) => v.startsWith('http://') || v.startsWith('https://'),
     errorMessage: 'Must be a valid URL'
+  },
+  {
+    key: 'STRIPE_SECRET_KEY',
+    required: true,
+    validator: (v) => v.startsWith('sk_'),
+    errorMessage: 'Must be a valid Stripe secret key (starts with sk_)'
+  },
+  {
+    key: 'STRIPE_WEBHOOK_SECRET',
+    required: true,
+    validator: (v) => v.startsWith('whsec_'),
+    errorMessage: 'Must be a valid Stripe webhook secret (starts with whsec_)'
+  },
+  {
+    key: 'STRIPE_PRICE_BASIC',
+    required: true,
+    validator: (v) => v.startsWith('price_'),
+    errorMessage: 'Must be a valid Stripe price id (starts with price_)'
+  },
+  {
+    key: 'STRIPE_PRICE_PRO',
+    required: true,
+    validator: (v) => v.startsWith('price_'),
+    errorMessage: 'Must be a valid Stripe price id (starts with price_)'
   }
 ]
 
@@ -71,7 +95,7 @@ const optionalConfig: string[] = [
   'LANGFUSE_SECRET_KEY',
   'UPSTASH_REDIS_REST_URL',
   'UPSTASH_REDIS_REST_TOKEN',
-  'STRIPE_SECRET_KEY'
+  'NEXT_PUBLIC_SITE_URL'
 ]
 
 /**
@@ -185,8 +209,13 @@ export function getConfigSummary() {
     },
     optional: {
       langfuse: !!process.env.LANGFUSE_PUBLIC_KEY,
-      redis: !!process.env.UPSTASH_REDIS_REST_URL,
-      stripe: !!process.env.STRIPE_SECRET_KEY
+      redis: !!process.env.UPSTASH_REDIS_REST_URL
+    },
+    stripe: {
+      secret: !!process.env.STRIPE_SECRET_KEY,
+      webhook: !!process.env.STRIPE_WEBHOOK_SECRET,
+      priceBasic: !!process.env.STRIPE_PRICE_BASIC,
+      pricePro: !!process.env.STRIPE_PRICE_PRO
     }
   }
 }
