@@ -16,16 +16,16 @@ const plans: Plan[] = [
   {
     key: "basic",
     name: "Basic",
-    price: "$9/ÔÂ",
-    credits: "50 »ı·Ö / ÔÂ",
-    description: "ÊÊºÏ¸öÈËÌ½Ë÷ÓëÖÜ±¨Êä³ö£¬±£ÁôºËĞÄÉú³ÉÌåÑé¡£",
+    price: "$9/æœˆ",
+    credits: "50 ç§¯åˆ† / æœˆ",
+    description: "é€‚åˆä¸ªäººæ¢ç´¢ä¸å‘¨æŠ¥è¾“å‡ºï¼Œä¿ç•™æ ¸å¿ƒç”Ÿæˆä½“éªŒã€‚",
   },
   {
     key: "pro",
     name: "Pro",
-    price: "$29/ÔÂ",
-    credits: "200 »ı·Ö / ÔÂ",
-    description: "ÍÅ¶Ó/¸ßÆµÊ¹ÓÃ³¡¾°£¬¸ü¶à¶î¶ÈÓëÓÅÏÈÖ§³Ö¡£",
+    price: "$29/æœˆ",
+    credits: "200 ç§¯åˆ† / æœˆ",
+    description: "å›¢é˜Ÿ/é«˜é¢‘ä½¿ç”¨åœºæ™¯ï¼Œæ›´å¤šé¢åº¦ä¸ä¼˜å…ˆæ”¯æŒã€‚",
   },
 ];
 
@@ -54,7 +54,7 @@ export default function PricingPage() {
       window.location.href = data.url;
     } catch (error) {
       console.error("[Pricing] checkout error", error);
-      alert("¶©ÔÄÁ´½Ó´´½¨Ê§°Ü£¬ÇëÉÔºóÖØÊÔ¡£");
+      alert("è®¢é˜…é“¾æ¥åˆ›å»ºå¤±è´¥ï¼Œè¯·ç¨åé‡è¯•ã€‚");
     } finally {
       setLoadingPlan(null);
     }
@@ -64,9 +64,9 @@ export default function PricingPage() {
     <main className="mx-auto max-w-6xl px-6 py-16">
       <header className="mb-12 text-center">
         <p className="text-sm uppercase tracking-[0.32em] text-[var(--text-subtle)]">Pricing</p>
-        <h1 className="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">Ñ¡ÔñºÏÊÊµÄ¶©ÔÄ</h1>
+        <h1 className="mt-4 text-3xl font-semibold text-[var(--color-foreground)]">é€‰æ‹©åˆé€‚çš„è®¢é˜…</h1>
         <p className="mt-3 text-base text-[var(--text-subtle)]">
-          Ö§³ÖËæÊ±Éı¼¶»òÈ¡Ïû£¬½áÕËÓÉ Stripe °²È«ÍĞ¹Ü¡£
+          æ”¯æŒéšæ—¶å‡çº§æˆ–å–æ¶ˆï¼Œç»“è´¦ç”± Stripe å®‰å…¨æ‰˜ç®¡ã€‚
         </p>
       </header>
 
@@ -88,7 +88,7 @@ export default function PricingPage() {
               disabled={loadingPlan === plan.key}
               className="mt-8 w-full rounded-xl bg-[var(--accent-emerald)] px-4 py-3 text-center text-sm font-semibold text-[#051b12] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {loadingPlan === plan.key ? "Ìø×ªÖĞ..." : "¶©ÔÄ"}
+              {loadingPlan === plan.key ? "è·³è½¬ä¸­..." : "è®¢é˜…"}
             </button>
           </article>
         ))}

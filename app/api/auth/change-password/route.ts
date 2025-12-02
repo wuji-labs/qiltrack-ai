@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { validatePassword } from "@/lib/auth/password-validator";
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,10 +53,11 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
-    // Validate new password length
-    if (newPassword.length < 8) {
+    // Validate new password strength
+    const passwordValidation = validatePassword(newPassword);
+    if (!passwordValidation.valid) {
       const response = NextResponse.json(
-        { error: "New password must be at least 8 characters", code: "password_too_short" },
+        { error: passwordValidation.errors.join(', '), code: "password_validation_failed" },
         { status: 400 }
       );
       responseCookies.forEach(({ name, value }) =>
