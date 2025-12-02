@@ -10,21 +10,20 @@ interface User {
   id: string;
   email: string;
   display_name: string | null;
+  name: string | null;
   role: string | null;
   plan: string | null;
-  quota_limit: number | null;
-  reports_used: number | null;
   created_at: string | null;
   avatar_url: string | null;
 }
 
 interface UserCredits {
-  credits_available: number | null;
-  credits_used: number | null;
+  credits_available: number;
+  credits_used: number;
 }
 
 const PLAN_CONFIGS = {
-  free: { name: "免费版", quota: 10, color: "#6b7280", price: 0 },
+  free: { name: "免费版", quota: 30, color: "#6b7280", price: 0 },
   basic: { name: "基础版", quota: 50, color: "#3b82f6", price: 99 },
   pro: { name: "专业版", quota: 200, color: "#8b5cf6", price: 299 },
   enterprise: { name: "企业版", quota: 999, color: "#f59e0b", price: 999 },
@@ -46,9 +45,10 @@ export default function UsersPage() {
     email: "",
     password: "",
     display_name: "",
+    full_name: "",
     role: "user",
     plan: "free",
-    quota_limit: 10,
+    initial_credits: 30,
   });
 
   // 编辑用户
@@ -58,7 +58,6 @@ export default function UsersPage() {
   // 修改密码
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordEmail, setPasswordEmail] = useState("");
-  const [newPassword, setNewPassword] = useState("");
 
   // 用户详情
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -68,8 +67,6 @@ export default function UsersPage() {
   // 批量操作
   const [showBatchModal, setShowBatchModal] = useState(false);
   const [batchAction, setBatchAction] = useState<"grant" | "revoke" | "role" | "plan">("grant");
-  const [batchRole, setBatchRole] = useState("user");
-  const [batchPlan, setBatchPlan] = useState("free");
   const [processing, setProcessing] = useState(false);
 
   const pageSize = 10;
@@ -90,25 +87,22 @@ export default function UsersPage() {
         .range((page - 1) * pageSize, page * pageSize - 1);
 
       if (search) {
-        query = query.or(`email.ilike.%${search}%,display_name.ilike.%${search}%`);
+        query = query.or(`email.ilike.%${search}%,display_name.ilike.%${search}%,full_name.ilike.%${search}%`);
       }
 
       if (roleFilter !== "all") {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        query = query.eq("role", roleFilter as any);
+        query = query.eq("role", roleFilter);
       }
 
       if (planFilter !== "all") {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        query = query.eq("plan", planFilter as any);
+        query = query.eq("plan", planFilter);
       }
 
       const { data, count, error } = await query;
 
       if (error) throw error;
 
-      // Type assertion: database schema doesn't have full_name but UI expects it
-      setUsers((data || []) as User[]);
+      setUsers(data || []);
       setTotalCount(count || 0);
     } catch (error) {
       console.error("Failed to fetch users:", error);
@@ -152,9 +146,10 @@ export default function UsersPage() {
         email: "",
         password: "",
         display_name: "",
+        full_name: "",
         role: "user",
         plan: "free",
-        quota_limit: 10,
+        initial_credits: 30,
       });
       fetchUsers();
     } catch (error: unknown) {
@@ -179,9 +174,9 @@ export default function UsersPage() {
         body: JSON.stringify({
           userId: editingUser.id,
           display_name: editingUser.display_name,
+          full_name: editingUser.name,
           role: editingUser.role,
           plan: editingUser.plan,
-          quota_limit: editingUser.quota_limit,
         }),
       });
 
@@ -289,19 +284,16 @@ export default function UsersPage() {
         case "role":
           await supabase
             .from("profiles")
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .update({ role: value as any, updated_at: new Date().toISOString() })
+            .update({ role: value, updated_at: new Date().toISOString() })
             .in("id", userIds);
           alert(`成功修改 ${userIds.length} 个用户的角色`);
           break;
 
         case "plan":
-          const planConfig = PLAN_CONFIGS[value as keyof typeof PLAN_CONFIGS];
           await supabase
             .from("profiles")
             .update({
-              plan: value as string,
-              quota_limit: planConfig.quota,
+              plan: value,
               updated_at: new Date().toISOString(),
             })
             .in("id", userIds);
@@ -392,7 +384,9 @@ export default function UsersPage() {
           >
             + 创建用户
           </button>
-          <div className="text-sm text-dim flex items-center">共 {totalCount} 个用户</div>
+          <div className="text-sm text-dim flex items-center">
+            共 {totalCount} 个用户
+          </div>
         </div>
       </div>
 
@@ -541,14 +535,11 @@ export default function UsersPage() {
                           className="w-4 h-4"
                         />
                       </td>
-                      <td
-                        className="px-4 py-3 text-sm"
-                        style={{ color: "var(--color-foreground)" }}
-                      >
+                      <td className="px-4 py-3 text-sm" style={{ color: "var(--color-foreground)" }}>
                         {user.email}
                       </td>
                       <td className="px-4 py-3 text-sm text-dim">
-                        {user.display_name || "-"}
+                        {user.display_name || user.name || "-"}
                       </td>
                       <td className="px-4 py-3">
                         <span
@@ -558,21 +549,17 @@ export default function UsersPage() {
                               user.role === "admin"
                                 ? "rgba(239, 68, 68, 0.2)"
                                 : user.role === "editor"
-                                  ? "rgba(59, 130, 246, 0.2)"
-                                  : "rgba(107, 114, 128, 0.2)",
+                                ? "rgba(59, 130, 246, 0.2)"
+                                : "rgba(107, 114, 128, 0.2)",
                             color:
                               user.role === "admin"
                                 ? "#ef4444"
                                 : user.role === "editor"
-                                  ? "#3b82f6"
-                                  : "#6b7280",
+                                ? "#3b82f6"
+                                : "#6b7280",
                           }}
                         >
-                          {user.role === "admin"
-                            ? "管理员"
-                            : user.role === "editor"
-                              ? "编辑"
-                              : "用户"}
+                          {user.role === "admin" ? "管理员" : user.role === "editor" ? "编辑" : "用户"}
                         </span>
                       </td>
                       <td className="px-4 py-3">
@@ -587,7 +574,7 @@ export default function UsersPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-dim">
-                        {user.reports_used || 0} / {user.quota_limit || planInfo.quota}
+                        {planInfo.quota} 积分/月
                       </td>
                       <td className="px-4 py-3 text-sm text-subtle">
                         {user.created_at
@@ -659,7 +646,10 @@ export default function UsersPage() {
 
       {/* 创建用户弹窗 */}
       {showCreateModal && (
-        <Modal title="创建新用户" onClose={() => setShowCreateModal(false)}>
+        <Modal
+          title="创建新用户"
+          onClose={() => setShowCreateModal(false)}
+        >
           <div className="space-y-4">
             <InputField
               label="邮箱 *"
@@ -681,6 +671,12 @@ export default function UsersPage() {
               onChange={(e) => setCreateData({ ...createData, display_name: e.target.value })}
               placeholder="用户昵称"
             />
+            <InputField
+              label="全名"
+              value={createData.full_name}
+              onChange={(e) => setCreateData({ ...createData, full_name: e.target.value })}
+              placeholder="真实姓名"
+            />
             <SelectField
               label="角色"
               value={createData.role}
@@ -699,7 +695,7 @@ export default function UsersPage() {
                 setCreateData({
                   ...createData,
                   plan: e.target.value,
-                  quota_limit: PLAN_CONFIGS[planKey].quota,
+                  initial_credits: PLAN_CONFIGS[planKey].quota,
                 });
               }}
               options={[
@@ -710,12 +706,10 @@ export default function UsersPage() {
               ]}
             />
             <InputField
-              label="报告配额"
+              label="初始积分"
               type="number"
-              value={createData.quota_limit.toString()}
-              onChange={(e) =>
-                setCreateData({ ...createData, quota_limit: Number(e.target.value) })
-              }
+              value={createData.initial_credits.toString()}
+              onChange={(e) => setCreateData({ ...createData, initial_credits: Number(e.target.value) })}
             />
             <div className="flex gap-3 pt-4">
               <button
@@ -739,13 +733,23 @@ export default function UsersPage() {
 
       {/* 编辑用户弹窗 */}
       {showEditModal && editingUser && (
-        <Modal title="编辑用户信息" onClose={() => setShowEditModal(false)}>
+        <Modal
+          title="编辑用户信息"
+          onClose={() => setShowEditModal(false)}
+        >
           <div className="space-y-4">
-            <div className="text-sm text-dim mb-4">邮箱: {editingUser.email}</div>
+            <div className="text-sm text-dim mb-4">
+              邮箱: {editingUser.email}
+            </div>
             <InputField
               label="显示名称"
               value={editingUser.display_name || ""}
               onChange={(e) => setEditingUser({ ...editingUser, display_name: e.target.value })}
+            />
+            <InputField
+              label="全名"
+              value={editingUser.name || ""}
+              onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
             />
             <SelectField
               label="角色"
@@ -765,7 +769,6 @@ export default function UsersPage() {
                 setEditingUser({
                   ...editingUser,
                   plan: e.target.value,
-                  quota_limit: PLAN_CONFIGS[planKey].quota,
                 });
               }}
               options={[
@@ -774,14 +777,6 @@ export default function UsersPage() {
                 { value: "pro", label: `专业版 (${PLAN_CONFIGS.pro.quota}篇)` },
                 { value: "enterprise", label: `企业版 (${PLAN_CONFIGS.enterprise.quota}篇)` },
               ]}
-            />
-            <InputField
-              label="报告配额"
-              type="number"
-              value={editingUser.quota_limit?.toString() || "10"}
-              onChange={(e) =>
-                setEditingUser({ ...editingUser, quota_limit: Number(e.target.value) })
-              }
             />
             <div className="flex gap-3 pt-4">
               <button
@@ -805,9 +800,14 @@ export default function UsersPage() {
 
       {/* 修改密码弹窗 */}
       {showPasswordModal && (
-        <Modal title="重置用户密码" onClose={() => setShowPasswordModal(false)}>
+        <Modal
+          title="重置用户密码"
+          onClose={() => setShowPasswordModal(false)}
+        >
           <div className="space-y-4">
-            <div className="text-sm text-dim mb-4">用户邮箱: {passwordEmail}</div>
+            <div className="text-sm text-dim mb-4">
+              用户邮箱: {passwordEmail}
+            </div>
             <InputField
               label="新密码 (至少6位)"
               type="password"
@@ -837,39 +837,35 @@ export default function UsersPage() {
 
       {/* 用户详情弹窗 */}
       {showDetailModal && detailUser && (
-        <Modal title="用户详细信息" onClose={() => setShowDetailModal(false)}>
+        <Modal
+          title="用户详细信息"
+          onClose={() => setShowDetailModal(false)}
+        >
           <div className="space-y-3">
             <DetailRow label="用户ID" value={detailUser.id} />
             <DetailRow label="邮箱" value={detailUser.email} />
             <DetailRow label="显示名称" value={detailUser.display_name || "-"} />
+            <DetailRow label="全名" value={detailUser.name || "-"} />
             <DetailRow
               label="角色"
               value={
-                detailUser.role === "admin"
-                  ? "管理员"
-                  : detailUser.role === "editor"
-                    ? "编辑"
-                    : "普通用户"
+                detailUser.role === "admin" ? "管理员" :
+                detailUser.role === "editor" ? "编辑" : "普通用户"
               }
             />
-            <DetailRow label="会员套餐" value={getPlanInfo(detailUser.plan).name} />
             <DetailRow
-              label="报告使用"
-              value={`${detailUser.reports_used || 0} / ${detailUser.quota_limit || 0}`}
+              label="会员套餐"
+              value={getPlanInfo(detailUser.plan).name}
             />
             {userCredits && (
               <>
-                <DetailRow label="可用积分" value={(userCredits.credits_available ?? 0).toString()} />
-                <DetailRow label="已用积分" value={(userCredits.credits_used ?? 0).toString()} />
+                <DetailRow label="可用积分" value={userCredits.credits_available.toString()} />
+                <DetailRow label="已用积分" value={userCredits.credits_used.toString()} />
               </>
             )}
             <DetailRow
               label="注册时间"
-              value={
-                detailUser.created_at
-                  ? format(new Date(detailUser.created_at), "yyyy-MM-dd HH:mm", { locale: zhCN })
-                  : "-"
-              }
+              value={detailUser.created_at ? format(new Date(detailUser.created_at), "yyyy-MM-dd HH:mm", { locale: zhCN }) : "-"}
             />
           </div>
         </Modal>
@@ -882,7 +878,9 @@ export default function UsersPage() {
           onClose={() => setShowBatchModal(false)}
         >
           <div className="space-y-4">
-            <div className="text-sm text-dim">已选择 {selectedUsers.size} 个用户</div>
+            <div className="text-sm text-dim">
+              已选择 {selectedUsers.size} 个用户
+            </div>
             {batchAction === "role" ? (
               <SelectField
                 label="新角色"
@@ -909,9 +907,7 @@ export default function UsersPage() {
             )}
             <div className="flex gap-3 pt-4">
               <button
-                onClick={() =>
-                  handleBatchOperation(batchAction, batchAction === "role" ? batchRole : batchPlan)
-                }
+                onClick={() => handleBatchOperation(batchAction, batchAction === "role" ? batchRole : batchPlan)}
                 disabled={processing}
                 className="flex-1 px-4 py-2.5 rounded-lg btn-gradient font-semibold disabled:opacity-50"
               >
@@ -933,15 +929,7 @@ export default function UsersPage() {
 }
 
 // 辅助组件
-function Modal({
-  title,
-  onClose,
-  children,
-}: {
-  title: string;
-  onClose: () => void;
-  children: React.ReactNode;
-}) {
+function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-50"
@@ -1037,10 +1025,7 @@ function SelectField({
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div
-      className="flex justify-between py-2 border-b"
-      style={{ borderColor: "var(--stroke-soft)" }}
-    >
+    <div className="flex justify-between py-2 border-b" style={{ borderColor: "var(--stroke-soft)" }}>
       <span className="text-sm text-dim">{label}:</span>
       <span className="text-sm font-medium" style={{ color: "var(--color-foreground)" }}>
         {value}

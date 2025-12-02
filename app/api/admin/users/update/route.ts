@@ -15,21 +15,20 @@ const supabaseAdmin = createClient(
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { userId, display_name, full_name, role, plan, quota_limit } = body;
+    const { userId, display_name, full_name, role, plan } = body;
 
     if (!userId) {
       return NextResponse.json({ error: "用户ID为必填项" }, { status: 400 });
     }
 
-    // 更新profiles表
+    // 更新profiles表 (不再包含 quota_limit)
     const { error } = await supabaseAdmin
       .from("profiles")
       .update({
         display_name,
-        full_name,
+        name: full_name,
         role,
         plan,
-        quota_limit,
         updated_at: new Date().toISOString(),
       })
       .eq("id", userId);
