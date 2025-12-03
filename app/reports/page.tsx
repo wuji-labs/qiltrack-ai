@@ -18,6 +18,109 @@ const seedReports = getSeedReportCards();
 const defaultCategories = ["All", ...listSeedCategories()];
 const PAGE_SIZE = 6;
 
+type MembershipBadgeVariant = "featured" | "grid";
+
+// 权限徽章 - 支持三种档位
+function AccessBadge({
+  variant,
+  accessLevel,
+  labels,
+}: {
+  variant: MembershipBadgeVariant;
+  accessLevel: "timed-free" | "monthly" | "annual";
+  labels: {
+    "timed-free": string;
+    monthly: string;
+    annual: string;
+  };
+}) {
+  const label = labels[accessLevel];
+
+  // 根据档位设定颜色 - 更豪华的设计
+  const colorMap = {
+    "timed-free": {
+      bg: "bg-gradient-to-br from-emerald-400/40 to-teal-500/30",
+      border: "border-emerald-400/70",
+      text: "text-emerald-50",
+      glow: "shadow-[0_0_20px_rgba(16,185,129,0.4)]",
+    },
+    monthly: {
+      bg: "bg-gradient-to-br from-amber-400/40 to-orange-500/30",
+      border: "border-amber-400/70",
+      text: "text-amber-50",
+      glow: "shadow-[0_0_20px_rgba(251,191,36,0.4)]",
+    },
+    annual: {
+      bg: "bg-gradient-to-br from-purple-400/40 to-pink-500/30",
+      border: "border-purple-400/70",
+      text: "text-purple-50",
+      glow: "shadow-[0_0_20px_rgba(168,85,247,0.5)]",
+    },
+  };
+
+  const colors = colorMap[accessLevel];
+
+  if (variant === "featured") {
+    return (
+      <div
+        className={`pointer-events-none absolute top-4 right-4 z-20 flex items-center gap-2 rounded-full px-4 py-2.5 ${colors.bg} border ${colors.border} ${colors.text} backdrop-blur-lg ${colors.glow}`}
+        aria-label={label}
+      >
+        <svg
+          viewBox="0 0 16 16"
+          className="h-5 w-5 shrink-0 drop-shadow-lg"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M13 4L6 11L3 8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        <span className="text-sm font-bold whitespace-nowrap">{label}</span>
+      </div>
+    );
+  }
+
+  // Grid variant - 更小但更高级的设计
+  return (
+    <div
+      className="pointer-events-none absolute top-2 right-2 z-10"
+      aria-label={label}
+    >
+      <div className={`flex items-center justify-center h-7 w-7 rounded-full ${colors.bg} border ${colors.border} backdrop-blur-lg ${colors.glow}`}>
+        <div className={`h-2.5 w-2.5 rounded-full ${colors.text} drop-shadow-lg`} />
+      </div>
+    </div>
+  );
+}
+
+function LockGlyph({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      aria-hidden="true"
+      focusable="false"
+      className={`shrink-0 ${className}`}
+    >
+      <path
+        d="M5 7V5.4a3 3 0 0 1 6 0V7"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M4.3 7.2h7.4v4.9a1.9 1.9 0 0 1-1.9 1.9H6.2a1.9 1.9 0 0 1-1.9-1.9z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M8 9.5v1.8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function applyLocalFilter(items: ReportCard[], theme: string, lang: string, query: string) {
   const normalizedQuery = query.trim().toLowerCase();
   return items.filter((item) => {
@@ -32,13 +135,45 @@ function applyLocalFilter(items: ReportCard[], theme: string, lang: string, quer
   });
 }
 
-type SortMode = "latest" | "popular";
-
 export default function ReportsPage() {
   const { t, language } = useLanguage();
   const auth = useSupabaseAuth();
+  const membershipLabel = t("reports.card.membershipBadge");
+  const timedFreeLabel = t("reports.card.timedFreeBadge");
+  const monthlyLabel = t("reports.card.monthlyBadge");
+  const accessLabels = {
+    "timed-free": timedFreeLabel,
+    monthly: monthlyLabel,
+    annual: membershipLabel,
+  };
+
+  // Category translation map
+  const categoryTranslationMap: Record<string, string> = {
+    All: "reports.category.all",
+    "Cloud + AI": "reports.category.cloud-ai",
+    Semiconductor: "reports.category.semiconductor",
+    "Defense & Aerospace": "reports.category.defense-aerospace",
+    Mobility: "reports.category.mobility",
+    Healthtech: "reports.category.healthtech",
+    Media: "reports.category.media",
+  };
+
+  const getCategoryLabel = (category: string) => {
+    const key = categoryTranslationMap[category];
+    return key ? t(key as any) : category;
+  };
   const [selectedCategory, setSelectedCategory] = useState(defaultCategories[0]);
-  const [selectedLang, setSelectedLang] = useState<"all" | "en" | "zh">("all");
+  // Language selector follows system language by default
+  const getInitialLang = () => {
+    // 优先使用主页语言设置，映射到报告页面的语言选项
+    if (language === "en") return "en";
+    if (language === "ja") return "ja";
+    if (language === "ko") return "ko";
+    if (language === "zh-Hant") return "zh-Hant";
+    if (language === "zh-Hans") return "zh-Hans";
+    return "all";
+  };
+  const [selectedLang, setSelectedLang] = useState<"all" | "en" | "ja" | "ko" | "zh-Hant" | "zh-Hans">(getInitialLang());
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [pageIndex, setPageIndex] = useState(1);
@@ -53,7 +188,6 @@ export default function ReportsPage() {
     total: seedReports.length,
     pages: Math.max(1, Math.ceil(seedReports.length / PAGE_SIZE)),
   });
-  const [sortMode, setSortMode] = useState<SortMode>("latest");
   const [popularReports, setPopularReports] = useState<string[]>([]);
   const [myReports, setMyReports] = useState<
     Array<{
@@ -120,55 +254,49 @@ export default function ReportsPage() {
     checkAdmin();
   }, [auth]);
 
-  // Load reports based on sort mode
+  // Load reports (always latest mode)
   useEffect(() => {
     let cancelled = false;
     const loadReports = async () => {
       setLoading(true);
       setError(null);
       try {
-        if (sortMode === "popular") {
-          const data = await fetchPopularReports({
-            limit: 50,
-            lang: selectedLang === "all" ? undefined : (selectedLang as any),
-          });
-          if (cancelled) return;
-          const symbolList = data.reports.map((r) => r.symbol);
-          setPopularReports(symbolList);
+        const data = await fetchReportPosts({
+          page: pageIndex,
+          limit: PAGE_SIZE,
+          theme: selectedCategory === "All" ? undefined : selectedCategory,
+          lang: selectedLang === "all" ? undefined : selectedLang,
+          query: debouncedQuery || undefined,
+        });
 
-          // Map to cards
-          const cards: ReportCard[] = data.reports.map((r) => ({
-            slug: r.symbol.toLowerCase(),
-            title: r.symbol,
-            snippet: `Featured report created on ${new Date(r.created_at).toLocaleDateString()}`,
-            date: r.created_at,
-            author: "Investor AI",
-            tags: ["popular"],
-            theme: "Featured",
-            cover: "linear-gradient(135deg, rgba(91, 224, 176, 0.1), rgba(0, 0, 0, 0.3))",
-            lang: selectedLang === "all" ? "en" : selectedLang,
-            readTime: "5 min",
-            body: [],
-          }));
-          setReports(cards);
-          setIsApiData(true);
+        if (cancelled) return;
+        const mapped = data.posts.map(mapApiPostToCard);
+
+        // If API returns empty, fallback to seed reports to avoid blank page
+        if (mapped.length === 0) {
+          let fallback = applyLocalFilter(
+            seedReports,
+            selectedCategory,
+            selectedLang,
+            debouncedQuery
+          );
+
+          // If filtered results are still empty, show all seed reports
+          if (fallback.length === 0) {
+            fallback = seedReports;
+          }
+
+          setReports(fallback);
+          setIsApiData(false);
           setPagination({
             page: 1,
-            pageSize: cards.length,
-            total: cards.length,
-            pages: 1,
+            pageSize: PAGE_SIZE,
+            total: fallback.length,
+            pages: Math.max(1, Math.ceil(fallback.length / PAGE_SIZE)),
           });
+          // Mark first 3 reports as popular
+          setPopularReports(fallback.slice(0, 3).map((r) => r.slug));
         } else {
-          const data = await fetchReportPosts({
-            page: pageIndex,
-            limit: PAGE_SIZE,
-            theme: selectedCategory === "All" ? undefined : selectedCategory,
-            lang: selectedLang === "all" ? undefined : selectedLang,
-            query: debouncedQuery || undefined,
-          });
-
-          if (cancelled) return;
-          const mapped = data.posts.map(mapApiPostToCard);
           setReports(mapped);
           setIsApiData(true);
           setPagination(data.pagination);
@@ -178,6 +306,8 @@ export default function ReportsPage() {
             if (item.theme) dynamicCategories.add(item.theme);
           });
           setCategories(["All", ...Array.from(dynamicCategories)]);
+          // Mark first 3 reports as popular
+          setPopularReports(mapped.slice(0, 3).map((r) => r.slug));
         }
       } catch (err) {
         if (cancelled) return;
@@ -201,6 +331,8 @@ export default function ReportsPage() {
           total,
           pages,
         });
+        // Mark first 3 reports as popular
+        setPopularReports(fallback.slice(0, 3).map((r) => r.slug));
         if (pageIndex !== normalizedPage) {
           setPageIndex(normalizedPage);
         }
@@ -216,7 +348,7 @@ export default function ReportsPage() {
     return () => {
       cancelled = true;
     };
-  }, [pageIndex, selectedCategory, selectedLang, debouncedQuery, sortMode]);
+  }, [pageIndex, selectedCategory, selectedLang, debouncedQuery]);
 
   // Load my reports when section is shown
   useEffect(() => {
@@ -262,9 +394,8 @@ export default function ReportsPage() {
     try {
       const result = await bulkUnfeatureReports({ olderThanDays: 30 });
       alert(`Successfully unfeatured ${result.unfeaturedCount} reports`);
-      // Refresh popular reports
-      setSortMode("latest");
-      setTimeout(() => setSortMode("popular"), 100);
+      // Refresh the page to reload reports
+      window.location.reload();
     } catch (err) {
       console.error("Bulk unfeature failed", err);
       alert("Failed to unfeature reports. Please check console.");
@@ -277,20 +408,32 @@ export default function ReportsPage() {
     return popularReports.some((s) => s.toLowerCase() === slug);
   };
 
-  const handleReportClick = (e: React.MouseEvent, slug: string, isPopular: boolean) => {
-    // Only apply paywall to popular reports
-    if (!isPopular) return;
+  const handleReportClick = (e: React.MouseEvent, slug: string, report: ReportCard) => {
+    const accessLevel = report.accessLevel || "timed-free";
 
-    // Allow admin and annual plan users
-    if (isAdmin || userPlan === "annual") return;
+    // 限时免费：任何人都能打开（用于 SEO）
+    if (accessLevel === "timed-free") return;
 
-    // Block and show paywall
+    // 月费和年费：检查用户计划
+    if (accessLevel === "monthly") {
+      // 月费或年费用户可以访问
+      if (userPlan === "monthly" || userPlan === "annual") return;
+      // 管理员可以访问
+      if (isAdmin) return;
+    }
+
+    if (accessLevel === "annual") {
+      // 仅年费用户和管理员可访问
+      if (userPlan === "annual" || isAdmin) return;
+    }
+
+    // 禁止访问：显示提示
     e.preventDefault();
     if (!auth.isAuthenticated) {
       // Not logged in - redirect to login
       window.location.assign("/#generator");
     } else {
-      // Logged in but not annual - show paywall
+      // Logged in but not authorized - show paywall
       setShowPaywall(true);
     }
   };
@@ -324,22 +467,22 @@ export default function ReportsPage() {
               style={{ animationDelay: "240ms" }}
             >
               <Link
+                href="/"
+                className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] transition-colors motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 motion-safe:hover:glow-pulse"
+              >
+                {t("reports.page.hero.backHome")}
+              </Link>
+              <Link
                 href="#popular"
                 className="btn-gradient px-5 py-2 text-sm font-semibold motion-safe:transition-transform motion-safe:hover:-translate-y-0.5"
               >
-                {t("reports.page.hero.cta")}
+                {t("reports.page.hero.popularCompanies")}
               </Link>
               <Link
                 href="#my-reports"
                 className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] transition-colors motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 motion-safe:hover:glow-pulse"
               >
                 {t("reports.page.hero.myReports")}
-              </Link>
-              <Link
-                href="/"
-                className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] transition-colors motion-safe:transition-transform motion-safe:hover:-translate-y-0.5"
-              >
-                {t("reports.page.hero.backHome")}
               </Link>
             </div>
           </div>
@@ -354,30 +497,50 @@ export default function ReportsPage() {
             <p className="text-sm text-dim">{t("reports.page.archiveDescription")}</p>
           </div>
 
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          {/* Filter Section - Search & Language on top */}
+          <div className="space-y-4">
+            {/* Search & Language Filter */}
+            <div className="flex flex-wrap items-center gap-3">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setPageIndex(1);
+                }}
+                className="flex items-center gap-2 rounded-full border border-[var(--accent-emerald)] bg-gradient-to-r from-[var(--accent-emerald)]/5 to-[var(--bg-base)]/90 px-4 py-2 transition-all duration-300 shadow-[0_0_20px_rgba(91,224,176,0.4),inset_0_0_20px_rgba(91,224,176,0.1)] hover:shadow-[0_0_30px_rgba(91,224,176,0.5),inset_0_0_20px_rgba(91,224,176,0.15)]"
+              >
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={t("reports.page.searchPlaceholder") ?? "Search reports"}
+                  className="bg-transparent text-sm focus:outline-none min-w-[180px] placeholder-[var(--accent-emerald)]/40"
+                />
+                <button
+                  type="submit"
+                  className="rounded-full bg-[var(--accent-emerald)] px-3.5 py-1.5 text-xs font-bold text-slate-950 shadow-[0_0_16px_rgba(91,224,176,0.4)] hover:shadow-[0_0_24px_rgba(91,224,176,0.6)] transition-shadow duration-200 active:scale-95"
+                >
+                  {t("reports.page.searchCta") ?? "Search"}
+                </button>
+              </form>
+              <select
+                value={selectedLang}
+                onChange={(e) => {
+                  setSelectedLang(e.target.value as typeof selectedLang);
+                  setPageIndex(1);
+                }}
+                className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-base)]/80 px-3 py-1.5 text-sm text-[var(--color-foreground)] focus:outline-none"
+              >
+                <option value="all">{t("reports.page.allLanguages")}</option>
+                <option value="en">English</option>
+                <option value="ja">日本語</option>
+                <option value="ko">한국어</option>
+                <option value="zh-Hant">繁體中文</option>
+                <option value="zh-Hans">简体中文</option>
+              </select>
+            </div>
+
+            {/* Categories */}
             <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => setSortMode("latest")}
-                className={`relative rounded-full border px-4 py-1 text-sm transition-all duration-200 ease-out ${
-                  sortMode === "latest"
-                    ? "border-[var(--accent-emerald)] bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)] motion-safe:hover:glow-pulse scale-100"
-                    : "border-[var(--stroke-soft)] text-dim hover:border-[var(--accent-emerald)]/50 hover:scale-102"
-                }`}
-              >
-                {t("reports.sort.latest")}
-              </button>
-              <button
-                type="button"
-                onClick={() => setSortMode("popular")}
-                className={`relative rounded-full border px-4 py-1 text-sm transition-all duration-200 ease-out ${
-                  sortMode === "popular"
-                    ? "border-[var(--accent-emerald)] bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)] motion-safe:hover:glow-pulse scale-100"
-                    : "border-[var(--stroke-soft)] text-dim hover:border-[var(--accent-emerald)]/50 hover:scale-102"
-                }`}
-              >
-                {t("reports.sort.popular")}
-              </button>
               {categories.map((category) => (
                 <button
                   key={category}
@@ -400,59 +563,9 @@ export default function ReportsPage() {
                       : {}
                   }
                 >
-                  {category}
+                  {getCategoryLabel(category)}
                 </button>
               ))}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              {sortMode === "latest" && (
-                <>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      setPageIndex(1);
-                    }}
-                    className="flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 px-3 py-1.5"
-                  >
-                    <input
-                      type="search"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder={t("reports.page.searchPlaceholder") ?? "Search reports"}
-                      className="bg-transparent text-sm focus:outline-none"
-                    />
-                    <button
-                      type="submit"
-                      className="rounded-full bg-[var(--accent-emerald)] px-3 py-1 text-xs font-semibold text-slate-950 shadow-[0_10px_20px_rgba(91,224,176,0.25)]"
-                    >
-                      {t("reports.page.searchCta") ?? "Search"}
-                    </button>
-                  </form>
-                  <select
-                    value={selectedLang}
-                    onChange={(e) => {
-                      setSelectedLang(e.target.value as typeof selectedLang);
-                      setPageIndex(1);
-                    }}
-                    className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-base)]/80 px-3 py-1.5 text-sm text-[var(--color-foreground)] focus:outline-none"
-                  >
-                    <option value="all">{t("reports.page.allLanguages") ?? "All languages"}</option>
-                    <option value="en">English</option>
-                    <option value="zh">中文</option>
-                  </select>
-                </>
-              )}
-              {isAdmin && sortMode === "popular" && (
-                <button
-                  type="button"
-                  onClick={handleBulkUnfeature}
-                  disabled={bulkActionLoading}
-                  className="rounded-full border border-amber-400/50 bg-amber-500/10 px-4 py-1.5 text-xs font-semibold text-amber-200 hover:bg-amber-500/20 disabled:opacity-50"
-                >
-                  {bulkActionLoading ? "Processing..." : t("reports.admin.manage")}
-                </button>
-              )}
             </div>
           </div>
 
@@ -471,20 +584,22 @@ export default function ReportsPage() {
             <>
               <div className="grid gap-5 lg:grid-cols-2">
                 {pagedReports.slice(0, 2).map((report) => {
-                  const isPopular = sortMode === "popular" || isReportPopular(report.slug);
+                  const isPopular = isReportPopular(report.slug);
                   return (
                     <Link
                       key={`${report.slug}-featured`}
                       href={`/reports/${report.slug}`}
-                      onClick={(e) => handleReportClick(e, report.slug, isPopular)}
+                      onClick={(e) => handleReportClick(e, report.slug, report)}
                       className="group relative overflow-hidden rounded-[32px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-6 transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-2 group-hover:shadow-elevated"
                     >
-                      {isPopular && (
-                        <span className="absolute top-4 right-4 rounded-full bg-[var(--accent-emerald)]/20 border border-[var(--accent-emerald)]/50 px-3 py-1 text-xs font-semibold text-[var(--accent-emerald)]">
-                          {t("reports.sort.popular")}
-                        </span>
-                      )}
                       <div className="relative mb-5 overflow-hidden rounded-[20px]">
+                        {report.accessLevel && (
+                          <AccessBadge
+                            variant="featured"
+                            accessLevel={report.accessLevel as "timed-free" | "monthly" | "annual"}
+                            labels={accessLabels}
+                          />
+                        )}
                         <div
                           className="h-48 bg-[var(--bg-base)] transition-transform duration-300 ease-out group-hover:scale-104 group-hover:-translate-y-6px"
                           style={{
@@ -515,13 +630,13 @@ export default function ReportsPage() {
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" ref={gridRef}>
                 {pagedReports.slice(2).map((report) => {
-                  const isPopular = sortMode === "popular" || isReportPopular(report.slug);
+                  const isPopular = isReportPopular(report.slug);
                   return (
                     <Link
                       key={`${report.slug}-tile`}
                       data-stagger-item
                       href={`/reports/${report.slug}`}
-                      onClick={(e) => handleReportClick(e, report.slug, isPopular)}
+                      onClick={(e) => handleReportClick(e, report.slug, report)}
                       className="group flex flex-col overflow-hidden rounded-[24px] border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 shadow-[0_18px_50px_rgba(0,0,0,0.35)] transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(0,0,0,0.45)]"
                       style={{
                         opacity: "var(--item-opacity, 0)",
@@ -541,7 +656,14 @@ export default function ReportsPage() {
                           backgroundPosition: "center",
                         }}
                       >
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                        {report.accessLevel && (
+                          <AccessBadge
+                            variant="grid"
+                            accessLevel={report.accessLevel as "timed-free" | "monthly" | "annual"}
+                            labels={accessLabels}
+                          />
+                        )}
                       </div>
                       <p className="mt-3 text-xs uppercase tracking-[0.3em] text-dim">
                         {formatDate(report.date)}
@@ -561,7 +683,7 @@ export default function ReportsPage() {
             </>
           )}
 
-          {sortMode === "latest" && (
+          {reports.length > 0 && (
             <div className="flex items-center justify-between text-xs text-subtle">
               <span>{t("reports.page.seoNote", { count: String(totalCount) })}</span>
               <div className="flex items-center gap-2">
@@ -586,15 +708,8 @@ export default function ReportsPage() {
           )}
         </section>
 
-        <section id="my-reports" className="space-y-8 scroll-mt-28 md:scroll-mt-32">
-          <div className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.4em] text-[var(--accent-emerald)]">
-              {t("reports.page.hero.myReports")}
-            </p>
-            <h2 className="text-2xl font-semibold">{t("reports.page.hero.myReports.cta")}</h2>
-          </div>
-
-          {!auth.isAuthenticated ? (
+        {!auth.isAuthenticated && (
+          <section id="my-reports" className="space-y-8 scroll-mt-28 md:scroll-mt-32">
             <div className="rounded-2xl border border-amber-400/50 bg-amber-500/10 px-4 py-3 text-base text-amber-50">
               <p>{t("generator.alert.unregistered")}</p>
               <button
@@ -605,86 +720,146 @@ export default function ReportsPage() {
                 {t("quota.action.login")}
               </button>
             </div>
-          ) : !showMyReports ? (
-            <button
-              type="button"
-              onClick={() => setShowMyReports(true)}
-              className="rounded-full border border-[var(--accent-emerald)]/50 bg-[var(--accent-emerald)]/10 px-5 py-2 text-sm font-semibold text-[var(--accent-emerald)]"
+          </section>
+        )}
+
+        {showMyReports && auth.isAuthenticated && (
+          <dialog
+            open
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowMyReports(false)}
+          >
+            <div
+              className="relative mx-4 max-w-4xl max-h-[85vh] overflow-y-auto rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/95 p-8 shadow-[0_26px_90px_rgba(0,0,0,0.5)]"
+              onClick={(e) => e.stopPropagation()}
             >
-              {t("reports.page.hero.myReports.cta")}
-            </button>
-          ) : loadingMyReports ? (
-            <p className="text-sm text-subtle">{t("reports.page.loading")}</p>
-          ) : myReports.length === 0 ? (
-            <p className="text-sm text-subtle">{t("reports.page.empty")}</p>
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {myReports.map((report) => (
-                <div
-                  key={report.id}
-                  className="rounded-[24px] border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 p-4 space-y-3"
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-semibold text-[var(--color-foreground)]">
+                  {t("reports.page.hero.myReports.cta")}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setShowMyReports(false)}
+                  className="rounded-full p-2 hover:bg-[var(--stroke-soft)] transition-colors"
+                  aria-label="Close"
                 >
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-[var(--accent-emerald)]">
-                      {report.symbol}
-                    </p>
-                    <span className="text-xs text-subtle">{formatDate(report.created_at)}</span>
-                  </div>
-                  <p className="text-xs text-dim">Status: {report.status}</p>
-                  {report.mode && <p className="text-xs text-subtle">Mode: {report.mode}</p>}
-                  <div className="flex flex-wrap gap-2">
-                    {report.markdown_signed_url && (
-                      <a
-                        href={report.markdown_signed_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-[var(--accent-emerald)] hover:underline"
-                      >
-                        View Markdown
-                      </a>
-                    )}
-                    {report.docx_signed_url && (
-                      <a
-                        href={report.docx_signed_url}
-                        download
-                        className="text-xs text-[var(--accent-emerald)] hover:underline"
-                      >
-                        Download DOCX
-                      </a>
-                    )}
-                  </div>
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="h-6 w-6"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              </div>
+
+              {loadingMyReports ? (
+                <p className="text-sm text-subtle">{t("reports.page.loading")}</p>
+              ) : myReports.length === 0 ? (
+                <p className="text-sm text-subtle">{t("reports.page.empty")}</p>
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {myReports.map((report) => (
+                    <div
+                      key={report.id}
+                      className="rounded-[24px] border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 space-y-3 hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] transition-shadow"
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-semibold text-[var(--accent-emerald)]">
+                          {report.symbol}
+                        </p>
+                        <span className="text-xs text-subtle">{formatDate(report.created_at)}</span>
+                      </div>
+                      <p className="text-xs text-dim">Status: {report.status}</p>
+                      {report.mode && <p className="text-xs text-subtle">Mode: {report.mode}</p>}
+                      <div className="flex flex-wrap gap-2">
+                        {report.markdown_signed_url && (
+                          <a
+                            href={report.markdown_signed_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-[var(--accent-emerald)] hover:underline"
+                          >
+                            View Markdown
+                          </a>
+                        )}
+                        {report.docx_signed_url && (
+                          <a
+                            href={report.docx_signed_url}
+                            download
+                            className="text-xs text-[var(--accent-emerald)] hover:underline"
+                          >
+                            Download DOCX
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
-          )}
-        </section>
+          </dialog>
+        )}
       </div>
 
       {showPaywall && (
         <dialog
           open
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-lg"
+          onClick={() => setShowPaywall(false)}
         >
-          <div className="relative mx-4 max-w-md rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/95 p-6 shadow-[0_26px_90px_rgba(0,0,0,0.5)]">
-            <h3 className="text-xl font-semibold text-[var(--color-foreground)]">
-              {t("reports.paywall.premium")}
-            </h3>
-            <p className="mt-2 text-sm text-dim">{t("reports.paywall.premium")}</p>
-            <div className="mt-6 flex flex-col gap-3">
-              <button
-                type="button"
-                onClick={() => window.location.assign("/pricing#quota")}
-                className="rounded-full bg-[var(--accent-emerald)] px-5 py-2.5 text-sm font-semibold text-slate-950 hover:bg-[var(--accent-emerald)]/90"
+          <div
+            className="relative mx-4 w-full max-w-md rounded-[32px] border border-[var(--accent-emerald)]/30 bg-gradient-to-br from-[var(--bg-layer)]/95 via-[var(--bg-layer)]/90 to-[var(--bg-layer)]/85 p-8 shadow-[0_0_60px_rgba(91,224,176,0.2),0_26px_90px_rgba(0,0,0,0.6)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="absolute inset-0 rounded-[32px] bg-gradient-to-br from-[var(--accent-emerald)]/5 to-transparent pointer-events-none" />
+
+            <button
+              type="button"
+              onClick={() => setShowPaywall(false)}
+              className="absolute top-6 right-6 p-2 hover:bg-[var(--stroke-soft)]/50 rounded-full transition-all duration-200"
+              aria-label="Close"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="h-6 w-6 text-[var(--color-foreground)]"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
               >
-                {t("quota.action.upgrade")}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowPaywall(false)}
-                className="rounded-full border border-[var(--stroke-soft)] px-5 py-2.5 text-sm text-dim hover:text-[var(--color-foreground)]"
-              >
-                {t("quota.action.retry")}
-              </button>
+                <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+
+            <div className="relative space-y-6">
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-emerald)]/20 border border-[var(--accent-emerald)]/50">
+                  <span className="text-xs font-semibold text-[var(--accent-emerald)] uppercase tracking-wider">高级内容</span>
+                </div>
+                <h3 className="text-3xl font-bold bg-gradient-to-r from-[var(--accent-emerald)] to-teal-400 bg-clip-text text-transparent">
+                  {t("reports.paywall.premium")}
+                </h3>
+                <p className="text-sm text-dim leading-relaxed">{t("reports.paywall.premium")}</p>
+              </div>
+
+              <div className="flex flex-col gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => window.location.assign("/pricing#quota")}
+                  className="rounded-full bg-gradient-to-r from-[var(--accent-emerald)] to-teal-500 px-6 py-3.5 text-sm font-bold text-slate-950 hover:shadow-[0_0_30px_rgba(91,224,176,0.4)] transition-all duration-300 hover:scale-105 active:scale-95"
+                >
+                  立即升级
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPaywall(false)}
+                  className="rounded-full border border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald)]/5 px-6 py-3 text-sm font-semibold text-[var(--accent-emerald)] hover:bg-[var(--accent-emerald)]/10 hover:border-[var(--accent-emerald)]/50 transition-all duration-200"
+                >
+                  返回查看
+                </button>
+              </div>
             </div>
           </div>
         </dialog>

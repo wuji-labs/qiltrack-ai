@@ -45,12 +45,12 @@ export default function CreditsPage() {
           profiles!inner(email, display_name)
         `
         )
-        .order("updated_at", { ascending: false });
+        .order("updated_at", { ascending: false }) as any;
 
       if (error) throw error;
 
       const formatted =
-        data?.map((item) => ({
+        data?.map((item: any) => ({
           user_id: item.user_id,
           email: item.profiles.email,
           display_name: item.profiles.display_name || item.profiles.email,
