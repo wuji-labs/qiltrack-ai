@@ -88,35 +88,6 @@ export class ReportGenerator {
         },
       });
 
-      // 1. Check cache for existing report
-      const cacheCheckSpan = trace?.span({
-        name: "cache-check",
-        input: { symbol: params.symbol, language, tone },
-      });
-
-      const cachedReport = await reportCache.get({
-        symbol: params.symbol,
-        language,
-        tone,
-      });
-
-      if (cachedReport) {
-        cacheCheckSpan?.end({ output: { cacheHit: true } });
-        trace?.update({
-          output: { success: true, cached: true },
-          metadata: { generationTimeMs: Date.now() - startTime }
-        });
-
-        console.info(
-          `[ReportGenerator] Cache hit for ${params.symbol} (${language}/${tone})`
-        );
-
-        return cachedReport;
-      }
-
-      cacheCheckSpan?.end({ output: { cacheHit: false } });
-
-      // 2. Check market data cache
       const marketDataSpan = trace?.span({
         name: "fetch-market-data",
         input: { symbol: params.symbol },
@@ -193,19 +164,6 @@ export class ReportGenerator {
         },
         generatedReport
       );
-
-      // 7. Enqueue embeddings generation (async, non-blocking)
-      const { enqueueEmbeddingsJob } = await import('@/lib/queue/embeddings.queue');
-      await enqueueEmbeddingsJob({
-        reportRunId: metadata.reportRunId || crypto.randomUUID(),
-        reportContent: sanitizedContent,
-        language,
-        tone,
-        userId: params.userId,
-      }).catch((err) => {
-        // Queue failure should not block report generation
-        console.error('[ReportGenerator] Failed to enqueue embeddings job:', err);
-      });
 
       trace?.update({ output: { success: true, cached: false } });
 

@@ -7,6 +7,7 @@ import { ReportGenerator } from "@/lib/core/reports/generator";
 import { ReportPersistence } from "@/lib/core/reports/persistence";
 import { EmbeddingsManager } from "@/lib/core/reports/embeddings";
 import { ContentSanitizer } from "@/lib/core/reports/content-sanitizer";
+import { MarketDataService } from "@/lib/services/market-data";
 import { handleApiError, successResponse } from "@/lib/api/error-handler";
 import { UnauthorizedError, InsufficientCreditsError, ValidationError } from "@/lib/core/errors";
 import { DEFAULT_LANGUAGE, type Language } from "@/lib/i18n-config";
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
       responseCookies.push(...cookies);
     });
 
-    let userId: string;
+    let userId: string | null;
 
     if (!isTestBypass) {
       const {
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
       userId = session.user.id;
     } else {
       // Test mode - use deterministic UUID
-      userId = "00000000-0000-0000-0000-000000000001";
+      userId = null;
     }
 
     // 2. Parse and validate parameters
@@ -106,7 +107,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 4. Check for reusable report (within 7 days)
-    if (!isTestBypass) {
+    if (!isTestBypass && userId) {
       const persistence = new ReportPersistence();
       const existingReport = await persistence.checkReusableReport(symbol, language, tone, userId);
 
@@ -115,10 +116,60 @@ export async function GET(request: NextRequest) {
           `[REPORT_REUSED] user_id: ${userId}, symbol: ${symbol}, report_id: ${existingReport.id}`
         );
 
+        // For consistency, load stored market data from Storage JSON instead of refetching live data
+        const storedMarketData =
+          (await persistence.getStoredMarketData(existingReport.report_run_id)) || null;
+        const companyData =
+          storedMarketData ?? {
+            symbol,
+            profile: {},
+            quote: {},
+            metrics: {},
+            recentNews: [],
+          };
+
         const response = successResponse({
-          report: existingReport,
+          symbol: existingReport.symbol,
+          report: existingReport.content,
+          companyData,
+          reportRunId: existingReport.report_run_id,
           reused: true,
           message: "Using existing report from the last 7 days",
+        });
+
+        responseCookies.forEach(({ name, value }) => {
+          response.headers.append("Set-Cookie", `${name}=${value}`);
+        });
+
+        return response;
+      }
+    }
+
+    // 4.1 Shared reuse for other/new users: only reuse same-day reports
+    if (isTestBypass || !userId) {
+      const persistence = new ReportPersistence();
+      const sharedReport = await persistence.checkSharedReusableReport(symbol, language, tone, 1);
+      if (sharedReport) {
+        console.info(
+          `[REPORT_REUSED_SHARED] symbol: ${symbol}, report_id: ${sharedReport.id}, run_id: ${sharedReport.report_run_id}`
+        );
+        const storedMarketData =
+          (await persistence.getStoredMarketData(sharedReport.report_run_id)) || null;
+        const companyData =
+          storedMarketData ?? {
+            symbol,
+            profile: {},
+            quote: {},
+            metrics: {},
+            recentNews: [],
+          };
+        const response = successResponse({
+          symbol: sharedReport.symbol,
+          report: sharedReport.content,
+          companyData,
+          reportRunId: sharedReport.report_run_id,
+          reused: true,
+          message: "Using existing report from today",
         });
 
         responseCookies.forEach(({ name, value }) => {
@@ -160,6 +211,15 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    const companyData =
+      generatedReport.marketData ?? {
+        symbol,
+        profile: {},
+        quote: {},
+        metrics: {},
+        recentNews: [],
+      };
+
     // 7. Extract title from report (first # line)
     const titleMatch = generatedReport.content.match(/^#\s+(.+)$/m);
     const title = titleMatch?.[1] || `Investment Analysis Report: ${symbol} (${language})`;
@@ -176,17 +236,19 @@ export async function GET(request: NextRequest) {
         tone,
         marketData: generatedReport.marketData,
       },
-      userId
+      userId ?? undefined
     );
 
     // 9. Record audit log
-    await persistence.recordAudit(userId, "GENERATE_REPORT", {
-      symbol,
-      language,
-      tone,
-      report_id: savedReport.id,
-      report_run_id: savedReport.report_run_id,
-    });
+    if (userId) {
+      await persistence.recordAudit(userId, "GENERATE_REPORT", {
+        symbol,
+        language,
+        tone,
+        report_id: savedReport.id,
+        report_run_id: savedReport.report_run_id,
+      });
+    }
 
     // 10. Generate embeddings in background (non-blocking)
     if (!isTestBypass && savedReport.report_run_id) {
@@ -205,7 +267,10 @@ export async function GET(request: NextRequest) {
 
     // 11. Return success response
     const response = successResponse({
-      report: savedReport,
+      symbol,
+      report: generatedReport.content,
+      companyData,
+      reportRunId: savedReport.report_run_id,
       reused: false,
       metadata: generatedReport.metadata,
     });
