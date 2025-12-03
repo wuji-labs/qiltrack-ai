@@ -184,7 +184,7 @@ export const supabaseDataProvider: any = {
 
     const { data, error } = await supabase
       .from(resource)
-      .update(updateData)
+      .update(updateData as never)
       .eq("id", id)
       .select()
       .single();
@@ -207,7 +207,11 @@ export const supabaseDataProvider: any = {
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error } = await supabase.from(resource).update(updateData).in("id", ids).select();
+    const { data, error } = await supabase
+      .from(resource)
+      .update(updateData as never)
+      .in("id", ids)
+      .select();
 
     if (error) {
       throw error;
@@ -297,7 +301,7 @@ export async function batchGrantCredits(userIds: string[], amount: number, reaso
     },
   }));
 
-  const { error } = await supabase.from("report_credit_events").insert(events);
+  const { error } = await supabase.from("report_credit_events").insert(events as never);
 
   if (error) {
     throw error;
@@ -311,13 +315,16 @@ export async function batchGrantCredits(userIds: string[], amount: number, reaso
       .eq("user_id", userId)
       .single();
 
-    if (currentCredits) {
+    const currentCreditsData =
+      (currentCredits as { credits_available: number | null } | null) ?? null;
+
+    if (currentCreditsData) {
       await supabase
         .from("report_credits")
         .update({
-          credits_available: (currentCredits.credits_available || 0) + amount,
+          credits_available: (currentCreditsData.credits_available || 0) + amount,
           updated_at: new Date().toISOString(),
-        })
+        } as never)
         .eq("user_id", userId);
     }
   }
@@ -342,7 +349,7 @@ export async function batchRevokeCredits(userIds: string[], amount: number, reas
     },
   }));
 
-  const { error } = await supabase.from("report_credit_events").insert(events);
+  const { error } = await supabase.from("report_credit_events").insert(events as never);
 
   if (error) {
     throw error;
@@ -356,14 +363,17 @@ export async function batchRevokeCredits(userIds: string[], amount: number, reas
       .eq("user_id", userId)
       .single();
 
-    if (currentCredits) {
-      const newBalance = Math.max(0, (currentCredits.credits_available || 0) - amount);
+    const currentCreditsData =
+      (currentCredits as { credits_available: number | null } | null) ?? null;
+
+    if (currentCreditsData) {
+      const newBalance = Math.max(0, (currentCreditsData.credits_available || 0) - amount);
       await supabase
         .from("report_credits")
         .update({
           credits_available: newBalance,
           updated_at: new Date().toISOString(),
-        })
+        } as never)
         .eq("user_id", userId);
     }
   }

@@ -1,5 +1,6 @@
 import { AuthProvider } from "@refinedev/core";
 import { createClient } from "@/lib/supabase/client";
+import type { Database } from "@/types/database";
 
 /**
  * Supabase Auth Provider for Refine
@@ -83,7 +84,9 @@ export const authProvider: AuthProvider = {
       .eq("id", session.user.id)
       .single();
 
-    if (!profile || profile.role !== "admin") {
+    const userRole = (profile as { role?: string | null } | null)?.role;
+
+    if (!userRole || userRole !== "admin") {
       return {
         authenticated: false,
         redirectTo: "/",
@@ -128,12 +131,15 @@ export const authProvider: AuthProvider = {
       .eq("id", user.id)
       .single();
 
+    const profileData =
+      (profile as Partial<Database["public"]["Tables"]["profiles"]["Row"]> | null) ?? null;
+
     return {
       id: user.id,
-      name: profile?.display_name || user.email,
+      name: profileData?.display_name || user.email,
       email: user.email,
-      avatar: profile?.avatar_url,
-      role: profile?.role,
+      avatar: profileData?.avatar_url,
+      role: profileData?.role,
     };
   },
 
@@ -157,6 +163,8 @@ export const authProvider: AuthProvider = {
       .eq("id", user.id)
       .single();
 
-    return profile?.role || "user";
+    const userRole = (profile as { role?: string | null } | null)?.role;
+
+    return userRole || "user";
   },
 };

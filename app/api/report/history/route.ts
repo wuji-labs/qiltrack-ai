@@ -54,7 +54,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    let resultReports = reports || [];
+    // Keep a mutable list for mapped report history items
+    let resultReports: any[] = reports || [];
 
     // For report_posts table, we don't have file paths, but we can generate links to view the reports
     try {

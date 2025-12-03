@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    if (!profile || !['admin', 'superadmin'].includes(profile.role)) {
+    if (!profile || !profile.role || !['admin', 'superadmin'].includes(profile.role)) {
       return NextResponse.json(
         { success: false, error: 'Forbidden' },
         { status: 403 }
@@ -136,18 +136,23 @@ export async function GET(request: NextRequest) {
         : 0;
 
     // User metrics
-    const [totalUsers, activeUsers, newUsers] = await Promise.all([
-      supabase.from('profiles').select('id', { count: 'exact', head: true }),
+    const totalUsersPromise = supabase.from('profiles').select('id', { count: 'exact', head: true });
 
-      // Active users (generated report in last 7 days)
-      supabase.rpc('get_active_users_count', { days: 7 }).catch(() => ({ data: 0 })),
+    // Active users (generated report in last 7 days) - with error handling
+    let activeUsersCount = 0;
+    try {
+      const result = await supabase.rpc('get_active_users_count', { days: 7 });
+      activeUsersCount = result.data || 0;
+    } catch {
+      activeUsersCount = 0;
+    }
 
-      // New users (created in last 7 days)
-      supabase
-        .from('profiles')
-        .select('id', { count: 'exact', head: true })
-        .gte('created_at', weekStart.toISOString()),
-    ]);
+    const newUsersPromise = supabase
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .gte('created_at', weekStart.toISOString());
+
+    const [totalUsers, newUsers] = await Promise.all([totalUsersPromise, newUsersPromise]);
 
     // Credit metrics
     const [creditEvents, creditBalances] = await Promise.all([
@@ -165,7 +170,7 @@ export async function GET(request: NextRequest) {
     const avgBalance =
       creditBalances.data && creditBalances.data.length > 0
         ? creditBalances.data.reduce(
-            (sum, c) => sum + c.credits_available,
+            (sum, c) => sum + (c.credits_available || 0),
             0
           ) / creditBalances.data.length
         : 0;
@@ -201,7 +206,7 @@ export async function GET(request: NextRequest) {
       },
       users: {
         total: totalUsers.count || 0,
-        active: typeof activeUsers.data === 'number' ? activeUsers.data : 0,
+        active: activeUsersCount,
         new: newUsers.count || 0,
       },
       credits: {

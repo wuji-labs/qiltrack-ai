@@ -5,6 +5,7 @@ import type { Database } from "@/types/database";
 
 type ReportPost = Database['public']['Tables']['report_posts']['Row'];
 type ReportPostInsert = Database['public']['Tables']['report_posts']['Insert'];
+type AuditLogInsert = Database['public']['Tables']['audit_logs']['Insert'];
 
 /**
  * Database error with context
@@ -106,9 +107,8 @@ export class ReportPersistence {
     }
 
     // Record audit log (independent, failure doesn't affect main flow)
-    await supabase
-      .from('audit_logs')
-      .insert({
+    try {
+      await supabase.from('audit_logs').insert({
         user_id: userId,
         action: 'GENERATE_REPORT',
         table_name: 'report_posts',
@@ -118,10 +118,10 @@ export class ReportPersistence {
           tone: report.tone,
           language: report.language,
         },
-      })
-      .catch(err => {
-        console.error('[Audit] Failed to log report generation:', err);
       });
+    } catch (err) {
+      console.error('[Audit] Failed to log report generation:', err);
+    }
 
     return {
       id: savedReport.id,
@@ -189,8 +189,8 @@ export class ReportPersistence {
       symbol,
       title: data.title,
       content: data.body ?? '',
-      tone: data.tone ?? 'baseline',
-      language: data.lang ?? 'en',
+      tone: (data.tone as ReportTone | null) ?? 'baseline',
+      language: (data.lang as Language | null) ?? 'en',
       created_at: data.created_at ?? new Date().toISOString(),
     };
   }
@@ -205,17 +205,18 @@ export class ReportPersistence {
   ): Promise<void> {
     const supabase = createServiceRoleClient();
 
-    await supabase
-      .from('audit_logs')
-      .insert({
+    const auditDetails: AuditLogInsert['details'] = details as AuditLogInsert['details'];
+
+    try {
+      await supabase.from('audit_logs').insert({
         user_id: userId,
         action,
         table_name: 'report_posts',
-        details,
-      })
-      .catch(err => {
-        console.error('[Audit] Failed to record audit log:', err);
+        details: auditDetails,
       });
+    } catch (err) {
+      console.error('[Audit] Failed to record audit log:', err);
+    }
   }
 
   /**
@@ -248,7 +249,7 @@ export class ReportPersistence {
     }
 
     // Validate language is in allowed values
-    const allowedLanguages: Language[] = ['en', 'zh', 'ja', 'ko'];
+    const allowedLanguages: Language[] = ['en', 'zh-Hans', 'zh-Hant', 'ja', 'ko'];
     if (!allowedLanguages.includes(report.language as Language)) {
       throw new ValidationError(
         `Invalid language. Must be one of: ${allowedLanguages.join(', ')}`,
