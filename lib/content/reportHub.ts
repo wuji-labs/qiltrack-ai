@@ -409,6 +409,44 @@ const reportData: ReportSummary[] = [
     ],
     accessLevel: "monthly",
   },
+  {
+    symbol: "DDOG",
+    title: "Datadog 可观测性平台与云原生市场",
+    snippet: "SaaS 订阅增长与企业客户留存率的深度分析。",
+    date: "2025-09-26",
+    author: "Investor AI Research",
+    theme: "Cloud + AI",
+    url: "/reports/ddog",
+    tags: ["可观测性", "云", "监控"],
+    cover:
+      "linear-gradient(135deg, rgba(80,80,180,0.85), rgba(120,120,220,0.75)), url('/reports/covers/ddog.webp')",
+    readTime: "6 min",
+    body: [
+      "Datadog 的平台整合了日志、指标、追踪功能，客户平均使用产品数量从 3.2 增长到 5.8 个。我们分析了这一趋势对 ARR（年度经常性收入）的正面影响，预测 2025 年增长率达 28%。",
+      "企业客户留存率维持在 130% 以上，说明现有客户的扩展销售动力强劲。我们评估了国际市场扩张的机遇。",
+      "报告指出可观测性已成为云原生基础设施的标配，这给 Datadog 长期增长提供了坚实基础。",
+    ],
+    accessLevel: "monthly",
+  },
+  {
+    symbol: "SNOW",
+    title: "Snowflake 云数据平台与数据共享生态",
+    snippet: "产品创新与市场竞争格局的变化分析。",
+    date: "2025-09-23",
+    author: "Investor AI Research",
+    theme: "Cloud + AI",
+    url: "/reports/snow",
+    tags: ["数据仓库", "云", "AI"],
+    cover:
+      "linear-gradient(135deg, rgba(100,150,200,0.85), rgba(150,200,255,0.75)), url('/reports/covers/snow.webp')",
+    readTime: "6 min",
+    body: [
+      "Snowflake 推出了 AI 数据应用功能，用户可直接在平台上构建 AI 应用而无需导出数据。这一创新降低了数据泄露风险，同时提升了用户粘性。",
+      "数据共享生态已扩展到 3000+ 企业用户，Snowflake 从中获取佣金收入。我们预测未来两年这块业务可达到 $50M 以上。",
+      "与 Databricks、BigQuery 的竞争日趋激烈，但 Snowflake 在易用性和成本控制上仍有优势。报告建议投资者关注产品创新的持续性。",
+    ],
+    accessLevel: "monthly",
+  },
 ];
 
 /**

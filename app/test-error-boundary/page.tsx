@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 /**
  * ErrorBoundary 测试页面
@@ -31,12 +32,12 @@ export default function TestErrorBoundaryPage() {
             触发错误
           </button>
 
-          <a
+          <Link
             href="/"
             className="block w-full text-center rounded-full border border-[var(--stroke-soft)] px-6 py-3 text-sm font-medium text-[var(--text-dim)] transition hover:border-[var(--accent-emerald)] hover:text-[var(--color-foreground)]"
           >
             返回首页
-          </a>
+          </Link>
         </div>
 
         <div className="rounded-xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/50 p-4">
@@ -45,7 +46,7 @@ export default function TestErrorBoundaryPage() {
             <li>点击按钮后应该显示错误页面</li>
             <li>错误页面应该有友好的 UI</li>
             <li>应该显示错误信息</li>
-            <li>应该有"刷新页面"和"重试"按钮</li>
+            <li>应该有&ldquo;刷新页面&rdquo;和&ldquo;重试&rdquo;按钮</li>
             <li>控制台应该记录错误详情</li>
           </ul>
         </div>

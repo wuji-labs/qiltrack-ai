@@ -43,12 +43,6 @@ export function ReportForm({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!hasDropdown) {
-      setFocusedIndex(-1);
-    }
-  }, [hasDropdown]);
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!hasDropdown || visibleResults.length === 0) return;
 
