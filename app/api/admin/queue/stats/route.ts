@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { embeddingsQueue } from '@/lib/queue/embeddings.queue';
+// import { embeddingsQueue } from '@/lib/queue/embeddings.queue';
 import { createServerClient } from '@/lib/supabase/server';
 
 /**
@@ -31,39 +31,19 @@ export async function GET() {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Get queue statistics
-    const [waiting, active, completed, failed, delayed] = await Promise.all([
-      embeddingsQueue.getWaitingCount(),
-      embeddingsQueue.getActiveCount(),
-      embeddingsQueue.getCompletedCount(),
-      embeddingsQueue.getFailedCount(),
-      embeddingsQueue.getDelayedCount(),
-    ]);
-
-    // Get recent failed jobs
-    const failedJobs = await embeddingsQueue.getFailed(0, 10);
-
+    // Placeholder: Queue functionality temporarily disabled
     return NextResponse.json({
       success: true,
       data: {
         stats: {
-          waiting,
-          active,
-          completed,
-          failed,
-          delayed,
-          total: waiting + active + completed + failed + delayed,
+          waiting: 0,
+          active: 0,
+          completed: 0,
+          failed: 0,
+          delayed: 0,
+          total: 0,
         },
-        failedJobs: failedJobs.map((job) => ({
-          id: job.id,
-          reportRunId: job.data.reportRunId,
-          language: job.data.language,
-          tone: job.data.tone,
-          failedReason: job.failedReason,
-          attemptsMade: job.attemptsMade,
-          timestamp: job.timestamp,
-          stacktrace: job.stacktrace,
-        })),
+        failedJobs: [],
       },
     });
   } catch (error) {
@@ -119,22 +99,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Retry the job
-    const job = await embeddingsQueue.getJob(jobId);
-
-    if (!job) {
-      return NextResponse.json(
-        { error: 'Job not found' },
-        { status: 404 }
-      );
-    }
-
-    await job.retry();
-
+    // Placeholder: Queue functionality temporarily disabled
     return NextResponse.json({
       success: true,
       data: {
-        message: `Job ${jobId} has been retried`,
+        message: `Job ${jobId} retry queued (placeholder)`,
       },
     });
   } catch (error) {

@@ -228,7 +228,7 @@ export default function UsersPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: user.id,
+          userId: (user as any).id,
           password: newPassword,
         }),
       });
@@ -280,7 +280,7 @@ export default function UsersPage() {
     try {
       switch (action) {
         case "role":
-          await supabase
+          await (supabase as any)
             .from("profiles")
             .update({ role: value as "admin" | "editor" | "user", updated_at: new Date().toISOString() })
             .in("id", userIds);
@@ -288,7 +288,7 @@ export default function UsersPage() {
           break;
 
         case "plan":
-          await supabase
+          await (supabase as any)
             .from("profiles")
             .update({
               plan: value as "free" | "basic" | "pro" | "enterprise",

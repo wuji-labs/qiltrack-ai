@@ -74,7 +74,7 @@ export default function AdminDashboard() {
 
       // 计算总积分消耗
       const totalCreditsUsed =
-        creditsResult.data?.reduce((sum, item) => sum + (item.credits_amount || 0), 0) || 0;
+        (creditsResult.data as any)?.reduce((sum: number, item: any) => sum + (item.credits_amount || 0), 0) || 0;
 
       // 获取活跃用户数 (最近7天有报告生成的用户)
       const sevenDaysAgo = new Date();
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
         .select("user_id")
         .gte("created_at", sevenDaysAgo.toISOString());
 
-      const activeUsers = new Set(activeUsersData?.map((r) => r.user_id) || []).size;
+      const activeUsers = new Set((activeUsersData as any)?.map((r: any) => r.user_id) || []).size;
 
       const avgReportsPerUser =
         usersResult.count && usersResult.count > 0
@@ -145,7 +145,7 @@ export default function AdminDashboard() {
       ]);
 
       const credits =
-        creditsData.data?.reduce((sum, item) => sum + (item.credits_amount || 0), 0) || 0;
+        (creditsData.data as any)?.reduce((sum: number, item: any) => sum + (item.credits_amount || 0), 0) || 0;
 
       return {
         date: format(date, "MM/dd", { locale: zhCN }),
