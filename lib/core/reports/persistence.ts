@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from "@/lib/supabase/server";
 import { StorageService } from "@/lib/services/storage";
+import { generateDocxFromMarkdown } from "@/lib/services/docx-generator";
 import type { SavedReport } from "./types";
 import { v4 as uuidv4 } from "uuid";
 import { createServiceRoleClient } from "@/lib/supabase/server";
@@ -34,6 +35,7 @@ export class ReportPersistence {
     userId?: string
   ): Promise<SavedReport> {
     const supabase = await createClient();
+    const supabaseServiceRole = createServiceRoleClient();
 
     // Generate IDs
     const reportRunId = uuidv4();
@@ -51,7 +53,28 @@ export class ReportPersistence {
       },
     });
 
-    // Save to database
+    // Generate markdown and docx file paths
+    const markdownPath = `reports/${reportRunId}.md`;
+    const docxPath = `reports/${reportRunId}.docx`;
+
+    // Upload markdown file to storage
+    try {
+      await this.storageService.uploadFile(markdownPath, report.content, "text/markdown");
+      console.info(`[ReportPersistence] Uploaded markdown file: ${markdownPath}`);
+    } catch (err) {
+      console.warn(`[ReportPersistence] Failed to upload markdown file:`, err);
+    }
+
+    // Generate and upload DOCX file to storage
+    try {
+      const docxBuffer = await generateDocxFromMarkdown(report.content, report.symbol);
+      await this.storageService.uploadFile(docxPath, docxBuffer, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+      console.info(`[ReportPersistence] Uploaded DOCX file: ${docxPath}`);
+    } catch (err) {
+      console.warn(`[ReportPersistence] Failed to generate or upload DOCX file:`, err);
+    }
+
+    // Save to database (report_posts)
     const { data, error } = await supabase
       .from("report_posts")
       .insert({
@@ -72,6 +95,34 @@ export class ReportPersistence {
 
     if (error) {
       throw new Error(`Failed to save report: ${error.message}`);
+    }
+
+    // Create report_runs record for report history tracking
+    try {
+      const { data: runData, error: runError } = await supabaseServiceRole
+        .from("report_runs")
+        .insert({
+          id: reportRunId,
+          user_id: userId ?? null,
+          symbol: report.symbol,
+          tone: report.tone,
+          language: report.language,
+          status: "completed",
+          markdown_path: markdownPath,
+          docx_path: docxPath,
+          mode: "production",
+          created_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (runError) {
+        console.error(`[ReportPersistence] Failed to create report_runs record:`, runError);
+      } else {
+        console.info(`[ReportPersistence] Created report_runs record: ${reportRunId}`);
+      }
+    } catch (err) {
+      console.error(`[ReportPersistence] Error creating report_runs record:`, err);
     }
 
     return {
