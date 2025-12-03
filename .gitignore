@@ -108,3 +108,10 @@ scripts/*admin*.js
 scripts/*direct*.js
 scripts/manual-*.sql
 
+# Local Supabase exports (keep untracked across worktrees)
+docs/supabase-api-openapi.json
+docs/supabase-api.md
+docs/decisions/2025-12-02-supabase-api-docs.md
+
+# Windows device placeholder to avoid clean errors
+nul

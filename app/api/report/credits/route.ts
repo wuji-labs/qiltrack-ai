@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
         .from("report_credits")
         .select("credits_available")
         .eq("user_id", userId as never)
-        .single();
+        .maybeSingle();
 
       if (quotaError) {
         console.warn(`[QUOTA_FETCH_FAILED] user_id: ${userId}, error: ${quotaError.message}`);
@@ -47,6 +47,29 @@ export async function GET(request: NextRequest) {
           { error: "Failed to fetch quota information", code: "quota_fetch_failed" },
           { status: 500 }
         );
+      }
+
+      // If no credits record exists, create one with default credits
+      if (!data) {
+        const { error: insertError } = await supabase
+          .from("report_credits")
+          .insert({
+            user_id: userId,
+            credits_available: 1,
+            credits_total: 1,
+          });
+
+        if (insertError) {
+          console.warn(`[CREDITS_INIT_FAILED] user_id: ${userId}, error: ${insertError.message}`);
+        }
+
+        return NextResponse.json({
+          userId,
+          credits: {
+            remaining_credits: 1,
+          },
+          source: "report_credits",
+        });
       }
 
       return NextResponse.json({

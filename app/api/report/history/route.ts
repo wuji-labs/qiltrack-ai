@@ -1,30 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import type { Database } from "@/types/database";
 
 const SIGNED_URL_TTL_SECONDS = 60 * 30; // 30 minutes
 
 export async function GET(request: NextRequest) {
   try {
-    // Initialize response headers for cookie writeback
-    const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
-
-    // Get Supabase server client with cookie handling
-    const supabase = createServerClient(request.cookies, (cookies) => {
-      responseCookies.push(...cookies);
+    // Get user session using the same approach as credits API
+    const cookieStore = cookies();
+    const supabase = createRouteHandlerClient<Database>({
+      cookies: () => cookieStore,
     });
 
-    // Get user session
     const {
       data: { session },
       error: sessionError,
     } = await supabase.auth.getSession();
 
     if (sessionError || !session?.user?.id) {
-      const response = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
-      return response;
+      console.warn(`[UNAUTHORIZED_SESSION] error: ${sessionError?.message || "no session"}`);
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const userId = session.user.id;
@@ -35,15 +31,15 @@ export async function GET(request: NextRequest) {
     const pageSize = Math.min(50, Math.max(1, parseInt(url.searchParams.get("limit") || "10")));
     const offset = (page - 1) * pageSize;
 
-    // Query report history with RLS (automatically filtered by user_id via RLS)
+    // Query report history from report_posts table (where reports are actually saved)
     const {
       data: reports,
       error: queryError,
       count,
     } = await supabase
-      .from("report_runs")
+      .from("report_posts")
       .select(
-        "id, symbol, created_at, status, markdown_path, docx_path, pdf_path, mode, reused_from_run_id, is_featured, lang",
+        "id, symbol, created_at, status, slug, report_run_id, tone, lang",
         { count: "exact" }
       )
       .eq("user_id", userId as never)
@@ -52,53 +48,33 @@ export async function GET(request: NextRequest) {
 
     if (queryError) {
       console.error("Failed to fetch report history:", queryError);
-      const response = NextResponse.json(
+      return NextResponse.json(
         { error: "Failed to fetch report history" },
         { status: 500 }
       );
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
-      return response;
     }
 
     let resultReports = reports || [];
 
+    // For report_posts table, we don't have file paths, but we can generate links to view the reports
     try {
-      const serviceClient = createServiceRoleClient();
-      const mapWithSignedUrls = async () => {
+      const mapReportPosts = async () => {
         if (!reports?.length) return [];
-        return Promise.all(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          reports.map(async (report: any) => {
-            const docxSigned = report.docx_path
-              ? await serviceClient.storage
-                  .from("report-assets")
-                  .createSignedUrl(report.docx_path, SIGNED_URL_TTL_SECONDS)
-              : null;
-            const markdownSigned = report.markdown_path
-              ? await serviceClient.storage
-                  .from("report-assets")
-                  .createSignedUrl(report.markdown_path, SIGNED_URL_TTL_SECONDS)
-              : null;
-            const pdfSigned = report.pdf_path
-              ? await serviceClient.storage
-                  .from("report-assets")
-                  .createSignedUrl(report.pdf_path, SIGNED_URL_TTL_SECONDS)
-              : null;
-
-            return {
-              ...report,
-              docx_signed_url: docxSigned?.data?.signedUrl ?? null,
-              markdown_signed_url: markdownSigned?.data?.signedUrl ?? null,
-              pdf_signed_url: pdfSigned?.data?.signedUrl ?? null,
-            };
-          })
-        );
+        return reports.map((report: any) => {
+          return {
+            ...report,
+            // Map report_posts fields to expected history format
+            mode: report.tone, // tone field maps to mode
+            // Generate view links based on slug or report_run_id
+            markdown_signed_url: report.slug ? `/reports/${report.slug}` : null,
+            docx_signed_url: null, // No DOCX export for report_posts yet
+            pdf_signed_url: null,  // No PDF export for report_posts yet
+          };
+        });
       };
-      resultReports = await mapWithSignedUrls();
-    } catch (signError) {
-      console.warn("Failed to sign report history downloads", signError);
+      resultReports = await mapReportPosts();
+    } catch (mapError) {
+      console.warn("Failed to map report history", mapError);
       resultReports = reports || [];
     }
 
@@ -110,10 +86,6 @@ export async function GET(request: NextRequest) {
         total: count || 0,
         pages: Math.ceil((count || 0) / pageSize),
       },
-    });
-
-    responseCookies.forEach(({ name, value }) => {
-      response.headers.append("Set-Cookie", `${name}=${value}`);
     });
 
     return response;

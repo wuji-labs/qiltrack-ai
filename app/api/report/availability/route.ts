@@ -83,6 +83,7 @@ export async function GET(request: NextRequest) {
 
       if (runError || !runData) {
         const response = NextResponse.json({
+          reusable: false,
           reusable_run_id: null,
           created_at: null,
           symbol,
@@ -100,6 +101,7 @@ export async function GET(request: NextRequest) {
       const isOwnReport = (runData as any).user_id === userId;
 
       const response = NextResponse.json({
+        reusable: true,
         reusable_run_id: reusableReport.run_id,
         created_at: reusableReport.created_at,
         symbol: reusableReport.symbol,
@@ -115,6 +117,7 @@ export async function GET(request: NextRequest) {
 
     // No reusable report found
     const response = NextResponse.json({
+      reusable: false,
       reusable_run_id: null,
       created_at: null,
       symbol,

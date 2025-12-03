@@ -6,12 +6,11 @@ import { saveAs } from "file-saver";
 
 import { ProgressBar } from "@/app/components/ProgressBar";
 import {
-  fetchSimilarReports,
   fetchReportAvailability,
   generateReport,
   searchSymbols,
 } from "@/lib/services/api";
-import type { ReportResponse, SearchResult, SimilarReport } from "@/types/report";
+import type { ReportResponse, SearchResult } from "@/types/report";
 
 import { type ReportGeneratorProps, type ErrorState, type PlaceholderVariant } from "./types";
 import { ReportForm } from "./ReportForm";
@@ -58,8 +57,6 @@ export function ReportGeneratorSection({
   const [loading, setLoading] = useState(false);
   const [errorState, setErrorState] = useState<ErrorState | null>(null);
   const [reportData, setReportData] = useState<ReportResponse | null>(null);
-  const [similarReports, setSimilarReports] = useState<SimilarReport[]>([]);
-  const [loadingSimilar, setLoadingSimilar] = useState(false);
   const [exportingDocx, setExportingDocx] = useState(false);
   const [exportingPdf, setExportingPdf] = useState(false);
   const [lastReportTone, setLastReportTone] = useState<typeof selectedTone>("baseline");
@@ -96,29 +93,6 @@ export function ReportGeneratorSection({
     () => t(placeholderKeyByVariant[placeholderVariant]),
     [placeholderVariant, t]
   );
-
-  // Similar reports loading
-  const loadSimilar = async (runId?: string, toneForReport?: typeof selectedTone) => {
-    if (!runId) {
-      setSimilarReports([]);
-      return;
-    }
-    setLoadingSimilar(true);
-    try {
-      const { similar } = await fetchSimilarReports({
-        runId,
-        lang: language,
-        tone: toneForReport,
-        limit: 4,
-      });
-      setSimilarReports(similar ?? []);
-    } catch (err) {
-      console.warn("similar reports fetch failed:", err);
-      setSimilarReports([]);
-    } finally {
-      setLoadingSimilar(false);
-    }
-  };
 
   // Search effect
   useEffect(() => {
@@ -260,14 +234,12 @@ export function ReportGeneratorSection({
     setLoading(true);
     setErrorState(null);
     setReportData(null);
-    setSimilarReports([]);
     progress.start(t("generator.progress.init"));
 
     try {
       const data = await generateReport({ symbol: raw, lang: language, tone: selectedTone });
       await progress.complete(t("generator.progress.done"));
       setReportData(data);
-      void loadSimilar(data.reportRunId, selectedTone);
       await auth.refreshSession();
       if (auth.refreshQuota) {
         await auth.refreshQuota();
@@ -634,8 +606,6 @@ export function ReportGeneratorSection({
           highlightFallback={highlightFallback}
           exportingDocx={exportingDocx}
           exportingPdf={exportingPdf}
-          similarReports={similarReports}
-          loadingSimilar={loadingSimilar}
           onCopyRichText={handleCopyRichText}
           onExportDocx={handleExportDocx}
           onExportPdf={handleExportPdf}
