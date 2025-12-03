@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe/client";
+import { getStripeClient } from "@/lib/stripe/client";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -33,6 +33,7 @@ function getBaseUrl() {
 
 export async function POST(req: Request) {
   try {
+    const stripe = getStripeClient();
     const { plan } = (await req.json()) as { plan?: PlanKey };
 
     if (plan !== "basic" && plan !== "pro") {
