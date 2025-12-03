@@ -1,6 +1,6 @@
 import { createServiceRoleClient } from "@/lib/supabase/server";
 import { StorageService } from "@/lib/services/storage";
-import type { SavedReport } from "./types";
+import type { SavedReport, ReportTone, Language } from "./types";
 import type { Database } from "@/types/database";
 
 type ReportPost = Database['public']['Tables']['report_posts']['Row'];
@@ -13,6 +13,16 @@ export class DatabaseError extends Error {
   constructor(message: string, public context?: Record<string, unknown>) {
     super(message);
     this.name = 'DatabaseError';
+  }
+}
+
+/**
+ * Validation error for input parameters
+ */
+export class ValidationError extends Error {
+  constructor(message: string, public context?: Record<string, unknown>) {
+    super(message);
+    this.name = 'ValidationError';
   }
 }
 
@@ -47,6 +57,9 @@ export class ReportPersistence {
     userId: string | null,
     reportRunId: string
   ): Promise<SavedReport> {
+    // Input validation
+    this.validateReportInput(report);
+
     const supabase = createServiceRoleClient();
 
     // Generate slug
@@ -113,12 +126,12 @@ export class ReportPersistence {
     return {
       id: savedReport.id,
       slug: savedReport.slug,
-      report_run_id: savedReport.report_run_id!,
+      report_run_id: savedReport.report_run_id ?? reportRunId,
       symbol: report.symbol,
       title: savedReport.title,
       content: savedReport.body ?? '',
-      tone: savedReport.tone ?? 'baseline',
-      language: savedReport.lang ?? 'en',
+      tone: (savedReport.tone as ReportTone) ?? 'baseline',
+      language: (savedReport.lang as Language) ?? 'en',
       storage_url: storageResult.publicUrl,
       created_at: savedReport.created_at ?? new Date().toISOString(),
     };
@@ -203,5 +216,61 @@ export class ReportPersistence {
       .catch(err => {
         console.error('[Audit] Failed to record audit log:', err);
       });
+  }
+
+  /**
+   * Validate report input parameters
+   * @throws {ValidationError} If validation fails
+   */
+  private validateReportInput(report: {
+    symbol: string;
+    tone: string;
+    language: string;
+    title: string;
+    content: string;
+  }): void {
+    // Validate symbol format (2-10 uppercase letters)
+    const symbolRegex = /^[A-Z]{1,10}$/;
+    if (!symbolRegex.test(report.symbol)) {
+      throw new ValidationError(
+        'Invalid symbol format. Must be 1-10 uppercase letters.',
+        { symbol: report.symbol }
+      );
+    }
+
+    // Validate tone is in allowed values
+    const allowedTones: ReportTone[] = ['baseline', 'buffett', 'musk', 'muddy'];
+    if (!allowedTones.includes(report.tone as ReportTone)) {
+      throw new ValidationError(
+        `Invalid tone. Must be one of: ${allowedTones.join(', ')}`,
+        { tone: report.tone, allowedTones }
+      );
+    }
+
+    // Validate language is in allowed values
+    const allowedLanguages: Language[] = ['en', 'zh', 'ja', 'ko'];
+    if (!allowedLanguages.includes(report.language as Language)) {
+      throw new ValidationError(
+        `Invalid language. Must be one of: ${allowedLanguages.join(', ')}`,
+        { language: report.language, allowedLanguages }
+      );
+    }
+
+    // Validate required fields are non-empty
+    if (!report.title || report.title.trim().length === 0) {
+      throw new ValidationError('Report title is required');
+    }
+
+    if (!report.content || report.content.trim().length === 0) {
+      throw new ValidationError('Report content is required');
+    }
+
+    // Validate content length (reasonable limits)
+    if (report.content.length > 500000) {
+      throw new ValidationError(
+        'Report content exceeds maximum length of 500KB',
+        { contentLength: report.content.length }
+      );
+    }
   }
 }

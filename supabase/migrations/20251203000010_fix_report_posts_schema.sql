@@ -65,3 +65,19 @@ CREATE POLICY "Users can read their own drafts" ON public.report_posts
     OR user_id = auth.uid()
     OR author_id = auth.uid()
   );
+
+-- 7. Data migration for existing records
+-- Backfill report_run_id for existing records without one
+UPDATE public.report_posts
+SET report_run_id = gen_random_uuid()
+WHERE report_run_id IS NULL;
+
+-- Backfill tone for existing records
+UPDATE public.report_posts
+SET tone = 'baseline'
+WHERE tone IS NULL;
+
+-- Backfill user_id from author_id if possible (for existing records)
+UPDATE public.report_posts
+SET user_id = author_id
+WHERE user_id IS NULL AND author_id IS NOT NULL;
