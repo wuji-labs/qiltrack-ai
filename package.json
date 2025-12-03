@@ -18,8 +18,11 @@
     "backup:db:bash": "bash scripts/backup-database.sh",
     "test:backup": "bash scripts/test-backup-scripts.sh",
     "pr:ready": "npm run lint && npm run test && echo '✅代码已准备好提交 PR'",
-    "worker:start": "tsx lib/queue/workers/start-workers.ts",
-    "worker:dev": "tsx watch lib/queue/workers/start-workers.ts"
+    "db:types": "supabase gen types typescript --local > types/database.ts",
+    "db:reset": "supabase db reset",
+    "postdb:reset": "npm run db:types",
+    "pretest": "npm run db:types",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.3.1",
@@ -31,8 +34,8 @@
     "@supabase/supabase-js": "^2.46.0",
     "@upstash/ratelimit": "^2.0.7",
     "@upstash/redis": "^1.35.7",
+    "@vercel/analytics": "^1.6.1",
     "axios": "^1.13.2",
-    "bullmq": "^5.65.1",
     "chart.js": "^4.5.1",
     "chartjs-node-canvas": "^5.0.0",
     "clsx": "^2.1.1",
@@ -40,7 +43,7 @@
     "docx": "^9.5.1",
     "esbuild": "^0.27.0",
     "file-saver": "^2.0.5",
-    "ioredis": "^5.8.2",
+    "inngest": "^3.46.0",
     "jspdf": "^3.0.3",
     "langfuse": "^2.0.0",
     "next": "16.0.3",
