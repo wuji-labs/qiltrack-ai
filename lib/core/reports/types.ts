@@ -15,7 +15,11 @@ export interface GenerateReportParams {
   language?: Language;
   tone?: ReportTone;
   userId?: string;
-  metadata?: Record<string, any>;
+  metadata?: {
+    reportRunId?: string;
+    isTest?: boolean;
+    [key: string]: unknown;
+  };
 }
 
 /**
@@ -31,6 +35,7 @@ export interface GeneratedReport {
  * Report metadata
  */
 export interface ReportMetadata {
+  reportRunId?: string;
   symbol: string;
   language: Language;
   tone: ReportTone;
