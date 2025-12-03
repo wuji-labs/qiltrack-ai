@@ -16,11 +16,11 @@ import type { ReportCard } from "@/types/report";
 
 const seedReports = getSeedReportCards();
 const defaultCategories = ["All", ...listSeedCategories()];
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 12;
 
 type MembershipBadgeVariant = "featured" | "grid";
 
-// 权限徽章 - 支持三种档位
+// 权限徽章 - 支持三种档位 - 高级设计
 function AccessBadge({
   variant,
   accessLevel,
@@ -36,25 +36,28 @@ function AccessBadge({
 }) {
   const label = labels[accessLevel];
 
-  // 根据档位设定颜色 - 更豪华的设计
+  // 根据档位设定颜色 - 完全重新设计
   const colorMap = {
     "timed-free": {
-      bg: "bg-gradient-to-br from-emerald-400/40 to-teal-500/30",
-      border: "border-emerald-400/70",
-      text: "text-emerald-50",
-      glow: "shadow-[0_0_20px_rgba(16,185,129,0.4)]",
+      bg: "bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600",
+      border: "border-emerald-300/80",
+      text: "text-white",
+      glow: "shadow-[0_0_40px_rgba(16,185,129,0.6),0_0_60px_rgba(16,185,129,0.3)]",
+      icon: "text-emerald-100",
     },
     monthly: {
-      bg: "bg-gradient-to-br from-amber-400/40 to-orange-500/30",
-      border: "border-amber-400/70",
-      text: "text-amber-50",
-      glow: "shadow-[0_0_20px_rgba(251,191,36,0.4)]",
+      bg: "bg-gradient-to-br from-amber-500 via-orange-500 to-red-500",
+      border: "border-amber-300/80",
+      text: "text-white",
+      glow: "shadow-[0_0_40px_rgba(251,146,60,0.6),0_0_60px_rgba(251,146,60,0.3)]",
+      icon: "text-amber-100",
     },
     annual: {
-      bg: "bg-gradient-to-br from-purple-400/40 to-pink-500/30",
-      border: "border-purple-400/70",
-      text: "text-purple-50",
-      glow: "shadow-[0_0_20px_rgba(168,85,247,0.5)]",
+      bg: "bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-600",
+      border: "border-purple-300/80",
+      text: "text-white",
+      glow: "shadow-[0_0_40px_rgba(168,85,247,0.7),0_0_60px_rgba(168,85,247,0.4)]",
+      icon: "text-purple-100",
     },
   };
 
@@ -63,31 +66,47 @@ function AccessBadge({
   if (variant === "featured") {
     return (
       <div
-        className={`pointer-events-none absolute top-4 right-4 z-20 flex items-center gap-2 rounded-full px-4 py-2.5 ${colors.bg} border ${colors.border} ${colors.text} backdrop-blur-lg ${colors.glow}`}
+        className={`pointer-events-none absolute top-4 right-4 z-20 flex items-center gap-2.5 rounded-full px-5 py-3 ${colors.bg} border-2 ${colors.border} ${colors.text} backdrop-blur-xl ${colors.glow} transform hover:scale-105 transition-transform duration-300`}
         aria-label={label}
       >
         <svg
           viewBox="0 0 16 16"
-          className="h-5 w-5 shrink-0 drop-shadow-lg"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
+          className={`h-6 w-6 shrink-0 drop-shadow-xl ${colors.icon}`}
+          fill="currentColor"
+          stroke="none"
         >
           <path d="M13 4L6 11L3 8" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.3" />
         </svg>
-        <span className="text-sm font-bold whitespace-nowrap">{label}</span>
+        <span className="text-sm font-black whitespace-nowrap tracking-wide drop-shadow-lg">{label}</span>
       </div>
     );
   }
 
-  // Grid variant - 更小但更高级的设计
+  // Grid variant - 小尺寸但超高级的设计
   return (
     <div
-      className="pointer-events-none absolute top-2 right-2 z-10"
+      className="pointer-events-none absolute top-3 right-3 z-10 group"
       aria-label={label}
     >
-      <div className={`flex items-center justify-center h-7 w-7 rounded-full ${colors.bg} border ${colors.border} backdrop-blur-lg ${colors.glow}`}>
-        <div className={`h-2.5 w-2.5 rounded-full ${colors.text} drop-shadow-lg`} />
+      <div className={`relative flex items-center justify-center h-10 w-10 rounded-full ${colors.bg} border-2 ${colors.border} backdrop-blur-xl ${colors.glow}`}>
+        {/* 内部发光点 */}
+        <div className={`absolute inset-0 rounded-full ${colors.bg} opacity-20 blur-md`} />
+
+        {/* 主图标 */}
+        <div className={`relative h-5 w-5 ${colors.icon}`}>
+          <svg viewBox="0 0 16 16" fill="currentColor" className="w-full h-full">
+            <path d="M13 4L6 11L3 8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+
+        {/* 脉冲动画光圈 */}
+        <div className={`absolute inset-0 rounded-full border-2 ${colors.border} animate-pulse opacity-50`} />
+      </div>
+
+      {/* Tooltip - hover 时显示 */}
+      <div className="absolute -bottom-10 right-0 hidden group-hover:block bg-black/90 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
+        {label}
       </div>
     </div>
   );
@@ -582,8 +601,8 @@ export default function ReportsPage() {
             </div>
           ) : (
             <>
-              <div className="grid gap-5 lg:grid-cols-2">
-                {pagedReports.slice(0, 2).map((report) => {
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {pagedReports.slice(0, 3).map((report) => {
                   const isPopular = isReportPopular(report.slug);
                   return (
                     <Link
@@ -601,7 +620,7 @@ export default function ReportsPage() {
                           />
                         )}
                         <div
-                          className="h-48 bg-[var(--bg-base)] transition-transform duration-300 ease-out group-hover:scale-104 group-hover:-translate-y-6px"
+                          className="h-40 sm:h-48 bg-[var(--bg-base)] transition-transform duration-300 ease-out group-hover:scale-104 group-hover:-translate-y-6px"
                           style={{
                             backgroundImage: report.cover,
                             backgroundSize: "cover",
@@ -629,7 +648,7 @@ export default function ReportsPage() {
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" ref={gridRef}>
-                {pagedReports.slice(2).map((report) => {
+                {pagedReports.slice(3).map((report) => {
                   const isPopular = isReportPopular(report.slug);
                   return (
                     <Link
