@@ -95,6 +95,13 @@ export default function ReportsPage() {
     return () => clearTimeout(timer);
   }, [query]);
 
+  // Check URL hash to auto-open My Reports section
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash === "#my-reports") {
+      setShowMyReports(true);
+    }
+  }, []);
+
   // Check admin status
   useEffect(() => {
     const checkAdmin = async () => {

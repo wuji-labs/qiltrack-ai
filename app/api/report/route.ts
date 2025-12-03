@@ -116,6 +116,10 @@ export async function GET(request: NextRequest) {
           `[REPORT_REUSED] user_id: ${userId}, symbol: ${symbol}, report_id: ${existingReport.id}`
         );
 
+        // Load full content from storage (fallback to database content if storage fails)
+        const storedContent = await persistence.getStoredReportContent(existingReport.report_run_id);
+        const reportContent = storedContent || existingReport.content;
+
         // For consistency, load stored market data from Storage JSON instead of refetching live data
         const storedMarketData =
           (await persistence.getStoredMarketData(existingReport.report_run_id)) || null;
@@ -130,7 +134,7 @@ export async function GET(request: NextRequest) {
 
         const response = successResponse({
           symbol: existingReport.symbol,
-          report: existingReport.content,
+          report: reportContent,
           companyData,
           reportRunId: existingReport.report_run_id,
           reused: true,
@@ -153,6 +157,11 @@ export async function GET(request: NextRequest) {
         console.info(
           `[REPORT_REUSED_SHARED] symbol: ${symbol}, report_id: ${sharedReport.id}, run_id: ${sharedReport.report_run_id}`
         );
+
+        // Load full content from storage (fallback to database content if storage fails)
+        const storedContent = await persistence.getStoredReportContent(sharedReport.report_run_id);
+        const reportContent = storedContent || sharedReport.content;
+
         const storedMarketData =
           (await persistence.getStoredMarketData(sharedReport.report_run_id)) || null;
         const companyData =
@@ -165,7 +174,7 @@ export async function GET(request: NextRequest) {
           };
         const response = successResponse({
           symbol: sharedReport.symbol,
-          report: sharedReport.content,
+          report: reportContent,
           companyData,
           reportRunId: sharedReport.report_run_id,
           reused: true,

@@ -11,7 +11,6 @@ import {
   NewsTimelineWidget,
 } from "@/app/components/ReportCharts";
 import { ExportButtons } from "./ExportButtons";
-import { SimilarReports } from "./SimilarReports";
 
 type ReportResultProps = {
   reportData: ReportResponse | null;
@@ -19,8 +18,6 @@ type ReportResultProps = {
   highlightFallback: string[];
   exportingDocx: boolean;
   exportingPdf: boolean;
-  similarReports: any[];
-  loadingSimilar: boolean;
   onCopyRichText: () => Promise<void>;
   onExportDocx: () => Promise<void>;
   onExportPdf: () => Promise<void>;
@@ -106,8 +103,6 @@ export function ReportResult({
   highlightFallback,
   exportingDocx,
   exportingPdf,
-  similarReports,
-  loadingSimilar,
   onCopyRichText,
   onExportDocx,
   onExportPdf,
@@ -329,10 +324,6 @@ export function ReportResult({
           {JSON.stringify(reportData.companyData, null, 2)}
         </pre>
       </details>
-
-      {reportData.reportRunId && (
-        <SimilarReports similarReports={similarReports} loadingSimilar={loadingSimilar} t={t} />
-      )}
     </div>
   );
 }

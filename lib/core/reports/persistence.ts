@@ -226,4 +226,22 @@ export class ReportPersistence {
       return null;
     }
   }
+
+  /**
+   * Load stored report content from storage (if available)
+   */
+  async getStoredReportContent(reportRunId: string): Promise<string | null> {
+    try {
+      const supabase = createServiceRoleClient();
+      const path = `reports/${reportRunId}.json`;
+      const { data, error } = await supabase.storage.from("report-outputs").download(path);
+      if (error || !data) return null;
+      const text = await data.text();
+      const parsed = JSON.parse(text);
+      return parsed?.content ?? null;
+    } catch (err) {
+      console.warn("[ReportPersistence] failed to load stored report content:", err);
+      return null;
+    }
+  }
 }
