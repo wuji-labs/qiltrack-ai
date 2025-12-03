@@ -8,10 +8,26 @@ import { createServerClient } from '@/lib/supabase/server';
  * GET /api/admin/queue/stats
  * Returns queue statistics and recent failed jobs
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
     // Auth check
-    const supabase = await createServerClient();
+    const supabase = createServerClient(
+      (name: string) => {
+        const cookieHeader = request.headers.get("cookie");
+        if (!cookieHeader) return undefined;
+        const cookies = cookieHeader.split("; ");
+        for (const cookie of cookies) {
+          const [cookieName, ...valueParts] = cookie.split("=");
+          if (cookieName === name) {
+            return { value: valueParts.join("=") };
+          }
+        }
+        return undefined;
+      },
+      () => {
+        // No-op for read-only admin endpoints
+      }
+    );
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -27,7 +43,7 @@ export async function GET() {
       .eq('id', user.id)
       .single();
 
-    if (!profile || !['admin', 'superadmin'].includes(profile.role)) {
+    if (!profile || !profile.role || !['admin', 'superadmin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -70,7 +86,23 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     // Auth check
-    const supabase = await createServerClient();
+    const supabase = createServerClient(
+      (name: string) => {
+        const cookieHeader = request.headers.get("cookie");
+        if (!cookieHeader) return undefined;
+        const cookies = cookieHeader.split("; ");
+        for (const cookie of cookies) {
+          const [cookieName, ...valueParts] = cookie.split("=");
+          if (cookieName === name) {
+            return { value: valueParts.join("=") };
+          }
+        }
+        return undefined;
+      },
+      () => {
+        // No-op for read-only admin endpoints
+      }
+    );
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -86,7 +118,7 @@ export async function POST(request: Request) {
       .eq('id', user.id)
       .single();
 
-    if (!profile || !['admin', 'superadmin'].includes(profile.role)) {
+    if (!profile || !profile.role || !['admin', 'superadmin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

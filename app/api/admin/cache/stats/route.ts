@@ -17,10 +17,26 @@ import { createServerClient } from '@/lib/supabase/server';
  *
  * @requires Admin role
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
     // 1. Authenticate and check admin role
-    const supabase = await createServerClient();
+    const supabase = createServerClient(
+      (name: string) => {
+        const cookieHeader = request.headers.get("cookie");
+        if (!cookieHeader) return undefined;
+        const cookies = cookieHeader.split("; ");
+        for (const cookie of cookies) {
+          const [cookieName, ...valueParts] = cookie.split("=");
+          if (cookieName === name) {
+            return { value: valueParts.join("=") };
+          }
+        }
+        return undefined;
+      },
+      () => {
+        // No-op for read-only admin endpoints
+      }
+    );
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -90,10 +106,26 @@ export async function GET() {
  *
  * @requires Admin role
  */
-export async function DELETE() {
+export async function DELETE(request: Request) {
   try {
     // 1. Authenticate and check admin role
-    const supabase = await createServerClient();
+    const supabase = createServerClient(
+      (name: string) => {
+        const cookieHeader = request.headers.get("cookie");
+        if (!cookieHeader) return undefined;
+        const cookies = cookieHeader.split("; ");
+        for (const cookie of cookies) {
+          const [cookieName, ...valueParts] = cookie.split("=");
+          if (cookieName === name) {
+            return { value: valueParts.join("=") };
+          }
+        }
+        return undefined;
+      },
+      () => {
+        // No-op for read-only admin endpoints
+      }
+    );
     const {
       data: { user },
     } = await supabase.auth.getUser();

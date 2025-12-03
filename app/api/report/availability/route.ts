@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       const { data: runData, error: runError } = await supabase
         .from("report_runs")
         .select("user_id")
-        .eq("id", reusableReport.run_id)
+        .eq("id", reusableReport.report_run_id)
         .single();
 
       if (runError || !runData) {
@@ -102,11 +102,11 @@ export async function GET(request: NextRequest) {
 
       const response = NextResponse.json({
         reusable: true,
-        reusable_run_id: reusableReport.run_id,
+        reusable_run_id: reusableReport.report_run_id,
         created_at: reusableReport.created_at,
         symbol: reusableReport.symbol,
         lang: reusableReport.lang,
-        mode: reusableReport.mode,
+        mode: reusableReport.tone,
         is_own_report: isOwnReport,
       });
       responseCookies.forEach(({ name, value }) => {

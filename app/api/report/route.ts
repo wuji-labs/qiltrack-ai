@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
     // 3. Rate limiting check (skip in test mode)
     if (!isTestBypass) {
       const { success, headers } = await checkRateLimit(
-        userId,
+        userId!,
         reportGenerationRateLimit
       );
 
@@ -194,7 +194,7 @@ export async function GET(request: NextRequest) {
       const creditManager = new CreditManager();
 
       // Check balance first
-      const balance = await creditManager.getBalance(userId);
+      const balance = await creditManager.getBalance(userId!);
 
       if (balance.credits_available <= 0) {
         throw new InsufficientCreditsError(
@@ -203,7 +203,7 @@ export async function GET(request: NextRequest) {
       }
 
       // Consume credit atomically
-      await creditManager.checkAndConsume(userId, 1, symbol);
+      await creditManager.checkAndConsume(userId!, 1, symbol);
       console.info(`[CREDIT_CONSUMED] user_id: ${userId}, symbol: ${symbol}`);
     }
 
@@ -214,7 +214,7 @@ export async function GET(request: NextRequest) {
       symbol,
       language,
       tone,
-      userId,
+      userId: userId ?? undefined,
       metadata: {
         isTest: isTestBypass,
       },

@@ -71,3 +71,5 @@ export interface ReuseCheckResult {
   existingReport?: SavedReport;
   reason?: string;
 }
+
+export type { Language };

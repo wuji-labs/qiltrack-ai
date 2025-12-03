@@ -53,11 +53,12 @@ export async function GET(request: NextRequest) {
       if (!data) {
         const { error: insertError } = await supabase
           .from("report_credits")
+          // Supabase types occasionally narrow this table to never; cast to keep runtime behavior unchanged
           .insert({
             user_id: userId,
             credits_available: 1,
             credits_total: 1,
-          });
+          } as never);
 
         if (insertError) {
           console.warn(`[CREDITS_INIT_FAILED] user_id: ${userId}, error: ${insertError.message}`);

@@ -102,7 +102,8 @@ export class MarketDataCache {
       if (data) {
         await this.incrementHit('market_data');
         // Parse if string
-        return typeof data === 'string' ? JSON.parse(data) : data;
+        const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+        return parsed as Record<string, unknown>;
       } else {
         await this.incrementMiss('market_data');
         return null;

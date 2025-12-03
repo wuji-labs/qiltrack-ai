@@ -124,7 +124,7 @@ export class ReportGeneratorV2 {
         input: { symbol: params.symbol },
       });
 
-      let marketData = await marketDataCache.get(params.symbol);
+      let marketData: any = await marketDataCache.get(params.symbol);
 
       if (!marketData) {
         // Fetch fresh market data

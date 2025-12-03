@@ -31,7 +31,7 @@ export function initSentry() {
     integrations: [
       Sentry.browserTracingIntegration({
         tracePropagationTargets: ['localhost', /^https:\/\/[^/]*\.vercel\.app/],
-      }),
+      } as any),
       Sentry.replayIntegration(),
     ],
 
@@ -155,7 +155,7 @@ export function clearUser() {
 export function startTransaction(name: string, op: string) {
   if (!SENTRY_DSN) return null;
 
-  return Sentry.startTransaction({
+  return (Sentry as any).startTransaction({
     name,
     op,
   });
