@@ -79,7 +79,7 @@ async function handleJson<T>(
   if (!res.ok) {
     const apiError = body as ApiErrorResponse;
     const message = typeof apiError?.error === "string" ? apiError.error : defaultMessage;
-    const error = new Error(message) as Error & { code?: string; statusCode?: number };
+    const error = new Error(message) as unknown as Error & { code?: string; statusCode?: number };
     error.code = apiError?.code;
     error.statusCode = res.status;
     throw error;
