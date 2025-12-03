@@ -223,26 +223,42 @@ export function useSupabaseAuth() {
         );
 
         // Check if user also has password (hybrid auth)
-        const { data: hasPassword, error: rpcError } = await supabase.rpc("fn_user_has_password");
+        try {
+          const { data: hasPassword, error: rpcError } = await supabase.rpc("fn_user_has_password");
 
-        if (rpcError) {
-          console.error("检查密码状态失败:", rpcError);
-          // Assume OAuth-only if RPC fails
+          if (rpcError) {
+            console.warn("RPC fn_user_has_password failed - falling back to OAuth", {
+              error: rpcError?.message || rpcError,
+              code: (rpcError as any)?.code,
+            });
+            // Assume OAuth-only if RPC fails
+            return "oauth";
+          }
+
+          return hasPassword ? "password" : "oauth";
+        } catch (rpcErr) {
+          console.warn("RPC 调用异常 - 降级处理:", rpcErr);
           return "oauth";
         }
-
-        return hasPassword ? "password" : "oauth";
       }
 
       // Step 3: No OAuth identities, check if has password
-      const { data: hasPassword, error: rpcError } = await supabase.rpc("fn_user_has_password");
+      try {
+        const { data: hasPassword, error: rpcError } = await supabase.rpc("fn_user_has_password");
 
-      if (rpcError) {
-        console.error("检查密码状态失败:", rpcError);
+        if (rpcError) {
+          console.warn("RPC fn_user_has_password failed - returning unknown", {
+            error: rpcError?.message || rpcError,
+            code: (rpcError as any)?.code,
+          });
+          return "unknown";
+        }
+
+        return hasPassword ? "password" : "magic_link";
+      } catch (rpcErr) {
+        console.warn("RPC 调用异常 - 返回 unknown:", rpcErr);
         return "unknown";
       }
-
-      return hasPassword ? "password" : "magic_link";
     } catch (err) {
       console.error("认证方法检测异常:", err);
       return "unknown";
