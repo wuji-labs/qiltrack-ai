@@ -116,7 +116,8 @@ export async function generateReport(params: FetchReportParams): Promise<ReportR
   }
 
   const res = await fetch(`/api/report?${search.toString()}`);
-  return handleJson<ReportResponse>(res, "Failed to generate report");
+  const body = await handleJson<any>(res, "Failed to generate report");
+  return (body as { data?: ReportResponse }).data ?? (body as ReportResponse);
 }
 
 export async function fetchQuote(symbol: string): Promise<QuoteResponse> {
