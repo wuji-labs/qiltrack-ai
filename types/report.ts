@@ -75,6 +75,8 @@ export type SearchResult = {
 
 export type ReportTone = "baseline" | "buffett" | "musk" | "muddy";
 
+export type AccessLevel = "timed-free" | "monthly" | "annual";
+
 export type ReportSummary = {
   symbol: string;
   title: string;
@@ -87,6 +89,7 @@ export type ReportSummary = {
   cover: string;
   readTime: string;
   body: string[];
+  accessLevel?: AccessLevel;
 };
 
 export type SimilarReport = {
@@ -136,6 +139,7 @@ export type ReportCard = {
   lang?: string | null;
   status?: "draft" | "published" | null;
   version?: number | null;
+  accessLevel?: AccessLevel;
 };
 
 export type ReportPagination = {

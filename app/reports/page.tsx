@@ -20,7 +20,7 @@ const PAGE_SIZE = 12;
 
 type MembershipBadgeVariant = "featured" | "grid";
 
-// 权限徽章 - 支持三种档位 - 高级设计
+// 权限徽章 - 支持三种档位 - 简约高级设计
 function AccessBadge({
   variant,
   accessLevel,
@@ -36,28 +36,28 @@ function AccessBadge({
 }) {
   const label = labels[accessLevel];
 
-  // 根据档位设定颜色 - 完全重新设计
+  // 根据档位设定颜色 - 简约而高级的设计
   const colorMap = {
     "timed-free": {
-      bg: "bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600",
-      border: "border-emerald-300/80",
-      text: "text-white",
-      glow: "shadow-[0_0_40px_rgba(16,185,129,0.6),0_0_60px_rgba(16,185,129,0.3)]",
-      icon: "text-emerald-100",
+      bg: "bg-emerald-600/20",
+      border: "border-emerald-500/50",
+      text: "text-emerald-300",
+      glow: "shadow-[0_0_20px_rgba(16,185,129,0.3)]",
+      icon: "text-emerald-300",
     },
     monthly: {
-      bg: "bg-gradient-to-br from-amber-500 via-orange-500 to-red-500",
-      border: "border-amber-300/80",
-      text: "text-white",
-      glow: "shadow-[0_0_40px_rgba(251,146,60,0.6),0_0_60px_rgba(251,146,60,0.3)]",
-      icon: "text-amber-100",
+      bg: "bg-amber-600/20",
+      border: "border-amber-500/50",
+      text: "text-amber-300",
+      glow: "shadow-[0_0_20px_rgba(251,146,60,0.3)]",
+      icon: "text-amber-300",
     },
     annual: {
-      bg: "bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-600",
-      border: "border-purple-300/80",
-      text: "text-white",
-      glow: "shadow-[0_0_40px_rgba(168,85,247,0.7),0_0_60px_rgba(168,85,247,0.4)]",
-      icon: "text-purple-100",
+      bg: "bg-purple-600/20",
+      border: "border-purple-500/50",
+      text: "text-purple-300",
+      glow: "shadow-[0_0_20px_rgba(168,85,247,0.3)]",
+      icon: "text-purple-300",
     },
   };
 
@@ -66,47 +66,30 @@ function AccessBadge({
   if (variant === "featured") {
     return (
       <div
-        className={`pointer-events-none absolute top-4 right-4 z-20 flex items-center gap-2.5 rounded-full px-5 py-3 ${colors.bg} border-2 ${colors.border} ${colors.text} backdrop-blur-xl ${colors.glow} transform hover:scale-105 transition-transform duration-300`}
+        className={`pointer-events-none absolute top-4 right-4 z-20 flex items-center gap-2 rounded-full px-4 py-2 ${colors.bg} border ${colors.border} ${colors.text} backdrop-blur-md ${colors.glow}`}
         aria-label={label}
       >
         <svg
           viewBox="0 0 16 16"
-          className={`h-6 w-6 shrink-0 drop-shadow-xl ${colors.icon}`}
+          className={`h-4 w-4 shrink-0 ${colors.icon}`}
           fill="currentColor"
           stroke="none"
         >
           <path d="M13 4L6 11L3 8" strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.3" />
         </svg>
-        <span className="text-sm font-black whitespace-nowrap tracking-wide drop-shadow-lg">{label}</span>
+        <span className="text-xs font-semibold whitespace-nowrap">{label}</span>
       </div>
     );
   }
 
-  // Grid variant - 小尺寸但超高级的设计
+  // Grid variant - 简约设计
   return (
     <div
-      className="pointer-events-none absolute top-3 right-3 z-10 group"
+      className="pointer-events-none absolute top-2 right-2 z-10"
       aria-label={label}
     >
-      <div className={`relative flex items-center justify-center h-10 w-10 rounded-full ${colors.bg} border-2 ${colors.border} backdrop-blur-xl ${colors.glow}`}>
-        {/* 内部发光点 */}
-        <div className={`absolute inset-0 rounded-full ${colors.bg} opacity-20 blur-md`} />
-
-        {/* 主图标 */}
-        <div className={`relative h-5 w-5 ${colors.icon}`}>
-          <svg viewBox="0 0 16 16" fill="currentColor" className="w-full h-full">
-            <path d="M13 4L6 11L3 8" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-
-        {/* 脉冲动画光圈 */}
-        <div className={`absolute inset-0 rounded-full border-2 ${colors.border} animate-pulse opacity-50`} />
-      </div>
-
-      {/* Tooltip - hover 时显示 */}
-      <div className="absolute -bottom-10 right-0 hidden group-hover:block bg-black/90 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50">
-        {label}
+      <div className={`flex items-center justify-center h-8 w-8 rounded-full ${colors.bg} border ${colors.border} backdrop-blur-md ${colors.glow}`}>
+        <div className={`h-2 w-2 rounded-full ${colors.icon}`} />
       </div>
     </div>
   );
@@ -193,6 +176,13 @@ export default function ReportsPage() {
     return "all";
   };
   const [selectedLang, setSelectedLang] = useState<"all" | "en" | "ja" | "ko" | "zh-Hant" | "zh-Hans">(getInitialLang());
+
+  // 当首页语言变化时，同步报告中心的语言选择
+  useEffect(() => {
+    const newLang = getInitialLang();
+    setSelectedLang(newLang);
+    setPageIndex(1); // 重置到第一页
+  }, [language]);
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [pageIndex, setPageIndex] = useState(1);
@@ -499,6 +489,11 @@ export default function ReportsPage() {
               </Link>
               <Link
                 href="#my-reports"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowMyReports(true);
+                  window.location.hash = "#my-reports";
+                }}
                 className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] transition-colors motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 motion-safe:hover:glow-pulse"
               >
                 {t("reports.page.hero.myReports")}
@@ -601,7 +596,7 @@ export default function ReportsPage() {
             </div>
           ) : (
             <>
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-2">
                 {pagedReports.slice(0, 3).map((report) => {
                   const isPopular = isReportPopular(report.slug);
                   return (
