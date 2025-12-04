@@ -16,6 +16,7 @@ import { type Language } from "@/lib/i18n-config";
 import { fetchCredits } from "@/lib/services/api";
 import type { ReportTone } from "@/types/report";
 import { getFeaturedReports } from "@/lib/content/reportHub";
+import { DailyRewardButton } from "@/app/components/DailyRewardButton";
 
 type TranslationKey = string;
 
@@ -432,6 +433,16 @@ export default function Home() {
                   />
                 </section>
 
+                {/* 每日签到 - 仅登录用户显示 */}
+                {isAuthenticated && (
+                  <DailyRewardButton
+                    onRewardClaimed={(credits) => {
+                      setRemainingQuota(credits);
+                    }}
+                    className="max-w-4xl mx-auto"
+                  />
+                )}
+
                 <section
                   id="overview"
                   className={`relative overflow-hidden rounded-3xl border p-5 sm:p-7 space-y-6 transition-all duration-200 ease-out ${cardSecondary}`}
@@ -667,9 +678,18 @@ export default function Home() {
                       <h2 className="text-2xl sm:text-3xl font-semibold">{t("pricing.title")}</h2>
                       <p className={`text-base ${subtleText}`}>{t("pricing.caption")}</p>
                     </div>
-                    <div className="flex flex-col gap-1 text-sm text-subtle sm:text-right">
+                    <div className="flex flex-col gap-2 text-sm text-subtle sm:text-right">
                       <p>{t("pricing.note1")}</p>
                       <p>{t("pricing.note2")}</p>
+                      <Link
+                        href="/pricing"
+                        className="inline-flex items-center gap-1 text-emerald-300 hover:text-emerald-200 transition-colors"
+                      >
+                        <span>查看完整定价详情</span>
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M4 2L8 6L4 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </Link>
                     </div>
                   </div>
 

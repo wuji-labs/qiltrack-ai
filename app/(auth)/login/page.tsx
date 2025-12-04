@@ -150,11 +150,11 @@ function LoginContent() {
       }
       if (result.code === "cooldown") {
         setEmailStatus("cooldown");
-        setMessage({ type: "error", text: t("auth.error.cooldown") });
+        setMessage({ type: "error", text: t("auth.error.rateLimited") });
         return;
       }
       setEmailStatus("error");
-      setMessage({ type: "error", text: result.error || t("auth.error.generic") });
+      setMessage({ type: "error", text: t("auth.error.generic") });
       return;
     }
 
@@ -169,6 +169,16 @@ function LoginContent() {
 
     const result = await resetPassword(email);
     if (!result.success) {
+      if (result.code === "cooldown") {
+        setEmailStatus("cooldown");
+        setMessage({ type: "error", text: t("auth.error.rateLimited") });
+        return;
+      }
+      if (result.code === "invalid_email") {
+        setEmailStatus("error");
+        setMessage({ type: "error", text: t("auth.email.invalid") });
+        return;
+      }
       setEmailStatus("error");
       setMessage({ type: "error", text: t("auth.error.generic") });
       return;

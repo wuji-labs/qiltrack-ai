@@ -11,7 +11,7 @@ import {
 } from "@/lib/services/api";
 import type { ReportPost } from "@/types/report";
 
-type Role = "admin" | "editor" | "user" | null;
+type Role = "super_admin" | "admin" | "developer" | "user" | "guest" | null;
 
 const PAGE_SIZE = 10;
 const EMPTY_POST: ReportPost = {
@@ -62,7 +62,7 @@ export default function AdminReportsPage() {
   }, [isAuthenticated, loading, getUserProfile]);
 
   useEffect(() => {
-    if (!isAuthenticated || (role !== "admin" && role !== "editor")) return;
+    if (!isAuthenticated || (role !== "super_admin" && role !== "admin" && role !== "developer")) return;
     let cancelled = false;
     const loadPosts = async () => {
       setIsLoading(true);
@@ -96,7 +96,7 @@ export default function AdminReportsPage() {
     };
   }, [isAuthenticated, role, page, statusFilter, query, refreshKey]);
 
-  const isAllowed = useMemo(() => role === "admin" || role === "editor", [role]);
+  const isAllowed = useMemo(() => role === "super_admin" || role === "admin" || role === "developer", [role]);
 
   const openEditor = (post?: ReportPost) => {
     if (post) {
@@ -248,9 +248,9 @@ export default function AdminReportsPage() {
                 }}
                 className="rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-base)]/80 px-3 py-1.5 text-sm text-[var(--color-foreground)] focus:outline-none"
               >
-                <option value="all">全部状态</option>
-                <option value="draft">草稿</option>
-                <option value="published">已发布</option>
+                <option value="all" style={{ background: "var(--bg-layer)", color: "var(--color-foreground)" }}>全部状态</option>
+                <option value="draft" style={{ background: "var(--bg-layer)", color: "var(--color-foreground)" }}>草稿</option>
+                <option value="published" style={{ background: "var(--bg-layer)", color: "var(--color-foreground)" }}>已发布</option>
               </select>
               <form
                 onSubmit={(e) => {
@@ -494,8 +494,8 @@ export default function AdminReportsPage() {
                   onChange={(e) => setEditing((prev) => ({ ...prev, lang: e.target.value }))}
                   className="w-full rounded-xl border border-[var(--stroke-soft)] bg-[var(--bg-base)] px-3 py-2 text-[var(--color-foreground)] focus:outline-none focus:border-[var(--stroke-glow)]"
                 >
-                  <option value="en">English</option>
-                  <option value="zh">中文</option>
+                  <option value="en" style={{ background: "var(--bg-layer)", color: "var(--color-foreground)" }}>English</option>
+                  <option value="zh" style={{ background: "var(--bg-layer)", color: "var(--color-foreground)" }}>中文</option>
                 </select>
               </label>
               <label className="space-y-1 text-sm">
@@ -510,8 +510,8 @@ export default function AdminReportsPage() {
                   }
                   className="w-full rounded-xl border border-[var(--stroke-soft)] bg-[var(--bg-base)] px-3 py-2 text-[var(--color-foreground)] focus:outline-none focus:border-[var(--stroke-glow)]"
                 >
-                  <option value="draft">草稿</option>
-                  <option value="published">已发布</option>
+                  <option value="draft" style={{ background: "var(--bg-layer)", color: "var(--color-foreground)" }}>草稿</option>
+                  <option value="published" style={{ background: "var(--bg-layer)", color: "var(--color-foreground)" }}>已发布</option>
                 </select>
               </label>
               <label className="space-y-1 text-sm">

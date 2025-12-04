@@ -281,8 +281,14 @@ export default function ReportsPage() {
         if (cancelled) return;
         const mapped = data.posts.map(mapApiPostToCard);
 
-        // If API returns empty, fallback to seed reports to avoid blank page
-        if (mapped.length === 0) {
+        // If API returns empty and we have filters, fallback to seed reports
+        // But if "All" is selected with no other filters, trust the API result
+        const hasActiveFilters =
+          (selectedCategory !== "All") ||
+          (selectedLang !== "all") ||
+          (debouncedQuery !== "");
+
+        if (mapped.length === 0 && hasActiveFilters) {
           let fallback = applyLocalFilter(
             seedReports,
             selectedCategory,
@@ -305,7 +311,20 @@ export default function ReportsPage() {
           });
           // Mark first 3 reports as popular
           setPopularReports(fallback.slice(0, 3).map((r) => r.slug));
+        } else if (mapped.length === 0 && !hasActiveFilters) {
+          // "All" selected with no filters, but API returned empty
+          // Use seed reports as fallback
+          setReports(seedReports);
+          setIsApiData(false);
+          setPagination({
+            page: 1,
+            pageSize: PAGE_SIZE,
+            total: seedReports.length,
+            pages: Math.max(1, Math.ceil(seedReports.length / PAGE_SIZE)),
+          });
+          setPopularReports(seedReports.slice(0, 3).map((r) => r.slug));
         } else {
+          // API returned data successfully
           setReports(mapped);
           setIsApiData(true);
           setPagination(data.pagination);

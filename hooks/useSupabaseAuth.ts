@@ -71,7 +71,10 @@ function mapAuthError(error: unknown): AuthResult {
       error: message,
       status,
       code:
-        status === 429 || code === "over_request_rate_limit"
+        status === 429 ||
+        code === "over_request_rate_limit" ||
+        normalizedMessage.includes("60 seconds") ||
+        normalizedMessage.includes("rate limit")
           ? "cooldown"
           : code === "email_address_invalid" ||
               normalizedMessage.includes("invalid email") ||
