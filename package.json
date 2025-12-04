@@ -19,9 +19,10 @@
     "test:backup": "bash scripts/test-backup-scripts.sh",
     "pr:ready": "npm run lint && npm run test && echo '✅代码已准备好提交 PR'",
     "db:types": "supabase gen types typescript --local > types/database.ts",
+    "db:types:optional": "node scripts/ensure-db-types.js",
     "db:reset": "supabase db reset",
     "postdb:reset": "npm run db:types",
-    "pretest": "npm run db:types",
+    "pretest": "npm run db:types:optional",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -71,6 +72,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/uuid": "^10.0.0",
+    "@vitest/coverage-v8": "^2.1.9",
     "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",

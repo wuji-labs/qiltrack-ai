@@ -168,12 +168,19 @@ export class ReportPersistence {
       .eq("symbol", symbol)
       .eq("lang", language)
       .eq("tone", tone)
+      .not("body", "is", null)
+      .not("report_run_id", "is", null)
       .gte("created_at", sevenDaysAgo.toISOString())
       .order("created_at", { ascending: false })
       .limit(1)
       .single();
 
     if (error || !data) {
+      return null;
+    }
+
+    const content = (data as any).content ?? data.body ?? data.summary ?? "";
+    if (!data.report_run_id || typeof content !== "string" || content.trim().length < 20) {
       return null;
     }
 
@@ -213,12 +220,19 @@ export class ReportPersistence {
       .eq("symbol", symbol)
       .eq("lang", language)
       .eq("tone", tone)
+      .not("body", "is", null)
+      .not("report_run_id", "is", null)
       .gte("created_at", since.toISOString())
       .order("created_at", { ascending: false })
       .limit(1)
       .single();
 
     if (error || !data) {
+      return null;
+    }
+
+    const content = (data as any).content ?? data.body ?? data.summary ?? "";
+    if (!data.report_run_id || typeof content !== "string" || content.trim().length < 20) {
       return null;
     }
 
@@ -271,7 +285,7 @@ export class ReportPersistence {
       if (error || !data) return null;
       const text = await data.text();
       const parsed = JSON.parse(text);
-      return parsed?.marketData ?? null;
+      return parsed?.marketData ?? parsed?.companyData ?? parsed?.data?.companyData ?? null;
     } catch (err) {
       console.warn("[ReportPersistence] failed to load stored market data:", err);
       return null;
@@ -283,15 +297,82 @@ export class ReportPersistence {
    */
   async getStoredReportContent(reportRunId: string): Promise<string | null> {
     try {
+      if (!reportRunId) {
+        console.warn("[ReportPersistence] missing reportRunId when loading stored content");
+        return null;
+      }
+
       const supabase = createServiceRoleClient();
-      const path = `reports/${reportRunId}.json`;
-      const { data, error } = await supabase.storage.from("report-outputs").download(path);
-      if (error || !data) return null;
-      const text = await data.text();
-      const parsed = JSON.parse(text);
-      return parsed?.content ?? null;
+      // Try markdown file first (most reliable source)
+      const mdPath = `reports/${reportRunId}.md`;
+      const { data: mdData, error: mdError } = await supabase.storage.from("report-outputs").download(mdPath);
+      if (!mdError && mdData) {
+        const text = await mdData.text();
+        const trimmed = text.trim();
+        if (trimmed) {
+          return trimmed;
+        }
+        console.warn(
+          "[ReportPersistence] markdown content empty, falling back to JSON",
+          { reportRunId }
+        );
+      }
+
+      // Fallback to JSON file
+      const jsonPath = `reports/${reportRunId}.json`;
+      const { data: jsonData, error: jsonError } = await supabase.storage.from("report-outputs").download(jsonPath);
+      if (!jsonError && jsonData) {
+        const text = await jsonData.text();
+        const parsed = JSON.parse(text);
+        const content = parsed?.content ?? parsed?.report ?? parsed?.data?.report;
+        if (typeof content === "string") {
+          const trimmed = content.trim();
+          if (trimmed) return trimmed;
+        }
+      }
+
+      // Fallback: try database columns (content_md / content_html) in report_runs
+      const dbContent = await this.getReportContentFromDatabase(reportRunId);
+      return dbContent;
     } catch (err) {
       console.warn("[ReportPersistence] failed to load stored report content:", err);
+      return null;
+    }
+  }
+
+  /**
+   * Fallback to fetch report content from report_runs table (content_md/html)
+   */
+  private async getReportContentFromDatabase(reportRunId: string): Promise<string | null> {
+    try {
+      const supabase = createServiceRoleClient();
+      const { data, error } = await supabase
+        .from("report_runs")
+        .select("content_md, content_html")
+        .eq("id", reportRunId as never)
+        .single();
+
+      if (error || !data) return null;
+
+      const md = (data as any).content_md;
+      if (typeof md === "string" && md.trim()) {
+        return md.trim();
+      }
+
+      const html = (data as any).content_html;
+      if (typeof html === "string" && html.trim()) {
+        const text = html
+          .replace(/<br\s*\/?>/gi, "\n")
+          .replace(/<\/p>/gi, "\n")
+          .replace(/<[^>]+>/g, " ")
+          .replace(/\s+\n/g, "\n")
+          .trim();
+        return text || null;
+      }
+
+      return null;
+    } catch (err) {
+      console.warn("[ReportPersistence] failed to load report content from DB:", err);
       return null;
     }
   }

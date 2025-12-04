@@ -142,7 +142,7 @@ export class MarketDataCache {
   /**
    * Get cached market data
    */
-  async get(symbol: string): Promise<Record<string, unknown> | null> {
+  async get(symbol: string): Promise<any | null> {
     if (!this.redis) return null;
 
     try {
@@ -167,7 +167,7 @@ export class MarketDataCache {
   /**
    * Set market data cache
    */
-  async set(symbol: string, data: Record<string, unknown>): Promise<void> {
+  async set(symbol: string, data: any): Promise<void> {
     if (!this.redis) return;
 
     try {

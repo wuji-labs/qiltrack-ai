@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 // import { embeddingsQueue } from '@/lib/queue/embeddings.queue';
 import { createServerClient } from '@/lib/supabase/server';
 
@@ -8,32 +8,23 @@ import { createServerClient } from '@/lib/supabase/server';
  * GET /api/admin/queue/stats
  * Returns queue statistics and recent failed jobs
  */
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     // Auth check
-    const supabase = createServerClient(
-      (name: string) => {
-        const cookieHeader = request.headers.get("cookie");
-        if (!cookieHeader) return undefined;
-        const cookies = cookieHeader.split("; ");
-        for (const cookie of cookies) {
-          const [cookieName, ...valueParts] = cookie.split("=");
-          if (cookieName === name) {
-            return { value: valueParts.join("=") };
-          }
-        }
-        return undefined;
-      },
-      () => {
-        // No-op for read-only admin endpoints
-      }
-    );
+    const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
+    const supabase = createServerClient(request.cookies, (cookies) => {
+      responseCookies.push(...cookies);
+    });
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      const response = NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      responseCookies.forEach(({ name, value }) => {
+        response.headers.append('Set-Cookie', `${name}=${value}`);
+      });
+      return response;
     }
 
     // Check admin role
@@ -43,12 +34,16 @@ export async function GET(request: Request) {
       .eq('id', user.id)
       .single();
 
-    if (!profile || !profile.role || !['admin', 'superadmin'].includes(profile.role)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (!profile || !['admin', 'superadmin'].includes(profile.role)) {
+      const response = NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      responseCookies.forEach(({ name, value }) => {
+        response.headers.append('Set-Cookie', `${name}=${value}`);
+      });
+      return response;
     }
 
     // Placeholder: Queue functionality temporarily disabled
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: {
         stats: {
@@ -62,6 +57,12 @@ export async function GET(request: Request) {
         failedJobs: [],
       },
     });
+
+    responseCookies.forEach(({ name, value }) => {
+      response.headers.append('Set-Cookie', `${name}=${value}`);
+    });
+
+    return response;
   } catch (error) {
     console.error('[Queue Stats API] Error:', error);
     return NextResponse.json(
@@ -83,32 +84,23 @@ export async function GET(request: Request) {
  * POST /api/admin/queue/stats
  * Body: { jobId: string }
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     // Auth check
-    const supabase = createServerClient(
-      (name: string) => {
-        const cookieHeader = request.headers.get("cookie");
-        if (!cookieHeader) return undefined;
-        const cookies = cookieHeader.split("; ");
-        for (const cookie of cookies) {
-          const [cookieName, ...valueParts] = cookie.split("=");
-          if (cookieName === name) {
-            return { value: valueParts.join("=") };
-          }
-        }
-        return undefined;
-      },
-      () => {
-        // No-op for read-only admin endpoints
-      }
-    );
+    const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
+    const supabase = createServerClient(request.cookies, (cookies) => {
+      responseCookies.push(...cookies);
+    });
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      const response = NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      responseCookies.forEach(({ name, value }) => {
+        response.headers.append('Set-Cookie', `${name}=${value}`);
+      });
+      return response;
     }
 
     // Check admin role
@@ -118,26 +110,40 @@ export async function POST(request: Request) {
       .eq('id', user.id)
       .single();
 
-    if (!profile || !profile.role || !['admin', 'superadmin'].includes(profile.role)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (!profile || !['admin', 'superadmin'].includes(profile.role)) {
+      const response = NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      responseCookies.forEach(({ name, value }) => {
+        response.headers.append('Set-Cookie', `${name}=${value}`);
+      });
+      return response;
     }
 
     const { jobId } = await request.json();
 
     if (!jobId) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'Missing jobId' },
         { status: 400 }
       );
+      responseCookies.forEach(({ name, value }) => {
+        response.headers.append('Set-Cookie', `${name}=${value}`);
+      });
+      return response;
     }
 
     // Placeholder: Queue functionality temporarily disabled
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: {
         message: `Job ${jobId} retry queued (placeholder)`,
       },
     });
+
+    responseCookies.forEach(({ name, value }) => {
+      response.headers.append('Set-Cookie', `${name}=${value}`);
+    });
+
+    return response;
   } catch (error) {
     console.error('[Queue Retry API] Error:', error);
     return NextResponse.json(
