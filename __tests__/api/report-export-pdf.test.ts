@@ -163,7 +163,7 @@ describe("API: /api/report/export/pdf", () => {
     const request = new NextRequest("http://localhost:3000/api/report/export/pdf", {
       method: "POST",
       body: JSON.stringify({
-        report: "# Investor AI\n\nFallback annual",
+        report: "# Qiltrack AI\n\nFallback annual",
         companyData: { symbol: "AAPL", profile: {}, quote: {}, metrics: {}, recentNews: [] },
         symbol: "AAPL",
         planLabel: "annual",
@@ -216,7 +216,7 @@ describe("API: /api/report/export/pdf", () => {
     const request = new NextRequest("http://localhost:3000/api/report/export/pdf", {
       method: "POST",
       body: JSON.stringify({
-        report: "# Investor AI\n\nTest body",
+        report: "# Qiltrack AI\n\nTest body",
         companyData: { symbol: "AAPL", profile: {}, quote: {}, metrics: {}, recentNews: [] },
         symbol: "AAPL",
         planLabel: "annual",

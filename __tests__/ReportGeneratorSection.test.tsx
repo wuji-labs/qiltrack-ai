@@ -43,7 +43,7 @@ const mockTranslate = (key: string, vars?: Record<string, string>) => {
     "quota.banner.title": "Try it free",
     "quota.banner.description": "3 free reports",
     "quota.banner.hint.register": "Sign up to unlock",
-    "hero.title": "Investor AI",
+    "hero.title": "Qiltrack AI",
     "report.tip.title": "Report tip",
     "report.tip.body": "Enter a ticker...",
     "report.tip.action": "Follow steps",

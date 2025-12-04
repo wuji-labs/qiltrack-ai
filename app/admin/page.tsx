@@ -349,7 +349,7 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-bold" style={{ color: "var(--color-foreground)" }}>
             仪表盘
           </h1>
-          <p className="mt-1 text-sm text-dim">Investor AI 平台数据总览</p>
+          <p className="mt-1 text-sm text-dim">Qiltrack AI 平台数据总览</p>
         </div>
         <div className="flex gap-3">
           <button onClick={fetchDashboardData} className="px-4 py-2 rounded-lg btn-ghost text-sm">

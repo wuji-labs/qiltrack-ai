@@ -5,7 +5,7 @@ import type { ReportResponse } from "@/types/report";
 
 const sampleResponse: ReportResponse = {
   symbol: "AAPL",
-  report: `# Investor AI 銆愭椿鍗＄墝銆戠ぞ浼氱鐞嗛閫夎瘎浼?
+  report: `# Qiltrack AI 銆愭椿鍗＄墝銆戠ぞ浼氱鐞嗛閫夎瘎浼?
 
 ## 椤圭洰缁撴瀯
 - Key 1 alpha

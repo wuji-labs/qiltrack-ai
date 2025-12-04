@@ -401,7 +401,7 @@ export function ReportGeneratorSection({
       titleLine = t("report.docx.fallbackTitle", { company: companyName, symbol });
     }
 
-    const fileName = `Investor-AI_Report_${reportData.symbol}_${new Date().toLocaleDateString("en-CA")}.docx`;
+    const fileName = `Qiltrack-AI_Report_${reportData.symbol}_${new Date().toLocaleDateString("en-CA")}.docx`;
 
     try {
       const markdownLines = reportData.report.split("\n");
@@ -550,7 +550,7 @@ export function ReportGeneratorSection({
       if (data.pdfBase64) {
         const link = document.createElement("a");
         link.href = `data:application/pdf;base64,${data.pdfBase64}`;
-        link.download = `Investor-AI_Report_${reportData.symbol}.pdf`;
+        link.download = `Qiltrack-AI_Report_${reportData.symbol}.pdf`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

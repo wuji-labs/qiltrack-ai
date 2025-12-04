@@ -98,7 +98,7 @@ describe("API: /api/report - Supabase Integration", () => {
           choices: [
             {
               message: {
-                content: "# [Investor AI] Apple Report\n\n## Test\n\nThis is a test report.",
+                content: "# [Qiltrack AI] Apple Report\n\n## Test\n\nThis is a test report.",
               },
             },
           ],

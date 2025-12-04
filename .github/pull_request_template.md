@@ -1,4 +1,4 @@
-# PR: Investor AI CAVR
+# PR: Qiltrack AI CAVR
 
 > ⚠️ 速查指南：`docs/guides/codex-claude-quickstart.md`  
 > 详尽流程：`CODEX_CLAUDE_COLLAB.md`

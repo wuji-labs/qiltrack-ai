@@ -148,7 +148,7 @@ function FooterMeta({
 
         {/* Copyright */}
         <p className="text-xs text-[var(--text-subtle)] sm:ml-auto">
-          © {new Date().getFullYear()} Investor AI. All rights reserved.
+          © {new Date().getFullYear()} Qiltrack AI. All rights reserved.
         </p>
       </div>
     </div>
