@@ -605,7 +605,8 @@ export function mapApiPostToCard(post: ReportPost): ReportCard {
     lang: post.lang ?? null,
     status: post.status ?? null,
     version: post.version ?? null,
-    accessLevel: (post as any)?.accessLevel || "timed-free",
+    // Default to "annual" for new reports - premium content
+    accessLevel: (post as any)?.accessLevel || "annual",
   };
 }
 

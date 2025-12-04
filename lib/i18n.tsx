@@ -3138,6 +3138,136 @@ const translations: Record<string, TranslationEntry> = {
     "zh-Hans":
       "本报告基于 CodeX 的结构化分析体系整合多源市场数据及公开披露信息自动生成。数据可能存在延迟或不完整，仅用于学习与参考，不构成任何投资建议。",
   },
+  // Report company info labels
+  "report.companyInfo.name": withChineseVariants({
+    en: "Company Name",
+    ja: "会社名",
+    ko: "회사명",
+    zh: { hant: "公司名稱", hans: "公司名称" },
+  }),
+  "report.companyInfo.ticker": withChineseVariants({
+    en: "Stock Code",
+    ja: "証券コード",
+    ko: "종목 코드",
+    zh: { hant: "股票代碼", hans: "股票代码" },
+  }),
+  "report.companyInfo.industry": withChineseVariants({
+    en: "Industry",
+    ja: "業種",
+    ko: "산업",
+    zh: { hant: "所屬行業", hans: "所属行业" },
+  }),
+  "report.companyInfo.ipo": withChineseVariants({
+    en: "IPO Date",
+    ja: "上場日",
+    ko: "상장일",
+    zh: { hant: "成立時間", hans: "成立时间" },
+  }),
+  // Report section titles
+  "report.section.keyMetrics": withChineseVariants({
+    en: "Key Metrics",
+    ja: "主要指標",
+    ko: "핵심 지표",
+    zh: { hant: "關鍵指標", hans: "关键指标" },
+  }),
+  "report.section.recentNews": withChineseVariants({
+    en: "Recent News",
+    ja: "最新ニュース",
+    ko: "최신 뉴스",
+    zh: { hant: "近期新聞", hans: "近期新闻" },
+  }),
+  "report.section.priceVolatility": withChineseVariants({
+    en: "Price & Volatility",
+    ja: "株価とボラティリティ",
+    ko: "가격 및 변동성",
+    zh: { hant: "價格與波動", hans: "价格与波动" },
+  }),
+  "report.section.valuationQuality": withChineseVariants({
+    en: "Valuation & Quality",
+    ja: "評価と質",
+    ko: "밸류에이션 및 퀄리티",
+    zh: { hant: "估值與品質", hans: "估值与品质" },
+  }),
+  // KPI card labels
+  "report.kpi.marketCap": withChineseVariants({
+    en: "Market Cap",
+    ja: "時価総額",
+    ko: "시가총액",
+    zh: { hant: "市值", hans: "市值" },
+  }),
+  "report.kpi.peRatio": withChineseVariants({
+    en: "P/E Ratio",
+    ja: "PER",
+    ko: "PER",
+    zh: { hant: "市盈率", hans: "市盈率" },
+  }),
+  "report.kpi.currentPrice": withChineseVariants({
+    en: "Current Price",
+    ja: "現在価格",
+    ko: "현재가",
+    zh: { hant: "當前價格", hans: "当前价格" },
+  }),
+  "report.kpi.roe": withChineseVariants({
+    en: "ROE",
+    ja: "ROE",
+    ko: "ROE",
+    zh: { hant: "ROE", hans: "ROE" },
+  }),
+  "report.kpi.roeHelper": withChineseVariants({
+    en: "Return on Equity",
+    ja: "株主資本利益率",
+    ko: "자기자본이익률",
+    zh: { hant: "股東權益報酬率", hans: "股东权益回报率" },
+  }),
+  // Chart labels
+  "report.chart.dayRange": withChineseVariants({
+    en: "Day Range",
+    ja: "日中レンジ",
+    ko: "일일 범위",
+    zh: { hant: "當日範圍", hans: "当日范围" },
+  }),
+  "report.chart.52wRange": withChineseVariants({
+    en: "52W Range",
+    ja: "52週レンジ",
+    ko: "52주 범위",
+    zh: { hant: "52週範圍", hans: "52周范围" },
+  }),
+  "report.chart.open": withChineseVariants({
+    en: "Open",
+    ja: "始値",
+    ko: "시가",
+    zh: { hant: "開盤", hans: "开盘" },
+  }),
+  "report.chart.prev": withChineseVariants({
+    en: "Prev",
+    ja: "前終値",
+    ko: "전일종가",
+    zh: { hant: "前收", hans: "前收" },
+  }),
+  "report.chart.valuationHelper": withChineseVariants({
+    en: "Key multiples and profitability",
+    ja: "主要な倍率と収益性",
+    ko: "주요 배수와 수익성",
+    zh: { hant: "關鍵倍數與盈利能力", hans: "关键倍数与盈利能力" },
+  }),
+  "report.news.noNews": withChineseVariants({
+    en: "No recent news.",
+    ja: "最新のニュースはありません。",
+    ko: "최근 뉴스가 없습니다.",
+    zh: { hant: "暫無近期新聞。", hans: "暂无近期新闻。" },
+  }),
+  "report.news.latest": withChineseVariants({
+    en: "Latest {{count}}",
+    ja: "最新 {{count}} 件",
+    ko: "최신 {{count}} 건",
+    zh: { hant: "最新 {{count}} 則", hans: "最新 {{count}} 条" },
+  }),
+  "report.news.source": withChineseVariants({
+    en: "News",
+    ja: "ニュース",
+    ko: "뉴스",
+    zh: { hant: "新聞", hans: "新闻" },
+  }),
   "footer.dataSource": {
     en: "Market information is sourced from multiple third-party providers; accuracy and timeliness remain with the respective vendors.",
     ja: "市場情報は複数の第三者プロバイダーから取得しており、その正確性・タイムリーさは各提供者の責任に帰属します。",

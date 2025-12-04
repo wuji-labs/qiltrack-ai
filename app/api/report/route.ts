@@ -15,12 +15,29 @@ import { reportGenerationRateLimit, checkRateLimit } from "@/lib/api/rate-limit"
 
 /**
  * Check for test bypass token
+ * SECURITY: Only enabled in development environment with explicit token
  */
 function checkTestBypass(request: NextRequest): boolean {
-  const testToken = process.env.TEST_REPORT_TOKEN || "local-test-token";
+  // Only allow test bypass in development
+  if (process.env.NODE_ENV === "production") {
+    return false;
+  }
+
+  const testToken = process.env.TEST_REPORT_TOKEN;
+  if (!testToken) {
+    return false;
+  }
+
   const tokenFromHeader = request.headers.get("x-test-token");
   const tokenFromQuery = new URL(request.url).searchParams.get("testToken");
-  return Boolean(testToken && (tokenFromHeader === testToken || tokenFromQuery === testToken));
+
+  const isValid = tokenFromHeader === testToken || tokenFromQuery === testToken;
+
+  if (isValid) {
+    console.warn("[REPORT_API] Test bypass activated - development mode only");
+  }
+
+  return isValid;
 }
 
 /**

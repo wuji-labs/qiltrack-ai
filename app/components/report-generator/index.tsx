@@ -65,8 +65,11 @@ export function ReportGeneratorSection({
   const [reuseRunId, setReuseRunId] = useState<string | null>(null);
   const [pendingSymbol, setPendingSymbol] = useState<string | null>(null);
 
+  // Test bypass should only work in development and requires explicit token in URL
   const testToken = process.env.NEXT_PUBLIC_TEST_REPORT_TOKEN;
-  const canBypassAuth = Boolean(testToken);
+  const isDevelopment = process.env.NODE_ENV === "development";
+  // Only allow bypass in development with explicit testToken in URL params
+  const canBypassAuth = false; // Disabled - production security fix
   const isQuotaExhausted =
     !canBypassAuth &&
     auth.isAuthenticated &&
@@ -456,11 +459,19 @@ export function ReportGeneratorSection({
       return;
     }
 
+    // Check if user has annual plan before making API call
+    const userPlan = (auth.planLabel || "").toLowerCase();
+    if (userPlan !== "annual" && userPlan !== "admin") {
+      alert(t("report.pdf.error.plan"));
+      return;
+    }
+
     setExportingPdf(true);
     try {
       const response = await fetch("/api/report/export/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // Ensure cookies are sent
         body: JSON.stringify({
           reportRunId: reportData.reportRunId,
           report: reportData.report,
@@ -481,6 +492,9 @@ export function ReportGeneratorSection({
       if (!response.ok) {
         if (data?.code === "plan_required") {
           alert(t("report.pdf.error.plan"));
+        } else if (data?.code === "not_authenticated") {
+          setErrorState({ type: "unauthorized", message: t("generator.alert.unregistered") });
+          onRequireLogin();
         } else {
           alert(data?.error || t("alert.export.error"));
         }

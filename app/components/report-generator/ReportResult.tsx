@@ -110,6 +110,46 @@ export function ReportResult({
 }: ReportResultProps) {
   const reportContentRef = useRef<HTMLDivElement>(null);
 
+  // Build company info items with translations and proper fallbacks
+  const companyInfoItems = useMemo(() => {
+    if (!reportData?.companyData?.profile) return [];
+
+    const profile = reportData.companyData.profile;
+    const items: Array<{ label: string; value: string }> = [];
+
+    // Company name
+    if (profile.name) {
+      items.push({
+        label: t("report.companyInfo.name"),
+        value: profile.name,
+      });
+    }
+
+    // Stock code with exchange
+    const exchange = profile.exchange || "";
+    const exchangeLabel = exchange ? ` (${exchange})` : "";
+    items.push({
+      label: t("report.companyInfo.ticker"),
+      value: `${reportData.symbol}${exchangeLabel}`,
+    });
+
+    // Industry - prioritize over IPO date
+    if (profile.finnhubIndustry) {
+      items.push({
+        label: t("report.companyInfo.industry"),
+        value: profile.finnhubIndustry,
+      });
+    } else if (profile.ipo) {
+      // Only show IPO date if industry is not available
+      items.push({
+        label: t("report.companyInfo.ipo"),
+        value: profile.ipo,
+      });
+    }
+
+    return items;
+  }, [reportData, t]);
+
   const keyInsights = useMemo(() => {
     if (!reportData?.report) return highlightFallback.slice(0, 3);
     const lines = reportData.report
@@ -195,12 +235,14 @@ export function ReportResult({
           </div>
 
           <div className="grid gap-2">
-            {keyInsights.map((highlight, index) => (
+            {/* Company basic info - prioritize industry over IPO */}
+            {companyInfoItems.map((item, index) => (
               <div
-                key={`${highlight}-${index}`}
+                key={`info-${index}`}
                 className="rounded-xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 px-3 py-2 text-base text-dim"
               >
-                {highlight}
+                <span className="text-subtle">{item.label}：</span>
+                <span>{item.value}</span>
               </div>
             ))}
           </div>
@@ -218,11 +260,11 @@ export function ReportResult({
 
       <div className="space-y-4">
         <h2 className="text-xl font-semibold uppercase tracking-wider text-[var(--color-foreground)] mb-4">
-          Key Metrics
+          {t("report.section.keyMetrics")}
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <KpiCard
-            label="Market Cap"
+            label={t("report.kpi.marketCap")}
             value={
               reportData.companyData.profile.marketCapitalization
                 ? `$${(reportData.companyData.profile.marketCapitalization / 1000).toFixed(1)}B`
@@ -232,7 +274,7 @@ export function ReportResult({
             tone="neutral"
           />
           <KpiCard
-            label="P/E Ratio"
+            label={t("report.kpi.peRatio")}
             value={reportData.companyData.metrics.peTTM?.toFixed(2) ?? "N/A"}
             icon="📊"
             tone={
@@ -247,7 +289,7 @@ export function ReportResult({
             helper="TTM"
           />
           <KpiCard
-            label="Current Price"
+            label={t("report.kpi.currentPrice")}
             value={
               reportData.companyData.quote.current
                 ? `$${reportData.companyData.quote.current.toFixed(2)}`
@@ -277,7 +319,7 @@ export function ReportResult({
             }
           />
           <KpiCard
-            label="ROE"
+            label={t("report.kpi.roe")}
             value={
               reportData.companyData.metrics.roeTTM
                 ? `${reportData.companyData.metrics.roeTTM.toFixed(2)}%`
@@ -293,19 +335,19 @@ export function ReportResult({
                     : "warning"
                 : "neutral"
             }
-            helper="Return on Equity"
+            helper={t("report.kpi.roeHelper")}
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        <PricePerformanceChart companyData={reportData.companyData} />
-        <ValuationMetricsChart companyData={reportData.companyData} />
+        <PricePerformanceChart companyData={reportData.companyData} t={t} />
+        <ValuationMetricsChart companyData={reportData.companyData} t={t} />
       </div>
 
       {reportData.companyData.recentNews && reportData.companyData.recentNews.length > 0 && (
         <div className="mt-6">
-          <NewsTimelineWidget companyData={reportData.companyData} />
+          <NewsTimelineWidget companyData={reportData.companyData} t={t} />
         </div>
       )}
 

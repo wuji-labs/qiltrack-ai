@@ -403,11 +403,32 @@ export default function ReportsPage() {
   const currentPage = Math.min(pageIndex, totalPages);
   const totalCount = isApiData ? pagination.total : reports.length;
 
+  // Deduplicate reports by company/symbol - show only the latest report per company
+  const deduplicatedReports = useMemo(() => {
+    const seenCompanies = new Map<string, ReportCard>();
+
+    // Sort by date descending to ensure we keep the latest
+    const sortedReports = [...reports].sort((a, b) =>
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+
+    for (const report of sortedReports) {
+      // Extract company identifier from title or slug
+      const companyKey = report.slug.split("-")[0]?.toLowerCase() || report.title.toLowerCase();
+
+      if (!seenCompanies.has(companyKey)) {
+        seenCompanies.set(companyKey, report);
+      }
+    }
+
+    return Array.from(seenCompanies.values());
+  }, [reports]);
+
   const pagedReports = useMemo(() => {
-    if (isApiData) return reports;
+    if (isApiData) return deduplicatedReports;
     const start = (currentPage - 1) * pageSize;
-    return reports.slice(start, start + pageSize);
-  }, [isApiData, reports, currentPage, pageSize]);
+    return deduplicatedReports.slice(start, start + pageSize);
+  }, [isApiData, deduplicatedReports, currentPage, pageSize]);
 
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleDateString(language === "en" ? "en-US" : "zh-CN", {
