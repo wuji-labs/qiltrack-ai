@@ -1,30 +1,29 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import { getAuthContextFromRequest, isAdmin } from "@/app/api/_utils/supabase";
+import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
 
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error("Missing Supabase admin environment variables");
-  }
-
-  return createClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const supabaseAdmin = getSupabaseAdmin();
-    const { userId: adminUserId, role } = await getAuthContextFromRequest(request);
+    const cookieStore = await cookies();
+    const supabase = createServerClient(cookieStore);
 
-    if (!adminUserId || !isAdmin(role)) {
-      return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user?.id) {
+      console.error("Auth error:", authError);
+      return NextResponse.json({ error: "需要登录" }, { status: 401 });
+    }
+
+    // 用 service role 获取当前用户角色（绕过 RLS）
+    const supabaseAdmin = createServiceRoleClient();
+    const { data: adminProfile } = await supabaseAdmin
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    const role = adminProfile?.role;
+    if (role !== "super_admin" && role !== "admin") {
+      return NextResponse.json({ error: "需要管理员权限" }, { status: 403 });
     }
 
     const { userId, role: newRole, plan, display_name, full_name } = await request.json();
@@ -44,7 +43,16 @@ export async function POST(request: Request) {
       updated_at: new Date().toISOString(),
     };
 
-    if (newRole) updateData.role = newRole;
+    // 只有 super_admin 才能设置 admin 或 super_admin 角色
+    if (newRole) {
+      if ((newRole === "admin" || newRole === "super_admin") && role !== "super_admin") {
+        return NextResponse.json(
+          { error: "只有超级管理员才能设置管理员或超级管理员角色" },
+          { status: 403 }
+        );
+      }
+      updateData.role = newRole;
+    }
     if (plan) updateData.plan = plan;
     if (display_name !== undefined) updateData.display_name = display_name;
     if (full_name !== undefined) updateData.full_name = full_name;
@@ -60,10 +68,10 @@ export async function POST(request: Request) {
     }
 
     await supabaseAdmin.from("audit_logs").insert({
-      user_id: adminUserId,
+      user_id: user.id,
       action: "user_update",
-      table_name: "profiles",
-      record_id: userId,
+      resource_type: "profiles",
+      resource_id: userId,
       details: { role: newRole, plan },
     });
 

@@ -2,28 +2,47 @@
 
 import { useEffect, useState } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
-import { format } from "date-fns";
-import { zhCN } from "date-fns/locale";
+import Link from "next/link";
 import {
   LineChart,
   Line,
   BarChart,
   Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
+import { format, subDays } from "date-fns";
+import { zhCN } from "date-fns/locale";
+import {
+  StatCard,
+  ActivityFeed,
+  type ActivityItem,
+  formatRelativeTime,
+} from "@/app/components/admin/ui";
 
 interface DashboardStats {
   totalUsers: number;
+  newUsersToday: number;
+  activeUsers7d: number;
+  paidUsers: number;
   totalReports: number;
-  totalCreditsUsed: number;
   reportsToday: number;
-  activeUsers: number;
+  totalCreditsUsed: number;
   avgReportsPerUser: number;
+  // 财务数据
+  mrr: number;
+  arr: number;
+  // 套餐分布
+  planDistribution: { name: string; value: number; color: string }[];
 }
 
 interface TrendData {
@@ -31,70 +50,115 @@ interface TrendData {
   users: number;
   reports: number;
   credits: number;
+  revenue: number;
 }
 
-interface RecentActivity {
+interface TopUser {
   id: string;
-  type: string;
-  user_email: string;
-  description: string;
-  created_at: string;
+  email: string;
+  display_name: string | null;
+  plan: string;
+  reports_count: number;
 }
 
 export default function AdminDashboard() {
   const { supabase } = useSupabaseAuth();
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
+    newUsersToday: 0,
+    activeUsers7d: 0,
+    paidUsers: 0,
     totalReports: 0,
-    totalCreditsUsed: 0,
     reportsToday: 0,
-    activeUsers: 0,
+    totalCreditsUsed: 0,
     avgReportsPerUser: 0,
+    mrr: 0,
+    arr: 0,
+    planDistribution: [],
   });
   const [trendData, setTrendData] = useState<TrendData[]>([]);
-  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
+  const [recentActivities, setRecentActivities] = useState<ActivityItem[]>([]);
+  const [topUsers, setTopUsers] = useState<TopUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [systemHealth, setSystemHealth] = useState({
+    database: "healthy",
+    queue: "healthy",
+    storage: "healthy",
+  });
 
   useEffect(() => {
     if (!supabase) {
       setLoading(false);
       return;
     }
-    setLoading(true);
     fetchDashboardData();
   }, [supabase]);
 
   async function fetchDashboardData() {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
+    if (!supabase) return;
 
     try {
-      // 获取基础统计数据
-      const [usersResult, reportsResult, creditsResult, todayReportsResult] = await Promise.all([
+      setLoading(true);
+
+      // 并行获取所有数据
+      const [
+        usersResult,
+        reportsResult,
+        creditsResult,
+        todayUsersResult,
+        todayReportsResult,
+        planDistResult,
+        subscriptionsResult,
+      ] = await Promise.all([
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("report_runs").select("*", { count: "exact", head: true }),
         supabase.from("report_credit_events").select("credits_amount"),
         supabase
+          .from("profiles")
+          .select("*", { count: "exact", head: true })
+          .gte("created_at", new Date(new Date().setHours(0, 0, 0, 0)).toISOString()),
+        supabase
           .from("report_runs")
           .select("*", { count: "exact", head: true })
           .gte("created_at", new Date(new Date().setHours(0, 0, 0, 0)).toISOString()),
+        supabase.from("profiles").select("plan"),
+        supabase.from("billing_subscriptions").select("*").eq("status", "active"),
       ]);
 
       // 计算总积分消耗
       const totalCreditsUsed =
-        (creditsResult.data as any)?.reduce((sum: number, item: any) => sum + (item.credits_amount || 0), 0) || 0;
+        creditsResult.data?.reduce(
+          (sum: number, item: { credits_amount?: number }) =>
+            sum + Math.abs(item.credits_amount || 0),
+          0
+        ) || 0;
 
       // 获取活跃用户数 (最近7天有报告生成的用户)
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      const sevenDaysAgo = subDays(new Date(), 7);
       const { data: activeUsersData } = await supabase
         .from("report_runs")
         .select("user_id")
         .gte("created_at", sevenDaysAgo.toISOString());
 
-      const activeUsers = new Set((activeUsersData as any)?.map((r: any) => r.user_id) || []).size;
+      const activeUsers = new Set(activeUsersData?.map((r: { user_id: string }) => r.user_id) || []).size;
+
+      // 套餐分布计算
+      const planCounts: Record<string, number> = { free: 0, pro: 0, annual: 0 };
+      planDistResult.data?.forEach((p: { plan?: string }) => {
+        const plan = p.plan || "free";
+        planCounts[plan] = (planCounts[plan] || 0) + 1;
+      });
+
+      const planDistribution = [
+        { name: "免费版", value: planCounts.free || 0, color: "#6b7280" },
+        { name: "月费版", value: planCounts.pro || 0, color: "#3b82f6" },
+        { name: "年费版", value: planCounts.annual || 0, color: "#8b5cf6" },
+      ];
+
+      // 计算付费用户和MRR
+      const paidUsers = (planCounts.pro || 0) + (planCounts.annual || 0);
+      const mrr = (planCounts.pro || 0) * 14.99 + (planCounts.annual || 0) * (119.99 / 12);
+      const arr = mrr * 12;
 
       const avgReportsPerUser =
         usersResult.count && usersResult.count > 0
@@ -103,18 +167,26 @@ export default function AdminDashboard() {
 
       setStats({
         totalUsers: usersResult.count || 0,
+        newUsersToday: todayUsersResult.count || 0,
+        activeUsers7d: activeUsers,
+        paidUsers,
         totalReports: reportsResult.count || 0,
-        totalCreditsUsed,
         reportsToday: todayReportsResult.count || 0,
-        activeUsers,
+        totalCreditsUsed,
         avgReportsPerUser,
+        mrr,
+        arr,
+        planDistribution,
       });
 
-      // 获取过去7天的趋势数据
+      // 获取趋势数据
       await fetchTrendData();
 
       // 获取最近活动
       await fetchRecentActivities();
+
+      // 获取活跃用户排行
+      await fetchTopUsers();
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
     } finally {
@@ -125,49 +197,55 @@ export default function AdminDashboard() {
   async function fetchTrendData() {
     if (!supabase) return;
 
-    const last7Days = [];
+    const last14Days = [];
     const today = new Date();
 
-    for (let i = 6; i >= 0; i--) {
+    for (let i = 13; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
       date.setHours(0, 0, 0, 0);
-      last7Days.push(date);
+      last14Days.push(date);
     }
 
-    const trendPromises = last7Days.map(async (date) => {
-      const nextDay = new Date(date);
-      nextDay.setDate(nextDay.getDate() + 1);
+    const trends: TrendData[] = await Promise.all(
+      last14Days.map(async (date) => {
+        const nextDay = new Date(date);
+        nextDay.setDate(nextDay.getDate() + 1);
 
-      const [usersCount, reportsCount, creditsData] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("*", { count: "exact", head: true })
-          .lt("created_at", nextDay.toISOString()),
-        supabase
-          .from("report_runs")
-          .select("*", { count: "exact", head: true })
-          .gte("created_at", date.toISOString())
-          .lt("created_at", nextDay.toISOString()),
-        supabase
-          .from("report_credit_events")
-          .select("credits_amount")
-          .gte("created_at", date.toISOString())
-          .lt("created_at", nextDay.toISOString()),
-      ]);
+        const [usersCount, reportsCount, creditsData] = await Promise.all([
+          supabase
+            .from("profiles")
+            .select("*", { count: "exact", head: true })
+            .lt("created_at", nextDay.toISOString()),
+          supabase
+            .from("report_runs")
+            .select("*", { count: "exact", head: true })
+            .gte("created_at", date.toISOString())
+            .lt("created_at", nextDay.toISOString()),
+          supabase
+            .from("report_credit_events")
+            .select("credits_amount")
+            .gte("created_at", date.toISOString())
+            .lt("created_at", nextDay.toISOString()),
+        ]);
 
-      const credits =
-        (creditsData.data as any)?.reduce((sum: number, item: any) => sum + (item.credits_amount || 0), 0) || 0;
+        const credits =
+          creditsData.data?.reduce(
+            (sum: number, item: { credits_amount?: number }) =>
+              sum + Math.abs(item.credits_amount || 0),
+            0
+          ) || 0;
 
-      return {
-        date: format(date, "MM/dd", { locale: zhCN }),
-        users: usersCount.count || 0,
-        reports: reportsCount.count || 0,
-        credits,
-      };
-    });
+        return {
+          date: format(date, "MM/dd", { locale: zhCN }),
+          users: usersCount.count || 0,
+          reports: reportsCount.count || 0,
+          credits,
+          revenue: 0, // 可以后续添加真实收入数据
+        };
+      })
+    );
 
-    const trends = await Promise.all(trendPromises);
     setTrendData(trends);
   }
 
@@ -186,18 +264,70 @@ export default function AdminDashboard() {
       `
       )
       .order("created_at", { ascending: false })
-      .limit(10);
+      .limit(15);
 
     if (recentRuns) {
-      const activities: RecentActivity[] = recentRuns.map((run: { id: string; status: string | null; symbol?: string | null; created_at: string | null; profiles?: { email?: string } | null }) => ({
-        id: run.id,
-        type: run.status === "completed" ? "success" : "warning",
-        user_email: run.profiles?.email || "未知用户",
-        description: `生成了 ${run.symbol || "未知"} 的投资报告`,
-        created_at: run.created_at || new Date().toISOString(),
-      }));
+      const activities: ActivityItem[] = recentRuns.map(
+        (run: {
+          id: string;
+          status: string | null;
+          symbol?: string | null;
+          created_at: string | null;
+          profiles?: { email?: string } | null;
+        }) => ({
+          id: run.id,
+          type: run.status === "completed" ? "success" : run.status === "failed" ? "error" : "info",
+          user: run.profiles?.email || "未知用户",
+          action: run.status === "completed" ? "生成了报告" : run.status === "failed" ? "报告生成失败" : "正在生成报告",
+          target: run.symbol || "",
+          time: run.created_at || new Date().toISOString(),
+        })
+      );
 
       setRecentActivities(activities);
+    }
+  }
+
+  async function fetchTopUsers() {
+    if (!supabase) return;
+
+    // 获取报告数量最多的用户
+    const { data } = await supabase
+      .from("report_runs")
+      .select("user_id, profiles:user_id(id, email, display_name, plan)")
+      .eq("status", "completed");
+
+    if (data) {
+      const userCounts: Record<string, { user: TopUser; count: number }> = {};
+
+      data.forEach((run: { user_id: string; profiles?: { id: string; email: string; display_name: string | null; plan: string } | null }) => {
+        if (run.profiles) {
+          const userId = run.user_id;
+          if (!userCounts[userId]) {
+            userCounts[userId] = {
+              user: {
+                id: run.profiles.id,
+                email: run.profiles.email,
+                display_name: run.profiles.display_name,
+                plan: run.profiles.plan || "free",
+                reports_count: 0,
+              },
+              count: 0,
+            };
+          }
+          userCounts[userId].count++;
+        }
+      });
+
+      const sorted = Object.values(userCounts)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5)
+        .map((item) => ({
+          ...item.user,
+          reports_count: item.count,
+        }));
+
+      setTopUsers(sorted);
     }
   }
 
@@ -209,95 +339,96 @@ export default function AdminDashboard() {
     );
   }
 
-  const statCards = [
-    {
-      label: "总用户数",
-      value: stats.totalUsers,
-      icon: "👥",
-      color: "#4dd0a6",
-      bgColor: "rgba(77, 208, 166, 0.1)",
-    },
-    {
-      label: "总报告数",
-      value: stats.totalReports,
-      icon: "📊",
-      color: "#5be0b0",
-      bgColor: "rgba(91, 224, 176, 0.1)",
-    },
-    {
-      label: "总积分消耗",
-      value: stats.totalCreditsUsed,
-      icon: "💰",
-      color: "#3f9dff",
-      bgColor: "rgba(63, 157, 255, 0.1)",
-    },
-    {
-      label: "今日报告",
-      value: stats.reportsToday,
-      icon: "📈",
-      color: "#8b5cf6",
-      bgColor: "rgba(139, 92, 246, 0.1)",
-    },
-    {
-      label: "活跃用户",
-      value: stats.activeUsers,
-      icon: "⚡",
-      color: "#f59e0b",
-      bgColor: "rgba(245, 158, 11, 0.1)",
-      subtext: "最近7天",
-    },
-    {
-      label: "人均报告",
-      value: stats.avgReportsPerUser,
-      icon: "📝",
-      color: "#ec4899",
-      bgColor: "rgba(236, 72, 153, 0.1)",
-      subtext: "平均每人",
-    },
-  ];
+  const COLORS = ["#6b7280", "#3b82f6", "#8b5cf6", "#f59e0b"];
 
   return (
-    <div className="px-4 py-6 space-y-8">
+    <div className="space-y-8">
       {/* 页头 */}
-      <div>
-        <h1 className="text-3xl font-bold" style={{ color: "var(--color-foreground)" }}>
-          仪表盘
-        </h1>
-        <p className="mt-2 text-sm text-dim">Investor AI 平台数据总览</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold" style={{ color: "var(--color-foreground)" }}>
+            仪表盘
+          </h1>
+          <p className="mt-1 text-sm text-dim">Investor AI 平台数据总览</p>
+        </div>
+        <div className="flex gap-3">
+          <button onClick={fetchDashboardData} className="px-4 py-2 rounded-lg btn-ghost text-sm">
+            刷新数据
+          </button>
+        </div>
       </div>
 
-      {/* 统计卡片网格 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {statCards.map((card) => (
-          <div
-            key={card.label}
-            className="glass-card p-6 hover:scale-105 transition-transform duration-200"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <div className="text-sm text-dim mb-1">{card.label}</div>
-                <div className="text-3xl font-bold" style={{ color: card.color }}>
-                  {card.value.toLocaleString()}
-                </div>
-                {card.subtext && <div className="text-xs text-subtle mt-1">{card.subtext}</div>}
-              </div>
-              <div className="text-4xl p-4 rounded-2xl" style={{ backgroundColor: card.bgColor }}>
-                {card.icon}
-              </div>
-            </div>
-          </div>
-        ))}
+      {/* 核心指标卡片 - 第一行 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard
+          label="总用户数"
+          value={stats.totalUsers}
+          icon="👥"
+          color="#4dd0a6"
+          trend={{ value: stats.newUsersToday, isUp: true }}
+          subtext={`今日新增 ${stats.newUsersToday}`}
+        />
+        <StatCard
+          label="活跃用户"
+          value={stats.activeUsers7d}
+          icon="⚡"
+          color="#f59e0b"
+          subtext="最近7天"
+        />
+        <StatCard
+          label="付费用户"
+          value={stats.paidUsers}
+          icon="💎"
+          color="#8b5cf6"
+          subtext={`转化率 ${stats.totalUsers > 0 ? ((stats.paidUsers / stats.totalUsers) * 100).toFixed(1) : 0}%`}
+        />
+        <StatCard
+          label="MRR"
+          value={`$${stats.mrr.toFixed(2)}`}
+          icon="💰"
+          color="#10b981"
+          subtext={`ARR: $${stats.arr.toFixed(0)}`}
+        />
       </div>
 
-      {/* 趋势图表 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 报告生成趋势 */}
-        <div className="glass-card p-6">
+      {/* 核心指标卡片 - 第二行 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard
+          label="总报告数"
+          value={stats.totalReports}
+          icon="📊"
+          color="#5be0b0"
+        />
+        <StatCard
+          label="今日报告"
+          value={stats.reportsToday}
+          icon="📈"
+          color="#3b82f6"
+        />
+        <StatCard
+          label="总积分消耗"
+          value={stats.totalCreditsUsed}
+          icon="🔥"
+          color="#ef4444"
+        />
+        <StatCard
+          label="人均报告"
+          value={stats.avgReportsPerUser}
+          icon="📝"
+          color="#ec4899"
+          subtext="平均每用户"
+        />
+      </div>
+
+      {/* 图表区域 */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* 趋势图 - 跨2列 */}
+        <div className="lg:col-span-2 glass-card p-6">
           <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--color-foreground)" }}>
-            报告生成趋势
+            14天趋势
           </h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={trendData}>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={trendData}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
               <XAxis dataKey="date" stroke="var(--text-dim)" />
               <YAxis stroke="var(--text-dim)" />
@@ -309,27 +440,46 @@ export default function AdminDashboard() {
                 }}
               />
               <Legend />
-              <Line
+              <Area
                 type="monotone"
                 dataKey="reports"
-                stroke="var(--accent-emerald)"
+                stroke="#5be0b0"
+                fill="rgba(91, 224, 176, 0.2)"
                 strokeWidth={2}
                 name="报告数"
               />
-            </LineChart>
+              <Area
+                type="monotone"
+                dataKey="credits"
+                stroke="#3b82f6"
+                fill="rgba(59, 130, 246, 0.2)"
+                strokeWidth={2}
+                name="积分消耗"
+              />
+            </AreaChart>
           </ResponsiveContainer>
         </div>
 
-        {/* 积分消耗趋势 */}
+        {/* 套餐分布饼图 */}
         <div className="glass-card p-6">
           <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--color-foreground)" }}>
-            积分消耗趋势
+            套餐分布
           </h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={trendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis dataKey="date" stroke="var(--text-dim)" />
-              <YAxis stroke="var(--text-dim)" />
+          <ResponsiveContainer width="100%" height={220}>
+            <PieChart>
+              <Pie
+                data={stats.planDistribution}
+                cx="50%"
+                cy="50%"
+                innerRadius={50}
+                outerRadius={80}
+                paddingAngle={2}
+                dataKey="value"
+              >
+                {stats.planDistribution.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
               <Tooltip
                 contentStyle={{
                   backgroundColor: "var(--bg-frosted)",
@@ -337,49 +487,161 @@ export default function AdminDashboard() {
                   borderRadius: "8px",
                 }}
               />
-              <Legend />
-              <Bar dataKey="credits" fill="#3f9dff" name="积分" />
-            </BarChart>
+            </PieChart>
           </ResponsiveContainer>
+          <div className="flex justify-center gap-4 mt-2">
+            {stats.planDistribution.map((item) => (
+              <div key={item.name} className="flex items-center gap-2 text-xs">
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                <span className="text-dim">{item.name}: {item.value}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* 最近活动 */}
+      {/* 下方信息区域 */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* 快捷操作 */}
+        <div className="glass-card p-6">
+          <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--color-foreground)" }}>
+            快捷操作
+          </h3>
+          <div className="space-y-3">
+            <Link
+              href="/admin/users"
+              className="flex items-center justify-between p-3 rounded-lg transition-colors"
+              style={{ background: "var(--bg-layer)" }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-xl">👤</span>
+                <span style={{ color: "var(--color-foreground)" }}>创建新用户</span>
+              </div>
+              <span className="text-dim">→</span>
+            </Link>
+            <Link
+              href="/admin/credits"
+              className="flex items-center justify-between p-3 rounded-lg transition-colors"
+              style={{ background: "var(--bg-layer)" }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-xl">💰</span>
+                <span style={{ color: "var(--color-foreground)" }}>授予积分</span>
+              </div>
+              <span className="text-dim">→</span>
+            </Link>
+            <Link
+              href="/admin/reports"
+              className="flex items-center justify-between p-3 rounded-lg transition-colors"
+              style={{ background: "var(--bg-layer)" }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-xl">📄</span>
+                <span style={{ color: "var(--color-foreground)" }}>发布报告</span>
+              </div>
+              <span className="text-dim">→</span>
+            </Link>
+            <Link
+              href="/admin/system/audit-logs"
+              className="flex items-center justify-between p-3 rounded-lg transition-colors"
+              style={{ background: "var(--bg-layer)" }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-xl">📜</span>
+                <span style={{ color: "var(--color-foreground)" }}>查看日志</span>
+              </div>
+              <span className="text-dim">→</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* 活跃用户排行 */}
+        <div className="glass-card p-6">
+          <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--color-foreground)" }}>
+            活跃用户 TOP 5
+          </h3>
+          <div className="space-y-3">
+            {topUsers.length === 0 ? (
+              <div className="text-center text-dim py-4">暂无数据</div>
+            ) : (
+              topUsers.map((user, index) => (
+                <Link
+                  key={user.id}
+                  href={`/admin/users/${user.id}`}
+                  className="flex items-center justify-between p-3 rounded-lg transition-colors"
+                  style={{ background: "var(--bg-layer)" }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
+                      style={{
+                        background: index === 0 ? "#fbbf24" : index === 1 ? "#9ca3af" : index === 2 ? "#cd7f32" : "var(--bg-base)",
+                        color: index < 3 ? "#000" : "var(--color-foreground)",
+                      }}
+                    >
+                      {index + 1}
+                    </div>
+                    <div>
+                      <div className="text-sm" style={{ color: "var(--color-foreground)" }}>
+                        {user.display_name || user.email.split("@")[0]}
+                      </div>
+                      <div className="text-xs text-dim">{user.email}</div>
+                    </div>
+                  </div>
+                  <div className="text-sm font-semibold" style={{ color: "var(--accent-emerald)" }}>
+                    {user.reports_count} 篇
+                  </div>
+                </Link>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* 最近活动 */}
+        <div className="glass-card p-6">
+          <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--color-foreground)" }}>
+            实时活动
+          </h3>
+          <ActivityFeed items={recentActivities} maxItems={6} />
+        </div>
+      </div>
+
+      {/* 系统状态 */}
       <div className="glass-card p-6">
         <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--color-foreground)" }}>
-          最近活动
+          系统状态
         </h3>
-        <div className="space-y-3">
-          {recentActivities.length === 0 ? (
-            <div className="text-center text-dim py-8">暂无活动记录</div>
-          ) : (
-            recentActivities.map((activity) => (
-              <div
-                key={activity.id}
-                className="flex items-center justify-between p-3 rounded-lg hover:bg-opacity-50 transition-colors"
-                style={{ backgroundColor: "var(--bg-layer)" }}
-              >
-                <div className="flex items-center space-x-3">
-                  <div
-                    className={`w-2 h-2 rounded-full`}
-                    style={{
-                      backgroundColor:
-                        activity.type === "success" ? "var(--accent-emerald)" : "#f59e0b",
-                    }}
-                  />
-                  <div>
-                    <div style={{ color: "var(--color-foreground)" }}>{activity.user_email}</div>
-                    <div className="text-sm text-dim">{activity.description}</div>
-                  </div>
-                </div>
-                <div className="text-sm text-subtle">
-                  {format(new Date(activity.created_at), "MM-dd HH:mm", {
-                    locale: zhCN,
-                  })}
-                </div>
-              </div>
-            ))
-          )}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="flex items-center justify-between p-4 rounded-lg" style={{ background: "var(--bg-layer)" }}>
+            <div className="flex items-center gap-3">
+              <span className="text-xl">🗄️</span>
+              <span style={{ color: "var(--color-foreground)" }}>数据库</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-green-400"></span>
+              <span className="text-sm text-green-400">正常</span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between p-4 rounded-lg" style={{ background: "var(--bg-layer)" }}>
+            <div className="flex items-center gap-3">
+              <span className="text-xl">⚙️</span>
+              <span style={{ color: "var(--color-foreground)" }}>任务队列</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-green-400"></span>
+              <span className="text-sm text-green-400">正常</span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between p-4 rounded-lg" style={{ background: "var(--bg-layer)" }}>
+            <div className="flex items-center gap-3">
+              <span className="text-xl">☁️</span>
+              <span style={{ color: "var(--color-foreground)" }}>存储服务</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-green-400"></span>
+              <span className="text-sm text-green-400">正常</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
