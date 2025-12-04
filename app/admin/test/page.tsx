@@ -11,15 +11,24 @@ export default function AdminTestPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!authLoading) {
+    if (!authLoading && supabase) {
       checkAuth();
+    } else if (!authLoading && !supabase) {
+      setError("Supabase 链接未初始化");
+      setLoading(false);
     }
-  }, [authLoading, user]);
+  }, [authLoading, supabase, user, session]);
 
   async function checkAuth() {
     try {
       if (!user || !session) {
         setError("❌ 未登录");
+        setLoading(false);
+        return;
+      }
+
+      if (!supabase) {
+        setError("❌ Supabase 未初始化");
         setLoading(false);
         return;
       }

@@ -29,58 +29,6 @@ vi.mock("next/headers", () => {
   };
 });
 
-// Lightweight Supabase mock
-vi.mock("@/lib/supabase/server", () => {
-  const makeBuilder = () => {
-    const builder: any = {
-      select: vi.fn(() => builder),
-      insert: vi.fn(async () => ({ data: null, error: null })),
-      update: vi.fn(async () => ({ data: null, error: null })),
-      delete: vi.fn(async () => ({ data: null, error: null })),
-      eq: vi.fn(() => builder),
-      order: vi.fn(() => builder),
-      range: vi.fn(() => builder),
-      gte: vi.fn(() => builder),
-      like: vi.fn(() => builder),
-      in: vi.fn(() => builder),
-      single: vi.fn(async () => ({ data: {}, error: null })),
-      maybeSingle: vi.fn(async () => ({ data: null, error: null })),
-      limit: vi.fn(() => builder),
-    };
-    return builder;
-  };
-
-  const baseClient: any = {
-    from: vi.fn(() => makeBuilder()),
-    rpc: vi.fn(async () => ({ data: null, error: null })),
-    storage: {
-      from: vi.fn(() => ({
-        upload: vi.fn(async () => ({ data: { path: "mock/path" }, error: null })),
-        createSignedUrl: vi.fn(async () => ({
-          data: { signedUrl: "https://example.com/mock" },
-          error: null,
-        })),
-      })),
-    },
-    auth: {
-      getSession: vi.fn(async () => ({ data: { session: { user: { id: "test-user" } } }, error: null })),
-      getUser: vi.fn(async () => ({ data: { user: { id: "test-user" } }, error: null })),
-      admin: {
-        createUser: vi.fn(async () => ({ data: { user: { id: "new-user" } }, error: null })),
-        updateUserById: vi.fn(async () => ({ error: null })),
-        deleteUser: vi.fn(async () => ({ error: null })),
-      },
-    },
-  };
-
-  return {
-    createServerClient: vi.fn(() => baseClient),
-    createServiceRoleClient: vi.fn(() => baseClient),
-    createRouteHandlerClient: vi.fn(() => baseClient),
-    getUserIdFromRequest: vi.fn(async () => "test-user"),
-  };
-});
-
 // Stripe mock
 vi.mock("@/lib/stripe/client", () => {
   const stripeMock = {
@@ -107,6 +55,9 @@ vi.mock("@/lib/services/market-data", () => {
   return {
     MarketDataService: class {
       async fetchCompanyData(symbol: string) {
+        if (symbol === "INVALID") {
+          throw new Error("Invalid symbol");
+        }
         return {
           symbol,
           profile: {
@@ -130,48 +81,68 @@ vi.mock("@/lib/services/market-data", () => {
             prevClose: 149,
             timestamp: Date.now(),
           },
-          metrics: {},
-          recentNews: [],
+          metrics: { peTTM: 15 },
+          recentNews: [{ headline: "Test News", datetime: Date.now(), source: "Test", url: "https://example.com" }],
+          news: [{ headline: "Test News", datetime: Date.now(), source: "Test", url: "https://example.com" }],
         };
       }
     },
   };
 });
 
-// LLM mock: keep cost calc but stub network methods
-vi.mock("@/lib/services/llm", async () => {
-  const actual = await vi.importActual<any>("@/lib/services/llm");
-  class LLMServiceMock extends actual.LLMService {
-    constructor(options?: any) {
-      super(
-        options ?? {
-          openRouter: {
-            apiKey: "test-openrouter-key",
-            model: "openai/gpt-4o",
-            siteUrl: "http://localhost",
-            appName: "test-app",
-          },
-          helicone: {
-            apiKey: "test-helicone-key",
-            model: "gpt-4o-mini",
-          },
-        },
-      );
+// LLM mock: deterministic behavior plus cost calculation
+vi.mock("@/lib/services/llm", () => {
+  type TokenUsage = { prompt_tokens: number; completion_tokens: number; total_tokens: number };
+  class LLMService {
+    private pricing = {
+      "gpt-4o-mini": { prompt: 0.15, completion: 0.6 },
+      "gpt-4o": { prompt: 2.5, completion: 10 },
+      "anthropic/claude-3.5-sonnet": { prompt: 3.0, completion: 15 },
+    };
+
+    constructor(_options?: any) {}
+
+    private normalizeModel(model: string) {
+      return model.replace(/^openai\//, "");
     }
-    async generateReport() {
-      return "mock-report";
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private calculateCost(usage: TokenUsage, model: string): number {
+      const normalized = this.normalizeModel(model);
+      const pricing = this.pricing[normalized as keyof typeof this.pricing] || this.pricing["gpt-4o-mini"];
+      const promptCost = (usage.prompt_tokens * pricing.prompt) / 1_000_000;
+      const completionCost = (usage.completion_tokens * pricing.completion) / 1_000_000;
+      return Number((promptCost + completionCost).toFixed(10));
     }
-    async generateEmbedding() {
-      return { embedding: [] };
+
+    async generateReport(systemPrompt: string, userPrompt: string, options?: { maxTokens?: number }) {
+      if (!systemPrompt || !userPrompt || (options?.maxTokens ?? 0) < 0) {
+        throw new Error("Invalid prompt");
+      }
+      return `mock-report-${userPrompt}`.slice(0);
+    }
+
+    async generateEmbedding(text: string) {
+      if (!text) {
+        throw new Error("Text is required");
+      }
+      return Array.from({ length: 5 }, (_, i) => i / 10);
     }
   }
-  return { ...actual, LLMService: LLMServiceMock };
+
+  return { LLMService };
 });
 
 // Storage mock
 vi.mock("@/lib/services/storage", () => {
+  const defaultBucket = "report-outputs";
+
+  const buildPath = (userId: string, reportId: string, format: string) =>
+    `reports/${userId}/${reportId}.${format}`;
+
   return {
     StorageService: class {
+      constructor(private bucket: string = defaultBucket) {}
       async uploadFile(path: string) {
         return { path, publicUrl: `https://example.com/${path}` };
       }
@@ -179,30 +150,23 @@ vi.mock("@/lib/services/storage", () => {
         const path = `reports/${runId}.json`;
         return { path, publicUrl: `https://example.com/${path}` };
       }
+      async uploadReportCover(reportId: string, _image: Buffer | string, format = "png") {
+        const path = `covers/${reportId}.${format}`;
+        return { path, publicUrl: `https://example.com/${path}` };
+      }
+      getPublicUrl(path: string) {
+        return `https://example.com/${path}`;
+      }
+      async fileExists(_path: string) {
+        return true;
+      }
     },
-  };
-});
-
-// Redis/rate limit mocks
-vi.mock("@/lib/cache/redis", () => {
-  class MarketDataCache {
-    async get() {
-      return null;
-    }
-    async set() {}
-  }
-  class ReportCache {
-    async get() {
-      return null;
-    }
-    async set() {}
-  }
-  return { MarketDataCache, ReportCache };
-});
-
-vi.mock("@/lib/api/rate-limit", () => {
-  return {
-    reportGenerationRateLimit: {},
-    checkRateLimit: vi.fn(async () => ({ success: true, headers: {} })),
+    async uploadReport(userId: string, reportId: string, _content: string, format = "json") {
+      const path = buildPath(userId, reportId, format);
+      return path;
+    },
+    async getSignedUrl(path: string, _expiresIn: number) {
+      return `https://example.com/${path}`;
+    },
   };
 });

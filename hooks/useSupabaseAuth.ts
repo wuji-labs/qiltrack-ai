@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import type { Session, User } from "@supabase/auth-helpers-nextjs";
 
@@ -85,7 +85,13 @@ function mapAuthError(error: unknown): AuthResult {
 }
 
 export function useSupabaseAuth() {
-  const supabase = createClientComponentClient<Database>();
+  const hasSupabaseConfig = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+  const supabase = useMemo(
+    () => (hasSupabaseConfig ? createClientComponentClient<Database>() : null),
+    [hasSupabaseConfig]
+  );
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -97,6 +103,11 @@ export function useSupabaseAuth() {
 
   useEffect(() => {
     const getSession = async () => {
+      if (!supabase) {
+        setLoading(false);
+        setIsAuthenticated(false);
+        return;
+      }
       try {
         const {
           data: { session: currentSession },
@@ -123,11 +134,12 @@ export function useSupabaseAuth() {
 
     getSession();
 
-    const { data } = supabase.auth.onAuthStateChange((_event, currentSession) => {
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      setIsAuthenticated(!!currentSession);
-    });
+    const { data } =
+      supabase?.auth.onAuthStateChange((_event, currentSession) => {
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        setIsAuthenticated(!!currentSession);
+      }) ?? { data: undefined };
 
     return () => {
       data?.subscription.unsubscribe();
@@ -143,10 +155,10 @@ export function useSupabaseAuth() {
       setOauthProviders([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, supabase]);
 
   const getUserProfile = useCallback(async () => {
-    if (!user) return null;
+    if (!user || !supabase) return null;
 
     try {
       const { data, error } = await supabase
@@ -168,7 +180,7 @@ export function useSupabaseAuth() {
   }, [user, supabase]);
 
   const getReportCredits = useCallback(async () => {
-    if (!user) return null;
+    if (!user || !supabase) return null;
 
     try {
       const { data, error } = await supabase
@@ -199,7 +211,7 @@ export function useSupabaseAuth() {
    * 3. If no identities, check if has password → "magic_link" or "password"
    */
   const getAuthMethod = useCallback(async (): Promise<AuthMethod> => {
-    if (!user) return "unknown";
+    if (!user || !supabase) return "unknown";
 
     try {
       // Step 1: Check for OAuth identities
@@ -267,6 +279,7 @@ export function useSupabaseAuth() {
 
   const signInWithEmail = useCallback(
     async (email: string): Promise<AuthResult> => {
+      if (!supabase) return { success: false, error: "Supabase not configured" };
       const trimmedEmail = email.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
         return { success: false, code: "invalid_email" };
@@ -295,6 +308,7 @@ export function useSupabaseAuth() {
 
   const signInWithPassword = useCallback(
     async (email: string, password: string): Promise<AuthResult> => {
+      if (!supabase) return { success: false, error: "Supabase not configured" };
       const trimmedEmail = email.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
         return { success: false, code: "invalid_email" };
@@ -325,6 +339,7 @@ export function useSupabaseAuth() {
 
   const signUpWithPassword = useCallback(
     async (email: string, password: string): Promise<AuthResult> => {
+      if (!supabase) return { success: false, error: "Supabase not configured" };
       const trimmedEmail = email.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
         return { success: false, code: "invalid_email" };
@@ -358,6 +373,7 @@ export function useSupabaseAuth() {
 
   const resetPassword = useCallback(
     async (email: string): Promise<AuthResult> => {
+      if (!supabase) return { success: false, error: "Supabase not configured" };
       const trimmedEmail = email.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
         return { success: false, code: "invalid_email" };
@@ -383,6 +399,7 @@ export function useSupabaseAuth() {
 
   const signInWithProvider = useCallback(
     async (provider: "google"): Promise<AuthResult> => {
+      if (!supabase) return { success: false, error: "Supabase not configured" };
       try {
         const { error } = await supabase.auth.signInWithOAuth({
           provider,
@@ -405,6 +422,12 @@ export function useSupabaseAuth() {
   );
 
   const signOut = useCallback(async () => {
+    if (!supabase) {
+      setSession(null);
+      setUser(null);
+      setIsAuthenticated(false);
+      return { success: true };
+    }
     try {
       const { error } = await supabase.auth.signOut();
 
@@ -423,6 +446,9 @@ export function useSupabaseAuth() {
   }, [supabase]);
 
   const refreshSession = useCallback(async () => {
+    if (!supabase) {
+      return { success: false, error: "Supabase not configured" };
+    }
     try {
       const {
         data: { session: refreshedSession },

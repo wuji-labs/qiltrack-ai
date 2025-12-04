@@ -14,18 +14,68 @@ import type { GeneratedReport } from '@/lib/core/reports/types';
  * Redis client instance
  * Only initialized if environment variables are present
  */
-let redis: Redis | null = null;
+type RedisLike = {
+  get<TData>(key: string): Promise<TData | null>;
+  set(key: string, value: unknown): Promise<unknown>;
+  setex(key: string, ttl: number, value: unknown): Promise<unknown>;
+  del(...keys: string[]): Promise<number>;
+  incr(key: string): Promise<number>;
+  keys(pattern: string): Promise<string[]>;
+};
+
+class InMemoryRedis implements RedisLike {
+  private store = new Map<string, unknown>();
+
+  async get<TData>(key: string): Promise<TData | null> {
+    return this.store.has(key) ? (this.store.get(key) as TData) : null;
+  }
+
+  async set(key: string, value: unknown): Promise<'OK'> {
+    this.store.set(key, value);
+    return 'OK';
+  }
+
+  async setex(key: string, _ttl: number, value: unknown): Promise<'OK'> {
+    return this.set(key, value);
+  }
+
+  async del(...keys: string[]) {
+    let count = 0;
+    keys.forEach((key) => {
+      if (this.store.delete(key)) count += 1;
+    });
+    return count;
+  }
+
+  async incr(key: string) {
+    const next = (this.store.get(key) as number | undefined) ?? 0;
+    const value = next + 1;
+    this.store.set(key, value);
+    return value;
+  }
+
+  async keys(pattern: string) {
+    const regex = new RegExp('^' + pattern.replace(/\*/g, '.*').replace(/\?/g, '.') + '$');
+    return Array.from(this.store.keys()).filter((key) => regex.test(key));
+  }
+}
+
+let redis: RedisLike | null = null;
 
 /**
  * Initialize Redis client
  */
-function getRedisClient(): Redis | null {
+function getRedisClient(): RedisLike | null {
   if (redis) return redis;
 
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
   if (!url || !token) {
+    if (process.env.NODE_ENV === 'test') {
+      redis = new InMemoryRedis();
+      return redis;
+    }
     console.warn('[Redis] Environment variables not set. Cache disabled.');
     return null;
   }
@@ -83,7 +133,7 @@ export interface ReportCacheParams {
  * Market Data Cache
  */
 export class MarketDataCache {
-  private redis: Redis | null;
+  private redis: RedisLike | null;
 
   constructor() {
     this.redis = getRedisClient();
@@ -159,7 +209,7 @@ export class MarketDataCache {
  * Report Cache for reusing generated reports
  */
 export class ReportCache {
-  private redis: Redis | null;
+  private redis: RedisLike | null;
 
   constructor() {
     this.redis = getRedisClient();
@@ -284,7 +334,7 @@ export class ReportCache {
  * Tracks and reports cache performance
  */
 export class CacheMetrics {
-  private redis: Redis | null;
+  private redis: RedisLike | null;
 
   constructor() {
     this.redis = getRedisClient();

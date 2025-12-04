@@ -30,6 +30,26 @@ vi.mock('@/lib/supabase/server', () => ({
       }),
     },
   })),
+  createClient: vi.fn(async () => {
+    const chain: any = {
+      select: vi.fn(() => chain),
+      eq: vi.fn(() => chain),
+      gte: vi.fn(() => chain),
+      order: vi.fn(() => chain),
+      limit: vi.fn(() => chain),
+      single: vi.fn().mockResolvedValue({ data: null, error: null }),
+      insert: vi.fn().mockResolvedValue({ error: null }),
+      update: vi.fn(() => chain),
+    };
+    const from = vi.fn(() => chain);
+    return {
+      from,
+      rpc: vi.fn().mockResolvedValue({
+        data: [{ success: true, remaining_credits: 10 }],
+        error: null,
+      }),
+    } as any;
+  }),
 }));
 
 import { GET } from '@/app/api/report/route';

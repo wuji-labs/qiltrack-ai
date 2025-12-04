@@ -10,13 +10,15 @@ export interface UploadResult {
   publicUrl: string;
 }
 
+const DEFAULT_BUCKET = "report-outputs";
+
 /**
  * Storage Service handles all interactions with Supabase Storage
  */
 export class StorageService {
   private bucket: string;
 
-  constructor(bucket: string = "report-outputs") {
+  constructor(bucket: string = DEFAULT_BUCKET) {
     this.bucket = bucket;
   }
 
@@ -158,4 +160,40 @@ export class StorageService {
 
     return data && data.length > 0;
   }
+}
+
+/**
+ * Convenience helper to upload a report file for a user.
+ * Returns the storage path so callers can request a signed URL later.
+ */
+export async function uploadReport(
+  userId: string,
+  reportId: string,
+  content: string | Buffer,
+  format: string = "json"
+): Promise<string> {
+  const service = new StorageService(DEFAULT_BUCKET);
+  const path = `reports/${userId}/${reportId}.${format}`;
+  await service.uploadFile(
+    path,
+    typeof content === "string" ? content : content,
+    format === "json" ? "application/json" : "text/plain"
+  );
+  return path;
+}
+
+/**
+ * Generate a signed URL for a stored file with a given TTL.
+ */
+export async function getSignedUrl(path: string, expiresIn: number = 3600): Promise<string> {
+  const supabase = createServiceRoleClient();
+  const { data, error } = await supabase.storage
+    .from(DEFAULT_BUCKET)
+    .createSignedUrl(path, expiresIn);
+
+  if (error || !data?.signedUrl) {
+    throw new ExternalServiceError("Failed to generate signed URL", { path, error: error?.message });
+  }
+
+  return data.signedUrl;
 }

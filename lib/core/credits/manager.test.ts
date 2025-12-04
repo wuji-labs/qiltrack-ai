@@ -35,6 +35,26 @@ describe("CreditManager", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockSupabase.rpc.mockReset();
+    mockSupabase.from.mockReset();
+    mockSupabase.select.mockReset();
+    mockSupabase.insert.mockReset();
+    mockSupabase.update.mockReset();
+    mockSupabase.eq.mockReset();
+    mockSupabase.single.mockReset();
+    mockSupabase.order.mockReset();
+    mockSupabase.limit.mockReset();
+    mockSupabase.from.mockReturnValue(mockSupabase);
+    mockSupabase.select.mockReturnValue(mockSupabase);
+    mockSupabase.insert.mockReturnValue(mockSupabase);
+    mockSupabase.update.mockReturnValue(mockSupabase);
+    mockSupabase.eq.mockReturnValue(mockSupabase);
+    mockSupabase.order.mockReturnValue(mockSupabase);
+    mockSupabase.limit.mockReturnValue(mockSupabase);
+    mockSupabase.single.mockResolvedValue({ data: null, error: null });
+    mockSupabase.rpc.mockResolvedValue({ data: null, error: null });
+    mockSupabase.limit.mockResolvedValue({ data: [], error: null });
+    mockSupabase.insert.mockResolvedValue({ error: null });
     manager = new CreditManager();
   });
 
@@ -213,6 +233,10 @@ describe("CreditManager", () => {
             credits_available: 35,
           },
           error: null,
+        })
+        .mockResolvedValueOnce({
+          data: { credits_available: 35 },
+          error: null,
         });
 
       mockSupabase.insert.mockResolvedValue({
@@ -247,6 +271,10 @@ describe("CreditManager", () => {
         .mockResolvedValueOnce({
           data: { role: "admin" },
           error: null,
+        })
+        .mockResolvedValueOnce({
+          data: null,
+          error: { message: "Update failed" },
         })
         .mockResolvedValueOnce({
           data: null,

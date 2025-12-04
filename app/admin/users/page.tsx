@@ -75,10 +75,19 @@ export default function UsersPage() {
   const pageSize = 10;
 
   useEffect(() => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
     fetchUsers();
-  }, [page, search, roleFilter, planFilter]);
+  }, [page, search, roleFilter, planFilter, supabase]);
 
   async function fetchUsers() {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -207,6 +216,11 @@ export default function UsersPage() {
       return;
     }
 
+    if (!supabase) {
+      alert("Supabase 链接未初始化");
+      return;
+    }
+
     setProcessing(true);
 
     try {
@@ -252,6 +266,8 @@ export default function UsersPage() {
   }
 
   async function loadUserDetail(user: User) {
+    if (!supabase) return;
+
     try {
       // 获取用户积分信息
       const { data: credits } = await supabase
@@ -271,6 +287,11 @@ export default function UsersPage() {
   async function handleBatchOperation(action: string, value: unknown) {
     if (selectedUsers.size === 0) {
       alert("请先选择用户");
+      return;
+    }
+
+    if (!supabase) {
+      alert("Supabase 链接未初始化");
       return;
     }
 

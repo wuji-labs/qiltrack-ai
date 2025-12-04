@@ -28,6 +28,11 @@ function ResetPasswordContent() {
   useEffect(() => {
     const resolveRecovery = async () => {
       try {
+        if (!supabase) {
+          setStatus("error");
+          setErrorMessage(t("auth.error.generic"));
+          return;
+        }
         const hash = typeof window !== "undefined" ? window.location.hash : "";
         const tokens = parseRecoveryTokens({ searchParams, hash });
 
