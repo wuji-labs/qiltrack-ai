@@ -125,6 +125,7 @@ describe("API: /api/report - Supabase Integration", () => {
         eq: vi.fn(),
         gte: vi.fn(),
         lte: vi.fn(),
+        not: vi.fn(),
         limit: vi.fn(),
         order: vi.fn(),
         single: vi.fn().mockResolvedValue({
@@ -138,6 +139,7 @@ describe("API: /api/report - Supabase Integration", () => {
       chain.eq.mockReturnValue(chain);
       chain.gte.mockReturnValue(chain);
       chain.lte.mockReturnValue(chain);
+      chain.not.mockReturnValue(chain);
       chain.limit.mockReturnValue(chain);
       chain.order.mockReturnValue(chain);
 
@@ -278,6 +280,7 @@ describe("API: /api/report - Supabase Integration", () => {
       eq: vi.fn(),
       gte: vi.fn(),
       lte: vi.fn(),
+      not: vi.fn(),
       limit: vi.fn(),
       order: vi.fn(),
       single: vi.fn(),
@@ -288,6 +291,7 @@ describe("API: /api/report - Supabase Integration", () => {
     mockChain.eq.mockReturnValue(mockChain);
     mockChain.gte.mockReturnValue(mockChain);
     mockChain.lte.mockReturnValue(mockChain);
+    mockChain.not.mockReturnValue(mockChain);
     mockChain.limit.mockReturnValue(mockChain);
     mockChain.order.mockReturnValue(mockChain);
     mockChain.single.mockResolvedValue({ data: null, error: null });
