@@ -300,8 +300,14 @@ export async function POST(request: NextRequest) {
     error: sessionError,
   } = await supabase.auth.getSession();
 
-  if (sessionError || !session?.user?.id) {
-    return respond({ error: "Unauthorized" }, 401);
+  if (sessionError) {
+    console.error("[PDF_EXPORT] Session error:", sessionError);
+    return respond({ error: "Session error", code: "session_error", details: sessionError.message }, 401);
+  }
+
+  if (!session?.user?.id) {
+    console.warn("[PDF_EXPORT] No session found - user not authenticated");
+    return respond({ error: "Please log in to export PDF", code: "not_authenticated" }, 401);
   }
 
   const payload = (await request.json().catch(() => null)) as ExportPayload | null;

@@ -1,16 +1,21 @@
 import type { CompanyData, CompanyNewsItem } from "@/types/report";
 
+type TranslateFn = (key: string, vars?: Record<string, string>) => string;
+
 type PricePerformanceChartProps = {
   companyData: CompanyData;
+  t?: TranslateFn;
 };
 
 type ValuationMetricsChartProps = {
   companyData: CompanyData;
+  t?: TranslateFn;
 };
 
 type NewsTimelineWidgetProps = {
   companyData: CompanyData;
   maxItems?: number;
+  t?: TranslateFn;
 };
 
 const formatNumber = (value?: number, digits = 2) => {
@@ -28,8 +33,21 @@ const StatPill = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
-export function PricePerformanceChart({ companyData }: PricePerformanceChartProps) {
+export function PricePerformanceChart({ companyData, t }: PricePerformanceChartProps) {
   const { quote, metrics } = companyData;
+
+  // Default translations if t is not provided
+  const translate = (key: string) => {
+    if (t) return t(key);
+    const defaults: Record<string, string> = {
+      "report.section.priceVolatility": "Price & Volatility",
+      "report.chart.dayRange": "Day Range",
+      "report.chart.52wRange": "52W Range",
+      "report.chart.open": "Open",
+      "report.chart.prev": "Prev",
+    };
+    return defaults[key] || key;
+  };
 
   const current = quote.current ?? quote.prevClose ?? 0;
   const dayLow = quote.low ?? current;
@@ -45,7 +63,7 @@ export function PricePerformanceChart({ companyData }: PricePerformanceChartProp
     <div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/75 p-4 space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.22em] text-emerald-300">Price & Volatility</p>
+          <p className="text-xs uppercase tracking-[0.22em] text-emerald-300">{translate("report.section.priceVolatility")}</p>
           <p className="text-lg font-semibold text-[var(--color-foreground)]">
             ${formatNumber(current, 2)}
             {quote.change !== undefined && (
@@ -61,9 +79,9 @@ export function PricePerformanceChart({ companyData }: PricePerformanceChartProp
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <StatPill label="Open" value={quote.open ? `$${formatNumber(quote.open)}` : "N/A"} />
+          <StatPill label={translate("report.chart.open")} value={quote.open ? `$${formatNumber(quote.open)}` : "N/A"} />
           <StatPill
-            label="Prev"
+            label={translate("report.chart.prev")}
             value={quote.prevClose ? `$${formatNumber(quote.prevClose)}` : "N/A"}
           />
         </div>
@@ -72,7 +90,7 @@ export function PricePerformanceChart({ companyData }: PricePerformanceChartProp
       <div className="space-y-3">
         <div className="space-y-2">
           <div className="flex justify-between text-xs text-subtle">
-            <span>Day Range</span>
+            <span>{translate("report.chart.dayRange")}</span>
             <span>
               {dayLow ? `$${formatNumber(dayLow)}` : "N/A"} -{" "}
               {dayHigh ? `$${formatNumber(dayHigh)}` : "N/A"}
@@ -92,7 +110,7 @@ export function PricePerformanceChart({ companyData }: PricePerformanceChartProp
 
         <div className="space-y-2">
           <div className="flex justify-between text-xs text-subtle">
-            <span>52W Range</span>
+            <span>{translate("report.chart.52wRange")}</span>
             <span>
               {weekLow ? `$${formatNumber(weekLow)}` : "N/A"} -{" "}
               {weekHigh ? `$${formatNumber(weekHigh)}` : "N/A"}
@@ -114,8 +132,18 @@ export function PricePerformanceChart({ companyData }: PricePerformanceChartProp
   );
 }
 
-export function ValuationMetricsChart({ companyData }: ValuationMetricsChartProps) {
+export function ValuationMetricsChart({ companyData, t }: ValuationMetricsChartProps) {
   const { metrics } = companyData;
+
+  // Default translations if t is not provided
+  const translate = (key: string) => {
+    if (t) return t(key);
+    const defaults: Record<string, string> = {
+      "report.section.valuationQuality": "Valuation & Quality",
+      "report.chart.valuationHelper": "Key multiples and profitability",
+    };
+    return defaults[key] || key;
+  };
 
   const metricRows: Array<{ label: string; value?: number; helper?: string; max?: number }> = [
     { label: "P/E (TTM)", value: metrics.peTTM, helper: "x", max: 60 },
@@ -132,9 +160,9 @@ export function ValuationMetricsChart({ companyData }: ValuationMetricsChartProp
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.22em] text-emerald-300">
-            Valuation & Quality
+            {translate("report.section.valuationQuality")}
           </p>
-          <p className="text-sm text-subtle">Key multiples and profitability</p>
+          <p className="text-sm text-subtle">{translate("report.chart.valuationHelper")}</p>
         </div>
       </div>
 
@@ -168,11 +196,23 @@ export function ValuationMetricsChart({ companyData }: ValuationMetricsChartProp
   );
 }
 
-export function NewsTimelineWidget({ companyData, maxItems = 4 }: NewsTimelineWidgetProps) {
+export function NewsTimelineWidget({ companyData, maxItems = 4, t }: NewsTimelineWidgetProps) {
   const news = (companyData.recentNews || [])
     .filter((item) => item.headline)
     .sort((a, b) => (b.datetime ?? 0) - (a.datetime ?? 0))
     .slice(0, maxItems);
+
+  // Default translations if t is not provided
+  const translate = (key: string, vars?: Record<string, string>) => {
+    if (t) return t(key, vars);
+    const defaults: Record<string, string> = {
+      "report.section.recentNews": "Recent News",
+      "report.news.noNews": "No recent news.",
+      "report.news.latest": `Latest ${vars?.count || ""}`,
+      "report.news.source": "News",
+    };
+    return defaults[key] || key;
+  };
 
   const formatDate = (item: CompanyNewsItem) => {
     if (!item.datetime) return "";
@@ -185,7 +225,7 @@ export function NewsTimelineWidget({ companyData, maxItems = 4 }: NewsTimelineWi
   if (news.length === 0) {
     return (
       <div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/60 p-4 text-sm text-subtle">
-        No recent news.
+        {translate("report.news.noNews")}
       </div>
     );
   }
@@ -193,8 +233,8 @@ export function NewsTimelineWidget({ companyData, maxItems = 4 }: NewsTimelineWi
   return (
     <div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/75 p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-[0.22em] text-emerald-300">Recent News</p>
-        <span className="text-xs text-subtle">Latest {news.length}</span>
+        <p className="text-xs uppercase tracking-[0.22em] text-emerald-300">{translate("report.section.recentNews")}</p>
+        <span className="text-xs text-subtle">{translate("report.news.latest", { count: String(news.length) })}</span>
       </div>
       <div className="space-y-3">
         {news.map((item) => (
@@ -207,7 +247,7 @@ export function NewsTimelineWidget({ companyData, maxItems = 4 }: NewsTimelineWi
           >
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs uppercase tracking-[0.18em] text-subtle">
-                {item.source ?? "News"}
+                {item.source ?? translate("report.news.source")}
               </p>
               <span className="text-xs text-subtle">{formatDate(item)}</span>
             </div>

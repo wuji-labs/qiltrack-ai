@@ -120,7 +120,7 @@ export class LLMService {
   }
 
   /**
-   * Call Helicone API
+   * Call Helicone API (OpenAI compatible gateway)
    * @private
    */
   private async callHelicone(
@@ -132,12 +132,26 @@ export class LLMService {
       throw new Error("Helicone not configured");
     }
 
-    const res = await fetch("https://gateway.helicone.ai/v1/chat/completions", {
+    console.info("[LLM] Attempting Helicone call with model:", this.heliconeConfig.model);
+
+    // Helicone uses OpenAI-compatible endpoint with custom auth header
+    // The gateway proxies to OpenAI, so we need both Helicone auth and OpenAI API key
+    const openaiApiKey = process.env.OPENAI_API_KEY;
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "Helicone-Auth": `Bearer ${this.heliconeConfig.apiKey}`,
+    };
+
+    // If we have an OpenAI API key, use Helicone as a proxy
+    // Otherwise, Helicone might be configured with its own OpenAI key
+    if (openaiApiKey) {
+      headers["Authorization"] = `Bearer ${openaiApiKey}`;
+    }
+
+    const res = await fetch("https://oai.helicone.ai/v1/chat/completions", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Helicone-Auth": `Bearer ${this.heliconeConfig.apiKey}`,
-      },
+      headers,
       body: JSON.stringify({
         model: this.heliconeConfig.model,
         messages: [
@@ -152,6 +166,7 @@ export class LLMService {
 
     if (!res.ok) {
       const errText = await res.text();
+      console.error("[LLM] Helicone request failed:", res.status, errText);
       throw new Error(`Helicone request failed: ${res.status} ${errText}`);
     }
 
@@ -159,9 +174,11 @@ export class LLMService {
     const content = data?.choices?.[0]?.message?.content;
 
     if (!content) {
+      console.error("[LLM] Invalid Helicone response:", JSON.stringify(data).slice(0, 200));
       throw new Error("Invalid response from Helicone");
     }
 
+    console.info("[LLM] Helicone call successful, content length:", content.length);
     return content;
   }
 
@@ -177,6 +194,9 @@ export class LLMService {
     if (!this.openRouterConfig) {
       throw new Error("OpenRouter not configured");
     }
+
+    // Log the model being used for debugging
+    console.info("[LLM] OpenRouter fallback with model:", this.openRouterConfig.model);
 
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -200,6 +220,7 @@ export class LLMService {
 
     if (!res.ok) {
       const errText = await res.text();
+      console.error("[LLM] OpenRouter request failed:", res.status, errText);
       throw new Error(`OpenRouter request failed: ${res.status} ${errText}`);
     }
 
@@ -207,9 +228,11 @@ export class LLMService {
     const content = data?.choices?.[0]?.message?.content;
 
     if (!content) {
+      console.error("[LLM] Invalid OpenRouter response:", JSON.stringify(data).slice(0, 200));
       throw new Error("Invalid response from OpenRouter");
     }
 
+    console.info("[LLM] OpenRouter call successful, content length:", content.length);
     return content;
   }
 
