@@ -152,13 +152,13 @@ const renderGenerator = (overrides: Partial<ReportGeneratorProps> = {}) => {
 };
 
 const typeAndSelectAapl = async (user: ReturnType<typeof userEvent.setup>) => {
-  const input = screen.getByRole("textbox", { name: /enter symbol/i });
+  const input = screen.getByRole("combobox", { name: /enter symbol/i });
   await user.clear(input);
   await user.type(input, "AAPL");
 
   // Wait for search to resolve so validation passes
   await waitFor(() => expect(apiModule.searchSymbols).toHaveBeenCalled());
-  await screen.findByRole("button", { name: /AAPL/i });
+  await screen.findByRole("option", { name: /AAPL/i });
 };
 
 describe("ReportGeneratorSection", () => {

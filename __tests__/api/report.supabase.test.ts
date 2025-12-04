@@ -224,7 +224,7 @@ describe("API: /api/report - Supabase Integration", () => {
     const data = await response.json();
     expect(data.success).toBe(true);
     expect(data.data.report).toBeDefined();
-    expect(data.data.report.symbol).toBe("AAPL");
+    expect(data.data.symbol).toBe("AAPL");
     // Verify test mode audit was called with test uuid
     // Note: In new architecture, audit is recorded via ReportPersistence
   });

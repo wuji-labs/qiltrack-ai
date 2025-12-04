@@ -2,44 +2,42 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getAuthContextFromRequest, isAdmin } from "@/app/api/_utils/supabase";
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error("Missing Supabase admin environment variables");
+  }
+
+  return createClient(supabaseUrl, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
     },
-  }
-);
+  });
+}
 
 export async function POST(request: Request) {
   try {
-    // 1. Verify authentication and authorization
+    const supabaseAdmin = getSupabaseAdmin();
     const { userId: adminUserId, role } = await getAuthContextFromRequest(request);
 
     if (!adminUserId || !isAdmin(role)) {
-      return NextResponse.json(
-        { error: "Forbidden: Admin access required" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
     }
 
-    const body = await request.json();
-    const { userId, display_name, full_name, role: newRole, plan } = body;
+    const { userId, role: newRole, plan } = await request.json();
 
     if (!userId) {
-      return NextResponse.json({ error: "用户ID为必填项" }, { status: 400 });
+      return NextResponse.json({ error: "缺少 userId" }, { status: 400 });
     }
 
-    // 2. 更新profiles表 (不再包含 quota_limit)
     const { error } = await supabaseAdmin
       .from("profiles")
       .update({
-        display_name,
-        name: full_name,
-        role: newRole,
-        plan,
+        role: newRole || undefined,
+        plan: plan || undefined,
         updated_at: new Date().toISOString(),
       })
       .eq("id", userId);
@@ -49,26 +47,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    // 3. Log admin action
-    await supabaseAdmin
-      .from("audit_logs")
-      .insert({
-        user_id: adminUserId,
-        action: "user_update",
-        resource_type: "profiles",
-        resource_id: userId,
-        details: {
-          target_user_id: userId,
-          display_name,
-          full_name,
-          role: newRole,
-          plan,
-        },
-      });
-
-    return NextResponse.json({
-      success: true,
+    await supabaseAdmin.from("audit_logs").insert({
+      user_id: adminUserId,
+      action: "user_update",
+      table_name: "profiles",
+      record_id: userId,
+      details: { role: newRole, plan },
     });
+
+    return NextResponse.json({ success: true });
   } catch (error: unknown) {
     console.error("Update user API error:", error);
     return NextResponse.json(

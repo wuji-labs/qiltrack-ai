@@ -56,10 +56,20 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     fetchDashboardData();
-  }, []);
+  }, [supabase]);
 
   async function fetchDashboardData() {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     try {
       // 获取基础统计数据
       const [usersResult, reportsResult, creditsResult, todayReportsResult] = await Promise.all([
@@ -113,6 +123,8 @@ export default function AdminDashboard() {
   }
 
   async function fetchTrendData() {
+    if (!supabase) return;
+
     const last7Days = [];
     const today = new Date();
 
@@ -160,6 +172,8 @@ export default function AdminDashboard() {
   }
 
   async function fetchRecentActivities() {
+    if (!supabase) return;
+
     const { data: recentRuns } = await supabase
       .from("report_runs")
       .select(
