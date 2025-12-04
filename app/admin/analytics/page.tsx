@@ -402,7 +402,7 @@ export default function AnalyticsPage() {
                 outerRadius={100}
                 dataKey="count"
                 nameKey="symbol"
-                label={({ symbol }) => symbol}
+                label={({ name }) => name}
               >
                 {data.topSymbols.slice(0, 5).map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
