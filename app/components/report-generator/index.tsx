@@ -208,8 +208,16 @@ export function ReportGeneratorSection({
       return;
     }
 
-    if (isQuotaExhausted) {
-      setErrorState({ type: "quota", message: t("generator.alert.quota") });
+    // 检查积分是否足够（生成报告需要30积分）
+    const REPORT_CREDIT_COST = 30;
+    if (isQuotaExhausted || auth.remainingQuota < REPORT_CREDIT_COST) {
+      setErrorState({
+        type: "quota",
+        message: t("generator.alert.insufficientCredits", {
+          required: REPORT_CREDIT_COST,
+          available: auth.remainingQuota
+        }) || `积分不足，需要 ${REPORT_CREDIT_COST} 积分，当前余额 ${auth.remainingQuota} 积分`
+      });
       return;
     }
 
@@ -254,9 +262,12 @@ export function ReportGeneratorSection({
       const errorCode = (error as { code?: string; statusCode?: number }).code;
       const statusCode = (error as { code?: string; statusCode?: number }).statusCode;
 
-      if (errorCode === "unauthorized" || statusCode === 401) {
+      if (errorCode === "unauthorized" || errorCode === "UNAUTHORIZED" || statusCode === 401) {
         setErrorState({ type: "unauthorized", message: t("quota.status.mismatch") });
         onRequireLogin();
+      } else if (errorCode === "INSUFFICIENT_CREDITS" || statusCode === 403) {
+        // 积分不足错误 - 显示API返回的中文错误信息
+        setErrorState({ type: "quota", message: message || t("generator.alert.quota") });
       } else if (errorCode === "quota_exceeded" || statusCode === 429) {
         setErrorState({ type: "quota", message: t("generator.alert.quota") });
       } else if (errorCode === "quota_fetch_failed") {
@@ -266,6 +277,8 @@ export function ReportGeneratorSection({
         if (normalized.includes("unauthorized")) {
           setErrorState({ type: "unauthorized", message: t("quota.status.mismatch") });
           onRequireLogin();
+        } else if (normalized.includes("积分不足") || normalized.includes("insufficient credits")) {
+          setErrorState({ type: "quota", message });
         } else if (normalized.includes("quota exceeded") || normalized.includes("429")) {
           setErrorState({ type: "quota", message: t("generator.alert.quota") });
         } else {
@@ -290,6 +303,38 @@ export function ReportGeneratorSection({
     const form = document.querySelector("form");
     if (form) {
       handleSubmit(syntheticEvent as any, true);
+    }
+  };
+
+  const handleUseReused = async () => {
+    setShowReuseDialog(false);
+    if (!pendingSymbol) return;
+
+    // 直接调用API获取复用的报告（API会返回复用的报告内容）
+    setLastReportTone(selectedTone);
+    setLoading(true);
+    setErrorState(null);
+    setReportData(null);
+    progress.start(t("generator.progress.loading"));
+
+    try {
+      const data = await generateReport({ symbol: pendingSymbol, lang: language, tone: selectedTone });
+      await progress.complete(t("generator.progress.done"));
+      setReportData(data);
+
+      // 显示复用提示
+      if (data.reused) {
+        console.info("[REPORT_REUSED] Using cached report from API");
+      }
+    } catch (err) {
+      console.error("加载复用报告异常:", err);
+      const error = err instanceof Error ? err : { message: "" };
+      setErrorState({ type: "generic", message: error.message || t("error.submit.generic") });
+      progress.fail(error.message || "Failed to load report");
+    } finally {
+      setLoading(false);
+      setPendingSymbol(null);
+      setReuseRunId(null);
     }
   };
 
@@ -459,12 +504,7 @@ export function ReportGeneratorSection({
       return;
     }
 
-    // Check if user has annual plan before making API call
-    const userPlan = (auth.planLabel || "").toLowerCase();
-    if (userPlan !== "annual" && userPlan !== "admin") {
-      alert(t("report.pdf.error.plan"));
-      return;
-    }
+    // 权限检查由后端完成，包括 plan 和 subscription_status
 
     setExportingPdf(true);
     try {
@@ -479,6 +519,7 @@ export function ReportGeneratorSection({
           symbol: reportData.symbol,
           tone: lastReportTone,
           planLabel: auth.planLabel,
+          lang: language, // 传递当前语言给 PDF 生成
         }),
       });
 
@@ -597,6 +638,7 @@ export function ReportGeneratorSection({
           showReuseDialog={showReuseDialog}
           onViewHistory={handleViewHistory}
           onRegenerate={handleRegenerate}
+          onUseReused={handleUseReused}
           onClose={() => setShowReuseDialog(false)}
           t={t}
         />

@@ -139,13 +139,16 @@ export async function GET(request: NextRequest) {
           : null;
         const reportContent = (storedContent && storedContent.trim()) || existingReport.content;
 
-        if (!reportContent || !reportContent.trim()) {
-          console.warn("[REPORT_REUSE_EMPTY_CONTENT]", {
+        // If content is empty or too short, skip reuse and regenerate
+        if (!reportContent || reportContent.trim().length < 100) {
+          console.warn("[REPORT_REUSE_EMPTY_CONTENT] Content empty or too short, will regenerate", {
             userId,
             symbol,
             reportId: existingReport.id,
             reportRunId: existingReport.report_run_id,
+            contentLength: reportContent?.length || 0,
           });
+          // Fall through to generate a new report
         } else {
           // For consistency, load stored market data from Storage JSON instead of refetching live data
           const storedMarketData =
@@ -193,12 +196,15 @@ export async function GET(request: NextRequest) {
           : null;
         const reportContent = (storedContent && storedContent.trim()) || sharedReport.content;
 
-        if (!reportContent || !reportContent.trim()) {
-          console.warn("[REPORT_REUSE_EMPTY_CONTENT_SHARED]", {
+        // If content is empty or too short, skip reuse and regenerate
+        if (!reportContent || reportContent.trim().length < 100) {
+          console.warn("[REPORT_REUSE_EMPTY_CONTENT_SHARED] Content empty or too short, will regenerate", {
             symbol,
             reportId: sharedReport.id,
             reportRunId: sharedReport.report_run_id,
+            contentLength: reportContent?.length || 0,
           });
+          // Fall through to generate a new report
         } else {
           const storedMarketData =
             (sharedReport.report_run_id
@@ -230,7 +236,86 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 5. Generate report FIRST (before consuming credits) using new service layer
+    // 4.2 Check for cross-user reusable report (same day, silent reuse - save tokens)
+    // This runs for authenticated users to check if another user already generated this report today
+    if (!isTestBypass && userId) {
+      const sharedReport = await persistence.checkSharedReusableReport(symbol, language, tone, 1);
+      if (sharedReport) {
+        console.info(
+          `[REPORT_REUSED_CROSS_USER] user_id: ${userId}, symbol: ${symbol}, original_report_id: ${sharedReport.id}`
+        );
+
+        // Load full content from storage (fallback to database content if storage fails)
+        const storedContent = sharedReport.report_run_id
+          ? await persistence.getStoredReportContent(sharedReport.report_run_id)
+          : null;
+        const reportContent = (storedContent && storedContent.trim()) || sharedReport.content;
+
+        // Only use cross-user reuse if content is substantial (100+ chars)
+        if (reportContent && reportContent.trim().length >= 100) {
+          const storedMarketData =
+            (sharedReport.report_run_id
+              ? await persistence.getStoredMarketData(sharedReport.report_run_id)
+              : null) || null;
+          const companyData =
+            storedMarketData ?? {
+              symbol,
+              profile: {},
+              quote: {},
+              metrics: {},
+              recentNews: [],
+            };
+
+          // For cross-user reuse, we still consume credits (user pays for viewing, but we save LLM costs)
+          const creditManager = new CreditManager();
+          const REPORT_CREDIT_COST = 30;
+
+          // Check balance first
+          const balance = await creditManager.getBalance(userId);
+          if (balance.credits_available < REPORT_CREDIT_COST) {
+            throw new InsufficientCreditsError(
+              `积分不足，需要 ${REPORT_CREDIT_COST} 积分，当前余额 ${balance.credits_available} 积分`
+            );
+          }
+
+          // Consume credit
+          await creditManager.checkAndConsume(userId, REPORT_CREDIT_COST, symbol);
+          console.info(`[CREDIT_CONSUMED_CROSS_USER_REUSE] user_id: ${userId}, symbol: ${symbol}, credits: ${REPORT_CREDIT_COST}`);
+
+          // Return the reused report (looks like a fresh generation to user - no reuse hint)
+          const response = successResponse({
+            symbol: sharedReport.symbol,
+            report: reportContent,
+            companyData,
+            reportRunId: sharedReport.report_run_id,
+            reused: false, // Silent reuse - don't tell the user
+          });
+
+          responseCookies.forEach(({ name, value }) => {
+            response.headers.append("Set-Cookie", `${name}=${value}`);
+          });
+
+          return response;
+        }
+      }
+    }
+
+    // 5. Check credits BEFORE generating report (important: prevent LLM costs if insufficient credits)
+    if (!isTestBypass && userId) {
+      const creditManager = new CreditManager();
+      const REPORT_CREDIT_COST = 30;
+
+      // Check balance first - BEFORE calling LLM
+      const balance = await creditManager.getBalance(userId);
+
+      if (balance.credits_available < REPORT_CREDIT_COST) {
+        throw new InsufficientCreditsError(
+          `积分不足，需要 ${REPORT_CREDIT_COST} 积分，当前余额 ${balance.credits_available} 积分`
+        );
+      }
+    }
+
+    // 6. Generate report using new service layer
     const generator = new ReportGenerator();
 
     const generatedReport = await generator.generate({
@@ -243,22 +328,15 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // 6. Check and consume credits ONLY after successful generation
+    // 7. Consume credits AFTER successful generation
     if (!isTestBypass && userId) {
       const creditManager = new CreditManager();
-
-      // Check balance first
-      const balance = await creditManager.getBalance(userId);
-
-      if (balance.credits_available <= 0) {
-        throw new InsufficientCreditsError(
-          `Insufficient credits. Available: ${balance.credits_available}`
-        );
-      }
+      const REPORT_CREDIT_COST = 30;
 
       // Consume credit atomically ONLY after successful generation
-      await creditManager.checkAndConsume(userId, 1, symbol);
-      console.info(`[CREDIT_CONSUMED] user_id: ${userId}, symbol: ${symbol}`);
+      // 每份报告固定扣除30积分
+      await creditManager.checkAndConsume(userId, REPORT_CREDIT_COST, symbol);
+      console.info(`[CREDIT_CONSUMED] user_id: ${userId}, symbol: ${symbol}, credits: ${REPORT_CREDIT_COST}`);
     }
 
     const companyData =
@@ -270,11 +348,11 @@ export async function GET(request: NextRequest) {
         recentNews: [],
       };
 
-    // 7. Extract title from report (first # line)
+    // 8. Extract title from report (first # line)
     const titleMatch = generatedReport.content.match(/^#\s+(.+)$/m);
     const title = titleMatch?.[1] || `Investment Analysis Report: ${symbol} (${language})`;
 
-    // 8. Save report to database
+    // 9. Save report to database
     const savedReport = await persistence.saveReport(
       {
         content: generatedReport.content,
@@ -287,7 +365,7 @@ export async function GET(request: NextRequest) {
       userId ?? undefined
     );
 
-    // 9. Record audit log
+    // 10. Record audit log
     if (userId) {
       await persistence.recordAudit(userId, "GENERATE_REPORT", {
         symbol,
@@ -298,7 +376,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 10. Generate embeddings in background (non-blocking)
+    // 11. Generate embeddings in background (non-blocking)
     if (!isTestBypass && savedReport.report_run_id) {
       const embeddingsManager = new EmbeddingsManager();
       // Fire and forget
@@ -313,7 +391,7 @@ export async function GET(request: NextRequest) {
       `[REPORT_GENERATED] user_id: ${userId}, symbol: ${symbol}, report_id: ${savedReport.id}`
     );
 
-    // 11. Return success response
+    // 12. Return success response
     const response = successResponse({
       symbol,
       report: generatedReport.content,
