@@ -1,7 +1,7 @@
 ﻿import Link from "next/link";
 
 const allowedUses = [
-  "将 Investor AI 用于研究、内部分析、报告撰写与合规的业务洞察。",
+  "将 Qiltrack AI 用于研究、内部分析、报告撰写与合规的业务洞察。",
   "在遵守法律、合同与本政策的前提下，将生成的内容用于内部或对外合规披露（如注明来源）。",
   "合理频率调用接口与页面功能，不干扰其他用户体验或平台稳定性。",
 ];
@@ -26,7 +26,7 @@ export default function AcceptableUsePage() {
     <main className="min-h-screen bg-slate-950 text-slate-100 px-4 py-12">
       <div className="max-w-4xl mx-auto space-y-10">
         <div>
-          <p className="text-xs uppercase tracking-[0.35em] text-emerald-300">Investor AI</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-emerald-300">Qiltrack AI</p>
           <h1 className="mt-3 text-3xl font-semibold">可接受使用政策</h1>
           <p className="mt-3 text-sm text-slate-400">
             本政策明确允许与禁止的使用方式，以保护平台稳定、安全与合规。使用本服务即表示您同意遵守。
@@ -71,8 +71,8 @@ export default function AcceptableUsePage() {
         <div className="text-xs text-slate-500 space-y-2">
           <p>
             如需申诉或说明用途，请邮件{" "}
-            <a className="text-emerald-300" href="mailto:legal@investor.ai">
-              legal@investor.ai
+            <a className="text-emerald-300" href="mailto:legal@qiltrack.com">
+              legal@qiltrack.com
             </a>{" "}
             与我们联系。
           </p>
@@ -83,7 +83,7 @@ export default function AcceptableUsePage() {
             <Link href="/" prefetch={false} className="underline underline-offset-2">
               返回首页
             </Link>
-            <span className="text-slate-400">investor-ai.com</span>
+            <span className="text-slate-400">qiltrack.com</span>
           </div>
         </div>
       </div>

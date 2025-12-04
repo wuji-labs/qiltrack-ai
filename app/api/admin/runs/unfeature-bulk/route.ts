@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
     const isAdmin =
       (profile as { plan?: string; email?: string }).plan === "admin" ||
-      (profile as { plan?: string; email?: string }).email?.endsWith("@investor.ai");
+      (profile as { plan?: string; email?: string }).email?.endsWith("@qiltrack.com");
 
     if (!isAdmin) {
       const response = NextResponse.json(

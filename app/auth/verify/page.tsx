@@ -5,7 +5,7 @@ export default function VerifyPage() {
     <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-6 text-center">
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.35em] text-emerald-300">Investor AI</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-emerald-300">Qiltrack AI</p>
           <h1 className="text-2xl font-semibold">Check your inbox</h1>
           <p className="text-sm text-slate-400">
             We have sent a secure sign-in link to your email address. Please open the message on
@@ -17,7 +17,7 @@ export default function VerifyPage() {
           <p>
             Need to try again?{" "}
             <Link className="text-emerald-300 underline" href="/">
-              Go back to Investor AI
+              Go back to Qiltrack AI
             </Link>
           </p>
         </div>

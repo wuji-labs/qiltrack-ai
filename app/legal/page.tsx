@@ -19,7 +19,7 @@ const links = [
 ];
 
 const notices = [
-  "Investor AI 提供自动化信息整理和生成式报告，不构成投资、法律、税务或财务建议。",
+  "Qiltrack AI 提供自动化信息整理和生成式报告，不构成投资、法律、税务或财务建议。",
   "数据可能来自公开市场、第三方提供商或用户输入，可能存在延时、缺漏或误差，仅供参考。",
   "如需专业意见，请咨询具备资质的专业人士；使用本服务即表示您接受相关条款与政策。",
 ];
@@ -29,10 +29,10 @@ export default function LegalPage() {
     <main className="min-h-screen bg-slate-950 text-slate-100 px-4 py-12">
       <div className="max-w-4xl mx-auto space-y-10">
         <div>
-          <p className="text-xs uppercase tracking-[0.35em] text-emerald-300">Investor AI</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-emerald-300">Qiltrack AI</p>
           <h1 className="mt-3 text-3xl font-semibold">法律与合规</h1>
           <p className="mt-3 text-sm text-slate-400">
-            以下文档说明使用 Investor AI
+            以下文档说明使用 Qiltrack AI
             时的权利义务、隐私保护与可接受使用范围。请根据需要查阅详细条款。
           </p>
           <p className="mt-2 text-xs text-slate-500">最近更新：2025-11-30</p>
@@ -68,8 +68,8 @@ export default function LegalPage() {
         <div className="text-xs text-slate-500 space-y-2">
           <p>
             如对上述条款或政策有疑问，请邮件{" "}
-            <a className="text-emerald-300" href="mailto:legal@investor.ai">
-              legal@investor.ai
+            <a className="text-emerald-300" href="mailto:legal@qiltrack.com">
+              legal@qiltrack.com
             </a>{" "}
             与我们联系。
           </p>
@@ -80,7 +80,7 @@ export default function LegalPage() {
             <Link href="/" prefetch={false} className="underline underline-offset-2">
               返回首页
             </Link>
-            <span className="text-slate-400">investor-ai.com</span>
+            <span className="text-slate-400">qiltrack.com</span>
           </div>
         </div>
       </div>

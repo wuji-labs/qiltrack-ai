@@ -48,7 +48,7 @@ export class LLMService {
         apiKey: process.env.OPENROUTER_API_KEY,
         model: process.env.OPENROUTER_MODEL || "openai/gpt-5.1",
         siteUrl: process.env.OPENROUTER_SITE_URL || "http://localhost:3000",
-        appName: process.env.OPENROUTER_APP_NAME || "investor-ai",
+        appName: process.env.OPENROUTER_APP_NAME || "qiltrack",
       };
     }
   }

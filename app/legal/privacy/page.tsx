@@ -4,7 +4,7 @@ const sections = [
   {
     title: "我们收集的信息",
     items: [
-      "您在使用 Investor AI 时提交的账号信息、偏好设置与与服务交互产生的日志（例如访问时间、功能使用记录）。",
+      "您在使用 Qiltrack AI 时提交的账号信息、偏好设置与与服务交互产生的日志（例如访问时间、功能使用记录）。",
       "生成报告所需的输入内容、选择的模板、生成结果及相关元数据，仅用于提供和改进服务。",
       "必要的技术信息（设备、浏览器、IP 近似位置、Cookie/本地存储标识）用于安全、防滥用与性能监测。",
     ],
@@ -58,7 +58,7 @@ export default function PrivacyPage() {
     <main className="min-h-screen bg-slate-950 text-slate-100 px-4 py-12">
       <div className="max-w-4xl mx-auto space-y-10">
         <div>
-          <p className="text-xs uppercase tracking-[0.35em] text-emerald-300">Investor AI</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-emerald-300">Qiltrack AI</p>
           <h1 className="mt-3 text-3xl font-semibold">隐私政策</h1>
           <p className="mt-3 text-sm text-slate-400">
             本政策说明我们如何收集、使用、存储和保护您的信息，以及您可行使的权利与选择。
@@ -87,8 +87,8 @@ export default function PrivacyPage() {
         <div className="text-xs text-slate-500 space-y-2">
           <p>
             如对隐私政策有疑问或需行使权利，请邮件{" "}
-            <a className="text-emerald-300" href="mailto:legal@investor.ai">
-              legal@investor.ai
+            <a className="text-emerald-300" href="mailto:legal@qiltrack.com">
+              legal@qiltrack.com
             </a>{" "}
             与我们联系。
           </p>
@@ -99,7 +99,7 @@ export default function PrivacyPage() {
             <Link href="/" prefetch={false} className="underline underline-offset-2">
               返回首页
             </Link>
-            <span className="text-slate-400">investor-ai.com</span>
+            <span className="text-slate-400">qiltrack.com</span>
           </div>
         </div>
       </div>

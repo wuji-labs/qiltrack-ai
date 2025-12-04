@@ -264,7 +264,7 @@ export default function ReportsPage() {
       const plan = (profile as any)?.plan || null;
       setUserPlan(plan);
       const isAdminPlan = plan === "admin";
-      const isAdminEmail = auth.user?.email?.endsWith("@investor.ai");
+      const isAdminEmail = auth.user?.email?.endsWith("@qiltrack.com");
       setIsAdmin(isAdminPlan || !!isAdminEmail);
     };
     checkAdmin();
