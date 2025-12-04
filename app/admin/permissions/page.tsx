@@ -107,7 +107,7 @@ export default function PermissionsPage() {
           .from("profiles")
           .select("role")
           .eq("id", user.id)
-          .single();
+          .single<{ role: string | null }>();
         setCurrentUserRole(profile?.role || "user");
       }
     }
