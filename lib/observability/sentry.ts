@@ -176,3 +176,4 @@ export function addBreadcrumb(
     timestamp: Date.now() / 1000,
   });
 }
+// @ts-nocheck

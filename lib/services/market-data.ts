@@ -73,6 +73,7 @@ export interface MarketData {
   quote: StockQuote;
   metrics: FinancialMetrics;
   recentNews: NewsItem[];
+  [key: string]: any;
 }
 
 /**

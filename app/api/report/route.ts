@@ -7,7 +7,6 @@ import { ReportGenerator } from "@/lib/core/reports/generator";
 import { ReportPersistence } from "@/lib/core/reports/persistence";
 import { EmbeddingsManager } from "@/lib/core/reports/embeddings";
 import { ContentSanitizer } from "@/lib/core/reports/content-sanitizer";
-import { MarketDataService } from "@/lib/services/market-data";
 import { handleApiError, successResponse } from "@/lib/api/error-handler";
 import { UnauthorizedError, InsufficientCreditsError, ValidationError } from "@/lib/core/errors";
 import { DEFAULT_LANGUAGE, type Language } from "@/lib/i18n-config";
@@ -44,7 +43,7 @@ export async function GET(request: NextRequest) {
       responseCookies.push(...cookies);
     });
 
-    let userId: string | null;
+    let userId: string | null = null;
 
     if (!isTestBypass) {
       const {
@@ -75,7 +74,7 @@ export async function GET(request: NextRequest) {
     const tone = (searchParams.get("tone") || "baseline") as ReportTone;
 
     // 3. Rate limiting check (skip in test mode)
-    if (!isTestBypass) {
+    if (!isTestBypass && userId) {
       const { success, headers } = await checkRateLimit(
         userId!,
         reportGenerationRateLimit
@@ -106,9 +105,10 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    const persistence = new ReportPersistence();
+
     // 4. Check for reusable report (within 7 days)
     if (!isTestBypass && userId) {
-      const persistence = new ReportPersistence();
       const existingReport = await persistence.checkReusableReport(symbol, language, tone, userId);
 
       if (existingReport) {
@@ -117,41 +117,53 @@ export async function GET(request: NextRequest) {
         );
 
         // Load full content from storage (fallback to database content if storage fails)
-        const storedContent = await persistence.getStoredReportContent(existingReport.report_run_id);
-        const reportContent = storedContent || existingReport.content;
+        const storedContent = existingReport.report_run_id
+          ? await persistence.getStoredReportContent(existingReport.report_run_id)
+          : null;
+        const reportContent = (storedContent && storedContent.trim()) || existingReport.content;
 
-        // For consistency, load stored market data from Storage JSON instead of refetching live data
-        const storedMarketData =
-          (await persistence.getStoredMarketData(existingReport.report_run_id)) || null;
-        const companyData =
-          storedMarketData ?? {
+        if (!reportContent || !reportContent.trim()) {
+          console.warn("[REPORT_REUSE_EMPTY_CONTENT]", {
+            userId,
             symbol,
-            profile: {},
-            quote: {},
-            metrics: {},
-            recentNews: [],
-          };
+            reportId: existingReport.id,
+            reportRunId: existingReport.report_run_id,
+          });
+        } else {
+          // For consistency, load stored market data from Storage JSON instead of refetching live data
+          const storedMarketData =
+            (existingReport.report_run_id
+              ? await persistence.getStoredMarketData(existingReport.report_run_id)
+              : null) || null;
+          const companyData =
+            storedMarketData ?? {
+              symbol,
+              profile: {},
+              quote: {},
+              metrics: {},
+              recentNews: [],
+            };
 
-        const response = successResponse({
-          symbol: existingReport.symbol,
-          report: reportContent,
-          companyData,
-          reportRunId: existingReport.report_run_id,
-          reused: true,
-          message: "Using existing report from the last 7 days",
-        });
+          const response = successResponse({
+            symbol: existingReport.symbol,
+            report: reportContent,
+            companyData,
+            reportRunId: existingReport.report_run_id,
+            reused: true,
+            message: "Using existing report from the last 7 days",
+          });
 
-        responseCookies.forEach(({ name, value }) => {
-          response.headers.append("Set-Cookie", `${name}=${value}`);
-        });
+          responseCookies.forEach(({ name, value }) => {
+            response.headers.append("Set-Cookie", `${name}=${value}`);
+          });
 
-        return response;
+          return response;
+        }
       }
     }
 
     // 4.1 Shared reuse for other/new users: only reuse same-day reports
     if (isTestBypass || !userId) {
-      const persistence = new ReportPersistence();
       const sharedReport = await persistence.checkSharedReusableReport(symbol, language, tone, 1);
       if (sharedReport) {
         console.info(
@@ -159,55 +171,49 @@ export async function GET(request: NextRequest) {
         );
 
         // Load full content from storage (fallback to database content if storage fails)
-        const storedContent = await persistence.getStoredReportContent(sharedReport.report_run_id);
-        const reportContent = storedContent || sharedReport.content;
+        const storedContent = sharedReport.report_run_id
+          ? await persistence.getStoredReportContent(sharedReport.report_run_id)
+          : null;
+        const reportContent = (storedContent && storedContent.trim()) || sharedReport.content;
 
-        const storedMarketData =
-          (await persistence.getStoredMarketData(sharedReport.report_run_id)) || null;
-        const companyData =
-          storedMarketData ?? {
+        if (!reportContent || !reportContent.trim()) {
+          console.warn("[REPORT_REUSE_EMPTY_CONTENT_SHARED]", {
             symbol,
-            profile: {},
-            quote: {},
-            metrics: {},
-            recentNews: [],
-          };
-        const response = successResponse({
-          symbol: sharedReport.symbol,
-          report: reportContent,
-          companyData,
-          reportRunId: sharedReport.report_run_id,
-          reused: true,
-          message: "Using existing report from today",
-        });
+            reportId: sharedReport.id,
+            reportRunId: sharedReport.report_run_id,
+          });
+        } else {
+          const storedMarketData =
+            (sharedReport.report_run_id
+              ? await persistence.getStoredMarketData(sharedReport.report_run_id)
+              : null) || null;
+          const companyData =
+            storedMarketData ?? {
+              symbol,
+              profile: {},
+              quote: {},
+              metrics: {},
+              recentNews: [],
+            };
+          const response = successResponse({
+            symbol: sharedReport.symbol,
+            report: reportContent,
+            companyData,
+            reportRunId: sharedReport.report_run_id,
+            reused: true,
+            message: "Using existing report from today",
+          });
 
-        responseCookies.forEach(({ name, value }) => {
-          response.headers.append("Set-Cookie", `${name}=${value}`);
-        });
+          responseCookies.forEach(({ name, value }) => {
+            response.headers.append("Set-Cookie", `${name}=${value}`);
+          });
 
-        return response;
+          return response;
+        }
       }
     }
 
-    // 5. Check and consume credits
-    if (!isTestBypass) {
-      const creditManager = new CreditManager();
-
-      // Check balance first
-      const balance = await creditManager.getBalance(userId!);
-
-      if (balance.credits_available <= 0) {
-        throw new InsufficientCreditsError(
-          `Insufficient credits. Available: ${balance.credits_available}`
-        );
-      }
-
-      // Consume credit atomically
-      await creditManager.checkAndConsume(userId!, 1, symbol);
-      console.info(`[CREDIT_CONSUMED] user_id: ${userId}, symbol: ${symbol}`);
-    }
-
-    // 6. Generate report using new service layer
+    // 5. Generate report FIRST (before consuming credits) using new service layer
     const generator = new ReportGenerator();
 
     const generatedReport = await generator.generate({
@@ -219,6 +225,24 @@ export async function GET(request: NextRequest) {
         isTest: isTestBypass,
       },
     });
+
+    // 6. Check and consume credits ONLY after successful generation
+    if (!isTestBypass && userId) {
+      const creditManager = new CreditManager();
+
+      // Check balance first
+      const balance = await creditManager.getBalance(userId);
+
+      if (balance.credits_available <= 0) {
+        throw new InsufficientCreditsError(
+          `Insufficient credits. Available: ${balance.credits_available}`
+        );
+      }
+
+      // Consume credit atomically ONLY after successful generation
+      await creditManager.checkAndConsume(userId, 1, symbol);
+      console.info(`[CREDIT_CONSUMED] user_id: ${userId}, symbol: ${symbol}`);
+    }
 
     const companyData =
       generatedReport.marketData ?? {
@@ -234,8 +258,6 @@ export async function GET(request: NextRequest) {
     const title = titleMatch?.[1] || `Investment Analysis Report: ${symbol} (${language})`;
 
     // 8. Save report to database
-    const persistence = new ReportPersistence();
-
     const savedReport = await persistence.saveReport(
       {
         content: generatedReport.content,
