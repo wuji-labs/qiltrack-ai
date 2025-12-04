@@ -597,3 +597,21 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ====== Select 和 Option 暗色主题样式 ====== */
+select {
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #1a1a1c !important;
+  color: #f4f4f7 !important;
+  font-family: inherit;
+  padding: 8px 12px;
+}
+
+select option:checked,
+select option:hover {
+  background: linear-gradient(90deg, rgba(91, 224, 176, 0.15), rgba(91, 224, 176, 0.08)) !important;
+  color: #5be0b0 !important;
+}

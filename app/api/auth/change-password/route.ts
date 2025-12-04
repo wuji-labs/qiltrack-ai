@@ -15,18 +15,7 @@ export async function POST(request: NextRequest) {
       error: sessionError,
     } = await supabase.auth.getSession();
 
-    if (sessionError || !session?.user?.id) {
-      const response = NextResponse.json(
-        { error: "Unauthorized", code: "unauthorized" },
-        { status: 401 }
-      );
-      responseCookies.forEach(({ name, value }) =>
-        response.headers.append("Set-Cookie", `${name}=${value}`)
-      );
-      return response;
-    }
-
-    // Parse request body
+    // Parse request body first to check if this is a recovery flow
     const body = await request.json().catch(() => null);
     if (!body || !body.newPassword) {
       const response = NextResponse.json(
@@ -40,6 +29,20 @@ export async function POST(request: NextRequest) {
     }
 
     const { currentPassword, newPassword, isRecovery } = body;
+
+    // For recovery flow, session might not be fully established yet
+    // Supabase auth.updateUser() will use the recovery token from the session
+    // For non-recovery flow, require valid session
+    if (!isRecovery && (sessionError || !session?.user?.id)) {
+      const response = NextResponse.json(
+        { error: "Unauthorized", code: "unauthorized" },
+        { status: 401 }
+      );
+      responseCookies.forEach(({ name, value }) =>
+        response.headers.append("Set-Cookie", `${name}=${value}`)
+      );
+      return response;
+    }
 
     // If not recovery mode, current password is required
     if (!isRecovery && !currentPassword) {
@@ -69,7 +72,7 @@ export async function POST(request: NextRequest) {
     // Only verify current password if not in recovery mode
     if (!isRecovery) {
       // Get user email to verify current password
-      const userEmail = session.user.email;
+      const userEmail = session?.user?.email;
       if (!userEmail) {
         const response = NextResponse.json(
           { error: "User email not found", code: "user_email_missing" },
@@ -90,7 +93,7 @@ export async function POST(request: NextRequest) {
 
       if (verifyError) {
         console.warn(
-          `[PASSWORD_VERIFY_FAILED] user_id: ${session.user.id}, error: ${verifyError.message}`
+          `[PASSWORD_VERIFY_FAILED] user_id: ${session?.user?.id}, error: ${verifyError.message}`
         );
         const response = NextResponse.json(
           { error: "Current password is incorrect", code: "invalid_current_password" },
@@ -110,7 +113,7 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       console.error(
-        `[PASSWORD_UPDATE_FAILED] user_id: ${session.user.id}, error: ${updateError.message}`
+        `[PASSWORD_UPDATE_FAILED] user_id: ${session?.user?.id || 'recovery'}, error: ${updateError.message}`
       );
       const response = NextResponse.json(
         { error: "Failed to update password", code: "update_failed" },
@@ -122,7 +125,8 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
-    console.info(`[PASSWORD_CHANGED] user_id: ${session.user.id}`);
+    console.info(`[PASSWORD_CHANGED] user_id: ${session?.user?.id || 'recovery'}`);
+
 
     const response = NextResponse.json({
       success: true,

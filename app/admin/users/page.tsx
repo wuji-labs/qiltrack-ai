@@ -22,10 +22,17 @@ interface UserCredits {
 }
 
 const PLAN_CONFIGS = {
-  free: { name: "免费版", quota: 30, color: "#6b7280", price: 0 },
-  basic: { name: "基础版", quota: 50, color: "#3b82f6", price: 99 },
-  pro: { name: "专业版", quota: 200, color: "#8b5cf6", price: 299 },
-  enterprise: { name: "企业版", quota: 999, color: "#f59e0b", price: 999 },
+  free: { name: "免费会员", quota: 0, color: "#6b7280", price: 0 },
+  pro: { name: "月费会员", quota: 300, color: "#3b82f6", price: 14.99 },
+  annual: { name: "年费会员", quota: 600, color: "#8b5cf6", price: 119.99 },
+};
+
+const ROLE_CONFIGS = {
+  super_admin: { name: "超级管理员", color: "#dc2626", icon: "👑" },
+  admin: { name: "管理员", color: "#ea580c", icon: "⭐" },
+  developer: { name: "开发者", color: "#8b5cf6", icon: "💻" },
+  user: { name: "用户", color: "#3b82f6", icon: "👤" },
+  guest: { name: "访客", color: "#6b7280", icon: "👁️" },
 };
 
 export default function UsersPage() {
@@ -55,10 +62,9 @@ export default function UsersPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
-  // 修改密码
+  // 发送密码重置邮件
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordEmail, setPasswordEmail] = useState("");
-  const [newPassword, setNewPassword] = useState("");
 
   // 用户详情
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -102,11 +108,11 @@ export default function UsersPage() {
       }
 
       if (roleFilter !== "all") {
-        query = query.eq("role", roleFilter as "admin" | "editor" | "user");
+        query = query.eq("role", roleFilter as "super_admin" | "admin" | "developer" | "user" | "guest");
       }
 
       if (planFilter !== "all") {
-        query = query.eq("plan", planFilter as "free" | "basic" | "pro" | "enterprise");
+        query = query.eq("plan", planFilter as "free" | "pro" | "annual");
       }
 
       const { data, count, error } = await query;
@@ -209,57 +215,34 @@ export default function UsersPage() {
     }
   }
 
-  async function handleResetPassword(newPassword: string) {
+  async function handleSendResetEmail() {
     if (!passwordEmail) return;
-    if (newPassword.length < 6) {
-      alert("密码至少6位");
-      return;
-    }
-
-    if (!supabase) {
-      alert("Supabase 链接未初始化");
-      return;
-    }
 
     setProcessing(true);
 
     try {
-      // 通过邮箱查找用户ID
-      const { data: user } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("email", passwordEmail)
-        .single();
-
-      if (!user) {
-        alert("用户不存在");
-        return;
-      }
-
-      const response = await fetch("/api/admin/users/reset-password", {
+      const response = await fetch("/api/admin/users/send-reset-email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: (user as any).id,
-          password: newPassword,
+          email: passwordEmail,
         }),
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "重置密码失败");
+        throw new Error(result.error || "发送重置邮件失败");
       }
 
-      alert("密码重置成功");
+      alert(`密码重置邮件已发送到 ${passwordEmail}\n请告知用户查收邮件并点击链接重置密码。`);
       setShowPasswordModal(false);
       setPasswordEmail("");
-      setNewPassword("");
     } catch (error: unknown) {
-      console.error("Reset password failed:", error);
-      alert(`重置密码失败: ${error instanceof Error ? error.message : "未知错误"}`);
+      console.error("Send reset email failed:", error);
+      alert(`发送失败: ${error instanceof Error ? error.message : "未知错误"}`);
     } finally {
       setProcessing(false);
     }
@@ -303,7 +286,7 @@ export default function UsersPage() {
         case "role":
           await (supabase as any)
             .from("profiles")
-            .update({ role: value as "admin" | "editor" | "user", updated_at: new Date().toISOString() })
+            .update({ role: value as "super_admin" | "admin" | "developer" | "user" | "guest", updated_at: new Date().toISOString() })
             .in("id", userIds);
           alert(`成功修改 ${userIds.length} 个用户的角色`);
           break;
@@ -312,7 +295,7 @@ export default function UsersPage() {
           await (supabase as any)
             .from("profiles")
             .update({
-              plan: value as "free" | "basic" | "pro" | "enterprise",
+              plan: value as "free" | "pro" | "annual",
               updated_at: new Date().toISOString(),
             })
             .in("id", userIds);
@@ -443,12 +426,15 @@ export default function UsersPage() {
               background: "var(--bg-layer)",
               border: "1px solid var(--stroke-soft)",
               color: "var(--color-foreground)",
+              colorScheme: "dark",
             }}
           >
             <option value="all">全部角色</option>
+            <option value="super_admin">超级管理员</option>
             <option value="admin">管理员</option>
-            <option value="editor">编辑</option>
-            <option value="user">普通用户</option>
+            <option value="developer">开发者</option>
+            <option value="user">用户</option>
+            <option value="guest">访客</option>
           </select>
 
           {/* 套餐过滤 */}
@@ -463,13 +449,13 @@ export default function UsersPage() {
               background: "var(--bg-layer)",
               border: "1px solid var(--stroke-soft)",
               color: "var(--color-foreground)",
+              colorScheme: "dark",
             }}
           >
             <option value="all">全部套餐</option>
-            <option value="free">免费版</option>
-            <option value="basic">基础版</option>
-            <option value="pro">专业版</option>
-            <option value="enterprise">企业版</option>
+            <option value="free">免费会员</option>
+            <option value="pro">月费会员</option>
+            <option value="annual">年费会员</option>
           </select>
 
           {/* 批量操作按钮 */}
@@ -627,7 +613,7 @@ export default function UsersPage() {
                               setShowPasswordModal(true);
                             }}
                           >
-                            改密码
+                            发送重置邮件
                           </button>
                         </div>
                       </td>
@@ -701,9 +687,11 @@ export default function UsersPage() {
               value={createData.role}
               onChange={(e) => setCreateData({ ...createData, role: e.target.value })}
               options={[
-                { value: "user", label: "普通用户" },
-                { value: "editor", label: "编辑" },
+                { value: "guest", label: "访客" },
+                { value: "user", label: "用户" },
+                { value: "developer", label: "开发者" },
                 { value: "admin", label: "管理员" },
+                { value: "super_admin", label: "超级管理员" },
               ]}
             />
             <SelectField
@@ -718,10 +706,9 @@ export default function UsersPage() {
                 });
               }}
               options={[
-                { value: "free", label: `免费版 (${PLAN_CONFIGS.free.quota}篇)` },
-                { value: "basic", label: `基础版 (${PLAN_CONFIGS.basic.quota}篇)` },
-                { value: "pro", label: `专业版 (${PLAN_CONFIGS.pro.quota}篇)` },
-                { value: "enterprise", label: `企业版 (${PLAN_CONFIGS.enterprise.quota}篇)` },
+                { value: "free", label: `免费会员 (${PLAN_CONFIGS.free.quota}积分/月)` },
+                { value: "pro", label: `月费会员 (${PLAN_CONFIGS.pro.quota}积分/月)` },
+                { value: "annual", label: `年费会员 (${PLAN_CONFIGS.annual.quota}积分/月)` },
               ]}
             />
             <InputField
@@ -775,9 +762,11 @@ export default function UsersPage() {
               value={editingUser.role || "user"}
               onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
               options={[
-                { value: "user", label: "普通用户" },
-                { value: "editor", label: "编辑" },
+                { value: "guest", label: "访客" },
+                { value: "user", label: "用户" },
+                { value: "developer", label: "开发者" },
                 { value: "admin", label: "管理员" },
+                { value: "super_admin", label: "超级管理员" },
               ]}
             />
             <SelectField
@@ -791,10 +780,9 @@ export default function UsersPage() {
                 });
               }}
               options={[
-                { value: "free", label: `免费版 (${PLAN_CONFIGS.free.quota}篇)` },
-                { value: "basic", label: `基础版 (${PLAN_CONFIGS.basic.quota}篇)` },
-                { value: "pro", label: `专业版 (${PLAN_CONFIGS.pro.quota}篇)` },
-                { value: "enterprise", label: `企业版 (${PLAN_CONFIGS.enterprise.quota}篇)` },
+                { value: "free", label: `免费会员 (${PLAN_CONFIGS.free.quota}积分/月)` },
+                { value: "pro", label: `月费会员 (${PLAN_CONFIGS.pro.quota}积分/月)` },
+                { value: "annual", label: `年费会员 (${PLAN_CONFIGS.annual.quota}积分/月)` },
               ]}
             />
             <div className="flex gap-3 pt-4">
@@ -817,30 +805,26 @@ export default function UsersPage() {
         </Modal>
       )}
 
-      {/* 修改密码弹窗 */}
+      {/* 发送密码重置邮件弹窗 */}
       {showPasswordModal && (
         <Modal
-          title="重置用户密码"
+          title="发送密码重置邮件"
           onClose={() => setShowPasswordModal(false)}
         >
           <div className="space-y-4">
             <div className="text-sm text-dim mb-4">
               用户邮箱: {passwordEmail}
             </div>
-            <InputField
-              label="新密码 (至少6位)"
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="输入新密码"
-            />
+            <div className="text-sm text-subtle mb-4">
+              系统将向该用户发送密码重置邮件，用户需点击邮件中的链接来设置新密码。
+            </div>
             <div className="flex gap-3 pt-4">
               <button
-                onClick={() => handleResetPassword(newPassword)}
+                onClick={handleSendResetEmail}
                 disabled={processing}
                 className="flex-1 px-4 py-2.5 rounded-lg btn-gradient font-semibold disabled:opacity-50"
               >
-                {processing ? "重置中..." : "确认重置"}
+                {processing ? "发送中..." : "发送重置邮件"}
               </button>
               <button
                 onClick={() => setShowPasswordModal(false)}
@@ -904,9 +888,11 @@ export default function UsersPage() {
                 value={batchRole}
                 onChange={(e) => setBatchRole(e.target.value)}
                 options={[
-                  { value: "user", label: "普通用户" },
-                  { value: "editor", label: "编辑" },
+                  { value: "guest", label: "访客" },
+                  { value: "user", label: "用户" },
+                  { value: "developer", label: "开发者" },
                   { value: "admin", label: "管理员" },
+                  { value: "super_admin", label: "超级管理员" },
                 ]}
               />
             ) : (
@@ -915,10 +901,9 @@ export default function UsersPage() {
                 value={batchPlan}
                 onChange={(e) => setBatchPlan(e.target.value)}
                 options={[
-                  { value: "free", label: `免费版 (${PLAN_CONFIGS.free.quota}篇)` },
-                  { value: "basic", label: `基础版 (${PLAN_CONFIGS.basic.quota}篇)` },
-                  { value: "pro", label: `专业版 (${PLAN_CONFIGS.pro.quota}篇)` },
-                  { value: "enterprise", label: `企业版 (${PLAN_CONFIGS.enterprise.quota}篇)` },
+                  { value: "free", label: `免费会员 (${PLAN_CONFIGS.free.quota}积分/月)` },
+                  { value: "pro", label: `月费会员 (${PLAN_CONFIGS.pro.quota}积分/月)` },
+                  { value: "annual", label: `年费会员 (${PLAN_CONFIGS.annual.quota}积分/月)` },
                 ]}
               />
             )}
@@ -1028,10 +1013,14 @@ function SelectField({
           background: "var(--bg-layer)",
           border: "1px solid var(--stroke-soft)",
           color: "var(--color-foreground)",
+          colorScheme: "dark",
         }}
       >
         {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
+          <option
+            key={opt.value}
+            value={opt.value}
+          >
             {opt.label}
           </option>
         ))}

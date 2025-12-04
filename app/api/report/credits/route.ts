@@ -29,7 +29,15 @@ export async function GET(request: NextRequest) {
 
       if (sessionError || !session?.user?.id) {
         console.warn(`[UNAUTHORIZED_SESSION] error: ${sessionError?.message || "no session"}`);
-        return NextResponse.json({ error: "Unauthorized", code: "unauthorized" }, { status: 401 });
+        // 友好地返回0积分，而不是401错误
+        return NextResponse.json({
+          userId: null,
+          credits: {
+            remaining_credits: 0,
+          },
+          source: "report_credits",
+          authenticated: false,
+        });
       }
 
       userId = session.user.id;
@@ -93,6 +101,14 @@ export async function GET(request: NextRequest) {
     }
   } catch (err) {
     console.error("Credits API error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    // 即使出错也返回友好的响应
+    return NextResponse.json({
+      userId: null,
+      credits: {
+        remaining_credits: 0,
+      },
+      source: "report_credits",
+      error: "Internal server error",
+    }, { status: 500 });
   }
 }

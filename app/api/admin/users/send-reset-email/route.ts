@@ -27,51 +27,39 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
     }
 
-    const { userId, role: newRole, plan, display_name, full_name } = await request.json();
+    const { email } = await request.json();
 
-    if (!userId) {
-      return NextResponse.json({ error: "缺少 userId" }, { status: 400 });
+    if (!email) {
+      return NextResponse.json({ error: "缺少 email" }, { status: 400 });
     }
 
-    // 准备更新数据
-    const updateData: {
-      role?: string;
-      plan?: string;
-      display_name?: string;
-      full_name?: string;
-      updated_at: string;
-    } = {
-      updated_at: new Date().toISOString(),
-    };
-
-    if (newRole) updateData.role = newRole;
-    if (plan) updateData.plan = plan;
-    if (display_name !== undefined) updateData.display_name = display_name;
-    if (full_name !== undefined) updateData.full_name = full_name;
-
-    const { error } = await supabaseAdmin
-      .from("profiles")
-      .update(updateData)
-      .eq("id", userId);
+    // 使用Supabase Admin API发送密码重置邮件
+    const { error } = await supabaseAdmin.auth.resetPasswordForEmail(email, {
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/account/change-password`,
+    });
 
     if (error) {
-      console.error("Update user error:", error);
+      console.error("Send reset email error:", error);
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
+    // 记录审计日志
     await supabaseAdmin.from("audit_logs").insert({
       user_id: adminUserId,
-      action: "user_update",
+      action: "password_reset_email_sent",
       table_name: "profiles",
-      record_id: userId,
-      details: { role: newRole, plan },
+      record_id: adminUserId,
+      details: { target_email: email },
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      message: "密码重置邮件已发送"
+    });
   } catch (error: unknown) {
-    console.error("Update user API error:", error);
+    console.error("Send reset email API error:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "更新用户失败" },
+      { error: error instanceof Error ? error.message : "发送重置邮件失败" },
       { status: 500 }
     );
   }

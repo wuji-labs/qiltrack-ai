@@ -34,9 +34,15 @@ export async function GET(request: NextRequest) {
         { count: "exact" }
       );
 
-    if (isAdmin && statusFilter) {
+    // Apply status filter
+    if (statusFilter) {
+      // Admin with explicit status filter
       query = query.eq("status" as never, statusFilter);
     } else if (!isAdmin) {
+      // Non-admin users can only see published reports
+      query = query.eq("status" as never, "published");
+    } else {
+      // Admin without status filter - default to published for report hub
       query = query.eq("status" as never, "published");
     }
 

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useMembershipTier } from "@/hooks/useMembershipTier";
 import { useLanguage } from "@/lib/i18n";
 import { LANGUAGE_OPTIONS } from "@/lib/i18n-config";
 
@@ -19,6 +20,7 @@ export default function AccountPage() {
   const router = useRouter();
   const { isAuthenticated, user, authMethod, oauthProviders, getReportCredits, signOut } =
     useSupabaseAuth();
+  const membership = useMembershipTier();
   const { language, setLanguage, t } = useLanguage();
   const [prefs, setPrefs] = useState<Preferences>({
     language,
@@ -135,8 +137,40 @@ export default function AccountPage() {
             </span>
             <div className="flex-1">
               <p className="text-lg font-semibold">{user?.email ?? t("auth.session.fallback")}</p>
-              <p className="text-sm text-subtle">{t("account.page.planLabel")}: free</p>
+              <p className="text-sm text-subtle">
+                {t("account.page.planLabel")}:{" "}
+                {membership.loading ? (
+                  "..."
+                ) : membership.tier === "free" ? (
+                  "免费版"
+                ) : membership.tier === "pro" ? (
+                  <span className="text-amber-300">Pro 会员</span>
+                ) : (
+                  <span className="text-purple-300">Premium 会员</span>
+                )}
+                {membership.isActive && membership.expiresAt && (
+                  <span className="text-xs ml-2 text-dim">
+                    到期: {new Date(membership.expiresAt).toLocaleDateString("zh-CN")}
+                  </span>
+                )}
+              </p>
             </div>
+            {!membership.isFree && (
+              <Link
+                href="/pricing"
+                className="rounded-xl border border-[var(--stroke-soft)] px-4 py-2 text-sm text-subtle hover:text-[var(--color-foreground)] hover:border-[var(--accent-emerald)]/50"
+              >
+                管理订阅
+              </Link>
+            )}
+            {membership.isFree && (
+              <Link
+                href="/pricing"
+                className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(251,146,60,0.3)] hover:scale-105"
+              >
+                升级会员
+              </Link>
+            )}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">

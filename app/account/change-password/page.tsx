@@ -9,7 +9,7 @@ import { useLanguage } from "@/lib/i18n";
 function ChangePasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated, authMethod, oauthProviders } = useSupabaseAuth();
+  const { isAuthenticated, authMethod, oauthProviders, supabase } = useSupabaseAuth();
   const { t } = useLanguage();
 
   const [currentPassword, setCurrentPassword] = useState("");
@@ -24,7 +24,9 @@ function ChangePasswordContent() {
   // (passed from callback route after successful code exchange)
   const isPasswordRecovery = searchParams.get("type") === "recovery";
 
-  // Redirect if not authenticated (unless it's password recovery)
+  // Redirect if not authenticated (but NOT for password recovery flow)
+  // For password recovery, we let the user input their password first,
+  // and check authentication when they submit the form
   useEffect(() => {
     if (!isAuthenticated && !isPasswordRecovery) {
       router.push("/login");
@@ -59,19 +61,20 @@ function ChangePasswordContent() {
       setLoading(true);
 
       try {
-        const response = await fetch("/api/auth/change-password", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            newPassword,
-            isRecovery: true,
-          }),
+        // For password recovery, use Supabase client directly
+        // because the recovery session is established in the browser
+        if (!supabase) {
+          setError(t("password.error.failed") || "Failed to change password");
+          return;
+        }
+
+        const { error: updateError } = await supabase.auth.updateUser({
+          password: newPassword,
         });
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          setError(data.error || t("password.error.failed") || "Failed to change password");
+        if (updateError) {
+          console.error("Password update error:", updateError);
+          setError(updateError.message || t("password.error.failed") || "Failed to change password");
           return;
         }
 
@@ -219,7 +222,7 @@ function ChangePasswordContent() {
         )}
 
         {/* Password Change Form */}
-        {!isOAuthUser && (
+        {(!isOAuthUser || isPasswordRecovery) && (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="rounded-3xl border border-slate-800 bg-slate-900/80 backdrop-blur-xl shadow-[0_20px_80px_rgba(0,0,0,0.6)] p-6 space-y-4">
               {/* Current Password - Only show for logged-in users changing password */}
@@ -332,7 +335,11 @@ function ChangePasswordContent() {
 
 export default function ChangePasswordPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 flex items-center justify-center">
+        <div className="text-base text-slate-400">Loading...</div>
+      </div>
+    }>
       <ChangePasswordContent />
     </Suspense>
   );

@@ -109,9 +109,13 @@ export async function getAuthContextFromRequest(request: Request): Promise<AuthC
 }
 
 export function isAdminOrEditor(role: AuthContext["role"]) {
-  return role === "admin" || role === "editor";
+  return role === "super_admin" || role === "admin" || role === "developer";
 }
 
 export function isAdmin(role: AuthContext["role"]) {
-  return role === "admin";
+  return role === "super_admin" || role === "admin";
+}
+
+export function isSuperAdmin(role: AuthContext["role"]) {
+  return role === "super_admin";
 }
