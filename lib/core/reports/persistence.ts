@@ -180,7 +180,13 @@ export class ReportPersistence {
     }
 
     const content = (data as any).content ?? data.body ?? data.summary ?? "";
-    if (!data.report_run_id || typeof content !== "string" || content.trim().length < 20) {
+    // Require at least 100 characters for a valid reusable report
+    if (!data.report_run_id || typeof content !== "string" || content.trim().length < 100) {
+      console.warn("[ReportPersistence] Skipping reuse - content too short", {
+        reportId: data.id,
+        reportRunId: data.report_run_id,
+        contentLength: content?.length || 0,
+      });
       return null;
     }
 
@@ -232,7 +238,13 @@ export class ReportPersistence {
     }
 
     const content = (data as any).content ?? data.body ?? data.summary ?? "";
-    if (!data.report_run_id || typeof content !== "string" || content.trim().length < 20) {
+    // Require at least 100 characters for a valid reusable report
+    if (!data.report_run_id || typeof content !== "string" || content.trim().length < 100) {
+      console.warn("[ReportPersistence] Skipping reuse - content too short", {
+        reportId: data.id,
+        reportRunId: data.report_run_id,
+        contentLength: content?.length || 0,
+      });
       return null;
     }
 

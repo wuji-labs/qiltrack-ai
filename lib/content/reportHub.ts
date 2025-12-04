@@ -1,4 +1,5 @@
 import type { AccessLevel, ReportCard, ReportPost, ReportSummary } from "@/types/report";
+import { getIndustryCover, getIndustryFromSymbol } from "./industryCoverGradients";
 
 /**
  * 权限检查上下文
@@ -511,13 +512,13 @@ function computeReadTime(body: string[]): string {
   return `${minutes} min`;
 }
 
-function fallbackCover(slug: string) {
-  const safe = slug || "report";
-  return `linear-gradient(135deg, rgba(20,20,20,0.6), rgba(60,120,90,0.6)), url('/reports/covers/${encodeURIComponent(safe)}.webp')`;
+function fallbackCover(slug: string, theme?: string | null) {
+  // Use industry-based gradient for dynamic cover
+  return getIndustryCover(theme, slug);
 }
 
-function formatCover(cover: string | null | undefined, slug: string) {
-  if (!cover) return fallbackCover(slug);
+function formatCover(cover: string | null | undefined, slug: string, theme?: string | null) {
+  if (!cover) return fallbackCover(slug, theme);
   if (cover.startsWith("url(") || cover.startsWith("linear-gradient")) return cover;
   if (/^https?:\/\//.test(cover)) return `url('${cover}')`;
 
@@ -525,7 +526,7 @@ function formatCover(cover: string | null | undefined, slug: string) {
   if (supabaseUrl) {
     return `url('${supabaseUrl}/storage/v1/object/public/report-assets/${cover}')`;
   }
-  return fallbackCover(slug);
+  return fallbackCover(slug, theme);
 }
 
 function normalizeSlugFromUrl(url?: string) {
@@ -558,7 +559,7 @@ export function mapSummaryToCard(summary: ReportSummary): ReportCard {
     author: summary.author,
     theme: summary.theme,
     tags: summary.tags || [],
-    cover: formatCover(summary.cover, slug),
+    cover: formatCover(summary.cover, slug, summary.theme),
     readTime,
     body: body.length ? body : [summary.snippet],
     lang: "en",
@@ -585,6 +586,7 @@ export function mapApiPostToCard(post: ReportPost): ReportCard {
     new Date().toISOString();
 
   const bodyForReadTime = body.length ? body : summary ? [summary] : [];
+  const theme = post.theme || "General";
 
   return {
     id: post.id,
@@ -593,9 +595,9 @@ export function mapApiPostToCard(post: ReportPost): ReportCard {
     snippet: summary || "No summary provided yet.",
     date,
     author: post.author || "Investor AI Team",
-    theme: post.theme || "General",
+    theme,
     tags: post.tags || [],
-    cover: formatCover(post.cover, slug),
+    cover: formatCover(post.cover, slug, theme),
     readTime: computeReadTime(bodyForReadTime),
     body: body.length
       ? body

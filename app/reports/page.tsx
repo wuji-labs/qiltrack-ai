@@ -238,10 +238,17 @@ export default function ReportsPage() {
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Check URL hash to auto-open My Reports section
+  // Check URL hash to auto-open My Reports section and scroll to it
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.hash === "#my-reports") {
       setShowMyReports(true);
+      // 延迟滚动，等待渲染完成
+      setTimeout(() => {
+        const myReportsSection = document.getElementById("my-reports-section");
+        if (myReportsSection) {
+          myReportsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
     }
   }, []);
 
@@ -533,6 +540,10 @@ export default function ReportsPage() {
                   e.preventDefault();
                   setShowMyReports(true);
                   window.location.hash = "#my-reports";
+                  // 滚动到顶部显示"我的报告"
+                  setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }, 100);
                 }}
                 className="inline-flex items-center gap-1 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] transition-colors motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 motion-safe:hover:glow-pulse"
               >
@@ -541,6 +552,151 @@ export default function ReportsPage() {
             </div>
           </div>
         </section>
+
+        {/* My Reports Section - 显示在 Hero 之后 */}
+        {showMyReports && auth.isAuthenticated && (
+          <section id="my-reports-section" className="space-y-6">
+            <div className="relative overflow-hidden rounded-[32px] border border-[var(--accent-emerald)]/30 bg-gradient-to-br from-[var(--bg-layer)]/95 via-[var(--bg-layer)]/90 to-[var(--bg-base)]/85 p-6 sm:p-8 shadow-[0_0_60px_rgba(91,224,176,0.1),0_26px_90px_rgba(0,0,0,0.4)]">
+              {/* Decorative gradient overlay */}
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[var(--accent-emerald)]/5 via-transparent to-transparent rounded-[32px]" aria-hidden />
+
+              {/* Header */}
+              <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+                <div className="space-y-2">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-emerald)]/20 border border-[var(--accent-emerald)]/40">
+                    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-[var(--accent-emerald)]" fill="currentColor">
+                      <path d="M4 4a2 2 0 012-2h4a2 2 0 012 2v1h2a1 1 0 011 1v8a1 1 0 01-1 1H2a1 1 0 01-1-1V6a1 1 0 011-1h2V4zm6 0H6v1h4V4z"/>
+                    </svg>
+                    <span className="text-xs font-semibold text-[var(--accent-emerald)] uppercase tracking-wider">
+                      {t("reports.page.hero.myReports")}
+                    </span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-[var(--color-foreground)]">
+                    打开我的报告
+                  </h2>
+                  <p className="text-sm text-dim">
+                    {myReports.length > 0
+                      ? `${myReports.length} 份报告`
+                      : "查看您生成的所有报告"}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowMyReports(false);
+                    window.location.hash = "";
+                  }}
+                  className="self-start sm:self-center inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)] hover:border-[var(--accent-emerald)]/50 transition-all duration-200"
+                >
+                  <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M12 4L4 12M4 4l8 8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  关闭
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="relative">
+                {loadingMyReports ? (
+                  <div className="flex items-center justify-center py-16">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="h-10 w-10 animate-spin rounded-full border-2 border-[var(--accent-emerald)]/30 border-t-[var(--accent-emerald)]" />
+                      <p className="text-sm text-dim">加载报告中...</p>
+                    </div>
+                  </div>
+                ) : myReports.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 space-y-4">
+                    <div className="h-16 w-16 rounded-full bg-[var(--accent-emerald)]/10 flex items-center justify-center">
+                      <svg viewBox="0 0 24 24" className="h-8 w-8 text-[var(--accent-emerald)]/60" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M9 12h6m-3-3v6m-7 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <div className="text-center space-y-2">
+                      <p className="text-base font-medium text-[var(--color-foreground)]">还没有报告</p>
+                      <p className="text-sm text-dim">前往首页生成您的第一份 AI 投研报告</p>
+                    </div>
+                    <Link
+                      href="/#generator"
+                      className="inline-flex items-center gap-2 rounded-full bg-[var(--accent-emerald)] px-5 py-2.5 text-sm font-semibold text-slate-950 hover:shadow-[0_0_24px_rgba(91,224,176,0.4)] transition-all duration-200"
+                    >
+                      <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M8 4v8M4 8h8" strokeLinecap="round" />
+                      </svg>
+                      生成报告
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {myReports.map((report, index) => {
+                      const reportViewUrl = report.markdown_signed_url || `/reports/view/${report.id}`;
+                      return (
+                        <a
+                          key={report.id}
+                          href={reportViewUrl}
+                          target={report.markdown_signed_url ? "_blank" : "_self"}
+                          rel="noopener noreferrer"
+                          className="group relative overflow-hidden rounded-[20px] border border-[var(--stroke-soft)] bg-[var(--bg-base)]/80 p-5 transition-all duration-300 hover:border-[var(--accent-emerald)]/40 hover:shadow-[0_12px_40px_rgba(0,0,0,0.3),0_0_20px_rgba(91,224,176,0.1)] cursor-pointer block"
+                          style={{ animationDelay: `${index * 50}ms` }}
+                        >
+                          <div className="absolute top-4 right-4">
+                            <span className={`inline-flex h-2.5 w-2.5 rounded-full ${
+                              report.status === "completed"
+                                ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]"
+                                : report.status === "processing"
+                                ? "bg-amber-400 animate-pulse"
+                                : "bg-slate-400"
+                            }`} />
+                          </div>
+                          <div className="mb-4">
+                            <h4 className="text-xl font-bold text-[var(--accent-emerald)] tracking-wide">
+                              {report.symbol}
+                            </h4>
+                            <p className="text-xs text-subtle mt-1">
+                              {formatDate(report.created_at)}
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium uppercase tracking-wider ${
+                              report.status === "completed"
+                                ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
+                                : report.status === "processing"
+                                ? "bg-amber-500/15 text-amber-300 border border-amber-500/30"
+                                : "bg-slate-500/15 text-slate-300 border border-slate-500/30"
+                            }`}>
+                              {report.status === "completed" ? "已完成" : report.status === "processing" ? "生成中" : report.status}
+                            </span>
+                            {report.mode && (
+                              <span className="inline-flex items-center px-2 py-1 rounded-md bg-purple-500/15 text-purple-300 border border-purple-500/30 text-[10px] font-medium uppercase tracking-wider">
+                                {report.mode}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex flex-wrap gap-2 pt-3 border-t border-[var(--stroke-soft)]">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--accent-emerald)]/10 text-xs font-medium text-[var(--accent-emerald)]">
+                              点击查看报告
+                            </span>
+                            {report.docx_signed_url && (
+                              <span
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  window.open(report.docx_signed_url!, '_blank');
+                                }}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[var(--stroke-soft)] text-xs font-medium text-dim hover:text-[var(--color-foreground)] hover:border-[var(--accent-emerald)]/40 transition-all cursor-pointer"
+                              >
+                                下载 DOCX
+                              </span>
+                            )}
+                          </div>
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
 
         <section id="popular" className="space-y-8 scroll-mt-28 md:scroll-mt-32">
           <div className="space-y-2">
@@ -775,86 +931,6 @@ export default function ReportsPage() {
               </button>
             </div>
           </section>
-        )}
-
-        {showMyReports && auth.isAuthenticated && (
-          <dialog
-            open
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-            onClick={() => setShowMyReports(false)}
-          >
-            <div
-              className="relative mx-4 max-w-4xl max-h-[85vh] overflow-y-auto rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/95 p-8 shadow-[0_26px_90px_rgba(0,0,0,0.5)]"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-semibold text-[var(--color-foreground)]">
-                  {t("reports.page.hero.myReports.cta")}
-                </h3>
-                <button
-                  type="button"
-                  onClick={() => setShowMyReports(false)}
-                  className="rounded-full p-2 hover:bg-[var(--stroke-soft)] transition-colors"
-                  aria-label="Close"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-              </div>
-
-              {loadingMyReports ? (
-                <p className="text-sm text-subtle">{t("reports.page.loading")}</p>
-              ) : myReports.length === 0 ? (
-                <p className="text-sm text-subtle">{t("reports.page.empty")}</p>
-              ) : (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {myReports.map((report) => (
-                    <div
-                      key={report.id}
-                      className="rounded-[24px] border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 space-y-3 hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] transition-shadow"
-                    >
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-semibold text-[var(--accent-emerald)]">
-                          {report.symbol}
-                        </p>
-                        <span className="text-xs text-subtle">{formatDate(report.created_at)}</span>
-                      </div>
-                      <p className="text-xs text-dim">Status: {report.status}</p>
-                      {report.mode && <p className="text-xs text-subtle">Mode: {report.mode}</p>}
-                      <div className="flex flex-wrap gap-2">
-                        {report.markdown_signed_url && (
-                          <a
-                            href={report.markdown_signed_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-[var(--accent-emerald)] hover:underline"
-                          >
-                            View Markdown
-                          </a>
-                        )}
-                        {report.docx_signed_url && (
-                          <a
-                            href={report.docx_signed_url}
-                            download
-                            className="text-xs text-[var(--accent-emerald)] hover:underline"
-                          >
-                            Download DOCX
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </dialog>
         )}
       </div>
 
