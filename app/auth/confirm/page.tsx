@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useLanguage } from "@/lib/i18n";
@@ -15,7 +15,8 @@ import { useLanguage } from "@/lib/i18n";
  *
  * It uses Supabase client to verify the OTP token
  */
-export default function AuthConfirmPage() {
+
+function AuthConfirmContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useLanguage();
@@ -117,5 +118,24 @@ export default function AuthConfirmPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)] flex items-center justify-center">
+      <div className="text-center space-y-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--accent-emerald)] mx-auto"></div>
+        <p className="text-base text-subtle">Loading...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function AuthConfirmPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <AuthConfirmContent />
+    </Suspense>
   );
 }
