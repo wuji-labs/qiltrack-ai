@@ -134,22 +134,15 @@ export class LLMService {
 
     console.info("[LLM] Attempting Helicone call with model:", this.heliconeConfig.model);
 
-    // Helicone uses OpenAI-compatible endpoint with custom auth header
-    // The gateway proxies to OpenAI, so we need both Helicone auth and OpenAI API key
-    const openaiApiKey = process.env.OPENAI_API_KEY;
-
+    // Helicone AI Gateway mode:
+    // Use HELICONE_API_KEY directly as Authorization header
+    // baseURL: https://ai-gateway.helicone.ai
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      "Helicone-Auth": `Bearer ${this.heliconeConfig.apiKey}`,
+      "Authorization": `Bearer ${this.heliconeConfig.apiKey}`,
     };
 
-    // If we have an OpenAI API key, use Helicone as a proxy
-    // Otherwise, Helicone might be configured with its own OpenAI key
-    if (openaiApiKey) {
-      headers["Authorization"] = `Bearer ${openaiApiKey}`;
-    }
-
-    const res = await fetch("https://oai.helicone.ai/v1/chat/completions", {
+    const res = await fetch("https://ai-gateway.helicone.ai/v1/chat/completions", {
       method: "POST",
       headers,
       body: JSON.stringify({
