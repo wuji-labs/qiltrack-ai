@@ -140,12 +140,13 @@ export async function POST(req: Request) {
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
+        const periodEnd = (subscription as unknown as { current_period_end?: number }).current_period_end;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await (supabase.from("profiles") as any)
           .update({
             subscription_status: subscription.status as string,
-            subscription_expires_at: new Date(subscription.current_period_end * 1000).toISOString(),
+            subscription_expires_at: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
             updated_at: new Date().toISOString(),
           })
           .eq("stripe_customer_id", customerId);
