@@ -5,8 +5,12 @@ import routerProvider from "@refinedev/nextjs-router";
 import { supabaseDataProvider } from "@/lib/admin/data-provider";
 import { authProvider } from "@/lib/admin/auth-provider";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Suspense, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { Suspense, useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+
+// Admin roles that can access the admin panel
+const ADMIN_ROLES = ["super_admin", "admin", "editor", "developer"];
 
 interface NavItem {
   href: string;
@@ -38,8 +42,8 @@ const navGroups: NavGroup[] = [
     title: "订阅与收入",
     items: [
       { href: "/admin/subscriptions", label: "订阅管理", icon: "💳" },
-      { href: "/admin/plans", label: "套餐配置", icon: "📦" },
       { href: "/admin/credits", label: "积分管理", icon: "💰" },
+      { href: "/admin/plans", label: "套餐配置", icon: "📦" },
     ],
   },
   {
@@ -236,6 +240,60 @@ function AdminHeader({ sidebarCollapsed }: { sidebarCollapsed: boolean }) {
 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+  const router = useRouter();
+
+  // Check admin permission on mount
+  useEffect(() => {
+    async function checkAdminPermission() {
+      const supabase = createClient();
+
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        // Not logged in, redirect to login
+        router.replace("/login?redirect=/admin");
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      const userRole = (profile as { role?: string | null } | null)?.role;
+
+      if (!userRole || !ADMIN_ROLES.includes(userRole)) {
+        // Not an admin, redirect to home
+        console.warn("[Admin] Access denied for role:", userRole);
+        router.replace("/?error=admin_access_denied");
+        return;
+      }
+
+      setIsAuthorized(true);
+    }
+
+    checkAdminPermission();
+  }, [router]);
+
+  // Show loading while checking permission
+  if (isAuthorized === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--bg-base)" }}>
+        <div className="text-dim">验证权限中...</div>
+      </div>
+    );
+  }
+
+  // Not authorized (will redirect)
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--bg-base)" }}>
+        <div className="text-dim">无权限访问</div>
+      </div>
+    );
+  }
 
   return (
     <Refine
