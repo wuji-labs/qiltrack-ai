@@ -23,7 +23,7 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
 
       if (result.success) {
         setClaimed(true);
-        setStreak(result.streakCount);
+        setStreak(result.streakCount || 0);
 
         // 通知父组件刷新积分
         if (onRewardClaimed) {

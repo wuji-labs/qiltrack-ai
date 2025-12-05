@@ -53,6 +53,7 @@ type DailyRewardResponse = {
   success: boolean;
   message: string;
   remainingCredits: number;
+  streakCount?: number;
 };
 
 type ApiErrorResponse = {
