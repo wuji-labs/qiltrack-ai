@@ -214,8 +214,8 @@ export function ReportGeneratorSection({
       setErrorState({
         type: "quota",
         message: t("generator.alert.insufficientCredits", {
-          required: REPORT_CREDIT_COST,
-          available: auth.remainingQuota
+          required: String(REPORT_CREDIT_COST),
+          available: String(auth.remainingQuota)
         }) || `积分不足，需要 ${REPORT_CREDIT_COST} 积分，当前余额 ${auth.remainingQuota} 积分`
       });
       return;
