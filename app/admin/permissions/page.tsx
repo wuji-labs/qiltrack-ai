@@ -14,7 +14,7 @@ import {
   type Column,
 } from "@/app/components/admin/ui";
 
-interface UserWithRole {
+interface UserWithRole extends Record<string, unknown> {
   id: string;
   email: string;
   display_name: string | null;
@@ -107,8 +107,9 @@ export default function PermissionsPage() {
           .from("profiles")
           .select("role")
           .eq("id", user.id)
-          .single<{ role: string | null }>();
-        setCurrentUserRole(profile?.role || "user");
+          .single();
+        const role = (profile as unknown as { role?: string } | null)?.role;
+        setCurrentUserRole(role || "user");
       }
     }
     fetchCurrentUser();

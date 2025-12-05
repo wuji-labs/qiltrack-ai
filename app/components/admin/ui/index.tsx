@@ -428,7 +428,7 @@ export interface DataTableProps<T> {
   };
 }
 
-export function DataTable<T extends Record<string, unknown>>({
+export function DataTable<T>({
   columns,
   data,
   loading,
@@ -442,7 +442,7 @@ export function DataTable<T extends Record<string, unknown>>({
 }: DataTableProps<T>) {
   const getRowKey = (record: T): string => {
     if (typeof rowKey === "function") return rowKey(record);
-    return String(record[rowKey]);
+    return String((record as Record<string, unknown>)[rowKey as string]);
   };
 
   const toggleSelectAll = () => {
@@ -525,7 +525,7 @@ export function DataTable<T extends Record<string, unknown>>({
                       )}
                       {columns.map((col) => (
                         <td key={col.key} className="px-4 py-3 text-sm" style={{ color: "var(--color-foreground)" }}>
-                          {col.render ? col.render(record[col.key], record, index) : String(record[col.key] ?? "-")}
+                          {col.render ? col.render((record as Record<string, unknown>)[col.key], record, index) : String((record as Record<string, unknown>)[col.key] ?? "-")}
                         </td>
                       ))}
                     </tr>

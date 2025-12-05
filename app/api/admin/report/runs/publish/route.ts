@@ -47,7 +47,8 @@ export async function POST(request: NextRequest) {
 
     // 2. 生成slug (使用symbol + timestamp)
     const timestamp = Date.now();
-    const slug = `${run.symbol.toLowerCase()}-${timestamp}`;
+    const symbolStr = run.symbol || 'unknown';
+    const slug = `${symbolStr.toLowerCase()}-${timestamp}`;
 
     // 3. 准备封面 (可以使用默认封面或者从storage获取)
     const cover = ""; // 可以后续添加封面上传功能
@@ -56,16 +57,16 @@ export async function POST(request: NextRequest) {
     let body_content = "";
     if (run.markdown_path) {
       // 这里简化处理,实际可能需要从storage读取
-      body_content = `# ${run.symbol} 投资报告\n\n生成时间: ${run.created_at}\n\n详情请查看附件文档。`;
+      body_content = `# ${symbolStr} 投资报告\n\n生成时间: ${run.created_at}\n\n详情请查看附件文档。`;
     }
 
     // 5. 创建report_post
     const { data: post, error: postError } = await context.supabase
       .from("report_posts")
       .insert({
-        title: title || `${run.symbol} 投资研究报告`,
+        title: title || `${symbolStr} 投资研究报告`,
         slug: slug,
-        summary: summary || `${run.symbol} 的深度投资分析报告,基于最新数据生成`,
+        summary: summary || `${symbolStr} 的深度投资分析报告,基于最新数据生成`,
         body: body_content,
         cover: cover,
         theme: theme || "investment",
