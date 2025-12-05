@@ -2893,6 +2893,20 @@ const translations: Record<string, TranslationEntry> = {
     "zh-Hant": "免費方案",
     "zh-Hans": "免费方案",
   },
+  "quota.plan.pro": {
+    en: "Pro plan",
+    ja: "Proプラン",
+    ko: "Pro 플랜",
+    "zh-Hant": "月費版",
+    "zh-Hans": "月费版",
+  },
+  "quota.plan.annual": {
+    en: "Annual plan",
+    ja: "年間プラン",
+    ko: "연간 플랜",
+    "zh-Hant": "年費版",
+    "zh-Hans": "年费版",
+  },
   "quota.status.session": {
     en: "{{email}} · plan: {{plan}}",
     ja: "{{email}} · プラン: {{plan}}",

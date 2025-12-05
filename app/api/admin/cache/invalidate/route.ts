@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { marketDataCache, reportCache } from '@/lib/cache/redis';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdmin, isAuthError } from '@/lib/auth/admin';
 
 /**
  * Admin Cache Invalidation API
@@ -19,36 +19,12 @@ interface InvalidateRequest {
 }
 
 export async function POST(request: NextRequest) {
+  // 认证检查
+  const auth = await requireAdmin();
+  if (isAuthError(auth)) return auth;
+
   try {
-    // 1. Check authentication
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    // 2. Check admin role
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (!profile || !profile.role || !['admin', 'superadmin'].includes(profile.role)) {
-      return NextResponse.json(
-        { success: false, error: 'Forbidden' },
-        { status: 403 }
-      );
-    }
-
-    // 3. Parse request body
+    // Parse request body
     const body: InvalidateRequest = await request.json();
 
     // 4. Validate request

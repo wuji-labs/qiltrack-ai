@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { requireAdmin, isAuthError } from "@/lib/auth/admin";
 
 const PLAN_PRICES = {
   free: 0,
@@ -8,6 +9,10 @@ const PLAN_PRICES = {
 };
 
 export async function GET() {
+  // 认证检查
+  const auth = await requireAdmin();
+  if (isAuthError(auth)) return auth;
+
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;

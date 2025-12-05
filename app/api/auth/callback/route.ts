@@ -1,7 +1,6 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import type { Database } from "@/types/database";
+import { createServerClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
@@ -52,10 +51,21 @@ export async function GET(request: NextRequest) {
   }
 
   if (code) {
-    const cookieStore = cookies();
-    const supabase = createRouteHandlerClient<Database>({
-      cookies: () => cookieStore,
-    });
+    const cookieStore = await cookies();
+
+    // 收集需要设置的 cookies
+    const cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }> = [];
+
+    const supabase = createServerClient(
+      cookieStore,
+      (cookies) => {
+        cookiesToSet.push(...cookies.map(c => ({
+          name: c.name,
+          value: c.value,
+          options: c.options as Record<string, unknown> | undefined
+        })));
+      }
+    );
 
     try {
       const { error } = await supabase.auth.exchangeCodeForSession(code);
@@ -95,16 +105,26 @@ export async function GET(request: NextRequest) {
         }
       }
 
+      // Create redirect response
+      let redirectUrl: URL;
+
       // If this is a password recovery callback, redirect to change password page
       if (type === "recovery") {
         console.log("[AUTH] Redirecting to change password page");
-        return NextResponse.redirect(
-          new URL("/account/change-password?type=recovery", requestUrl.origin)
-        );
+        redirectUrl = new URL("/account/change-password?type=recovery", requestUrl.origin);
+      } else {
+        console.log("[AUTH] Redirecting to homepage");
+        redirectUrl = new URL("/", requestUrl.origin);
       }
 
-      console.log("[AUTH] Redirecting to homepage");
-      return NextResponse.redirect(new URL("/", requestUrl.origin));
+      const response = NextResponse.redirect(redirectUrl);
+
+      // 设置 cookies 到响应
+      for (const cookie of cookiesToSet) {
+        response.cookies.set(cookie.name, cookie.value, cookie.options as Record<string, unknown> | undefined);
+      }
+
+      return response;
     } catch (error) {
       console.error("[AUTH] Session exchange error:", error);
       return NextResponse.redirect(

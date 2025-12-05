@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripeClient } from "@/lib/stripe/client";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
-import type { Database } from "@/types/database";
+import { createServerClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -36,17 +35,16 @@ function getBaseUrl() {
 
 export async function POST(req: NextRequest) {
   try {
-    // 获取用户session
-    const cookieStore = cookies();
-    const supabase = createRouteHandlerClient<Database>({
-      cookies: () => cookieStore,
-    });
+    // 获取用户session - 使用新的 @supabase/ssr
+    const cookieStore = await cookies();
+    const supabase = createServerClient(cookieStore);
 
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -61,19 +59,19 @@ export async function POST(req: NextRequest) {
     const baseUrl = getBaseUrl();
 
     const checkoutSession = await stripe.checkout.sessions.create({
-      customer_email: session.user.email,
+      customer_email: user.email,
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${baseUrl}/account?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/pricing?canceled=true`,
       metadata: {
-        user_id: session.user.id,
+        user_id: user.id,
         plan,
       },
       subscription_data: {
         metadata: {
-          user_id: session.user.id,
+          user_id: user.id,
           plan,
         },
       },

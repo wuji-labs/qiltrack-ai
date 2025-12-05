@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 import { InsufficientCreditsError, UnauthorizedError } from "../errors";
 
 /**
@@ -67,7 +67,7 @@ export class CreditManager {
     symbol?: string,
     metadata?: Record<string, any>
   ): Promise<CreditOperationResult> {
-    const supabase = await createClient();
+    const supabase = createServiceRoleClient();
 
     if (amount === 1) {
       // Use optimized single-credit consumption
@@ -118,7 +118,7 @@ export class CreditManager {
    * @returns Credit balance information
    */
   async getBalance(userId: string): Promise<CreditBalance> {
-    const supabase = await createClient();
+    const supabase = createServiceRoleClient();
 
     const { data, error } = await supabase
       .from("report_credits")
@@ -161,7 +161,7 @@ export class CreditManager {
     amount: number,
     reason: string = "admin_grant"
   ): Promise<CreditOperationResult> {
-    const supabase = await createClient();
+    const supabase = createServiceRoleClient();
 
     // Check admin permissions
     const isAdmin = await this.checkAdminPermission(adminId);
@@ -238,7 +238,7 @@ export class CreditManager {
    * @returns Operation result with remaining credits
    */
   async claimDailyReward(userId: string): Promise<CreditOperationResult> {
-    const supabase = await createClient();
+    const supabase = createServiceRoleClient();
 
     const { data, error } = await supabase.rpc("fn_claim_daily_reward" as any, {
       p_user_id: userId,
@@ -269,7 +269,7 @@ export class CreditManager {
    * @returns Array of credit transactions
    */
   async getTransactionHistory(userId: string, limit: number = 50): Promise<CreditTransaction[]> {
-    const supabase = await createClient();
+    const supabase = createServiceRoleClient();
 
     const { data, error } = await supabase
       .from("report_credit_events")
@@ -290,7 +290,7 @@ export class CreditManager {
    * @private
    */
   private async checkAdminPermission(userId: string): Promise<boolean> {
-    const supabase = await createClient();
+    const supabase = createServiceRoleClient();
 
     const { data, error } = await supabase
       .from("profiles")
@@ -313,7 +313,7 @@ export class CreditManager {
    * @internal
    */
   async initializeCredits(userId: string, initialCredits: number = 30): Promise<void> {
-    const supabase = await createClient();
+    const supabase = createServiceRoleClient();
 
     const { error } = await supabase.from("report_credits").insert({
       user_id: userId,

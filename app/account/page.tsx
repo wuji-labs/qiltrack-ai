@@ -144,9 +144,9 @@ export default function AccountPage() {
                 ) : membership.tier === "free" ? (
                   "免费版"
                 ) : membership.tier === "pro" ? (
-                  <span className="text-amber-300">Pro 会员</span>
+                  <span className="text-amber-300">Pro 月费会员</span>
                 ) : (
-                  <span className="text-purple-300">Premium 会员</span>
+                  <span className="text-purple-300">年费会员</span>
                 )}
                 {membership.isActive && membership.expiresAt && (
                   <span className="text-xs ml-2 text-dim">

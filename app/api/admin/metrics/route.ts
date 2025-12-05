@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdmin, isAuthError } from '@/lib/auth/admin';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 
 /**
  * Business Metrics API
@@ -35,36 +36,15 @@ interface MetricsData {
 }
 
 export async function GET(request: NextRequest) {
+  // 认证检查
+  const auth = await requireAdmin();
+  if (isAuthError(auth)) return auth;
+
   try {
-    // 1. Check authentication
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    // 使用 service role 查询数据
+    const supabase = createServiceRoleClient();
 
-    if (authError || !user) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    // 2. Check admin role
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (!profile || !profile.role || !['admin', 'superadmin'].includes(profile.role)) {
-      return NextResponse.json(
-        { success: false, error: 'Forbidden' },
-        { status: 403 }
-      );
-    }
-
-    // 3. Fetch metrics
+    // Fetch metrics
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);

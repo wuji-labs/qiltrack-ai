@@ -152,7 +152,7 @@ export default function PermissionsPage() {
       // 获取角色统计
       const { data: allProfiles } = await supabase.from("profiles").select("role");
       const stats: Record<string, number> = { super_admin: 0, admin: 0, developer: 0, user: 0, guest: 0 };
-      allProfiles?.forEach((p: { role?: string }) => {
+      allProfiles?.forEach((p: { role: string | null }) => {
         const role = p.role || "user";
         stats[role] = (stats[role] || 0) + 1;
       });

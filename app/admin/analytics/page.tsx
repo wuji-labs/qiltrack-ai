@@ -96,8 +96,10 @@ export default function AnalyticsPage() {
         .not("symbol", "is", null);
 
       const symbolCounts: Record<string, number> = {};
-      symbolData?.forEach((r: { symbol: string }) => {
-        symbolCounts[r.symbol] = (symbolCounts[r.symbol] || 0) + 1;
+      symbolData?.forEach((r: { symbol: string | null }) => {
+        if (r.symbol) {
+          symbolCounts[r.symbol] = (symbolCounts[r.symbol] || 0) + 1;
+        }
       });
 
       const topSymbols = Object.entries(symbolCounts)
@@ -173,7 +175,7 @@ export default function AnalyticsPage() {
     }
   }
 
-  function aggregateByDate(items: { created_at: string }[], field: string, days: number) {
+  function aggregateByDate(items: { created_at: string | null }[], _field: string, days: number) {
     const result: { date: string; count: number }[] = [];
     const today = new Date();
 
@@ -183,6 +185,7 @@ export default function AnalyticsPage() {
       const displayDate = format(date, "MM/dd");
 
       const count = items.filter((item) => {
+        if (!item.created_at) return false;
         const itemDate = format(new Date(item.created_at), "yyyy-MM-dd");
         return itemDate === dateStr;
       }).length;
@@ -193,7 +196,7 @@ export default function AnalyticsPage() {
     return result;
   }
 
-  function aggregateReportsByDate(items: { created_at: string; status: string }[], days: number) {
+  function aggregateReportsByDate(items: { created_at: string | null; status: string | null }[], days: number) {
     const result: { date: string; count: number; success: number; failed: number }[] = [];
     const today = new Date();
 
@@ -203,6 +206,7 @@ export default function AnalyticsPage() {
       const displayDate = format(date, "MM/dd");
 
       const dayItems = items.filter((item) => {
+        if (!item.created_at) return false;
         const itemDate = format(new Date(item.created_at), "yyyy-MM-dd");
         return itemDate === dateStr;
       });

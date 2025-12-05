@@ -12,7 +12,7 @@ interface AuditLog {
   action: string;
   resource_type: string | null;
   resource_id: string | null;
-  details: Record<string, unknown> | null;
+  details: Json;
   ip_address?: string | null;
   user_agent?: string | null;
   created_at: string;
@@ -21,6 +21,8 @@ interface AuditLog {
     display_name: string | null;
   } | null;
 }
+
+type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 interface AuditStats {
   totalLogs: number;
@@ -164,7 +166,7 @@ export default function AuditLogsPage() {
       let reportActions = 0;
       let securityEvents = 0;
 
-      allLogs?.forEach((log: { action: string; resource_type?: string }) => {
+      allLogs?.forEach((log: { action: string; resource_type: string | null }) => {
         byAction[log.action] = (byAction[log.action] || 0) + 1;
         if (log.resource_type) {
           byResource[log.resource_type] = (byResource[log.resource_type] || 0) + 1;
@@ -248,13 +250,13 @@ export default function AuditLogsPage() {
       if (error) throw error;
 
       // 客户端筛选
-      let filteredData = data || [];
+      let filteredData: AuditLog[] = (data || []) as AuditLog[];
 
       // 搜索过滤
       if (searchTerm) {
         const term = searchTerm.toLowerCase();
         filteredData = filteredData.filter(
-          (log: AuditLog) =>
+          (log) =>
             log.profiles?.email?.toLowerCase().includes(term) ||
             log.action.toLowerCase().includes(term) ||
             log.resource_id?.toLowerCase().includes(term)
@@ -264,7 +266,7 @@ export default function AuditLogsPage() {
       // 仅显示危险操作
       if (dangerOnly) {
         filteredData = filteredData.filter(
-          (log: AuditLog) => ACTION_LABELS[log.action]?.danger
+          (log) => ACTION_LABELS[log.action]?.danger
         );
       }
 
@@ -298,7 +300,7 @@ export default function AuditLogsPage() {
 
       // 创建CSV
       const headers = ["时间", "用户ID", "动作", "资源类型", "资源ID", "IP地址", "详情"];
-      const rows = data?.map((log: AuditLog) => [
+      const rows = (data as AuditLog[])?.map((log) => [
         format(new Date(log.created_at), "yyyy-MM-dd HH:mm:ss"),
         log.user_id || "",
         ACTION_LABELS[log.action]?.label || log.action,
