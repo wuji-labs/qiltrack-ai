@@ -140,7 +140,7 @@
 所有 `[AUTH]` 前缀的日志：
 
 ```bash
-cd D:\Projects\investor-ai-g2
+cd D:\Projects\qiltrack-ai-g2
 # 终端应该已经在运行 npm run dev
 # 查看输出中的 [AUTH] 日志
 ```

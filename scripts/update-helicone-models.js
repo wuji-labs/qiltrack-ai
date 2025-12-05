@@ -22,7 +22,7 @@ function fetchJson(url) {
         {
           headers: {
             Accept: "application/json",
-            "User-Agent": "investor-ai-model-sync",
+            "User-Agent": "qiltrack-ai-model-sync",
           },
         },
         (res) => {

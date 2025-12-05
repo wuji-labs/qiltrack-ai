@@ -5,7 +5,7 @@ Write-Host "Deep cleaning worktree..." -ForegroundColor Cyan
 
 # Step 1: Kill any running dev servers
 Write-Host "1. Checking for running dev servers..." -ForegroundColor Yellow
-Get-Process node -ErrorAction SilentlyContinue | Where-Object { $_.Path -like "*investor-ai*" } | Stop-Process -Force
+Get-Process node -ErrorAction SilentlyContinue | Where-Object { $_.Path -like "*qiltrack-ai*" } | Stop-Process -Force
 Write-Host "   Done" -ForegroundColor Green
 
 # Step 2: Remove caches

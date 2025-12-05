@@ -67,7 +67,7 @@
 
 ```powershell
 # 已执行验证脚本
-cd D:\Projects\investor-ai
+cd D:\Projects\qiltrack-ai
 claude mcp list              # ✅ 通过
 claude mcp get tailwind      # ✅ 通过
 ```

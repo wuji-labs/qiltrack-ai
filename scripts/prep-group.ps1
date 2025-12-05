@@ -30,7 +30,7 @@ function Get-WorktreePath {
   if ([string]::IsNullOrWhiteSpace($sanitized)) {
     throw "Worktree name cannot be empty."
   }
-  return (Join-Path $parent ("investor-ai-{0}" -f $sanitized))
+  return (Join-Path $parent ("qiltrack-ai-{0}" -f $sanitized))
 }
 
 function Invoke-GitLocal {

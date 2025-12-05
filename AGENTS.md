@@ -22,7 +22,7 @@
 .\scripts\reset-worktree.ps1 -Name g1
 
 # 启动开发服务器（不同端口）
-cd D:\Projects\investor-ai-g1 && npm run dev -- --port 3001
+cd D:\Projects\qiltrack-ai-g1 && npm run dev -- --port 3001
 ```
 
 详见 `docs/guides/worktree-multi-team.md`。

@@ -87,14 +87,14 @@ const isRecovery = type === "recovery" && tokenHash !== null; // 必须同时满
 
 ```bash
 # 检查所有 worktree 端口
-grep '"dev"' D:/Projects/investor-ai-g*/package.json
+grep '"dev"' D:/Projects/qiltrack-ai-g*/package.json
 
 # 应输出：
-# D:/Projects/investor-ai-g1/package.json:    "dev": "next dev -p 3001",
-# D:/Projects/investor-ai-g2/package.json:    "dev": "next dev -p 3002",
-# D:/Projects/investor-ai-g3/package.json:    "dev": "next dev -p 3003",
-# D:/Projects/investor-ai-g4/package.json:    "dev": "next dev -p 3004",
-# D:/Projects/investor-ai-g5/package.json:    "dev": "next dev -p 3005",
+# D:/Projects/qiltrack-ai-g1/package.json:    "dev": "next dev -p 3001",
+# D:/Projects/qiltrack-ai-g2/package.json:    "dev": "next dev -p 3002",
+# D:/Projects/qiltrack-ai-g3/package.json:    "dev": "next dev -p 3003",
+# D:/Projects/qiltrack-ai-g4/package.json:    "dev": "next dev -p 3004",
+# D:/Projects/qiltrack-ai-g5/package.json:    "dev": "next dev -p 3005",
 ```
 
 ### 功能验证
@@ -116,11 +116,11 @@ grep '"dev"' D:/Projects/investor-ai-g*/package.json
 ```bash
 # 停止所有运行的 dev 服务器
 # 然后每个 worktree 重新启动
-cd D:\Projects\investor-ai-g1 && npm run dev  # → 3001
-cd D:\Projects\investor-ai-g2 && npm run dev  # → 3002
-cd D:\Projects\investor-ai-g3 && npm run dev  # → 3003
-cd D:\Projects\investor-ai-g4 && npm run dev  # → 3004
-cd D:\Projects\investor-ai-g5 && npm run dev  # → 3005
+cd D:\Projects\qiltrack-ai-g1 && npm run dev  # → 3001
+cd D:\Projects\qiltrack-ai-g2 && npm run dev  # → 3002
+cd D:\Projects\qiltrack-ai-g3 && npm run dev  # → 3003
+cd D:\Projects\qiltrack-ai-g4 && npm run dev  # → 3004
+cd D:\Projects\qiltrack-ai-g5 && npm run dev  # → 3005
 ```
 
 ### 2. 验证端口监听

@@ -13,7 +13,7 @@
 
 ### 分支与目录
 
-- 分支命名：`g1/feature-reporting`、`g2/fix-auth` 等，和 worktree `D:\Projects\investor-ai-g1` 对应。
+- 分支命名：`g1/feature-reporting`、`g2/fix-auth` 等，和 worktree `D:\Projects\qiltrack-ai-g1` 对应。
 - 组内文档约定：`docs/decisions/<date>-g1-*.md`、`docs/plans/g1-*.md`、`docs/reports/<date>-g1-*-cavr.md`。
 
 ## 2. Boot Sequence（启动指令）

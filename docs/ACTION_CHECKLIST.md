@@ -50,7 +50,7 @@
 
 ```bash
 # 在项目目录运行
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 supabase migration list      # 查看现有迁移
 supabase migration up        # 应用所有待处理迁移
 ```

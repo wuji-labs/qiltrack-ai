@@ -50,7 +50,7 @@
 5. ✅ 完成！
 
 # 选项 B：使用 CLI
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 supabase migration up
 ```
 

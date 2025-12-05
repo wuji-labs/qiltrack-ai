@@ -280,10 +280,10 @@ QUICK_REFERENCE.md
 
 ```bash
 # 当前工作区
-pwd  # D:\Projects\investor-ai-gX
+pwd  # D:\Projects\qiltrack-ai-gX
 
 # 运行测试（从总部触发）
-npm run test --prefix D:\Projects\investor-ai-gX
+npm run test --prefix D:\Projects\qiltrack-ai-gX
 
 # 查看状态
 git status

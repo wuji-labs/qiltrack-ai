@@ -217,7 +217,7 @@ export function FooterSection({
     },
     {
       platform: "linkedin",
-      href: "https://linkedin.com/company/investor-ai",
+      href: "https://linkedin.com/company/qiltrack-ai",
       label: t("footer.social.linkedin"),
     },
   ];

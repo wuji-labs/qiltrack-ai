@@ -276,8 +276,8 @@ npx supabase db reset      # 重置数据库
 
 ## 📧 反馈与贡献
 
-- **Bug 反馈**: [GitHub Issues](https://github.com/your-org/investor-ai/issues)
-- **功能建议**: [GitHub Discussions](https://github.com/your-org/investor-ai/discussions)
+- **Bug 反馈**: [GitHub Issues](https://github.com/your-org/qiltrack-ai/issues)
+- **功能建议**: [GitHub Discussions](https://github.com/your-org/qiltrack-ai/discussions)
 - **文档改进**: 直接提交 PR 到 `docs/` 目录
 
 ---

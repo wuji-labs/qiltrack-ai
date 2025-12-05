@@ -1,6 +1,6 @@
 # Claude 实现工程师 PR 推送工作流指南
 
-> 本指南说明 Claude 在 investor-ai 项目中如何推送 PR，包括工具链检查、标准流程、常见问题与优化方案。
+> 本指南说明 Claude 在 qiltrack-ai 项目中如何推送 PR，包括工具链检查、标准流程、常见问题与优化方案。
 
 **快速版本**：详见 `CODEX_CLAUDE_COLLAB.md`；本文为详细操作手册。
 
@@ -48,7 +48,7 @@ git config user.email   # 应显示提交者邮箱
 ```bash
 # 检查远程仓库
 git remote -v
-# 预期：origin  git@github.com:explore0012/investor-ai.git (fetch/push)
+# 预期：origin  git@github.com:explore0012/qiltrack-ai.git (fetch/push)
 
 # 检查 PR 模板是否存在
 ls -la .github/pull_request_template.md

@@ -8,7 +8,7 @@
 
 - 环境：本地 Docker + Supabase + Next.js
 - 分支：`g1/task-name`
-- 工作目录：`D:\Projects\investor-ai-g1`
+- 工作目录：`D:\Projects\qiltrack-ai-g1`
 - 关键配置：`.env.local` 已配置 Supabase 本地栈地址与密钥
 
 ## Actions（执行动作）

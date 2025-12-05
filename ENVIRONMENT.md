@@ -1,6 +1,6 @@
 # 项目开发环境指南
 
-> 本文档描述 **investor-ai** 项目的开发环境要求、检查方法、常见问题及优化方案。
+> 本文档描述 **qiltrack-ai** 项目的开发环境要求、检查方法、常见问题及优化方案。
 > 该指南面向所有项目成员，确保开发环境一致，提高协作效率并减少环境相关的错误。
 
 ---
@@ -170,11 +170,11 @@ npm install
 
 ```bash
 # 使用 GitHub CLI（推荐）
-gh repo clone explore0012/investor-ai
+gh repo clone explore0012/qiltrack-ai
 
 # 或使用 Git SSH
-git clone git@github.com:explore0012/investor-ai.git
-cd investor-ai
+git clone git@github.com:explore0012/qiltrack-ai.git
+cd qiltrack-ai
 ```
 
 ### 第二步：安装依赖
@@ -473,12 +473,12 @@ gh version 2.83.1
 Python 3.14.0
 
 === Project Info ===
-origin  git@github.com:explore0012/investor-ai.git (fetch)
-origin  git@github.com:explore0012/investor-ai.git (push)
+origin  git@github.com:explore0012/qiltrack-ai.git (fetch)
+origin  git@github.com:explore0012/qiltrack-ai.git (push)
 * feature/your-feature
 
 === Dependencies ===
-investor-ai@0.1.0 /path/to/investor-ai
+qiltrack-ai@0.1.0 /path/to/qiltrack-ai
 ├── next@16.0.3
 ├── react@19.2.0
 ├── react-dom@19.2.0
@@ -715,8 +715,8 @@ powershell -ExecutionPolicy Bypass -File scripts/prep-group.ps1 -Name g1 -Branch
 
 ```bash
 # 每个 worktree 用不同端口
-cd D:\Projects\investor-ai-g1 && npm run dev -- --port 3001
-cd D:\Projects\investor-ai-g2 && npm run dev -- --port 3002
+cd D:\Projects\qiltrack-ai-g1 && npm run dev -- --port 3001
+cd D:\Projects\qiltrack-ai-g2 && npm run dev -- --port 3002
 ```
 
 详见 `docs/guides/worktree-multi-team.md`。

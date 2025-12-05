@@ -1,6 +1,6 @@
 # ⚡ Hosted Supabase 部署 - 快速参考卡
 
-**项目**: investor-ai
+**项目**: qiltrack-ai
 **Project ref**: inmtounwqcjwsxkfnsfd
 **分支**: feat/supabase-deployment
 

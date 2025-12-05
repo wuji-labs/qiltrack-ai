@@ -63,7 +63,7 @@
 3. **本地链路**：`npx supabase start` → `npm run supabase:env local` → `npm run dev` → 在 `/login` 输入邮箱，验证浏览器 Network 调用 `http://127.0.0.1:54321`，并在 `http://127.0.0.1:54324` Inbucket 收到邮件。
 4. **Hosted 提示**：运行 `npm run supabase:env hosted` 后访问 `/login`，确认呈现琥珀警告与切换指南，不再误导。
 5. **脚本幂等性**：连续运行 `npm run supabase:env local` 两次不应重复追加；`git status` 仅显示 `.env.local` 变化。
-6. **多组协作**：在新 worktree（例如 `investor-ai-g1`）执行脚本，验证 `GROUP.md` / plan 中指向的流程可独立完成。
+6. **多组协作**：在新 worktree（例如 `qiltrack-ai-g1`）执行脚本，验证 `GROUP.md` / plan 中指向的流程可独立完成。
 
 ## 里程碑
 

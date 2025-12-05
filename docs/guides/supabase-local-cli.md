@@ -1,7 +1,7 @@
 # Supabase CLI 本地开发手册
 
 **Updated:** 2025-11-27  
-**Audience:** 任意需要本地跑通 investor-ai 后端的 AI/工程师  
+**Audience:** 任意需要本地跑通 qiltrack-ai 后端的 AI/工程师  
 **Scope:** 如何用 Supabase CLI 初始化/运行/同步本地 Postgres + Auth + Storage 栈，并与现有 Next.js API 协作
 
 > 生产运行依旧使用 Hosted Supabase。CLI 方案用于本地开发、测试与 schema 迭代，提交前必须将迁移与类型同步到版本库。
@@ -29,7 +29,7 @@ supabase --version
 ## 2. 快速上手（10 分钟）
 
 ```bash
-cd investor-ai
+cd qiltrack-ai
 npx supabase login                      # 首次执行会打开浏览器
 npx supabase start                      # 拉起 Docker stack
 npx supabase status                     # 记下 API URL / anon / service_role

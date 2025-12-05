@@ -26,14 +26,14 @@ Next.js 的 `next dev` 会自动选择可用端口（3000 → 3001 → 3002...�
 编辑每个 worktree 的 `package.json`：
 
 ```json
-// D:\Projects\investor-ai-g1\package.json
+// D:\Projects\qiltrack-ai-g1\package.json
 {
   "scripts": {
     "dev": "next dev -p 3001"  // ← 固定 3001
   }
 }
 
-// D:\Projects\investor-ai-g2\package.json
+// D:\Projects\qiltrack-ai-g2\package.json
 {
   "scripts": {
     "dev": "next dev -p 3002"  // ← 固定 3002
@@ -58,7 +58,7 @@ Next.js 的 `next dev` 会自动选择可用端口（3000 → 3001 → 3002...�
 
 ## 问题
 
-`scripts/reset-worktree.ps1` 会从总部（`D:\Projects\investor-ai`）复制 `.env.local` 到各 worktree，可能覆盖本地配置。
+`scripts/reset-worktree.ps1` 会从总部（`D:\Projects\qiltrack-ai`）复制 `.env.local` 到各 worktree，可能覆盖本地配置。
 
 ## 解决方案
 
@@ -83,7 +83,7 @@ Next.js 的 `next dev` 会自动选择可用端口（3000 → 3001 → 3002...�
 如果你需要所有 worktree 共享同一个认证 session（不推荐），可以在**总部** `.env.local` 设置：
 
 ```bash
-# D:\Projects\investor-ai\.env.local（总部）
+# D:\Projects\qiltrack-ai\.env.local（总部）
 NEXT_PUBLIC_SITE_URL=http://localhost:3001  # 或其他固定端口
 ```
 

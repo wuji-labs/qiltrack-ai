@@ -169,7 +169,7 @@ npm run env:check
 
 ```bash
 # 1. 克隆仓库
-gh repo clone explore0012/investor-ai
+gh repo clone explore0012/qiltrack-ai
 
 # 2. 安装依赖
 npm install

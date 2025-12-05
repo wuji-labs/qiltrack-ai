@@ -51,7 +51,7 @@ Investor AI 是一个「三分钟理解美股上市公司」的投研助手。�
 
 ```powershell
 # Step 1: 在主仓库更新代码
-cd D:\Projects\investor-ai
+cd D:\Projects\qiltrack-ai
 git fetch origin
 git reset --hard origin/main
 
@@ -59,7 +59,7 @@ git reset --hard origin/main
 .\scripts\reset-worktrees-only.ps1
 
 # Step 3: 开始开发
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 npm run dev
 ```
 
@@ -77,7 +77,7 @@ git reset --hard origin/main
 .\scripts\reset-worktrees-only.ps1
 
 # 启动开发服务器（不同端口避免冲突）
-cd D:\Projects\investor-ai-g1 && npm run dev
+cd D:\Projects\qiltrack-ai-g1 && npm run dev
 ```
 
 详见 [Worktree 多组协作](docs/guides/worktree-multi-team.md)。

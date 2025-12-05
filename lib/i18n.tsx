@@ -3875,7 +3875,7 @@ type LanguageContextValue = {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
-const STORAGE_KEY = "investor-ai-language";
+const STORAGE_KEY = "qiltrack-ai-language";
 function interpolate(template: string, vars?: Record<string, string>) {
   if (!vars) return template;
   return template.replace(/\{\{(.*?)\}\}/g, (_, key) => vars[key.trim()] ?? "");

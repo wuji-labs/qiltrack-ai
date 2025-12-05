@@ -1464,7 +1464,7 @@ npm run start  # 测试生产环境
 ### 6.1 重构后的完整目录结构
 
 ```
-D:\Projects\investor-ai-g2\
+D:\Projects\qiltrack-ai-g2\
 ├── app/
 │   ├── (auth)/
 │   │   └── login/
@@ -1820,7 +1820,7 @@ D:\Projects\investor-ai-g2\
 
 如有问题，请联系架构团队：
 
-- Slack: #investor-ai-refactor
+- Slack: #qiltrack-ai-refactor
 - Email: arch-team@investor.ai
 
 ---

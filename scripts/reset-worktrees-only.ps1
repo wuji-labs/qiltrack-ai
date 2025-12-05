@@ -37,7 +37,7 @@ Remove-BOMFromFile -FilePath (Join-Path $repoRoot "package.json")
 $resetScript = Join-Path $PSScriptRoot "reset-worktree.ps1"
 
 foreach ($worktree in $Worktrees) {
-  $worktreePath = Join-Path (Split-Path $repoRoot -Parent) "investor-ai-$worktree"
+  $worktreePath = Join-Path (Split-Path $repoRoot -Parent) "qiltrack-ai-$worktree"
 
   if (-not (Test-Path $worktreePath)) {
     Write-Host "Skipping $worktree (not found)" -ForegroundColor Gray

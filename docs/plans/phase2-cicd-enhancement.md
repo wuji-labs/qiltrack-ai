@@ -317,7 +317,7 @@ jobs:
           AWS_REGION: us-east-1
         run: |
           aws s3 cp ${{ steps.backup.outputs.backup_file }} \
-            s3://${{ secrets.S3_BACKUP_BUCKET }}/investor-ai/$(basename ${{ steps.backup.outputs.backup_file }})
+            s3://${{ secrets.S3_BACKUP_BUCKET }}/qiltrack-ai/$(basename ${{ steps.backup.outputs.backup_file }})
 
       - name: Upload to GitHub Artifacts (fallback)
         if: failure()
@@ -433,7 +433,7 @@ jobs:
 
       - name: Health check
         run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" https://staging.investor-ai.com/api/health)
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://staging.qiltrack-ai.com/api/health)
           if [ "$response" != "200" ]; then
             echo "Health check failed: $response"
             exit 1
@@ -452,7 +452,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Staging Deployment - ${{ job.status }}*\n\n🚀 Environment: Staging\n🔗 URL: https://staging.investor-ai.com\n📝 Commit: ${{ github.event.head_commit.message }}\n👤 Author: ${{ github.actor }}"
+                    "text": "*Staging Deployment - ${{ job.status }}*\n\n🚀 Environment: Staging\n🔗 URL: https://staging.qiltrack-ai.com\n📝 Commit: ${{ github.event.head_commit.message }}\n👤 Author: ${{ github.actor }}"
                   }
                 }
               ]
@@ -561,7 +561,7 @@ jobs:
 1. 访问 https://api.slack.com/apps
 2. 创建新 App: "Investor AI CI/CD Bot"
 3. 添加 Incoming Webhook
-4. 选择频道: `#investor-ai-alerts`
+4. 选择频道: `#qiltrack-ai-alerts`
 5. 复制 Webhook URL
 
 #### 2. 配置 GitHub Secrets
@@ -580,7 +580,7 @@ SLACK_WEBHOOK_URL=https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXX
 
 📦 Backup File: backup_20251202_000000.sql.gz
 💾 Size: 1.2 GB (compressed)
-☁️ Uploaded to: s3://backups/investor-ai/
+☁️ Uploaded to: s3://backups/qiltrack-ai/
 🗓️ Date: 2025-12-02 08:00:00 UTC+8
 🔗 View Run: https://github.com/.../actions/runs/...
 ```
@@ -609,8 +609,8 @@ SLACK_WEBHOOK_URL=https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXX
     username: ${{ secrets.EMAIL_USERNAME }}
     password: ${{ secrets.EMAIL_PASSWORD }}
     subject: ❌ Database Backup Failed - ${{ github.run_number }}
-    to: infrastructure@investor-ai.com
-    from: github-actions@investor-ai.com
+    to: infrastructure@qiltrack-ai.com
+    from: github-actions@qiltrack-ai.com
     body: |
       Database backup failed at ${{ github.run_started_at }}.
 
@@ -631,7 +631,7 @@ SUPABASE_PROJECT_REF=inmtounwqcjwsxkfnsfd
 # AWS S3 (备份存储)
 AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
 AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-S3_BACKUP_BUCKET=investor-ai-backups
+S3_BACKUP_BUCKET=qiltrack-ai-backups
 
 # Slack 通知
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/T00000000/B00000000/XXXX

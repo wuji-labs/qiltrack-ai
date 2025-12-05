@@ -109,7 +109,7 @@
 - [ ] `npm run lint` 通过，无新增警告
 
   ```
-  > investor-ai@0.1.0 lint
+  > qiltrack-ai@0.1.0 lint
   > eslint app/reports/page.tsx app/reports/hooks/useVisibilityStagger.ts
 
   (no errors, no warnings)

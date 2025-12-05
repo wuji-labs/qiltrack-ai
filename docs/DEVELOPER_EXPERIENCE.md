@@ -329,7 +329,7 @@ For questions or issues:
 
 ```bash
 # ~/.bashrc or ~/.zshrc
-alias ii-dev='cd /path/to/investor-ai && bash scripts/dev-start.sh'
-alias ii-test='cd /path/to/investor-ai && npm test'
-alias ii-check='cd /path/to/investor-ai && npm run env:check'
+alias ii-dev='cd /path/to/qiltrack-ai && bash scripts/dev-start.sh'
+alias ii-test='cd /path/to/qiltrack-ai && npm test'
+alias ii-check='cd /path/to/qiltrack-ai && npm run env:check'
 ```

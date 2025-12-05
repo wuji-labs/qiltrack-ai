@@ -180,7 +180,7 @@ npm run dev
 ### 立即行动 (老板操作)
 1. **提交代码**
    ```bash
-   cd D:\Projects\investor-ai-g1
+   cd D:\Projects\qiltrack-ai-g1
    git add .
    git commit -m "[G1/Phase1] 前端优化: 拆分组件 + 错误边界 + 代码格式化
 

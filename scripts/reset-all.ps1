@@ -94,7 +94,7 @@ Write-Step "STEP 2: Resetting worktrees"
 $resetScript = Join-Path $PSScriptRoot "reset-worktree.ps1"
 
 foreach ($worktree in $Worktrees) {
-  $worktreePath = Join-Path (Split-Path $repoRoot -Parent) "investor-ai-$worktree"
+  $worktreePath = Join-Path (Split-Path $repoRoot -Parent) "qiltrack-ai-$worktree"
 
   if (-not (Test-Path $worktreePath)) {
     Write-Host "Skipping $worktree (not found at $worktreePath)" -ForegroundColor Gray
@@ -133,12 +133,12 @@ Write-Host "  All Reset Complete!" -ForegroundColor Green
 Write-Host "============================================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
-Write-Host "  1. cd D:\Projects\investor-ai-g1" -ForegroundColor Gray
+Write-Host "  1. cd D:\Projects\qiltrack-ai-g1" -ForegroundColor Gray
 Write-Host "  2. npm run dev" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Available worktrees:" -ForegroundColor Cyan
 foreach ($worktree in $Worktrees) {
-  $worktreePath = Join-Path (Split-Path $repoRoot -Parent) "investor-ai-$worktree"
+  $worktreePath = Join-Path (Split-Path $repoRoot -Parent) "qiltrack-ai-$worktree"
   if (Test-Path $worktreePath) {
     $port = 3000 + [int]$worktree.Substring(1)
     Write-Host "  $worktree -> http://localhost:$port" -ForegroundColor Green

@@ -10,12 +10,12 @@
 ### 你的工作环境
 
 ```
-D:\Projects\investor-ai          ← 总部（main 分支）
-├─ investor-ai-g1               ← G1 工作区（g1/* 分支）
-├─ investor-ai-g2               ← G2 工作区（g2/* 分支）
-├─ investor-ai-g3               ← G3 工作区（g3/* 分支）
-├─ investor-ai-g4               ← G4 工作区（g4/* 分支）
-└─ investor-ai-g5               ← G5 工作区（g5/* 分支）
+D:\Projects\qiltrack-ai          ← 总部（main 分支）
+├─ qiltrack-ai-g1               ← G1 工作区（g1/* 分支）
+├─ qiltrack-ai-g2               ← G2 工作区（g2/* 分支）
+├─ qiltrack-ai-g3               ← G3 工作区（g3/* 分支）
+├─ qiltrack-ai-g4               ← G4 工作区（g4/* 分支）
+└─ qiltrack-ai-g5               ← G5 工作区（g5/* 分支）
 ```
 
 ### AI 团队结构
@@ -54,7 +54,7 @@ HQ（VS Code Codex 插件）
 ### 1. 检查总部环境
 
 ```powershell
-cd D:\Projects\investor-ai
+cd D:\Projects\qiltrack-ai
 git status  # 确保在 main 分支
 npm install  # 确保依赖已安装
 ```
@@ -83,7 +83,7 @@ git worktree list
 
 #### 1.1 在总部终端跟 HQ 说话
 
-**位置**：`D:\Projects\investor-ai`（VS Code Codex 插件）
+**位置**：`D:\Projects\qiltrack-ai`（VS Code Codex 插件）
 
 ```
 @HQ 我有个新需求：
@@ -133,11 +133,11 @@ Next: 确认后我开始分配
 
 ```powershell
 # G1 创建任务分支
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 git checkout -b g1/local-auth-signal
 
 # G2 创建任务分支
-cd D:\Projects\investor-ai-g2
+cd D:\Projects\qiltrack-ai-g2
 git checkout -b g2/supabase-env-sync
 ```
 
@@ -147,9 +147,9 @@ git checkout -b g2/supabase-env-sync
 git worktree list
 
 # 应该看到：
-# D:/Projects/investor-ai     xxx [main]
-# D:/Projects/investor-ai-g1  xxx [g1/local-auth-signal]
-# D:/Projects/investor-ai-g2  xxx [g2/supabase-env-sync]
+# D:/Projects/qiltrack-ai     xxx [main]
+# D:/Projects/qiltrack-ai-g1  xxx [g1/local-auth-signal]
+# D:/Projects/qiltrack-ai-g2  xxx [g2/supabase-env-sync]
 ```
 
 ---
@@ -167,11 +167,11 @@ git worktree list
 **终端设置**：
 
 ```
-终端1: HQ            → cd D:\Projects\investor-ai
-终端2: G1-Codex      → cd D:\Projects\investor-ai-g1
-终端3: G1-Claude     → cd D:\Projects\investor-ai-g1
-终端4: G2-Codex      → cd D:\Projects\investor-ai-g2
-终端5: G2-Claude     → cd D:\Projects\investor-ai-g2
+终端1: HQ            → cd D:\Projects\qiltrack-ai
+终端2: G1-Codex      → cd D:\Projects\qiltrack-ai-g1
+终端3: G1-Claude     → cd D:\Projects\qiltrack-ai-g1
+终端4: G2-Codex      → cd D:\Projects\qiltrack-ai-g2
+终端5: G2-Claude     → cd D:\Projects\qiltrack-ai-g2
 ```
 
 #### 3.2 启动各个 AI
@@ -341,7 +341,7 @@ Next: 提交 PR，使用模板 .github/pull_request_template.md
 G1-Claude 会运行：
 
 ```bash
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 git add .
 git commit -m "feat(auth): add Supabase status indicator"
 git push origin g1/local-auth-signal
@@ -512,7 +512,7 @@ Next: 可以重置 G1 工作区准备下一个任务了
 
 ```powershell
 # 1. 进总部，拉最新代码
-cd D:\Projects\investor-ai
+cd D:\Projects\qiltrack-ai
 git checkout main
 git pull
 
@@ -540,7 +540,7 @@ code docs/plans/workstreams.md
 git worktree list
 
 # 看某个组的进度
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 git status
 git log --oneline -5
 ```
@@ -556,7 +556,7 @@ git log --oneline -5
 @HQ 汇总今天的进度
 
 # 保存工作（如果需要）
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 git add .
 git commit -m "WIP: save progress"
 git push
@@ -592,7 +592,7 @@ git push
 .\scripts\reset-worktree.ps1 -Name gX
 
 # 或手动重置
-cd D:\Projects\investor-ai-gX
+cd D:\Projects\qiltrack-ai-gX
 git reset --hard HEAD
 git sparse-checkout set app docs hooks lib supabase types __tests__ scripts
 ```
@@ -602,7 +602,7 @@ git sparse-checkout set app docs hooks lib supabase types __tests__ scripts
 **解决**：
 
 ```powershell
-cd D:\Projects\investor-ai-gX
+cd D:\Projects\qiltrack-ai-gX
 git fetch origin
 git rebase origin/main
 # 如果有冲突，让 Claude 解决
@@ -613,7 +613,7 @@ git rebase origin/main
 **方法：保留 worktree，提交到远程**
 
 ```powershell
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 git add .
 git commit -m "WIP: paused"
 git push
@@ -627,7 +627,7 @@ git pull
 **解决**：独立安装 node_modules
 
 ```powershell
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 
 # 删除旧的 node_modules（可能是 Junction 链接）
 Remove-Item -Recurse -Force node_modules -ErrorAction SilentlyContinue
@@ -642,11 +642,11 @@ npm ci
 
 ```powershell
 # G1
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 npm run dev -- --port 3001
 
 # G2
-cd D:\Projects\investor-ai-g2
+cd D:\Projects\qiltrack-ai-g2
 npm run dev -- --port 3002
 ```
 
@@ -683,8 +683,8 @@ Next: 确认后开始
 .\scripts\reset-worktree.ps1 -Name g4
 
 # 创建任务分支
-cd D:\Projects\investor-ai-g3 && git checkout -b g3/pdf-export-ui
-cd D:\Projects\investor-ai-g4 && git checkout -b g4/pdf-generation
+cd D:\Projects\qiltrack-ai-g3 && git checkout -b g3/pdf-export-ui
+cd D:\Projects\qiltrack-ai-g4 && git checkout -b g4/pdf-generation
 ```
 
 #### 4. HQ 分配任务（10:15）

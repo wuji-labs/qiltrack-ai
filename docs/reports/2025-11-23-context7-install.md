@@ -242,7 +242,7 @@ claude mcp add context7 -- npx -y @upstash/context7-mcp
 
 ```
 Added stdio MCP server context7 with command: npx -y @upstash/context7-mcp to local config
-File modified: C:\Users\xiuluart\.claude.json [project: D:\Projects\investor-ai]
+File modified: C:\Users\xiuluart\.claude.json [project: D:\Projects\qiltrack-ai]
 ```
 
 ### Verification（验证结果）

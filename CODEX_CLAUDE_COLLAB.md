@@ -7,7 +7,7 @@
 > - 组织架构：`docs/guides/organization-structure.md`（HQ 和各组职责）
 > - 老板手册：`docs/guides/BOSS-OPERATION-MANUAL.md`（完整操作流程）
 
-本手册说明架构师（Codex）与实现工程师（Claude）在 investor-ai 项目的协作方式、职责分工与交付规范。命令/路径保持英文，其余叙述统一中文。
+本手册说明架构师（Codex）与实现工程师（Claude）在 qiltrack-ai 项目的协作方式、职责分工与交付规范。命令/路径保持英文，其余叙述统一中文。
 
 ## 1. 目的与范围
 
@@ -158,7 +158,7 @@
 
 ## 10. 多工作组 worktree 协作
 
-- 仅在总部 `D:\Projects\investor-ai` 执行 `npm install`，其他 worktree 通过 `npm run <script> --prefix <worktree>` 使用共享依赖。
+- 仅在总部 `D:\Projects\qiltrack-ai` 执行 `npm install`，其他 worktree 通过 `npm run <script> --prefix <worktree>` 使用共享依赖。
 - 使用 `scripts/worktree-manager.ps1`（或 `scripts/prep-group.ps1`）创建/清理 worktree（自动 `--no-checkout` + sparse-checkout + `node_modules` 链接），详见 `docs/guides/worktree-multi-team.md`。
 - 每个工作组维护自己的分支 `gX/<topic>` 与 worktree，任务完成后必须 `git worktree remove` 清理。
 - HQ 与各组 Codex 的组织架构、Boot Sequence 参见 `docs/guides/organization-structure.md`。

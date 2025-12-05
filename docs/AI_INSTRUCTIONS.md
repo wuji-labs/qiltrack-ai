@@ -25,18 +25,18 @@
 ### ✅ 端口系统工作原理
 
 ```
-主仓库 (D:\Projects\investor-ai)
+主仓库 (D:\Projects\qiltrack-ai)
 ├── package.json                  → "dev": "next dev" (无端口)
 ├── .env.local                    → PORT=3000 (本地配置，不提交)
 └── scripts/
     ├── worktree-ports.json       → 定义各 worktree 的端口映射
     └── setup-worktree-port.js    → 自动设置 .env.local 的 PORT
 
-Worktree g1 (D:\Projects\investor-ai-g1)
+Worktree g1 (D:\Projects\qiltrack-ai-g1)
 ├── package.json                  → "dev": "next dev" (继承主仓库)
 └── .env.local                    → PORT=3001 (本地配置，不提交)
 
-Worktree g2 (D:\Projects\investor-ai-g2)
+Worktree g2 (D:\Projects\qiltrack-ai-g2)
 ├── package.json                  → "dev": "next dev" (继承主仓库)
 └── .env.local                    → PORT=3002 (本地配置，不提交)
 ```

@@ -18,7 +18,7 @@
 **选项 B - 使用 Supabase CLI**（推荐开发者）
 
 ```bash
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 supabase migration up
 ```
 

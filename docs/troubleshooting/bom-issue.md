@@ -8,7 +8,7 @@
 Error parsing package.json file
 > 1 | ﻿{
     | ^
-  2 |   "name": "investor-ai",
+  2 |   "name": "qiltrack-ai",
 
 package.json is not parseable: invalid JSON: expected value at line 1 column 1
 ```
@@ -56,13 +56,13 @@ BOM（Byte Order Mark）是文件开头的特殊字节序列：
 
 ```powershell
 # 在主仓库执行，自动完成所有步骤
-cd D:\Projects\investor-ai
+cd D:\Projects\qiltrack-ai
 git fetch origin
 git reset --hard origin/main
 .\scripts\reset-worktrees-only.ps1
 
 # 然后开始工作
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 npm run dev  # ✅ 保证能运行！
 ```
 
@@ -82,7 +82,7 @@ npm run dev  # ✅ 保证能运行！
 
 ```powershell
 # 在出问题的工作树执行
-D:\Projects\investor-ai\scripts\deep-clean-worktree.ps1
+D:\Projects\qiltrack-ai\scripts\deep-clean-worktree.ps1
 ```
 
 这个脚本会：

@@ -4,7 +4,7 @@
 
 ```powershell
 # 1. 更新主仓库
-cd D:\Projects\investor-ai
+cd D:\Projects\qiltrack-ai
 git fetch origin
 git reset --hard origin/main
 
@@ -12,7 +12,7 @@ git reset --hard origin/main
 .\scripts\reset-worktrees-only.ps1
 
 # 3. 开始工作
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 npm run dev
 ```
 
@@ -34,8 +34,8 @@ git branch -f main origin/main
 
 ```powershell
 # 应急修复
-cd D:\Projects\investor-ai-g1
-D:\Projects\investor-ai\scripts\deep-clean-worktree.ps1
+cd D:\Projects\qiltrack-ai-g1
+D:\Projects\qiltrack-ai\scripts\deep-clean-worktree.ps1
 npm run dev
 ```
 
@@ -69,11 +69,11 @@ Windows 上的 Git 操作会在 `package.json` 中注入 BOM（字节顺序标�
 
 | 工作树         | 端口 | URL                   |
 | -------------- | ---- | --------------------- |
-| investor-ai-g1 | 3001 | http://localhost:3001 |
-| investor-ai-g2 | 3002 | http://localhost:3002 |
-| investor-ai-g3 | 3003 | http://localhost:3003 |
-| investor-ai-g4 | 3004 | http://localhost:3004 |
-| investor-ai-g5 | 3005 | http://localhost:3005 |
+| qiltrack-ai-g1 | 3001 | http://localhost:3001 |
+| qiltrack-ai-g2 | 3002 | http://localhost:3002 |
+| qiltrack-ai-g3 | 3003 | http://localhost:3003 |
+| qiltrack-ai-g4 | 3004 | http://localhost:3004 |
+| qiltrack-ai-g5 | 3005 | http://localhost:3005 |
 
 ## 🎯 记住三条
 

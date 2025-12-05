@@ -223,5 +223,5 @@ PR #88: ✅ 已通过所有审核，等待合并
 URL: https://github.com/explore0012/ai-report/pull/88
 
 # 工作目录
-D:\Projects\investor-ai-g4
+D:\Projects\qiltrack-ai-g4
 ```

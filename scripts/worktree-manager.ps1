@@ -20,7 +20,7 @@ function Get-WorktreePath {
   if (-not $parent) {
     $parent = $RepoRoot
   }
-  return (Join-Path $parent ("investor-ai-{0}" -f $Name.Trim()))
+  return (Join-Path $parent ("qiltrack-ai-{0}" -f $Name.Trim()))
 }
 
 function Invoke-Git {

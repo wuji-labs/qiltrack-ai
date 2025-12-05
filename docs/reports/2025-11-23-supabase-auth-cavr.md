@@ -51,7 +51,7 @@
 ### 📁 核心文件清单
 
 ```
-D:\Projects\investor-ai
+D:\Projects\qiltrack-ai
 ├── hooks/
 │   ├── useAuth.ts                [原 NextAuth hook - 保留用于兼容]
 │   └── useSupabaseAuth.ts        [新 Supabase Auth hook ✨]

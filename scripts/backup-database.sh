@@ -136,13 +136,13 @@ upload_to_cloud() {
     # Example for AWS S3:
     # if command -v aws &> /dev/null; then
     #     print_info "Uploading to S3..."
-    #     aws s3 cp "${BACKUP_FILE}.gz" s3://my-bucket/backups/investor-ai/
+    #     aws s3 cp "${BACKUP_FILE}.gz" s3://my-bucket/backups/qiltrack-ai/
     # fi
 
     # Example for Azure Blob Storage:
     # if command -v az &> /dev/null; then
     #     print_info "Uploading to Azure Blob..."
-    #     az storage blob upload --file "${BACKUP_FILE}.gz" --container-name backups --name "investor-ai/backup_${TIMESTAMP}.sql.gz"
+    #     az storage blob upload --file "${BACKUP_FILE}.gz" --container-name backups --name "qiltrack-ai/backup_${TIMESTAMP}.sql.gz"
     # fi
 }
 

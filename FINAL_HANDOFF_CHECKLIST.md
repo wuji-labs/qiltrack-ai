@@ -68,7 +68,7 @@
 
 **操作**:
 
-1. 打开 GitHub: https://github.com/your-repo/investor-ai
+1. 打开 GitHub: https://github.com/your-repo/qiltrack-ai
 2. 点击 "New Pull Request"
 3. 设置:
    - **Base**: main

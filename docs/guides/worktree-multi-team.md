@@ -4,8 +4,8 @@
 
 ## 1. 术语
 
-- **总部**：`D:\Projects\investor-ai`，常驻 `main`，维护 Snapshot/Plan/Report。
-- **工作组目录**：`D:\Projects\investor-ai-gX`（X=1..5），对应 `group-*/feature-*` 分支。
+- **总部**：`D:\Projects\qiltrack-ai`，常驻 `main`，维护 Snapshot/Plan/Report。
+- **工作组目录**：`D:\Projects\qiltrack-ai-gX`（X=1..5），对应 `group-*/feature-*` 分支。
 - **脚本**：
   - `scripts/worktree-manager.ps1`：新增/清理 worktree
   - `scripts/prep-group.ps1`：完整初始化（worktree + env + npm ci）
@@ -37,7 +37,7 @@ powershell -ExecutionPolicy Bypass -File scripts/worktree-manager.ps1 `
   -Folders app,docs,hooks,lib,supabase,types,__tests__,scripts
 ```
 
-会生成 `D:\Projects\investor-ai-g1`，其中：
+会生成 `D:\Projects\qiltrack-ai-g1`，其中：
 
 - 仅检出指定目录；其余文件按需可 `git -C <path> sparse-checkout add <dir>`。
 - **独立 `node_modules`**：`prep-group.ps1` 会自动运行 `npm ci` 安装依赖。
@@ -80,24 +80,24 @@ powershell -ExecutionPolicy Bypass -File scripts/reset-worktree.ps1 -Name g1 -Dr
 
 ```bash
 # 直接在 worktree 目录运行（推荐）
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 npm run dev -- --port 3001
 
 # 或使用 --prefix（从总部运行）
-npm run dev --prefix ../investor-ai-g1 -- --port 3001
+npm run dev --prefix ../qiltrack-ai-g1 -- --port 3001
 ```
 
 ### 多 worktree 并行开发
 
 ```bash
 # 终端 1: G1 在 3001 端口
-cd D:\Projects\investor-ai-g1 && npm run dev -- --port 3001
+cd D:\Projects\qiltrack-ai-g1 && npm run dev -- --port 3001
 
 # 终端 2: G2 在 3002 端口
-cd D:\Projects\investor-ai-g2 && npm run dev -- --port 3002
+cd D:\Projects\qiltrack-ai-g2 && npm run dev -- --port 3002
 
 # 终端 3: G3 在 3003 端口
-cd D:\Projects\investor-ai-g3 && npm run dev -- --port 3003
+cd D:\Projects\qiltrack-ai-g3 && npm run dev -- --port 3003
 ```
 
 ## 6. 环境变量
@@ -108,14 +108,14 @@ cd D:\Projects\investor-ai-g3 && npm run dev -- --port 3003
 
 ## 7. VS Code & 多 root
 
-- 建议建立 `investor-ai.code-workspace`，包含总部 + 5 个 worktree；共享 `.vscode/settings.json`（ESLint、format、env hint）。
+- 建议建立 `qiltrack-ai.code-workspace`，包含总部 + 5 个 worktree；共享 `.vscode/settings.json`（ESLint、format、env hint）。
 - 每个 worktree 有独立的 `node_modules`，可以正常使用所有 VS Code 扩展。
 
 ## 8. 提交流程
 
-1. `git -C ../investor-ai-gX status` 确认干净。
-2. `git -C ../investor-ai-gX fetch --all`。
-3. `git -C ../investor-ai-gX rebase origin/main`（或指定 upstream）。
+1. `git -C ../qiltrack-ai-gX status` 确认干净。
+2. `git -C ../qiltrack-ai-gX fetch --all`。
+3. `git -C ../qiltrack-ai-gX rebase origin/main`（或指定 upstream）。
 4. 在 worktree 目录运行 `npm run lint` 和 `npm test`。
 5. 按 Snapshot/CAVR 流程提交 PR；终端状态更新用 `@Codex Report/Status/Next`。
 
@@ -128,7 +128,7 @@ cd D:\Projects\investor-ai-g3 && npm run dev -- --port 3003
 .\scripts\reset-worktree.ps1 -Name g1
 
 # 2. 创建任务分支
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 git checkout -b feature/my-task
 
 # 3. 开始开发
@@ -139,7 +139,7 @@ npm run dev -- --port 3001
 
 ```powershell
 # 无需重置，直接继续
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 git status
 npm run dev -- --port 3001
 ```
@@ -148,7 +148,7 @@ npm run dev -- --port 3001
 
 ```powershell
 # 1. 提交代码
-cd D:\Projects\investor-ai-g1
+cd D:\Projects\qiltrack-ai-g1
 git add .
 git commit -m "feat: my feature"
 git push origin feature/my-task

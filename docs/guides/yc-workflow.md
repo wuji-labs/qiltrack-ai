@@ -1,4 +1,4 @@
-# YC 氛围编程优化方案（针对 investor-ai）
+# YC 氛围编程优化方案（针对 qiltrack-ai）
 
 结合 YC 氛围编程指南与当前仓库现状，以下方案用于指导 Codex / Claude 的协作与执行。可作为 `CODEX_CLAUDE_COLLAB.md` 的补充，在每次任务启动前引用。
 

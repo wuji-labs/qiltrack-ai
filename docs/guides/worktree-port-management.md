@@ -50,7 +50,7 @@
 
 ```bash
 # 进入 worktree 目录
-cd /path/to/investor-ai-g2
+cd /path/to/qiltrack-ai-g2
 
 # 运行端口设置脚本
 npm run worktree:setup-port
@@ -130,7 +130,7 @@ npm run worktree:setup-port
 
 ```bash
 # 在各个 worktree 目录运行
-for dir in ~/Projects/investor-ai-g{1..5}; do
+for dir in ~/Projects/qiltrack-ai-g{1..5}; do
   echo "=== $(basename $dir) ==="
   cat $dir/.env.local 2>/dev/null | grep PORT || echo "  未设置"
 done
@@ -139,9 +139,9 @@ done
 预期输出：
 
 ```
-=== investor-ai-g1 ===
+=== qiltrack-ai-g1 ===
   PORT=3001
-=== investor-ai-g2 ===
+=== qiltrack-ai-g2 ===
   PORT=3002
 ...
 ```

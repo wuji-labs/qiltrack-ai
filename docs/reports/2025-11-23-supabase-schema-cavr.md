@@ -38,7 +38,7 @@
 ### 📁 文件清单
 
 ```
-D:\Projects\investor-ai
+D:\Projects\qiltrack-ai
 ├── supabase/
 │   ├── config.toml           [Supabase 配置文件]
 │   └── migrations/

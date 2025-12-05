@@ -1,6 +1,6 @@
 # Quick fix for BOM issues in package.json
 # Usage: .\scripts\fix-bom.ps1
-#        .\scripts\fix-bom.ps1 -Path D:\Projects\investor-ai-g1
+#        .\scripts\fix-bom.ps1 -Path D:\Projects\qiltrack-ai-g1
 
 [CmdletBinding()]
 param(

@@ -1,21 +1,21 @@
 ﻿# Premium PDF 本地验证指引（g3 worktree）
 
-> 目标：在 `D:\Projects\investor-ai-g3` 下启动本地 Supabase、跑通 `/api/report/export/pdf`，确认签名 URL、Storage、`report_documents` 等链路工作正常。
+> 目标：在 `D:\Projects\qiltrack-ai-g3` 下启动本地 Supabase、跑通 `/api/report/export/pdf`，确认签名 URL、Storage、`report_documents` 等链路工作正常。
 
 ## 1. 启动本地 Supabase CLI
 
-1. 打开 PowerShell，切到 `D:\Projects\investor-ai-g3`。
+1. 打开 PowerShell，切到 `D:\Projects\qiltrack-ai-g3`。
 2. 运行 `npx supabase start`。
 3. 完成后执行 `npx supabase status`，记录输出中的：
    - `API URL`（通常是 `http://127.0.0.1:54321`）
    - `anon key`
    - `service_role key`
 
-> 说明：CLI 仅感知当前工作目录，所以一定要在 `investor-ai-g3` 下启动。
+> 说明：CLI 仅感知当前工作目录，所以一定要在 `qiltrack-ai-g3` 下启动。
 
 ## 2. 配置环境变量
 
-编辑 `D:\Projects\investor-ai-g3\.env.local`，保证以下字段与 `supabase status` 输出一致：
+编辑 `D:\Projects\qiltrack-ai-g3\.env.local`，保证以下字段与 `supabase status` 输出一致：
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321

@@ -1,7 +1,7 @@
 # Chrome DevTools Protocol 自动化脚本
 $debugPort = 9333
 $targetUrl = "http://localhost:3000"
-$screenshotPath = "D:\Projects\investor-ai\homepage-screenshot.png"
+$screenshotPath = "D:\Projects\qiltrack-ai\homepage-screenshot.png"
 
 Write-Host "🎯 开始自动化操作..." -ForegroundColor Cyan
 

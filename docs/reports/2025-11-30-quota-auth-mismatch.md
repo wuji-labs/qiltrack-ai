@@ -6,7 +6,7 @@
 
 ### API 层修改
 
-#### 1. `/api/report/credits` 端点 (D:\Projects\investor-ai-g1\app\api\report\credits\route.ts)
+#### 1. `/api/report/credits` 端点 (D:\Projects\qiltrack-ai-g1\app\api\report\credits\route.ts)
 
 - [x] 返回 payload 增加 `source: "v_user_quota"`
 - [x] 401 错误返回 `{ error, code: "unauthorized" }`
@@ -14,7 +14,7 @@
 - [x] 添加控制台日志：`[UNAUTHORIZED_SESSION]` 和 `[QUOTA_FETCH_FAILED]`，包含用户ID和错误信息
 - **修改行数：** 26-33 (401 错误处理), 52-60 (500 错误处理), 65-71 (返回 payload)
 
-#### 2. `/api/report` 端点 (D:\Projects\investor-ai-g1\app\api\report\route.ts)
+#### 2. `/api/report` 端点 (D:\Projects\qiltrack-ai-g1\app\api\report\route.ts)
 
 - [x] 401 错误返回 `{ error, code: "unauthorized" }`
 - [x] 429 错误返回 `{ error, code: "quota_exceeded" }`
@@ -24,14 +24,14 @@
 
 ### 客户端修改
 
-#### 3. API 服务层 (D:\Projects\investor-ai-g1\lib\services\api.ts)
+#### 3. API 服务层 (D:\Projects\qiltrack-ai-g1\lib\services\api.ts)
 
 - [x] 更新 `CreditsResponse` 类型增加可选的 `source` 字段
 - [x] 新增 `ApiErrorResponse` 类型定义错误码
 - [x] 增强 `handleJson` 函数，从响应中提取 `code` 和状态码，附加到 Error 对象
 - **修改行数：** 44-77 (类型和 handleJson 函数)
 
-#### 4. 首页 (D:\Projects\investor-ai-g1\app\page.tsx)
+#### 4. 首页 (D:\Projects\qiltrack-ai-g1\app\page.tsx)
 
 - [x] 新增 `quotaLoaded` 状态标记
 - [x] 在 `loadCredits` 效果中设置 `quotaLoaded=true`（无论成功失败）
@@ -40,7 +40,7 @@
 - [x] 将 `quotaLoaded` 传递给 `ReportGeneratorSection`
 - **修改行数：** 183 (quotaLoaded state), 186-205 (loadCredits effect), 266-276 (refreshQuota), 355 (传递 quotaLoaded)
 
-#### 5. 报告生成组件 (D:\Projects\investor-ai-g1\app\sections\ReportGeneratorSection.tsx)
+#### 5. 报告生成组件 (D:\Projects\qiltrack-ai-g1\app\sections\ReportGeneratorSection.tsx)
 
 - [x] 更新类型定义，AuthInfo 中增加 `quotaLoaded?: boolean`
 - [x] 使用 `quotaLoaded` 标记来决定是否阻止提交：仅当 `quotaLoaded=true` 且 `remainingQuota=0` 时阻止
@@ -51,7 +51,7 @@
   - 保留字符串匹配作为降级方案
 - **修改行数：** 337-367 (错误处理逻辑)
 
-#### 6. 国际化翻译 (D:\Projects\investor-ai-g1\lib\i18n.tsx)
+#### 6. 国际化翻译 (D:\Projects\qiltrack-ai-g1\lib\i18n.tsx)
 
 - [x] 新增 `quota.status.mismatch` (多语言)
   - en: "Detected quota mismatch, refresh session and retry"
@@ -69,7 +69,7 @@
 
 ### 单元测试
 
-#### 7. API 服务测试 (D:\Projects\investor-ai-g1\_\_tests\_\_\api.test.ts)
+#### 7. API 服务测试 (D:\Projects\qiltrack-ai-g1\_\_tests\_\_\api.test.ts)
 
 - [x] `fetchCredits` 成功返回信用额度和 source
 - [x] `fetchCredits` 401 错误携带 code 和 statusCode
@@ -77,7 +77,7 @@
 - [x] `generateReport` 429 错误携带 quota_exceeded code
 - **新增测试用例数：** 4 个 (行 48-123)
 
-#### 8. 组件测试 (D:\Projects\investor-ai-g1\_\_tests\_\_\ReportGeneratorSection.test.tsx)
+#### 8. 组件测试 (D:\Projects\qiltrack-ai-g1\_\_tests\_\_\ReportGeneratorSection.test.tsx)
 
 - [x] 测试 unauthorized 错误码路径：显示 mismatch 提示并调用 onRequireLogin
 - [x] 测试 quota_exceeded 错误码路径：显示配额不足提示

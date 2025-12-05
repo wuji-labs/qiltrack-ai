@@ -174,7 +174,7 @@ return data.remaining_credits ?? 0;
 
 ```
 $ npm run lint
-> investor-ai@0.1.0 lint
+> qiltrack-ai@0.1.0 lint
 > eslint
 
 [无错误输出 - 通过]

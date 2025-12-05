@@ -346,7 +346,7 @@ npm install inngest
 import { Inngest } from 'inngest';
 
 export const inngest = new Inngest({
-  id: 'investor-ai',
+  id: 'qiltrack-ai',
   name: 'Investor AI',
 });
 ```

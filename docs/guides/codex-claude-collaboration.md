@@ -1,6 +1,6 @@
 # Codex–Claude 协作手册
 
-本手册说明架构师（Codex）与实现工程师（Claude）在 investor-ai 项目的协作方式、职责分工与交付规范。命令/路径保持英文，其余叙述统一中文。如需 1 页速查，请参阅 `docs/guides/codex-claude-quickstart.md`；若存在冲突，以本手册为准。
+本手册说明架构师（Codex）与实现工程师（Claude）在 qiltrack-ai 项目的协作方式、职责分工与交付规范。命令/路径保持英文，其余叙述统一中文。如需 1 页速查，请参阅 `docs/guides/codex-claude-quickstart.md`；若存在冲突，以本手册为准。
 
 > 本文件为主版本，根目录保留 `CODEX_CLAUDE_COLLAB.md` 作为跳转 stub 指向此处。
 

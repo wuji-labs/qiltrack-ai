@@ -46,7 +46,7 @@ Query successful - X rows affected
 ### 选项 B：使用 Supabase CLI
 
 ```bash
-cd "D:\Projects\investor-ai-g1"
+cd "D:\Projects\qiltrack-ai-g1"
 supabase link  # 如果还未链接
 supabase migration up
 ```

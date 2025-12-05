@@ -271,19 +271,19 @@ Next: 请审查代码并决定是否提交 PR
 
 ```bash
 # 运行开发服务器
-npm run dev --prefix D:\Projects\investor-ai-gX
+npm run dev --prefix D:\Projects\qiltrack-ai-gX
 
 # 运行测试
-npm run test --prefix D:\Projects\investor-ai-gX
+npm run test --prefix D:\Projects\qiltrack-ai-gX
 
 # Lint 检查
-npm run lint --prefix D:\Projects\investor-ai-gX
+npm run lint --prefix D:\Projects\qiltrack-ai-gX
 
 # 构建
-npm run build --prefix D:\Projects\investor-ai-gX
+npm run build --prefix D:\Projects\qiltrack-ai-gX
 
 # 提交代码
-cd D:\Projects\investor-ai-gX
+cd D:\Projects\qiltrack-ai-gX
 git add .
 git commit -m "feat(scope): description"
 git push origin gX/feature-name

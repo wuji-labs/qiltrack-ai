@@ -672,7 +672,7 @@ ENABLE_DB_TRACING=true
 ### Langfuse 账号设置
 
 1. **注册账号**: https://cloud.langfuse.com/signup
-2. **创建项目**: "investor-ai-production"
+2. **创建项目**: "qiltrack-ai-production"
 3. **生成 API Keys**: 复制 Public Key 和 Secret Key
 4. **配置告警**:
    - 添加 Slack Webhook 或 Email
@@ -688,7 +688,7 @@ ENABLE_DB_TRACING=true
 ### 日常监控
 
 **每天早上 9:00**:
-1. 打开 Langfuse Dashboard: https://cloud.langfuse.com/project/investor-ai-production
+1. 打开 Langfuse Dashboard: https://cloud.langfuse.com/project/qiltrack-ai-production
 2. 查看 "Performance Dashboard"
 3. 检查关键指标:
    - 报告生成 P95 时间 < 40s ✅

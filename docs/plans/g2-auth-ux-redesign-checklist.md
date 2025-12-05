@@ -52,7 +52,7 @@
 - [ ] **执行迁移**
 
   ```bash
-  cd /d/Projects/investor-ai
+  cd /d/Projects/qiltrack-ai
   npx supabase migration up
   ```
 
@@ -65,7 +65,7 @@
 #### 1.2 Hooks 层
 
 - [ ] **增强 `useSupabaseAuth.ts`**
-      路径: `D:\Projects\investor-ai-g2\hooks\useSupabaseAuth.ts`
+      路径: `D:\Projects\qiltrack-ai-g2\hooks\useSupabaseAuth.ts`
 
   **新增类型**:
 
@@ -115,7 +115,7 @@
 #### 1.3 UI 层 - 账号页改造
 
 - [ ] **修改 `app/account/page.tsx`**
-      路径: `D:\Projects\investor-ai-g2\app\account\page.tsx`
+      路径: `D:\Projects\qiltrack-ai-g2\app\account\page.tsx`
 
 - [ ] **导入 authMethod 和 oauthProviders**
 
@@ -205,7 +205,7 @@
 - [ ] **启动开发服务器**
 
   ```bash
-  cd /d/Projects/investor-ai && npm run dev
+  cd /d/Projects/qiltrack-ai && npm run dev
   ```
 
 - [ ] **测试 OAuth 用户**
@@ -238,7 +238,7 @@
 
 - [ ] **创建备份**
   ```bash
-  cp D:/Projects/investor-ai-g2/app/(auth)/login/page.tsx D:/Projects/investor-ai-g2/app/(auth)/login/page.tsx.backup
+  cp D:/Projects/qiltrack-ai-g2/app/(auth)/login/page.tsx D:/Projects/qiltrack-ai-g2/app/(auth)/login/page.tsx.backup
   ```
 
 #### 2.2 重构登录页
@@ -336,7 +336,7 @@
 #### 3.1 创建密码修改页面
 
 - [ ] **新建文件**
-      路径: `D:\Projects\investor-ai-g2\app\account\change-password\page.tsx`
+      路径: `D:\Projects\qiltrack-ai-g2\app\account\change-password\page.tsx`
 
 - [ ] **实现 OAuth 用户拦截**
 

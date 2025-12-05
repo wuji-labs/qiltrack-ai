@@ -56,7 +56,7 @@ if [ "$has_account" != "yes" ]; then
   echo -e "${BLUE}📖 Instructions:${NC}"
   echo "  1. Go to https://app.inngest.com/sign-up"
   echo "  2. Sign up with your GitHub account"
-  echo "  3. Create a new app (name: 'investor-ai')"
+  echo "  3. Create a new app (name: 'qiltrack-ai')"
   echo "  4. Return here when done"
   echo ""
   read -p "Press Enter when you've created your account..."

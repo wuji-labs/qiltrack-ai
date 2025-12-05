@@ -21,8 +21,8 @@
 - 命名：`g<n>/<topic>`（例：`g1/report-ai`、`g2/report-ai`）。
 - 工作树：每组一个 worktree 绑定该分支（同一分支不得挂两份 worktree）。示例：
   ```
-  git worktree add ../investor-ai-g1 -b g1/report-ai origin/main
-  git worktree add ../investor-ai-g2 -b g2/report-ai origin/main
+  git worktree add ../qiltrack-ai-g1 -b g1/report-ai origin/main
+  git worktree add ../qiltrack-ai-g2 -b g2/report-ai origin/main
   ```
 - 使用：组内多人共享同一目录，可开多终端/多 VS Code 窗口；不要为同一分支再新增第二个 worktree。
 
@@ -59,7 +59,7 @@
 
 ## 快速执行清单
 
-- [ ] 为每组创建分支 + worktree：`git worktree add ../investor-ai-g{n} -b g{n}/<topic> origin/main`
+- [ ] 为每组创建分支 + worktree：`git worktree add ../qiltrack-ai-g{n} -b g{n}/<topic> origin/main`
 - [ ] 每日 rebase main，保持分支新鲜
 - [ ] 提前落公共契约与 mock，再动 UI/逻辑
 - [ ] PR 前：`git status` 干净 → `npm run lint` → `npm run test` → 更新文档 → 填 PR 模板

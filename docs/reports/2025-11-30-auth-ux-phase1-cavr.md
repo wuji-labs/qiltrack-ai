@@ -389,7 +389,7 @@ useEffect(() => {
 
 ```bash
 # 1. 启动开发服务器
-cd /d/Projects/investor-ai
+cd /d/Projects/qiltrack-ai
 npm run dev
 
 # 2. 执行数据库迁移（需要 Supabase 权限）

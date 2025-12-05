@@ -11,7 +11,7 @@
 ### 第一步：检查现有 MCP 配置
 
 ```powershell
-PS D:\Projects\investor-ai> claude mcp list
+PS D:\Projects\qiltrack-ai> claude mcp list
 Checking MCP server health...
 
 context7: npx -y @upstash/context7-mcp - ✓ Connected
@@ -24,15 +24,15 @@ context7: npx -y @upstash/context7-mcp - ✓ Connected
 ### 第二步：添加 Tailwind MCP（首次尝试失败）
 
 ```powershell
-PS D:\Projects\investor-ai> claude mcp add tailwind -- npx -y tailwindcss-mcp
+PS D:\Projects\qiltrack-ai> claude mcp add tailwind -- npx -y tailwindcss-mcp
 Added stdio MCP server tailwind with command: npx -y tailwindcss-mcp to local config
-File modified: C:\Users\xiuluart\.claude.json [project: D:\Projects\investor-ai]
+File modified: C:\Users\xiuluart\.claude.json [project: D:\Projects\qiltrack-ai]
 ```
 
 验证连接：
 
 ```powershell
-PS D:\Projects\investor-ai> claude mcp list
+PS D:\Projects\qiltrack-ai> claude mcp list
 Checking MCP server health...
 
 context7: npx -y @upstash/context7-mcp - ✓ Connected
@@ -42,7 +42,7 @@ tailwind: npx -y tailwindcss-mcp - ✗ Failed to connect
 **问题诊断**：
 
 ```powershell
-PS D:\Projects\investor-ai> npx -y tailwindcss-mcp --help
+PS D:\Projects\qiltrack-ai> npx -y tailwindcss-mcp --help
 npm error code E404
 npm error 404 Not Found - GET https://registry.npmjs.org/tailwindcss-mcp - Not found
 ```
@@ -54,17 +54,17 @@ npm error 404 Not Found - GET https://registry.npmjs.org/tailwindcss-mcp - Not f
 ### 第三步：移除错误配置并重新添加
 
 ```powershell
-PS D:\Projects\investor-ai> claude mcp remove tailwind
+PS D:\Projects\qiltrack-ai> claude mcp remove tailwind
 Removed MCP server "tailwind" from local config
-File modified: C:\Users\xiuluart\.claude.json [project: D:\Projects\investor-ai]
+File modified: C:\Users\xiuluart\.claude.json [project: D:\Projects\qiltrack-ai]
 ```
 
 添加正确的包：
 
 ```powershell
-PS D:\Projects\investor-ai> claude mcp add tailwind -- npx -y tailwindcss-mcp-server
+PS D:\Projects\qiltrack-ai> claude mcp add tailwind -- npx -y tailwindcss-mcp-server
 Added stdio MCP server tailwind with command: npx -y tailwindcss-mcp-server to local config
-File modified: C:\Users\xiuluart\.claude.json [project: D:\Projects\investor-ai]
+File modified: C:\Users\xiuluart\.claude.json [project: D:\Projects\qiltrack-ai]
 ```
 
 ---
@@ -72,7 +72,7 @@ File modified: C:\Users\xiuluart\.claude.json [project: D:\Projects\investor-ai]
 ### 第四步：验证连接状态
 
 ```powershell
-PS D:\Projects\investor-ai> claude mcp list
+PS D:\Projects\qiltrack-ai> claude mcp list
 Checking MCP server health...
 
 context7: npx -y @upstash/context7-mcp - ✓ Connected
@@ -86,7 +86,7 @@ tailwind: npx -y tailwindcss-mcp-server - ✓ Connected
 ### 第五步：获取 Tailwind MCP 详细信息
 
 ```powershell
-PS D:\Projects\investor-ai> claude mcp get tailwind
+PS D:\Projects\qiltrack-ai> claude mcp get tailwind
 tailwind:
   Scope: Local config (private to you in this project)
   Status: ✓ Connected
@@ -237,7 +237,7 @@ use tailwind utility_classes_by_category --category spacing
 
 ```powershell
 # 在仓库根目录执行
-cd D:\Projects\investor-ai
+cd D:\Projects\qiltrack-ai
 
 # 若已存在旧配置需清理
 claude mcp remove tailwind

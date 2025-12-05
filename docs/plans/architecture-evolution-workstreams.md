@@ -1017,7 +1017,7 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
 
 - 每天早上同步 main 到各 worktree
   ```bash
-  cd D:\Projects\investor-ai-g1
+  cd D:\Projects\qiltrack-ai-g1
   git fetch origin
   git rebase origin/main
   ```
@@ -1077,16 +1077,16 @@ find "$BACKUP_DIR" -name "*.sql.gz" -mtime +30 -delete
 2. **创建任务分支**
 
    ```powershell
-   cd D:\Projects\investor-ai-g1
+   cd D:\Projects\qiltrack-ai-g1
    git checkout -b g1/phase1-frontend-refactor
 
-   cd D:\Projects\investor-ai-g2
+   cd D:\Projects\qiltrack-ai-g2
    git checkout -b g2/phase1-api-hardening
 
-   cd D:\Projects\investor-ai-g3
+   cd D:\Projects\qiltrack-ai-g3
    git checkout -b g3/phase1-business-logic-cleanup
 
-   cd D:\Projects\investor-ai-g4
+   cd D:\Projects\qiltrack-ai-g4
    git checkout -b g4/phase1-infrastructure-tooling
    ```
 

@@ -2,7 +2,7 @@
 
 ## 📋 Summary
 
-Implement comprehensive lightweight motion effects across the entire investor-ai website, following the architecture decision in `docs/decisions/2025-11-23-motion-refresh.md`. All animations respect `prefers-reduced-motion` and use GPU-accelerated properties (transform/opacity) for optimal performance.
+Implement comprehensive lightweight motion effects across the entire qiltrack-ai website, following the architecture decision in `docs/decisions/2025-11-23-motion-refresh.md`. All animations respect `prefers-reduced-motion` and use GPU-accelerated properties (transform/opacity) for optimal performance.
 
 ## Motion Effects Coverage
 
