@@ -153,7 +153,8 @@ export default function SystemConfigPage() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any)
         .from("system_config")
         .select("*");
 
@@ -173,8 +174,12 @@ export default function SystemConfigPage() {
       });
 
       // 用数据库值覆盖
-      data?.forEach((item: SystemConfig) => {
-        configMap[item.key] = item.value.value ?? item.value;
+      data?.forEach((item: SystemConfig | Record<string, unknown>) => {
+        const typedItem = item as SystemConfig;
+        const value = typedItem.value as Record<string, unknown> | unknown;
+        configMap[typedItem.key] = (value && typeof value === 'object' && 'value' in value)
+          ? (value as Record<string, unknown>).value
+          : value;
       });
 
       setConfigs(configMap);
@@ -191,7 +196,8 @@ export default function SystemConfigPage() {
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase.from("system_config") as any)
+      const { error } = await (supabase as any)
+        .from("system_config")
         .upsert(
           {
             key,
@@ -208,7 +214,7 @@ export default function SystemConfigPage() {
 
       // 记录审计日志
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase.from("audit_logs") as any).insert({
+      await (supabase as any).from("audit_logs").insert({
         action: "UPDATE_CONFIG",
         resource_type: "config",
         resource_id: key,
@@ -229,7 +235,7 @@ export default function SystemConfigPage() {
     try {
       // 删除所有配置
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase.from("system_config") as any).delete().neq("key", "");
+      await (supabase as any).from("system_config").delete().neq("key", "");
 
       // 重新加载默认值
       await fetchConfigs();

@@ -59,7 +59,11 @@ export async function GET(request: NextRequest) {
     const supabase = createServerClient(
       cookieStore,
       (cookies) => {
-        cookiesToSet.push(...cookies);
+        cookiesToSet.push(...cookies.map(c => ({
+          name: c.name,
+          value: c.value,
+          options: c.options as Record<string, unknown> | undefined
+        })));
       }
     );
 

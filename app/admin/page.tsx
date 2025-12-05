@@ -140,11 +140,11 @@ export default function AdminDashboard() {
         .select("user_id")
         .gte("created_at", sevenDaysAgo.toISOString());
 
-      const activeUsers = new Set(activeUsersData?.map((r: { user_id: string }) => r.user_id) || []).size;
+      const activeUsers = new Set(activeUsersData?.filter((r: { user_id: string | null }) => r.user_id).map((r: { user_id: string | null }) => r.user_id) || []).size;
 
       // 套餐分布计算
       const planCounts: Record<string, number> = { free: 0, pro: 0, annual: 0 };
-      planDistResult.data?.forEach((p: { plan?: string }) => {
+      planDistResult.data?.forEach((p: { plan: string | null }) => {
         const plan = p.plan || "free";
         planCounts[plan] = (planCounts[plan] || 0) + 1;
       });
@@ -300,8 +300,8 @@ export default function AdminDashboard() {
     if (data) {
       const userCounts: Record<string, { user: TopUser; count: number }> = {};
 
-      data.forEach((run: { user_id: string; profiles?: { id: string; email: string; display_name: string | null; plan: string } | null }) => {
-        if (run.profiles) {
+      data.forEach((run: { user_id: string | null; profiles: { id: string; email: string; display_name: string | null; plan: string | null } | null }) => {
+        if (run.profiles && run.user_id) {
           const userId = run.user_id;
           if (!userCounts[userId]) {
             userCounts[userId] = {

@@ -86,7 +86,7 @@ export default function SubscriptionsPage() {
       let mrr = 0;
       let newPaidThisMonth = 0;
 
-      allProfiles?.forEach((p: { plan?: string; created_at?: string }) => {
+      allProfiles?.forEach((p: { plan: string | null; created_at: string | null; updated_at: string | null }) => {
         const plan = p.plan || "free";
         byPlan[plan] = (byPlan[plan] || 0) + 1;
 
