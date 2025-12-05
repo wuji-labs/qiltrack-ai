@@ -190,8 +190,8 @@ export default function SystemConfigPage() {
     setSaving(true);
 
     try {
-      const { error } = await supabase
-        .from("system_config")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from("system_config") as any)
         .upsert(
           {
             key,
@@ -207,7 +207,8 @@ export default function SystemConfigPage() {
       setEditingKey(null);
 
       // 记录审计日志
-      await supabase.from("audit_logs").insert({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.from("audit_logs") as any).insert({
         action: "UPDATE_CONFIG",
         resource_type: "config",
         resource_id: key,
@@ -227,7 +228,8 @@ export default function SystemConfigPage() {
 
     try {
       // 删除所有配置
-      await supabase.from("system_config").delete().neq("key", "");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.from("system_config") as any).delete().neq("key", "");
 
       // 重新加载默认值
       await fetchConfigs();

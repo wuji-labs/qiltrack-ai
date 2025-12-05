@@ -141,7 +141,8 @@ export async function GET(request: NextRequest) {
     // Active users (generated report in last 7 days) - with error handling
     let activeUsersCount = 0;
     try {
-      const result = await supabase.rpc('get_active_users_count', { days: 7 });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = await (supabase as any).rpc('get_active_users_count', { days: 7 });
       activeUsersCount = result.data || 0;
     } catch {
       activeUsersCount = 0;

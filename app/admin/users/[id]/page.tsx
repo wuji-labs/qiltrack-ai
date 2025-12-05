@@ -34,13 +34,13 @@ interface UserProfile {
   stripe_subscription_id: string | null;
 }
 
-interface UserCredits {
+interface UserCredits extends Record<string, unknown> {
   credits_available: number;
   credits_used: number;
   last_reset: string | null;
 }
 
-interface CreditEvent {
+interface CreditEvent extends Record<string, unknown> {
   id: string;
   event_type: string;
   credits_amount: number;
@@ -48,7 +48,7 @@ interface CreditEvent {
   created_at: string;
 }
 
-interface ReportRun {
+interface ReportRun extends Record<string, unknown> {
   id: string;
   symbol: string | null;
   status: string | null;
@@ -57,7 +57,7 @@ interface ReportRun {
   created_at: string | null;
 }
 
-interface Subscription {
+interface Subscription extends Record<string, unknown> {
   id: string;
   plan_id: string | null;
   status: string | null;
@@ -66,7 +66,7 @@ interface Subscription {
   stripe_subscription_id: string | null;
 }
 
-interface AuditLog {
+interface AuditLog extends Record<string, unknown> {
   id: string;
   action: string;
   resource_type: string | null;
@@ -150,11 +150,12 @@ export default function UserDetailPage() {
         .single();
 
       if (userError) throw userError;
-      setUser(userData);
+      const typedUserData = userData as unknown as UserProfile;
+      setUser(typedUserData);
       setEditData({
-        display_name: userData.display_name || "",
-        role: userData.role || "user",
-        plan: userData.plan || "free",
+        display_name: typedUserData.display_name || "",
+        role: typedUserData.role || "user",
+        plan: typedUserData.plan || "free",
       });
 
       // 并行获取其他数据
@@ -166,11 +167,11 @@ export default function UserDetailPage() {
         supabase.from("audit_logs").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(50),
       ]);
 
-      setCredits(creditsRes.data);
-      setCreditEvents(eventsRes.data || []);
-      setReportRuns(runsRes.data || []);
-      setSubscriptions(subsRes.data || []);
-      setAuditLogs(logsRes.data || []);
+      setCredits(creditsRes.data as unknown as UserCredits | null);
+      setCreditEvents((eventsRes.data || []) as unknown as CreditEvent[]);
+      setReportRuns((runsRes.data || []) as unknown as ReportRun[]);
+      setSubscriptions((subsRes.data || []) as unknown as Subscription[]);
+      setAuditLogs((logsRes.data || []) as unknown as AuditLog[]);
     } catch (error) {
       console.error("Failed to fetch user data:", error);
     } finally {

@@ -121,9 +121,9 @@ export default function PlansPage() {
     try {
       const supabase = createClient();
 
-      if (editingPlan.id.startsWith("default-")) {
+      if (editingPlan.id.startsWith("default-") || editingPlan.id.startsWith("new-")) {
         // 创建新套餐
-        const { error } = await supabase.from("subscription_plans").insert({
+        const insertData = {
           name: editingPlan.name,
           slug: editingPlan.slug,
           description: editingPlan.description,
@@ -134,23 +134,26 @@ export default function PlansPage() {
           is_active: editingPlan.is_active,
           sort_order: editingPlan.sort_order,
           color: editingPlan.color,
-        });
+        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase.from("subscription_plans") as any).insert(insertData);
         if (error) throw error;
       } else {
         // 更新现有套餐
-        const { error } = await supabase
-          .from("subscription_plans")
-          .update({
-            name: editingPlan.name,
-            description: editingPlan.description,
-            price_monthly: editingPlan.price_monthly,
-            price_yearly: editingPlan.price_yearly,
-            credits_monthly: editingPlan.credits_monthly,
-            features: editingPlan.features,
-            is_active: editingPlan.is_active,
-            sort_order: editingPlan.sort_order,
-            color: editingPlan.color,
-          })
+        const updateData = {
+          name: editingPlan.name,
+          description: editingPlan.description,
+          price_monthly: editingPlan.price_monthly,
+          price_yearly: editingPlan.price_yearly,
+          credits_monthly: editingPlan.credits_monthly,
+          features: editingPlan.features,
+          is_active: editingPlan.is_active,
+          sort_order: editingPlan.sort_order,
+          color: editingPlan.color,
+        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase.from("subscription_plans") as any)
+          .update(updateData)
           .eq("id", editingPlan.id);
         if (error) throw error;
       }

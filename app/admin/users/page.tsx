@@ -356,8 +356,8 @@ export default function UsersPage() {
 
     try {
       if (batchAction === "plan") {
-        await supabase
-          .from("profiles")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase.from("profiles") as any)
           .update({ plan: batchPlan, updated_at: new Date().toISOString() })
           .in("id", userIds);
         alert(`成功修改 ${userIds.length} 个用户的套餐`);

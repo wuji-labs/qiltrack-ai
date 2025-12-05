@@ -66,8 +66,8 @@ export default function BatchOperationsPage() {
 
         for (const userId of userIds) {
           try {
-            const { error } = await supabase
-              .from("profiles")
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase.from("profiles") as any)
               .update({ plan: params.plan })
               .eq("id", userId);
 
@@ -76,7 +76,8 @@ export default function BatchOperationsPage() {
             } else {
               success++;
               // 记录审计日志
-              await supabase.from("audit_logs").insert({
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              await (supabase.from("audit_logs") as any).insert({
                 user_id: userId,
                 action: "CHANGE_PLAN",
                 resource_type: "user",
@@ -125,12 +126,12 @@ export default function BatchOperationsPage() {
               .eq("user_id", userId)
               .single();
 
-            const currentCredits = current?.credits_available || 0;
+            const currentCredits = (current as { credits_available?: number } | null)?.credits_available || 0;
             const amount = Number(params.amount);
 
             // 更新或插入积分记录
-            const { error } = await supabase
-              .from("report_credits")
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase.from("report_credits") as any)
               .upsert({
                 user_id: userId,
                 credits_available: currentCredits + amount,
@@ -142,14 +143,16 @@ export default function BatchOperationsPage() {
             } else {
               success++;
               // 记录积分事件
-              await supabase.from("report_credit_events").insert({
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              await (supabase.from("report_credit_events") as any).insert({
                 user_id: userId,
                 event_type: "admin_grant",
                 credits_amount: amount,
                 reason: params.reason || "批量授予",
               });
               // 记录审计日志
-              await supabase.from("audit_logs").insert({
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              await (supabase.from("audit_logs") as any).insert({
                 action: "GRANT_CREDITS",
                 resource_type: "credits",
                 resource_id: userId,
@@ -188,8 +191,8 @@ export default function BatchOperationsPage() {
 
         for (const userId of userIds) {
           try {
-            const { error } = await supabase
-              .from("profiles")
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase.from("profiles") as any)
               .update({ role: params.role })
               .eq("id", userId);
 
@@ -197,7 +200,8 @@ export default function BatchOperationsPage() {
               failed++;
             } else {
               success++;
-              await supabase.from("audit_logs").insert({
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              await (supabase.from("audit_logs") as any).insert({
                 action: "UPDATE_USER",
                 resource_type: "user",
                 resource_id: userId,
@@ -238,8 +242,8 @@ export default function BatchOperationsPage() {
 
         for (const userId of userIds) {
           try {
-            const { error } = await supabase
-              .from("user_notifications")
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase.from("user_notifications") as any)
               .insert({
                 user_id: userId,
                 title: params.title,
@@ -282,8 +286,8 @@ export default function BatchOperationsPage() {
 
         for (const userId of userIds) {
           try {
-            const { error } = await supabase
-              .from("report_credits")
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase.from("report_credits") as any)
               .upsert({
                 user_id: userId,
                 credits_available: Number(params.amount),
@@ -294,7 +298,8 @@ export default function BatchOperationsPage() {
               failed++;
             } else {
               success++;
-              await supabase.from("report_credit_events").insert({
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              await (supabase.from("report_credit_events") as any).insert({
                 user_id: userId,
                 event_type: "admin_reset",
                 credits_amount: Number(params.amount),
@@ -402,11 +407,10 @@ export default function BatchOperationsPage() {
                     setParams({});
                   }}
                   className={`p-4 rounded-lg text-left transition-all ${
-                    selectedOperation === op.id ? "ring-2" : ""
+                    selectedOperation === op.id ? "ring-2 ring-emerald-500" : ""
                   }`}
                   style={{
                     background: selectedOperation === op.id ? "var(--accent-emerald-dim)" : "var(--bg-layer)",
-                    ringColor: "var(--accent-emerald)",
                   }}
                 >
                   <div className="text-2xl mb-2">{op.icon}</div>

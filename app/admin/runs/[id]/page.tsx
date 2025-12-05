@@ -76,11 +76,12 @@ export default function ReportRunDetailPage() {
         .single();
 
       if (error) throw error;
-      setRun(data);
+      const runData = data as unknown as ReportRun;
+      setRun(runData);
 
       // 如果有markdown路径，尝试获取内容
-      if (data.markdown_path) {
-        await fetchMarkdownContent(data.markdown_path);
+      if (runData.markdown_path) {
+        await fetchMarkdownContent(runData.markdown_path);
       }
     } catch (error) {
       console.error("Failed to fetch run data:", error);
@@ -161,7 +162,8 @@ export default function ReportRunDetailPage() {
 
     try {
       const supabase = createClient();
-      const { error } = await supabase.from("report_runs").delete().eq("id", run.id);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from("report_runs") as any).delete().eq("id", run.id);
 
       if (error) throw error;
 

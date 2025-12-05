@@ -34,7 +34,8 @@ export async function GET(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    if (!profile || !['admin', 'superadmin'].includes(profile.role)) {
+    const role = (profile as { role?: string | null } | null)?.role;
+    if (!role || !['admin', 'superadmin', 'super_admin'].includes(role)) {
       const response = NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       responseCookies.forEach(({ name, value }) => {
         response.headers.append('Set-Cookie', `${name}=${value}`);
@@ -110,7 +111,8 @@ export async function POST(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    if (!profile || !['admin', 'superadmin'].includes(profile.role)) {
+    const role2 = (profile as { role?: string | null } | null)?.role;
+    if (!role2 || !['admin', 'superadmin', 'super_admin'].includes(role2)) {
       const response = NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       responseCookies.forEach(({ name, value }) => {
         response.headers.append('Set-Cookie', `${name}=${value}`);
