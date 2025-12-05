@@ -2,9 +2,8 @@
   "name": "qiltrack",
   "version": "0.1.0",
   "private": true,
-  "_comment_port_warning": "⚠️ DO NOT modify 'dev' script! Port is managed via .env.local. See docs/AI_INSTRUCTIONS.md",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev.js",
     "dev:start": "bash scripts/dev-start.sh",
     "build": "next build",
     "start": "next start",
