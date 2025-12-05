@@ -34,16 +34,16 @@ BEGIN
   END IF;
 END $$;
 
--- 4. Create indexes for better query performance (concurrent to avoid locking)
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_report_posts_report_run_id
+-- 4. Create indexes for better query performance
+CREATE INDEX IF NOT EXISTS idx_report_posts_report_run_id
   ON public.report_posts(report_run_id)
   WHERE report_run_id IS NOT NULL;
 
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_report_posts_user_id
+CREATE INDEX IF NOT EXISTS idx_report_posts_user_id
   ON public.report_posts(user_id)
   WHERE user_id IS NOT NULL;
 
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_report_posts_tone
+CREATE INDEX IF NOT EXISTS idx_report_posts_tone
   ON public.report_posts(tone);
 
 -- 5. Add field comments for documentation

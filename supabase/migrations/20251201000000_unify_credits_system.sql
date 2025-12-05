@@ -100,6 +100,8 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- 4. Remove quota_limit and reports_used columns from profiles
 -- IMPORTANT: This is a breaking change - make sure all code is updated to use report_credits table
+-- First drop any views that depend on these columns
+DROP VIEW IF EXISTS public.v_user_quota CASCADE;
 ALTER TABLE public.profiles DROP COLUMN IF EXISTS quota_limit;
 ALTER TABLE public.profiles DROP COLUMN IF EXISTS reports_used;
 

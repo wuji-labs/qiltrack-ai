@@ -42,14 +42,14 @@ ALTER TABLE public.audit_logs
   ADD COLUMN IF NOT EXISTS record_id TEXT;
 
 -- 4. Add index for better query performance
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_audit_logs_user_id
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id
   ON public.audit_logs(user_id)
   WHERE user_id IS NOT NULL;
 
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_audit_logs_action
+CREATE INDEX IF NOT EXISTS idx_audit_logs_action
   ON public.audit_logs(action);
 
-CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_audit_logs_record
+CREATE INDEX IF NOT EXISTS idx_audit_logs_record
   ON public.audit_logs(table_name, record_id)
   WHERE table_name IS NOT NULL AND record_id IS NOT NULL;
 
