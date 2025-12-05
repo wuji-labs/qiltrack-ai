@@ -57,12 +57,13 @@ export async function POST(req: Request) {
         console.log(`[Stripe] Checkout completed for user ${userId}, plan: ${plan}`);
 
         // 调用数据库函数升级会员
-        const { error: upgradeError } = await supabase.rpc("fn_upgrade_membership", {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error: upgradeError } = await (supabase as any).rpc("fn_upgrade_membership", {
           p_user_id: userId,
           p_plan: plan,
           p_stripe_customer_id: customerId,
           p_stripe_subscription_id: subscriptionId,
-        } as never);
+        });
 
         if (upgradeError) {
           console.error("[Stripe] Failed to upgrade membership:", upgradeError);

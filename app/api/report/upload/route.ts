@@ -49,7 +49,8 @@ export async function POST(request: NextRequest) {
     const serviceClient = createServiceRoleClient();
     const signedUrl = await uploadToStorage(serviceClient, "report-assets", storagePath, file);
 
-    const { data, error } = await serviceClient
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (serviceClient as any)
       .from("user_report_uploads")
       .insert({
         user_id: userId,

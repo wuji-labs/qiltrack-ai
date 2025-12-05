@@ -71,14 +71,15 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if the reusable report belongs to the current user
-    const reusableReport = data && data.length > 0 ? data[0] : null;
+    const reusableReport = data && data.length > 0 ? data[0] as { report_run_id?: string; run_id?: string; created_at?: string; symbol?: string; lang?: string; mode?: string; tone?: string } : null;
 
     if (reusableReport) {
-      // Verify ownership
+      // Verify ownership - use report_run_id or run_id depending on which exists
+      const runId = reusableReport.report_run_id || reusableReport.run_id;
       const { data: runData, error: runError } = await supabase
         .from("report_runs")
         .select("user_id")
-        .eq("id", reusableReport.report_run_id)
+        .eq("id", runId as string)
         .single();
 
       if (runError || !runData) {
