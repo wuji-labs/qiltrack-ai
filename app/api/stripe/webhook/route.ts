@@ -141,13 +141,13 @@ export async function POST(req: Request) {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
 
-        await supabase
-          .from("profiles")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase.from("profiles") as any)
           .update({
             subscription_status: subscription.status as string,
             subscription_expires_at: new Date(subscription.current_period_end * 1000).toISOString(),
             updated_at: new Date().toISOString(),
-          } as never)
+          })
           .eq("stripe_customer_id", customerId);
 
         break;
@@ -165,10 +165,11 @@ export async function POST(req: Request) {
           .single();
 
         if (profile) {
-          await supabase.rpc("fn_cancel_membership", {
-            p_user_id: profile.id,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase as any).rpc("fn_cancel_membership", {
+            p_user_id: (profile as { id: string }).id,
             p_immediate: false,
-          } as never);
+          });
         }
 
         break;
