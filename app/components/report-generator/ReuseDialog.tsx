@@ -4,6 +4,7 @@ type ReuseDialogProps = {
   showReuseDialog: boolean;
   onViewHistory: () => void;
   onRegenerate: () => void;
+  onUseReused: () => void;
   onClose: () => void;
   t: (key: string, vars?: Record<string, string>) => string;
 };
@@ -12,6 +13,7 @@ export function ReuseDialog({
   showReuseDialog,
   onViewHistory,
   onRegenerate,
+  onUseReused,
   onClose,
   t,
 }: ReuseDialogProps) {
