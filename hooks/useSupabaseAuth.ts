@@ -1,9 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import type { Session, User } from "@supabase/auth-helpers-nextjs";
-
+import { createClient } from "@/lib/supabase/client";
+import type { Session, User } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 
 /**
@@ -92,7 +91,7 @@ export function useSupabaseAuth() {
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
   const supabase = useMemo(
-    () => (hasSupabaseConfig ? createClientComponentClient<Database>() : null),
+    () => (hasSupabaseConfig ? createClient() : null),
     [hasSupabaseConfig]
   );
   const [user, setUser] = useState<User | null>(null);
@@ -244,7 +243,7 @@ export function useSupabaseAuth() {
           if (rpcError) {
             console.warn("RPC fn_user_has_password failed - falling back to OAuth", {
               error: rpcError?.message || rpcError,
-              code: (rpcError as any)?.code,
+              code: (rpcError as unknown as { code?: string })?.code,
             });
             // Assume OAuth-only if RPC fails
             return "oauth";
@@ -264,7 +263,7 @@ export function useSupabaseAuth() {
         if (rpcError) {
           console.warn("RPC fn_user_has_password failed - returning unknown", {
             error: rpcError?.message || rpcError,
-            code: (rpcError as any)?.code,
+            code: (rpcError as unknown as { code?: string })?.code,
           });
           return "unknown";
         }

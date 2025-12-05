@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { requireAdmin, isAuthError } from "@/lib/auth/admin";
 
 export async function GET(request: NextRequest) {
+  // 认证检查
+  const auth = await requireAdmin();
+  if (isAuthError(auth)) return auth;
+
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
@@ -60,6 +65,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  // 认证检查
+  const auth = await requireAdmin();
+  if (isAuthError(auth)) return auth;
+
   try {
     const body = await request.json();
     const { action, resourceType, resourceId, details, userId } = body;

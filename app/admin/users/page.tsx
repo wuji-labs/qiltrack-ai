@@ -350,17 +350,26 @@ export default function UsersPage() {
       return;
     }
 
-    if (!supabase) return;
     setProcessing(true);
     const userIds = Array.from(selectedUsers);
 
     try {
       if (batchAction === "plan") {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase.from("profiles") as any)
-          .update({ plan: batchPlan, updated_at: new Date().toISOString() })
-          .in("id", userIds);
-        alert(`成功修改 ${userIds.length} 个用户的套餐`);
+        // 使用批量操作API
+        const response = await fetch("/api/admin/batch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userIds,
+            action: "change_plan",
+            params: { plan: batchPlan },
+          }),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || "批量修改套餐失败");
+        }
+        alert(`成功修改 ${result.success} 个用户的套餐${result.failed > 0 ? `，失败 ${result.failed} 个` : ""}`);
       } else if (batchAction === "delete") {
         if (!confirm(`确定要删除 ${userIds.length} 个用户吗？此操作不可恢复！`)) {
           setProcessing(false);

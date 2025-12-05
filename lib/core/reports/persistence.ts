@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 import { StorageService } from "@/lib/services/storage";
 import { generateDocxFromMarkdown } from "@/lib/services/docx-generator";
 import type { SavedReport } from "./types";
 import { v4 as uuidv4 } from "uuid";
-import { createServiceRoleClient } from "@/lib/supabase/server";
 
 /**
  * Report persistence layer handles saving reports to database
@@ -34,7 +33,6 @@ export class ReportPersistence {
     },
     userId?: string
   ): Promise<SavedReport> {
-    const supabase = await createClient();
     const supabaseServiceRole = createServiceRoleClient();
 
     // Generate IDs
@@ -74,12 +72,13 @@ export class ReportPersistence {
       console.warn(`[ReportPersistence] Failed to generate or upload DOCX file:`, err);
     }
 
-    // Save to database (report_posts)
-    const { data, error } = await supabase
+    // Save to database (report_posts) - use service role to bypass RLS
+    const { data, error } = await supabaseServiceRole
       .from("report_posts")
       .insert({
         report_run_id: reportRunId,
         user_id: userId ?? null,
+        author_id: userId ?? null, // 同时设置 author_id 确保查询能找到
         symbol: report.symbol,
         title: report.title,
         slug: slug,
@@ -155,7 +154,8 @@ export class ReportPersistence {
     tone: string,
     userId: string
   ): Promise<SavedReport | null> {
-    const supabase = await createClient();
+    // 使用 service role 绕过 RLS
+    const supabase = createServiceRoleClient();
 
     // Check for reports within last 7 days
     const sevenDaysAgo = new Date();
@@ -214,7 +214,8 @@ export class ReportPersistence {
     tone: string,
     maxAgeDays: number = 1
   ): Promise<SavedReport | null> {
-    const supabase = await createClient();
+    // 使用 service role 绕过 RLS
+    const supabase = createServiceRoleClient();
 
     const since = new Date();
     since.setUTCHours(0, 0, 0, 0);
@@ -276,7 +277,8 @@ export class ReportPersistence {
    * Record audit log for report generation
    */
   async recordAudit(userId: string, action: string, details: Record<string, any>): Promise<void> {
-    const supabase = await createClient();
+    // 使用 service role 绕过 RLS
+    const supabase = createServiceRoleClient();
 
     await (supabase as any).from("audit_logs").insert({
       user_id: userId,

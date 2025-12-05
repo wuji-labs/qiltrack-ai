@@ -153,11 +153,7 @@ export async function getUserIdFromRequest(supabase: ReturnType<typeof createSer
   return session?.user?.id ?? null;
 }
 
-/**
- * Create a Supabase client for use in business logic layer
- * This function creates a service role client for internal operations
- * Used by: CreditManager, ReportPersistence, DailyRewards
- */
-export async function createClient() {
-  return createServiceRoleClient();
-}
+// REMOVED: createClient() function was causing confusion
+// It returned createServiceRoleClient() but callers expected a user session
+// Use createServiceRoleClient() directly for privileged operations
+// Use createServerClient(cookies) for user-authenticated operations

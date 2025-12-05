@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 import { useLanguage } from "@/lib/i18n";
 
 /**
@@ -32,7 +32,7 @@ function AuthConfirmContent() {
       return;
     }
 
-    const supabase = createClientComponentClient();
+    const supabase = createClient();
 
     async function verifyToken() {
       try {

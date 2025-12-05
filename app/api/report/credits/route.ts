@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
-import type { Database } from "@/types/database";
+import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
+
+// 默认初始积分
+const DEFAULT_INITIAL_CREDITS = 60;
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,19 +18,17 @@ export async function GET(request: NextRequest) {
     let userId: string | null = null;
 
     if (!isTestBypass) {
-      // Get user session using the same approach as auth callback
-      const cookieStore = cookies();
-      const supabase = createRouteHandlerClient<Database>({
-        cookies: () => cookieStore,
-      });
+      // Get user session using @supabase/ssr
+      const cookieStore = await cookies();
+      const supabase = createServerClient(cookieStore);
 
       const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
 
-      if (sessionError || !session?.user?.id) {
-        console.warn(`[UNAUTHORIZED_SESSION] error: ${sessionError?.message || "no session"}`);
+      if (authError || !user?.id) {
+        console.warn(`[UNAUTHORIZED_SESSION] error: ${authError?.message || "no session"}`);
         // 友好地返回0积分，而不是401错误
         return NextResponse.json({
           userId: null,
@@ -40,13 +40,14 @@ export async function GET(request: NextRequest) {
         });
       }
 
-      userId = session.user.id;
+      userId = user.id;
 
-      // Query report_credits table for real-time remaining credits
-      const { data, error: quotaError } = await supabase
+      // 使用 service role 查询积分（绕过 RLS）
+      const supabaseAdmin = createServiceRoleClient();
+      const { data, error: quotaError } = await supabaseAdmin
         .from("report_credits")
         .select("credits_available")
-        .eq("user_id", userId as never)
+        .eq("user_id", userId)
         .maybeSingle();
 
       if (quotaError) {
@@ -59,14 +60,13 @@ export async function GET(request: NextRequest) {
 
       // If no credits record exists, create one with default credits
       if (!data) {
-        const { error: insertError } = await supabase
+        const { error: insertError } = await supabaseAdmin
           .from("report_credits")
-          // Supabase types occasionally narrow this table to never; cast to keep runtime behavior unchanged
           .insert({
             user_id: userId,
-            credits_available: 1,
-            credits_total: 1,
-          } as never);
+            credits_available: DEFAULT_INITIAL_CREDITS,
+            credits_total: DEFAULT_INITIAL_CREDITS,
+          });
 
         if (insertError) {
           console.warn(`[CREDITS_INIT_FAILED] user_id: ${userId}, error: ${insertError.message}`);
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({
           userId,
           credits: {
-            remaining_credits: 1,
+            remaining_credits: DEFAULT_INITIAL_CREDITS,
           },
           source: "report_credits",
         });
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         userId,
         credits: {
-          remaining_credits: (data as { credits_available: number })?.credits_available ?? 0,
+          remaining_credits: data.credits_available ?? 0,
         },
         source: "report_credits",
       });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { StatCard, formatDate } from "@/app/components/admin/ui";
 
@@ -26,6 +26,213 @@ interface ResourceUsage {
   unit: string;
 }
 
+// Helper functions moved outside component to avoid useCallback dependency issues
+type SupabaseClient = ReturnType<typeof createClient>;
+
+async function checkDatabase(supabase: SupabaseClient): Promise<HealthCheck> {
+  const start = Date.now();
+  try {
+    const { error } = await supabase
+      .from("profiles")
+      .select("*", { count: "exact", head: true });
+
+    const latency = Date.now() - start;
+
+    if (error) {
+      return {
+        name: "数据库",
+        status: "down",
+        latency,
+        message: error.message,
+        lastCheck: new Date(),
+      };
+    }
+
+    return {
+      name: "数据库",
+      status: latency < 500 ? "healthy" : "degraded",
+      latency,
+      message: `连接正常，响应时间 ${latency}ms`,
+      lastCheck: new Date(),
+    };
+  } catch (error) {
+    return {
+      name: "数据库",
+      status: "down",
+      latency: Date.now() - start,
+      message: error instanceof Error ? error.message : "连接失败",
+      lastCheck: new Date(),
+    };
+  }
+}
+
+async function checkStorage(supabase: SupabaseClient): Promise<HealthCheck> {
+  const start = Date.now();
+  try {
+    const { data, error } = await supabase.storage.listBuckets();
+
+    const latency = Date.now() - start;
+
+    if (error) {
+      return {
+        name: "存储服务",
+        status: "down",
+        latency,
+        message: error.message,
+        lastCheck: new Date(),
+      };
+    }
+
+    return {
+      name: "存储服务",
+      status: latency < 1000 ? "healthy" : "degraded",
+      latency,
+      message: `${data?.length || 0} 个存储桶可用`,
+      lastCheck: new Date(),
+    };
+  } catch (error) {
+    return {
+      name: "存储服务",
+      status: "down",
+      latency: Date.now() - start,
+      message: error instanceof Error ? error.message : "连接失败",
+      lastCheck: new Date(),
+    };
+  }
+}
+
+async function checkAuth(supabase: SupabaseClient): Promise<HealthCheck> {
+  const start = Date.now();
+  try {
+    const { data, error } = await supabase.auth.getSession();
+
+    const latency = Date.now() - start;
+
+    if (error) {
+      return {
+        name: "认证服务",
+        status: "degraded",
+        latency,
+        message: error.message,
+        lastCheck: new Date(),
+      };
+    }
+
+    return {
+      name: "认证服务",
+      status: "healthy",
+      latency,
+      message: data.session ? "已认证" : "服务正常",
+      lastCheck: new Date(),
+    };
+  } catch (error) {
+    return {
+      name: "认证服务",
+      status: "down",
+      latency: Date.now() - start,
+      message: error instanceof Error ? error.message : "连接失败",
+      lastCheck: new Date(),
+    };
+  }
+}
+
+async function checkApi(): Promise<HealthCheck> {
+  const start = Date.now();
+  try {
+    const response = await fetch("/api/health", { method: "GET" });
+    const latency = Date.now() - start;
+
+    if (!response.ok) {
+      return {
+        name: "API服务",
+        status: "degraded",
+        latency,
+        message: `HTTP ${response.status}`,
+        lastCheck: new Date(),
+      };
+    }
+
+    return {
+      name: "API服务",
+      status: "healthy",
+      latency,
+      message: `响应时间 ${latency}ms`,
+      lastCheck: new Date(),
+    };
+  } catch {
+    return {
+      name: "API服务",
+      status: "healthy", // API可能没有health端点，默认正常
+      latency: Date.now() - start,
+      message: "服务运行中",
+      lastCheck: new Date(),
+    };
+  }
+}
+
+async function fetchDbStats(
+  supabase: SupabaseClient,
+  setDbStats: React.Dispatch<React.SetStateAction<{
+    totalUsers: number;
+    totalReports: number;
+    totalCredits: number;
+    totalLogs: number;
+  }>>,
+  setResources: React.Dispatch<React.SetStateAction<ResourceUsage[]>>
+) {
+  try {
+    const [users, reports, credits, logs] = await Promise.all([
+      supabase.from("profiles").select("*", { count: "exact", head: true }),
+      supabase.from("report_runs").select("*", { count: "exact", head: true }),
+      supabase.from("report_credits").select("credits_available"),
+      supabase.from("audit_logs").select("*", { count: "exact", head: true }),
+    ]);
+
+    const totalCredits = credits.data?.reduce(
+      (sum: number, c: { credits_available?: number }) => sum + (c.credits_available || 0),
+      0
+    ) || 0;
+
+    setDbStats({
+      totalUsers: users.count || 0,
+      totalReports: reports.count || 0,
+      totalCredits,
+      totalLogs: logs.count || 0,
+    });
+
+    // 模拟资源使用数据
+    setResources([
+      { label: "数据库连接", current: 12, max: 100, unit: "个" },
+      { label: "存储空间", current: 256, max: 5120, unit: "MB" },
+      { label: "API请求/分钟", current: 45, max: 1000, unit: "次" },
+    ]);
+  } catch (error) {
+    console.error("Failed to fetch db stats:", error);
+  }
+}
+
+function getStatusColor(status: HealthCheck["status"]) {
+  switch (status) {
+    case "healthy":
+      return { bg: "#10b981", text: "#10b981" };
+    case "degraded":
+      return { bg: "#f59e0b", text: "#f59e0b" };
+    case "down":
+      return { bg: "#ef4444", text: "#ef4444" };
+  }
+}
+
+function getStatusLabel(status: HealthCheck["status"]) {
+  switch (status) {
+    case "healthy":
+      return "正常";
+    case "degraded":
+      return "降级";
+    case "down":
+      return "故障";
+  }
+}
+
 export default function SystemHealthPage() {
   const [metrics, setMetrics] = useState<SystemMetrics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,13 +250,7 @@ export default function SystemHealthPage() {
   // 资源使用
   const [resources, setResources] = useState<ResourceUsage[]>([]);
 
-  useEffect(() => {
-    runHealthChecks();
-    const interval = setInterval(runHealthChecks, 60000); // 每分钟刷新
-    return () => clearInterval(interval);
-  }, []);
-
-  async function runHealthChecks() {
+  const runHealthChecks = useCallback(async () => {
     setRefreshing(true);
     const supabase = createClient();
 
@@ -64,206 +265,17 @@ export default function SystemHealthPage() {
     setLastRefresh(new Date());
 
     // 获取数据库统计
-    await fetchDbStats(supabase);
+    await fetchDbStats(supabase, setDbStats, setResources);
 
     setLoading(false);
     setRefreshing(false);
-  }
+  }, []);
 
-  async function checkDatabase(supabase: ReturnType<typeof createClient>): Promise<HealthCheck> {
-    const start = Date.now();
-    try {
-      const { count, error } = await supabase
-        .from("profiles")
-        .select("*", { count: "exact", head: true });
-
-      const latency = Date.now() - start;
-
-      if (error) {
-        return {
-          name: "数据库",
-          status: "down",
-          latency,
-          message: error.message,
-          lastCheck: new Date(),
-        };
-      }
-
-      return {
-        name: "数据库",
-        status: latency < 500 ? "healthy" : "degraded",
-        latency,
-        message: `连接正常，响应时间 ${latency}ms`,
-        lastCheck: new Date(),
-      };
-    } catch (error) {
-      return {
-        name: "数据库",
-        status: "down",
-        latency: Date.now() - start,
-        message: error instanceof Error ? error.message : "连接失败",
-        lastCheck: new Date(),
-      };
-    }
-  }
-
-  async function checkStorage(supabase: ReturnType<typeof createClient>): Promise<HealthCheck> {
-    const start = Date.now();
-    try {
-      const { data, error } = await supabase.storage.listBuckets();
-
-      const latency = Date.now() - start;
-
-      if (error) {
-        return {
-          name: "存储服务",
-          status: "down",
-          latency,
-          message: error.message,
-          lastCheck: new Date(),
-        };
-      }
-
-      return {
-        name: "存储服务",
-        status: latency < 1000 ? "healthy" : "degraded",
-        latency,
-        message: `${data?.length || 0} 个存储桶可用`,
-        lastCheck: new Date(),
-      };
-    } catch (error) {
-      return {
-        name: "存储服务",
-        status: "down",
-        latency: Date.now() - start,
-        message: error instanceof Error ? error.message : "连接失败",
-        lastCheck: new Date(),
-      };
-    }
-  }
-
-  async function checkAuth(supabase: ReturnType<typeof createClient>): Promise<HealthCheck> {
-    const start = Date.now();
-    try {
-      const { data, error } = await supabase.auth.getSession();
-
-      const latency = Date.now() - start;
-
-      if (error) {
-        return {
-          name: "认证服务",
-          status: "degraded",
-          latency,
-          message: error.message,
-          lastCheck: new Date(),
-        };
-      }
-
-      return {
-        name: "认证服务",
-        status: "healthy",
-        latency,
-        message: data.session ? "已认证" : "服务正常",
-        lastCheck: new Date(),
-      };
-    } catch (error) {
-      return {
-        name: "认证服务",
-        status: "down",
-        latency: Date.now() - start,
-        message: error instanceof Error ? error.message : "连接失败",
-        lastCheck: new Date(),
-      };
-    }
-  }
-
-  async function checkApi(): Promise<HealthCheck> {
-    const start = Date.now();
-    try {
-      const response = await fetch("/api/health", { method: "GET" });
-      const latency = Date.now() - start;
-
-      if (!response.ok) {
-        return {
-          name: "API服务",
-          status: "degraded",
-          latency,
-          message: `HTTP ${response.status}`,
-          lastCheck: new Date(),
-        };
-      }
-
-      return {
-        name: "API服务",
-        status: "healthy",
-        latency,
-        message: `响应时间 ${latency}ms`,
-        lastCheck: new Date(),
-      };
-    } catch (error) {
-      return {
-        name: "API服务",
-        status: "healthy", // API可能没有health端点，默认正常
-        latency: Date.now() - start,
-        message: "服务运行中",
-        lastCheck: new Date(),
-      };
-    }
-  }
-
-  async function fetchDbStats(supabase: ReturnType<typeof createClient>) {
-    try {
-      const [users, reports, credits, logs] = await Promise.all([
-        supabase.from("profiles").select("*", { count: "exact", head: true }),
-        supabase.from("report_runs").select("*", { count: "exact", head: true }),
-        supabase.from("report_credits").select("credits_available"),
-        supabase.from("audit_logs").select("*", { count: "exact", head: true }),
-      ]);
-
-      const totalCredits = credits.data?.reduce(
-        (sum: number, c: { credits_available?: number }) => sum + (c.credits_available || 0),
-        0
-      ) || 0;
-
-      setDbStats({
-        totalUsers: users.count || 0,
-        totalReports: reports.count || 0,
-        totalCredits,
-        totalLogs: logs.count || 0,
-      });
-
-      // 模拟资源使用数据
-      setResources([
-        { label: "数据库连接", current: 12, max: 100, unit: "个" },
-        { label: "存储空间", current: 256, max: 5120, unit: "MB" },
-        { label: "API请求/分钟", current: 45, max: 1000, unit: "次" },
-      ]);
-    } catch (error) {
-      console.error("Failed to fetch db stats:", error);
-    }
-  }
-
-  function getStatusColor(status: HealthCheck["status"]) {
-    switch (status) {
-      case "healthy":
-        return { bg: "#10b981", text: "#10b981" };
-      case "degraded":
-        return { bg: "#f59e0b", text: "#f59e0b" };
-      case "down":
-        return { bg: "#ef4444", text: "#ef4444" };
-    }
-  }
-
-  function getStatusLabel(status: HealthCheck["status"]) {
-    switch (status) {
-      case "healthy":
-        return "正常";
-      case "degraded":
-        return "降级";
-      case "down":
-        return "故障";
-    }
-  }
+  useEffect(() => {
+    runHealthChecks();
+    const interval = setInterval(runHealthChecks, 60000); // 每分钟刷新
+    return () => clearInterval(interval);
+  }, [runHealthChecks]);
 
   const overallStatus = metrics
     ? Object.values(metrics).every((m) => m.status === "healthy")

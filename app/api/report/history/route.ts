@@ -1,29 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
-import type { Database } from "@/types/database";
-
-const SIGNED_URL_TTL_SECONDS = 60 * 30; // 30 minutes
+import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
 
 export async function GET(request: NextRequest) {
   try {
-    // Get user session using the same approach as credits API
-    const cookieStore = cookies();
-    const supabase = createRouteHandlerClient<Database>({
-      cookies: () => cookieStore,
-    });
+    // Get user session using @supabase/ssr
+    const cookieStore = await cookies();
+    const supabase = createServerClient(cookieStore);
 
     const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
-    if (sessionError || !session?.user?.id) {
-      console.warn(`[UNAUTHORIZED_SESSION] error: ${sessionError?.message || "no session"}`);
+    if (authError || !user?.id) {
+      console.warn(`[UNAUTHORIZED_SESSION] error: ${authError?.message || "no session"}`);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
 
     // Get pagination params
     const url = new URL(request.url);
@@ -31,18 +26,21 @@ export async function GET(request: NextRequest) {
     const pageSize = Math.min(50, Math.max(1, parseInt(url.searchParams.get("limit") || "10")));
     const offset = (page - 1) * pageSize;
 
+    // 使用 service role 查询报告（绕过 RLS 以确保能查到数据）
+    const supabaseAdmin = createServiceRoleClient();
+
     // Query report history from report_posts table (where reports are actually saved)
     const {
       data: reports,
       error: queryError,
       count,
-    } = await supabase
+    } = await supabaseAdmin
       .from("report_posts")
       .select(
-        "id, symbol, created_at, status, slug, report_run_id, tone, lang",
+        "id, symbol, created_at, status, slug, report_run_id, tone, lang, user_id, author_id",
         { count: "exact" }
       )
-      .eq("user_id", userId as never)
+      .or(`user_id.eq.${userId},author_id.eq.${userId}`)
       .order("created_at", { ascending: false })
       .range(offset, offset + pageSize - 1);
 
@@ -55,28 +53,39 @@ export async function GET(request: NextRequest) {
     }
 
     // Keep a mutable list for mapped report history items
-    let resultReports: any[] = reports || [];
+    let resultReports: Array<{
+      id: string;
+      symbol: string;
+      created_at: string;
+      status: string;
+      slug: string | null;
+      report_run_id: string | null;
+      tone: string | null;
+      lang: string | null;
+      mode: string | null;
+      markdown_signed_url: string | null;
+      docx_signed_url: null;
+      pdf_signed_url: null;
+    }> = [];
 
     // For report_posts table, we don't have file paths, but we can generate links to view the reports
-    try {
-      const mapReportPosts = async () => {
-        if (!reports?.length) return [];
-        return reports.map((report: any) => {
-          return {
-            ...report,
-            // Map report_posts fields to expected history format
-            mode: report.tone, // tone field maps to mode
-            // Generate view links based on slug or report_run_id
-            markdown_signed_url: report.slug ? `/reports/${report.slug}` : null,
-            docx_signed_url: null, // No DOCX export for report_posts yet
-            pdf_signed_url: null,  // No PDF export for report_posts yet
-          };
-        });
-      };
-      resultReports = await mapReportPosts();
-    } catch (mapError) {
-      console.warn("Failed to map report history", mapError);
-      resultReports = reports || [];
+    if (reports?.length) {
+      resultReports = reports.map((report) => ({
+        id: report.id,
+        symbol: report.symbol,
+        created_at: report.created_at,
+        status: report.status,
+        slug: report.slug,
+        report_run_id: report.report_run_id,
+        tone: report.tone,
+        lang: report.lang,
+        // Map report_posts fields to expected history format
+        mode: report.tone, // tone field maps to mode
+        // Generate view links based on slug or report_run_id
+        markdown_signed_url: report.slug ? `/reports/${report.slug}` : null,
+        docx_signed_url: null, // No DOCX export for report_posts yet
+        pdf_signed_url: null,  // No PDF export for report_posts yet
+      }));
     }
 
     const response = NextResponse.json({

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 import { CreditManager } from "./manager";
 
 /**
@@ -29,7 +29,7 @@ export class RewardsManager {
    * @returns Daily reward status
    */
   async checkDailyRewardStatus(userId: string): Promise<DailyRewardStatus> {
-    const supabase = await createClient();
+    const supabase = createServiceRoleClient();
 
     const { data, error } = await supabase
       .from("daily_rewards" as any)
@@ -86,7 +86,7 @@ export class RewardsManager {
    * @returns Streak information
    */
   async getStreakInfo(userId: string) {
-    const supabase = await createClient();
+    const supabase = createServiceRoleClient();
 
     const { data, error } = await supabase
       .from("daily_rewards" as any)

@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getAuthContextFromRequest, isAdmin } from "@/app/api/_utils/supabase";
+import { requireAdmin, isAuthError } from "@/lib/auth/admin";
 
 function getSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -18,29 +18,34 @@ function getSupabaseAdmin() {
   });
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  // 认证检查 - 只有 super_admin 和 admin 可以删除用户
+  const auth = await requireAdmin(["super_admin", "admin"]);
+  if (isAuthError(auth)) return auth;
+
   try {
     const supabaseAdmin = getSupabaseAdmin();
-    const { userId: adminUserId, role } = await getAuthContextFromRequest(request);
-
-    if (!adminUserId || !isAdmin(role)) {
-      return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
-    }
-
     const { userId: targetUserId } = await request.json();
 
     if (!targetUserId) {
       return NextResponse.json({ error: "缺少 userId" }, { status: 400 });
     }
 
-    // 删除用户
+    // 不能删除自己
+    if (targetUserId === auth.userId) {
+      return NextResponse.json({ error: "不能删除自己的账户" }, { status: 400 });
+    }
+
+    // 记录审计日志
     await supabaseAdmin.from("audit_logs").insert({
-      user_id: adminUserId,
-      action: "user_delete",
-      table_name: "profiles",
-      record_id: targetUserId,
+      user_id: auth.userId,
+      action: "DELETE_USER",
+      resource_type: "user",
+      resource_id: targetUserId,
+      details: { deleted_by: auth.email },
     });
 
+    // 删除用户
     const { error } = await supabaseAdmin.auth.admin.deleteUser(targetUserId);
     if (error) {
       console.error("Delete user error:", error);

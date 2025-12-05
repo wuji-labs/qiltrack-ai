@@ -11,7 +11,7 @@ STABLE
 AS $$
   SELECT EXISTS (
     SELECT 1 FROM public.profiles
-    WHERE id = user_id AND role IN ('admin', 'editor')
+    WHERE id = user_id AND role IN ('super_admin', 'admin', 'editor')
   );
 $$;
 
@@ -69,4 +69,4 @@ CREATE POLICY "Admins can delete users" ON public.profiles
   );
 
 -- Add comment
-COMMENT ON FUNCTION public.is_admin IS 'Check if a user has admin or editor role. Uses SECURITY DEFINER to bypass RLS and prevent infinite recursion.';
+COMMENT ON FUNCTION public.is_admin IS 'Check if a user has super_admin, admin or editor role. Uses SECURITY DEFINER to bypass RLS and prevent infinite recursion.';

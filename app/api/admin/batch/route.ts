@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { requireAdmin, isAuthError, getAuthenticatedUser } from "@/lib/auth/admin";
 
 export async function POST(request: NextRequest) {
+  // 认证检查 - 批量操作需要 admin 或 super_admin
+  const auth = await requireAdmin(["super_admin", "admin"]);
+  if (isAuthError(auth)) return auth;
+
   try {
     const body = await request.json();
     const { userIds, action, params } = body;

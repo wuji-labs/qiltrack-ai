@@ -204,37 +204,45 @@ const highlightFallbackKeys: TranslationKey[] = [
 
 export default function Home() {
   const { language, setLanguage, t } = useLanguage();
-  const { isAuthenticated, user, signOut, refreshSession } = useSupabaseAuth();
+  const { isAuthenticated, user, signOut, refreshSession, getUserProfile } = useSupabaseAuth();
   const router = useRouter();
   const progress = useProgress();
   const [selectedTone, setSelectedTone] = useState<ReportTone>("baseline");
   const [remainingQuota, setRemainingQuota] = useState(0);
   const [quotaLoaded, setQuotaLoaded] = useState(false);
+  const [userPlan, setUserPlan] = useState<string>("free");
 
-  // Fetch remaining credits on mount and when authenticated, with auto-refresh
+  // Fetch remaining credits and user profile on mount and when authenticated
   useEffect(() => {
-    const loadCredits = async () => {
+    const loadUserData = async () => {
       if (!isAuthenticated) {
         setRemainingQuota(0);
         setQuotaLoaded(true);
+        setUserPlan("free");
         return;
       }
       try {
-        const creditsData = await fetchCredits();
+        // 并行获取积分和用户profile
+        const [creditsData, profile] = await Promise.all([
+          fetchCredits(),
+          getUserProfile(),
+        ]);
         setRemainingQuota(creditsData.credits?.remaining_credits ?? 0);
         setQuotaLoaded(true);
+        setUserPlan(profile?.plan || "free");
       } catch (err) {
-        console.error("Failed to load credits:", err);
+        console.error("Failed to load user data:", err);
         setRemainingQuota(0);
         setQuotaLoaded(true);
+        setUserPlan("free");
       }
     };
 
     // Fetch immediately
-    loadCredits();
+    loadUserData();
 
     // Auto-refresh every 30 seconds to keep quota in sync
-    const interval = setInterval(loadCredits, 30000);
+    const interval = setInterval(loadUserData, 30000);
 
     // Cleanup interval on unmount
     return () => clearInterval(interval);
@@ -311,10 +319,14 @@ export default function Home() {
   const faqList = faqItems.map((item) => ({ question: t(item.question), answer: t(item.answer) }));
   const highlightFallback = highlightFallbackKeys.map((key) => t(key));
 
-  const planLabel =
-    user?.user_metadata?.plan && user?.user_metadata?.plan !== "free"
-      ? user?.user_metadata?.plan
-      : t("quota.plan.free");
+  // 套餐显示名称映射
+  const PLAN_DISPLAY_NAMES: Record<string, string> = {
+    free: t("quota.plan.free"),
+    pro: t("quota.plan.pro") || "月费版",
+    annual: t("quota.plan.annual") || "年费版",
+  };
+
+  const planLabel = PLAN_DISPLAY_NAMES[userPlan] || t("quota.plan.free");
 
   // Refresh quota from API and refresh session
   const refreshQuota = async () => {
