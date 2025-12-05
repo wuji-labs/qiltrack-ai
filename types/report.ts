@@ -64,6 +64,7 @@ export type ReportResponse = {
   companyData: CompanyData;
   remainingQuota?: number;
   reportRunId?: string;
+  reused?: boolean;
 };
 
 export type SearchResult = {
