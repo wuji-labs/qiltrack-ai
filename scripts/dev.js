@@ -35,6 +35,7 @@ const nextCmd = isWindows ? nextBin + ".cmd" : nextBin;
 const child = spawn(nextCmd, ["dev", "--port", String(port)], {
   stdio: "inherit",
   cwd: path.join(__dirname, ".."),
+  shell: true,
 });
 
 child.on("error", (err) => {
