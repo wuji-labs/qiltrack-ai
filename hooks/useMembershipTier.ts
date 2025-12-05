@@ -5,6 +5,12 @@ import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 export type MembershipTier = "free" | "pro" | "annual";
 
+type ProfileData = {
+  plan?: string;
+  subscription_status?: string;
+  subscription_expires_at?: string | null;
+};
+
 export interface MembershipInfo {
   tier: MembershipTier;
   loading: boolean;
@@ -42,7 +48,7 @@ export function useMembershipTier(): MembershipInfo {
       }
 
       try {
-        const profile = await getUserProfile();
+        const profile = await getUserProfile() as ProfileData | null;
 
         if (profile) {
           setTier((profile.plan as MembershipTier) || "free");
