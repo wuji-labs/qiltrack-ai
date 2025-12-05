@@ -70,22 +70,24 @@ export async function GET(request: NextRequest) {
 
     // For report_posts table, we don't have file paths, but we can generate links to view the reports
     if (reports?.length) {
-      resultReports = reports.map((report) => ({
-        id: report.id,
-        symbol: report.symbol,
-        created_at: report.created_at,
-        status: report.status,
-        slug: report.slug,
-        report_run_id: report.report_run_id,
-        tone: report.tone,
-        lang: report.lang,
-        // Map report_posts fields to expected history format
-        mode: report.tone, // tone field maps to mode
-        // Generate view links based on slug or report_run_id
-        markdown_signed_url: report.slug ? `/reports/${report.slug}` : null,
-        docx_signed_url: null, // No DOCX export for report_posts yet
-        pdf_signed_url: null,  // No PDF export for report_posts yet
-      }));
+      resultReports = reports
+        .filter((report) => report.symbol && report.created_at && report.status)
+        .map((report) => ({
+          id: report.id,
+          symbol: report.symbol!,
+          created_at: report.created_at!,
+          status: report.status!,
+          slug: report.slug,
+          report_run_id: report.report_run_id,
+          tone: report.tone,
+          lang: report.lang,
+          // Map report_posts fields to expected history format
+          mode: report.tone, // tone field maps to mode
+          // Generate view links based on slug or report_run_id
+          markdown_signed_url: report.slug ? `/reports/${report.slug}` : null,
+          docx_signed_url: null, // No DOCX export for report_posts yet
+          pdf_signed_url: null,  // No PDF export for report_posts yet
+        }));
     }
 
     const response = NextResponse.json({

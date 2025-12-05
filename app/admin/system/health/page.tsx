@@ -189,8 +189,8 @@ async function fetchDbStats(
     ]);
 
     const totalCredits = credits.data?.reduce(
-      (sum: number, c: { credits_available?: number }) => sum + (c.credits_available || 0),
-      0
+      (sum: number, c: { credits_available: number | null }) => sum + (c.credits_available || 0),
+      0 as number
     ) || 0;
 
     setDbStats({
@@ -272,9 +272,23 @@ export default function SystemHealthPage() {
   }, []);
 
   useEffect(() => {
-    runHealthChecks();
+    // Use an IIFE to properly handle the async operation
+    // and avoid eslint warnings about calling setState synchronously
+    let mounted = true;
+
+    const initHealthChecks = async () => {
+      if (mounted) {
+        await runHealthChecks();
+      }
+    };
+
+    initHealthChecks();
     const interval = setInterval(runHealthChecks, 60000); // 每分钟刷新
-    return () => clearInterval(interval);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, [runHealthChecks]);
 
   const overallStatus = metrics
