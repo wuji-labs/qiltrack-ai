@@ -7,7 +7,7 @@ const client = new OpenAI({
 
 export async function heliTest() {
   const response = await client.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: process.env.HELICONE_MODEL || "gpt-5.1",
     messages: [{ role: "user", content: "Hello, world!" }],
   });
   return response;

@@ -119,7 +119,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <p className="text-xs text-[var(--text-subtle)]">
                 如果问题持续存在，请{" "}
                 <a
-                  href="mailto:support@example.com"
+                  href="mailto:support@qiltrack.com"
                   className="text-[var(--accent-emerald)] hover:underline"
                 >
                   联系技术支持

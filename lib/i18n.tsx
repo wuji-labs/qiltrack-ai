@@ -1652,11 +1652,15 @@ const translations: Record<string, TranslationEntry> = {
   },
   "language.zh": {
     en: "中文",
+    ja: "中文",
+    ko: "中文",
     "zh-Hant": "中文",
     "zh-Hans": "中文",
   },
   "language.en": {
     en: "EN",
+    ja: "EN",
+    ko: "EN",
     "zh-Hant": "EN",
     "zh-Hans": "EN",
   },

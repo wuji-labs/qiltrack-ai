@@ -240,8 +240,8 @@ export class AlertEvaluator {
 export const ALERT_CHANNELS = {
   email: {
     enabled: process.env.ALERT_EMAIL_ENABLED === 'true',
-    from: process.env.ALERT_EMAIL_FROM || 'alerts@example.com',
-    to: process.env.ALERT_EMAIL_TO?.split(',') || ['admin@example.com'],
+    from: process.env.ALERT_EMAIL_FROM || 'no-reply@qiltrack.com',
+    to: process.env.ALERT_EMAIL_TO?.split(',') || ['team@qiltrack.com'],
   },
   slack: {
     enabled: !!process.env.SLACK_WEBHOOK_URL,

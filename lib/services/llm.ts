@@ -39,7 +39,7 @@ export class LLMService {
     if (!this.heliconeConfig && process.env.HELICONE_API_KEY) {
       this.heliconeConfig = {
         apiKey: process.env.HELICONE_API_KEY,
-        model: process.env.HELICONE_MODEL || "gpt-4o-mini",
+        model: process.env.HELICONE_MODEL || "gpt-5.1",
       };
     }
 

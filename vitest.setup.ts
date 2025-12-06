@@ -10,7 +10,7 @@ process.env.FINNHUB_API_KEY ||= "test-finnhub-key";
 process.env.OPENROUTER_API_KEY ||= "test-openrouter-key";
 process.env.OPENROUTER_MODEL ||= "openai/gpt-4o";
 process.env.HELICONE_API_KEY ||= "test-helicone-key";
-process.env.HELICONE_MODEL ||= "gpt-4o-mini";
+process.env.HELICONE_MODEL ||= "gpt-5.1";
 process.env.NEXTAUTH_URL ||= "http://localhost:3000";
 
 // Mock Next headers/cookies to avoid request-scope errors

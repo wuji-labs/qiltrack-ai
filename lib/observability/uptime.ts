@@ -188,7 +188,7 @@ export const ALERT_CONFIG: AlertConfig = {
     errorRate: 5, // 5%
     responseTime: 10000, // 10 seconds
   },
-  recipients: ['admin@example.com'],
+  recipients: ['team@qiltrack.com'],
 };
 
 /**

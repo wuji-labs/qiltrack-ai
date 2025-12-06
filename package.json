@@ -20,6 +20,9 @@
     "db:types": "supabase gen types typescript --local > types/database.ts",
     "db:types:optional": "node scripts/ensure-db-types.js",
     "db:reset": "supabase db reset",
+    "db:push": "supabase db push",
+    "db:push:dev": "supabase link --project-ref nkqwtejxnghotzuazslk && supabase db push",
+    "db:push:prod": "supabase link --project-ref inmtounwqcjwsxkfnsfd && supabase db push",
     "postdb:reset": "npm run db:types",
     "pretest": "npm run db:types:optional",
     "type-check": "tsc --noEmit"
