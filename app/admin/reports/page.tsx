@@ -22,7 +22,7 @@ const EMPTY_POST: ReportPost = {
   cover: "",
   theme: "",
   tags: [],
-  lang: "en",
+  language: "en",
   status: "draft",
   version: 1,
 };
@@ -129,7 +129,7 @@ export default function AdminReportsPage() {
         cover: editing.cover ?? "",
         theme: editing.theme ?? "",
         tags: editing.tags ?? [],
-        lang: editing.lang ?? "en",
+        language: editing.language ?? "en",
         status: editing.status ?? "draft",
         version: editing.version ?? 1,
       };
@@ -313,7 +313,7 @@ export default function AdminReportsPage() {
                           {post.status ?? "draft"}
                         </span>
                       </td>
-                      <td className="py-3 pr-4 text-subtle">{post.lang ?? "en"}</td>
+                      <td className="py-3 pr-4 text-subtle">{post.language ?? "en"}</td>
                       <td className="py-3 pr-4 text-subtle">{post.version ?? 1}</td>
                       <td className="py-3 pr-4 text-subtle">
                         {post.updated_at || post.updatedAt || post.published_at || post.publishedAt
@@ -490,8 +490,8 @@ export default function AdminReportsPage() {
               <label className="space-y-1 text-sm">
                 <span className="text-subtle">语言</span>
                 <select
-                  value={editing.lang || "en"}
-                  onChange={(e) => setEditing((prev) => ({ ...prev, lang: e.target.value }))}
+                  value={editing.language || "en"}
+                  onChange={(e) => setEditing((prev) => ({ ...prev, language: e.target.value }))}
                   className="w-full rounded-xl border border-[var(--stroke-soft)] bg-[var(--bg-base)] px-3 py-2 text-[var(--color-foreground)] focus:outline-none focus:border-[var(--stroke-glow)]"
                 >
                   <option value="en" style={{ background: "var(--bg-layer)", color: "var(--color-foreground)" }}>English</option>

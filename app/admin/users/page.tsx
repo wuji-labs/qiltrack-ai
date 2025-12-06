@@ -1157,11 +1157,11 @@ function StatCard({
 
 // 辅助组件
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+  // 阻止背景点击关闭，只能通过关闭按钮或取消按钮关闭
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-50"
       style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
-      onClick={onClose}
     >
       <div
         className="glass-card p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto"

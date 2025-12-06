@@ -54,6 +54,8 @@ export async function POST(request: NextRequest) {
       message: (data as any)?.[0]?.message ?? "Unknown error",
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       remainingCredits: (data as any)?.[0]?.remaining_credits ?? 0,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      streakCount: (data as any)?.[0]?.streak_count ?? 0,
     });
 
     responseCookies.forEach(({ name, value }) =>

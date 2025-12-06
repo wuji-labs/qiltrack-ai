@@ -3881,6 +3881,43 @@ const translations: Record<string, TranslationEntry> = {
     "zh-Hant": "返回登入",
     "zh-Hans": "返回登录",
   },
+  // Daily reward translations
+  "quota.daily.claimed": withChineseVariants({
+    en: "Already claimed today",
+    ja: "本日はすでに取得しました",
+    ko: "오늘 이미 받았습니다",
+    zh: {
+      hant: "今日已領取",
+      hans: "今日已领取",
+    },
+  }),
+  "quota.daily.success": withChineseVariants({
+    en: "Successfully claimed {{credits}} credits!",
+    ja: "{{credits}} クレジットを取得しました！",
+    ko: "{{credits}} 크레딧을 받았습니다!",
+    zh: {
+      hant: "成功領取 {{credits}} 積分！",
+      hans: "成功领取 {{credits}} 积分！",
+    },
+  }),
+  "quota.daily.error": withChineseVariants({
+    en: "Failed to claim daily reward",
+    ja: "デイリー報酬の取得に失敗しました",
+    ko: "일일 보상 수령 실패",
+    zh: {
+      hant: "領取每日獎勵失敗",
+      hans: "领取每日奖励失败",
+    },
+  }),
+  "quota.daily.cta": withChineseVariants({
+    en: "Claim 30 credits",
+    ja: "30 クレジットを取得",
+    ko: "30 크레딧 받기",
+    zh: {
+      hant: "領取 30 積分",
+      hans: "领取 30 积分",
+    },
+  }),
 } as const satisfies Record<string, TranslationEntry>;
 
 export type TranslationKey = keyof typeof translations;

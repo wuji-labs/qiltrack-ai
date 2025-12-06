@@ -20,8 +20,8 @@ const requiredConfig: ConfigValidation[] = [
   {
     key: 'NEXT_PUBLIC_SUPABASE_URL',
     required: true,
-    validator: (v) => v.startsWith('https://'),
-    errorMessage: 'Must start with https://'
+    validator: (v) => v.startsWith('https://') || v.startsWith('http://127.0.0.1') || v.startsWith('http://localhost'),
+    errorMessage: 'Must be a valid Supabase URL (https:// for production, http://127.0.0.1 or http://localhost for local)'
   },
   {
     key: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',

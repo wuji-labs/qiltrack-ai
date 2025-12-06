@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     let query = context.supabase
       .from("report_posts")
       .select(
-        "id, title, slug, summary, cover, theme, tags, lang, status, version, author_id, published_at, created_at, updated_at",
+        "id, title, slug, summary, cover, theme, tags, language, status, version, user_id, published_at, created_at, updated_at",
         { count: "exact" }
       );
 
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (lang) {
-      query = query.eq("lang" as never, lang);
+      query = query.eq("language" as never, lang);
     }
 
     if (theme) {

@@ -41,7 +41,7 @@ export class EmbeddingsManager {
             report_run_id: reportRunId,
             chunk_index: i,
             embedding,
-            lang: language,
+            language: language,
             tone,
           });
         } catch (err) {

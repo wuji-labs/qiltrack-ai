@@ -47,8 +47,8 @@ export async function POST(request: Request) {
     await supabaseAdmin.from("audit_logs").insert({
       user_id: adminUserId,
       action: "password_reset_email_sent",
-      table_name: "profiles",
-      record_id: adminUserId,
+      resource_type: "profiles",
+      resource_id: adminUserId,
       details: { target_email: email },
     });
 

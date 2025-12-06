@@ -127,7 +127,7 @@ function applyLocalFilter(items: ReportCard[], theme: string, lang: string, quer
   const normalizedQuery = query.trim().toLowerCase();
   return items.filter((item) => {
     const matchTheme = theme === "All" || item.theme === theme;
-    const matchLang = lang === "all" || (item.lang ?? "en") === lang;
+    const matchLang = lang === "all" || (item.language ?? "en") === lang;
     const matchQuery =
       !normalizedQuery ||
       item.title.toLowerCase().includes(normalizedQuery) ||

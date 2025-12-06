@@ -87,7 +87,7 @@ export class ReportPersistence {
       slug,
       body: report.content,
       tone: report.tone,
-      lang: report.language,
+      language: report.language,
       status: 'draft',
     };
 
@@ -111,8 +111,8 @@ export class ReportPersistence {
       await supabase.from('audit_logs').insert({
         user_id: userId,
         action: 'GENERATE_REPORT',
-        table_name: 'report_posts',
-        record_id: savedReport.id,
+        resource_type: 'report_posts',
+        resource_id: savedReport.id,
         details: {
           symbol: report.symbol,
           tone: report.tone,
@@ -131,7 +131,7 @@ export class ReportPersistence {
       title: savedReport.title,
       content: savedReport.body ?? '',
       tone: (savedReport.tone as ReportTone) ?? 'baseline',
-      language: (savedReport.lang as Language) ?? 'en',
+      language: (savedReport.language as Language) ?? 'en',
       storage_url: storageResult.publicUrl,
       created_at: savedReport.created_at ?? new Date().toISOString(),
     };
@@ -190,7 +190,7 @@ export class ReportPersistence {
       title: data.title,
       content: data.body ?? '',
       tone: (data.tone as ReportTone | null) ?? 'baseline',
-      language: (data.lang as Language | null) ?? 'en',
+      language: (data.language as Language | null) ?? 'en',
       created_at: data.created_at ?? new Date().toISOString(),
     };
   }
@@ -211,7 +211,7 @@ export class ReportPersistence {
       await supabase.from('audit_logs').insert({
         user_id: userId,
         action,
-        table_name: 'report_posts',
+        resource_type: 'report_posts',
         details: auditDetails,
       });
     } catch (err) {

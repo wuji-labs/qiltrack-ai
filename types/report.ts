@@ -109,11 +109,11 @@ export type ReportPost = {
   cover?: string | null;
   theme?: string | null;
   tags?: string[];
-  lang?: string | null;
+  language?: string | null;
   status?: "draft" | "published" | null;
   version?: number | null;
   author?: string | null;
-  authorId?: string | null;
+  userId?: string | null;
   publishedAt?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
@@ -121,7 +121,7 @@ export type ReportPost = {
   published_at?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
-  author_id?: string | null;
+  user_id?: string | null;
   cover_signed_url?: string | null;
 };
 
@@ -137,7 +137,7 @@ export type ReportCard = {
   cover: string;
   readTime: string;
   body: string[];
-  lang?: string | null;
+  language?: string | null;
   status?: "draft" | "published" | null;
   version?: number | null;
   accessLevel?: AccessLevel;
@@ -168,7 +168,7 @@ export type AdminReportPostPayload = {
   cover?: string | null;
   theme?: string | null;
   tags?: string[];
-  lang?: string | null;
+  language?: string | null;
   status?: "draft" | "published" | null;
   version?: number | null;
   publishedAt?: string | null;

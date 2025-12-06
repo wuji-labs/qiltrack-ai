@@ -37,10 +37,10 @@ export async function GET(request: NextRequest) {
     } = await supabaseAdmin
       .from("report_posts")
       .select(
-        "id, symbol, created_at, status, slug, report_run_id, tone, lang, user_id, author_id",
+        "id, symbol, created_at, status, slug, report_run_id, tone, language, user_id",
         { count: "exact" }
       )
-      .or(`user_id.eq.${userId},author_id.eq.${userId}`)
+      .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .range(offset, offset + pageSize - 1);
 
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
       slug: string | null;
       report_run_id: string | null;
       tone: string | null;
-      lang: string | null;
+      language: string | null;
       mode: string | null;
       markdown_signed_url: string | null;
       docx_signed_url: null;
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
           slug: report.slug,
           report_run_id: report.report_run_id,
           tone: report.tone,
-          lang: report.lang,
+          language: report.language,
           // Map report_posts fields to expected history format
           mode: report.tone, // tone field maps to mode
           // Generate view links based on slug or report_run_id

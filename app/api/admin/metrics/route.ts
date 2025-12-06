@@ -137,7 +137,7 @@ export async function GET(request: NextRequest) {
 
     // Credit metrics
     const [creditEvents, creditBalances] = await Promise.all([
-      supabase.from('report_credit_events').select('event_type, credits_amount'),
+      supabase.from('report_credit_events').select('event_type, delta'),
 
       supabase.from('report_credits').select('credits_available'),
     ]);
@@ -147,7 +147,7 @@ export async function GET(request: NextRequest) {
     const totalGranted =
       creditEvents.data
         ?.filter((e) => e.event_type === 'granted')
-        .reduce((sum, e) => sum + e.credits_amount, 0) || 0;
+        .reduce((sum, e) => sum + (e.delta || 0), 0) || 0;
     const avgBalance =
       creditBalances.data && creditBalances.data.length > 0
         ? creditBalances.data.reduce(

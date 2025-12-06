@@ -562,7 +562,7 @@ export function mapSummaryToCard(summary: ReportSummary): ReportCard {
     cover: formatCover(summary.cover, slug, summary.theme),
     readTime,
     body: body.length ? body : [summary.snippet],
-    lang: "en",
+    language: "en",
     status: "published",
     version: 1,
     accessLevel: summary.accessLevel || "timed-free",
@@ -604,7 +604,7 @@ export function mapApiPostToCard(post: ReportPost): ReportCard {
       : bodyForReadTime.length
         ? bodyForReadTime
         : ["Report content coming soon."],
-    lang: post.lang ?? null,
+    language: post.language ?? null,
     status: post.status ?? null,
     version: post.version ?? null,
     // Default to "annual" for new reports - premium content

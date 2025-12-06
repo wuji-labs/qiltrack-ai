@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     await supabaseAdmin.from("report_credit_events").insert({
       user_id: userId,
       event_type: eventType,
-      credits_amount: Math.abs(numericAmount),
+      delta: Math.abs(numericAmount),
       reason: reason || (numericAmount > 0 ? "管理员授予" : "管理员扣除"),
     });
 

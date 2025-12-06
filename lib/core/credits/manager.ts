@@ -9,10 +9,10 @@ export interface CreditTransaction {
   id: string;
   user_id: string;
   event_type: "consumed" | "granted" | "daily_reward";
-  credits_amount: number;
+  delta: number;
   reason?: string;
   metadata?: Record<string, any>;
-  delta: number;
+  balance_after?: number;
   created_at: string;
 }
 
@@ -71,7 +71,7 @@ export class CreditManager {
 
     if (amount === 1) {
       // Use optimized single-credit consumption
-      const { data, error } = await supabase.rpc("fn_consume_report_credit", {
+      const { data, error } = await supabase.rpc("fn_consume_credit", {
         p_user_id: userId,
         p_symbol: symbol,
         p_metadata: metadata ? metadata : null,
@@ -91,7 +91,7 @@ export class CreditManager {
       };
     } else {
       // Use batch consumption for multiple credits
-      const { data, error } = await supabase.rpc("fn_consume_report_credit", {
+      const { data, error } = await supabase.rpc("fn_consume_credit", {
         p_user_id: userId,
         p_cost: amount,
       });
@@ -196,9 +196,8 @@ export class CreditManager {
     const { error: eventError } = await supabase.from("report_credit_events").insert({
       user_id: targetUserId,
       event_type: "granted",
-      credits_amount: amount,
-      reason,
       delta: amount,
+      reason,
       metadata: {
         granted_by: adminId,
       },
@@ -302,7 +301,7 @@ export class CreditManager {
       return false;
     }
 
-    return data.role === "admin";
+    return data.role === "admin" || data.role === "super_admin";
   }
 
   /**
@@ -330,9 +329,8 @@ export class CreditManager {
     await supabase.from("report_credit_events").insert({
       user_id: userId,
       event_type: "granted",
-      credits_amount: initialCredits,
-      reason: "Initial signup bonus",
       delta: initialCredits,
+      reason: "Initial signup bonus",
     });
   }
 }

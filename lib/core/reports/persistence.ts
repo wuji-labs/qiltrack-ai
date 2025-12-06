@@ -78,7 +78,6 @@ export class ReportPersistence {
       .insert({
         report_run_id: reportRunId,
         user_id: userId ?? null,
-        author_id: userId ?? null, // 同时设置 author_id 确保查询能找到
         symbol: report.symbol,
         title: report.title,
         slug: slug,
@@ -86,7 +85,7 @@ export class ReportPersistence {
         body: report.content,
         // storage_url: storageResult.publicUrl, // Not in table schema
         tone: report.tone,
-        lang: report.language,
+        language: report.language,
         status: "draft",
       })
       .select()
@@ -134,7 +133,7 @@ export class ReportPersistence {
       cover_url: data.cover ?? undefined,
       storage_url: undefined, // Not in schema
       tone: report.tone as any,
-      language: data.lang as any,
+      language: data.language as any,
       created_at: data.created_at ?? new Date().toISOString(),
     };
   }
@@ -166,7 +165,7 @@ export class ReportPersistence {
       .select("*")
       .eq("user_id", userId)
       .eq("symbol", symbol)
-      .eq("lang", language)
+      .eq("language", language)
       .eq("tone", tone)
       .not("body", "is", null)
       .not("report_run_id", "is", null)
@@ -200,7 +199,7 @@ export class ReportPersistence {
       cover_url: (data as any).cover_url ?? data.cover ?? undefined,
       storage_url: (data as any).storage_url ?? undefined,
       tone: tone as any,
-      language: data.lang as any,
+      language: data.language as any,
       created_at: data.created_at ?? new Date().toISOString(),
     };
   }
@@ -225,7 +224,7 @@ export class ReportPersistence {
       .from("report_posts")
       .select("*")
       .eq("symbol", symbol)
-      .eq("lang", language)
+      .eq("language", language)
       .eq("tone", tone)
       .not("body", "is", null)
       .not("report_run_id", "is", null)
@@ -259,7 +258,7 @@ export class ReportPersistence {
       cover_url: (data as any).cover_url ?? data.cover ?? undefined,
       storage_url: (data as any).storage_url ?? undefined,
       tone: tone as any,
-      language: data.lang as any,
+      language: data.language as any,
       created_at: data.created_at ?? new Date().toISOString(),
     };
   }
@@ -283,7 +282,7 @@ export class ReportPersistence {
     await (supabase as any).from("audit_logs").insert({
       user_id: userId,
       action,
-      table_name: "report_posts",
+      resource_type: "report_posts",
       details,
     });
   }

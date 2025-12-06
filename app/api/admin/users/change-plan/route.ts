@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       await supabaseAdmin.from("report_credit_events").insert({
         user_id: userId,
         event_type: "granted",
-        credits_amount: planConfig.quota,
+        delta: planConfig.quota,
         reason: `套餐升级: ${PLAN_CONFIGS[oldPlan as keyof typeof PLAN_CONFIGS]?.name || oldPlan} -> ${planConfig.name}`,
       });
     }

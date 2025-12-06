@@ -112,7 +112,7 @@ export default function AdminDashboard() {
       ] = await Promise.all([
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("report_runs").select("*", { count: "exact", head: true }),
-        supabase.from("report_credit_events").select("credits_amount"),
+        supabase.from("report_credit_events").select("delta"),
         supabase
           .from("profiles")
           .select("*", { count: "exact", head: true })
@@ -128,8 +128,8 @@ export default function AdminDashboard() {
       // 计算总积分消耗
       const totalCreditsUsed =
         creditsResult.data?.reduce(
-          (sum: number, item: { credits_amount?: number }) =>
-            sum + Math.abs(item.credits_amount || 0),
+          (sum: number, item: { delta?: number }) =>
+            sum + Math.abs(item.delta || 0),
           0
         ) || 0;
 
@@ -224,15 +224,15 @@ export default function AdminDashboard() {
             .lt("created_at", nextDay.toISOString()),
           supabase
             .from("report_credit_events")
-            .select("credits_amount")
+            .select("delta")
             .gte("created_at", date.toISOString())
             .lt("created_at", nextDay.toISOString()),
         ]);
 
         const credits =
           creditsData.data?.reduce(
-            (sum: number, item: { credits_amount?: number }) =>
-              sum + Math.abs(item.credits_amount || 0),
+            (sum: number, item: { delta?: number }) =>
+              sum + Math.abs(item.delta || 0),
             0
           ) || 0;
 

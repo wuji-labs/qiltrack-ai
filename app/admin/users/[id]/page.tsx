@@ -43,7 +43,7 @@ interface UserCredits extends Record<string, unknown> {
 interface CreditEvent extends Record<string, unknown> {
   id: string;
   event_type: string;
-  credits_amount: number;
+  delta: number;
   reason: string | null;
   created_at: string;
 }
@@ -364,11 +364,11 @@ export default function UserDetailPage() {
       ),
     },
     {
-      key: "credits_amount",
+      key: "delta",
       title: "数量",
       render: (_, record) => (
-        <span style={{ color: record.credits_amount > 0 ? "#10b981" : "#ef4444" }}>
-          {record.credits_amount > 0 ? "+" : ""}{record.credits_amount}
+        <span style={{ color: record.delta > 0 ? "#10b981" : "#ef4444" }}>
+          {record.delta > 0 ? "+" : ""}{record.delta}
         </span>
       ),
     },

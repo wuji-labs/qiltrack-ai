@@ -1,4 +1,4 @@
-﻿export type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -7,10 +7,30 @@
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -20,8 +40,10 @@ export type Database = {
           created_at: string | null
           details: Json | null
           id: string
+          ip_address: unknown
           resource_id: string | null
           resource_type: string | null
+          user_agent: string | null
           user_id: string | null
         }
         Insert: {
@@ -29,8 +51,10 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
+          ip_address?: unknown
           resource_id?: string | null
           resource_type?: string | null
+          user_agent?: string | null
           user_id?: string | null
         }
         Update: {
@@ -38,8 +62,10 @@ export type Database = {
           created_at?: string | null
           details?: Json | null
           id?: string
+          ip_address?: unknown
           resource_id?: string | null
           resource_type?: string | null
+          user_agent?: string | null
           user_id?: string | null
         }
         Relationships: [
@@ -54,37 +80,49 @@ export type Database = {
       }
       billing_subscriptions: {
         Row: {
+          cancel_at: string | null
+          canceled_at: string | null
           created_at: string | null
           current_period_end: string | null
           current_period_start: string | null
           id: string
-          plan_id: string | null
-          status: string | null
-          stripe_customer_id: string | null
+          metadata: Json | null
+          plan_id: string
+          status: string
+          stripe_customer_id: string
+          stripe_price_id: string | null
           stripe_subscription_id: string | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          cancel_at?: string | null
+          canceled_at?: string | null
           created_at?: string | null
           current_period_end?: string | null
           current_period_start?: string | null
           id?: string
-          plan_id?: string | null
-          status?: string | null
-          stripe_customer_id?: string | null
+          metadata?: Json | null
+          plan_id: string
+          status: string
+          stripe_customer_id: string
+          stripe_price_id?: string | null
           stripe_subscription_id?: string | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          cancel_at?: string | null
+          canceled_at?: string | null
           created_at?: string | null
           current_period_end?: string | null
           current_period_start?: string | null
           id?: string
-          plan_id?: string | null
-          status?: string | null
-          stripe_customer_id?: string | null
+          metadata?: Json | null
+          plan_id?: string
+          status?: string
+          stripe_customer_id?: string
+          stripe_price_id?: string | null
           stripe_subscription_id?: string | null
           updated_at?: string | null
           user_id?: string
@@ -126,6 +164,122 @@ export type Database = {
         }
         Relationships: []
       }
+      coupon_redemptions: {
+        Row: {
+          coupon_id: string
+          id: string
+          redeemed_at: string | null
+          user_id: string
+        }
+        Insert: {
+          coupon_id: string
+          id?: string
+          redeemed_at?: string | null
+          user_id: string
+        }
+        Update: {
+          coupon_id?: string
+          id?: string
+          redeemed_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_redemptions_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coupon_redemptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupons: {
+        Row: {
+          code: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          max_uses: number | null
+          min_plan: string | null
+          type: string
+          uses_count: number | null
+          valid_from: string | null
+          valid_until: string | null
+          value: number
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          min_plan?: string | null
+          type: string
+          uses_count?: number | null
+          valid_from?: string | null
+          valid_until?: string | null
+          value: number
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          min_plan?: string | null
+          type?: string
+          uses_count?: number | null
+          valid_from?: string | null
+          valid_until?: string | null
+          value?: number
+        }
+        Relationships: []
+      }
+      daily_rewards: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_claimed_at: string | null
+          streak_count: number | null
+          total_claimed: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_claimed_at?: string | null
+          streak_count?: number | null
+          total_claimed?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_claimed_at?: string | null
+          streak_count?: number | null
+          total_claimed?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_rewards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       faq_entries: {
         Row: {
           answer: string
@@ -158,6 +312,47 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          link: string | null
+          message: string | null
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          link?: string | null
+          message?: string | null
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          link?: string | null
+          message?: string | null
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pricing_plans: {
         Row: {
@@ -214,12 +409,14 @@ export type Database = {
           display_name: string | null
           email: string
           id: string
+          last_login_at: string | null
           last_report_at: string | null
-          name: string | null
           plan: string | null
           role: string | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
+          subscription_expires_at: string | null
+          subscription_status: string | null
           updated_at: string | null
         }
         Insert: {
@@ -227,13 +424,15 @@ export type Database = {
           created_at?: string | null
           display_name?: string | null
           email: string
-          id?: string
+          id: string
+          last_login_at?: string | null
           last_report_at?: string | null
-          name?: string | null
           plan?: string | null
           role?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
+          subscription_expires_at?: string | null
+          subscription_status?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -242,12 +441,14 @@ export type Database = {
           display_name?: string | null
           email?: string
           id?: string
+          last_login_at?: string | null
           last_report_at?: string | null
-          name?: string | null
           plan?: string | null
           role?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
+          subscription_expires_at?: string | null
+          subscription_status?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -285,11 +486,59 @@ export type Database = {
         }
         Relationships: []
       }
+      referrals: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          credits_awarded: number | null
+          id: string
+          referral_code: string
+          referred_id: string | null
+          referrer_id: string
+          status: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          credits_awarded?: number | null
+          id?: string
+          referral_code: string
+          referred_id?: string | null
+          referrer_id: string
+          status?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          credits_awarded?: number | null
+          id?: string
+          referral_code?: string
+          referred_id?: string | null
+          referrer_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       report_credit_events: {
         Row: {
+          balance_after: number | null
           created_at: string | null
-          credits_amount: number
-          delta: number | null
+          delta: number
           event_type: string
           id: string
           metadata: Json | null
@@ -297,9 +546,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          balance_after?: number | null
           created_at?: string | null
-          credits_amount: number
-          delta?: number | null
+          delta: number
           event_type: string
           id?: string
           metadata?: Json | null
@@ -307,9 +556,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          balance_after?: number | null
           created_at?: string | null
-          credits_amount?: number
-          delta?: number | null
+          delta?: number
           event_type?: string
           id?: string
           metadata?: Json | null
@@ -329,28 +578,28 @@ export type Database = {
       report_credits: {
         Row: {
           created_at: string | null
-          credits_available: number | null
-          credits_used: number | null
+          credits_available: number
+          credits_used: number
           id: string
-          last_reset: string | null
+          last_reset_at: string | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
-          credits_available?: number | null
-          credits_used?: number | null
+          credits_available?: number
+          credits_used?: number
           id?: string
-          last_reset?: string | null
+          last_reset_at?: string | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string | null
-          credits_available?: number | null
-          credits_used?: number | null
+          credits_available?: number
+          credits_used?: number
           id?: string
-          last_reset?: string | null
+          last_reset_at?: string | null
           updated_at?: string | null
           user_id?: string
         }
@@ -396,35 +645,58 @@ export type Database = {
           },
         ]
       }
-      report_documents_backup: {
+      report_feedback: {
         Row: {
-          document_type: string | null
-          id: string | null
+          comment: string | null
+          created_at: string | null
+          feedback_type: string | null
+          id: string
+          rating: number | null
           report_run_id: string | null
-          storage_path: string | null
+          user_id: string | null
         }
         Insert: {
-          document_type?: string | null
-          id?: string | null
+          comment?: string | null
+          created_at?: string | null
+          feedback_type?: string | null
+          id?: string
+          rating?: number | null
           report_run_id?: string | null
-          storage_path?: string | null
+          user_id?: string | null
         }
         Update: {
-          document_type?: string | null
-          id?: string | null
+          comment?: string | null
+          created_at?: string | null
+          feedback_type?: string | null
+          id?: string
+          rating?: number | null
           report_run_id?: string | null
-          storage_path?: string | null
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "report_feedback_report_run_id_fkey"
+            columns: ["report_run_id"]
+            isOneToOne: false
+            referencedRelation: "report_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       report_posts: {
         Row: {
-          author_id: string | null
           body: string | null
           cover: string | null
           created_at: string | null
           id: string
-          lang: string | null
+          language: string
           published_at: string | null
           report_run_id: string | null
           slug: string
@@ -440,12 +712,11 @@ export type Database = {
           version: number | null
         }
         Insert: {
-          author_id?: string | null
           body?: string | null
           cover?: string | null
           created_at?: string | null
           id?: string
-          lang?: string | null
+          language?: string
           published_at?: string | null
           report_run_id?: string | null
           slug: string
@@ -461,12 +732,11 @@ export type Database = {
           version?: number | null
         }
         Update: {
-          author_id?: string | null
           body?: string | null
           cover?: string | null
           created_at?: string | null
           id?: string
-          lang?: string | null
+          language?: string
           published_at?: string | null
           report_run_id?: string | null
           slug?: string
@@ -483,10 +753,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "report_posts_author_id_fkey"
-            columns: ["author_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
+            foreignKeyName: "report_posts_report_run_id_fkey"
+            columns: ["report_run_id"]
+            isOneToOne: true
+            referencedRelation: "report_runs"
             referencedColumns: ["id"]
           },
           {
@@ -510,8 +780,7 @@ export type Database = {
           hash: string | null
           id: string
           is_featured: boolean | null
-          lang: string | null
-          language: string | null
+          language: string
           markdown_path: string | null
           meta: Json | null
           mode: string | null
@@ -519,8 +788,7 @@ export type Database = {
           pdf_path: string | null
           reused_from_run_id: string | null
           status: string | null
-          symbol: string | null
-          template_id: string | null
+          symbol: string
           tone: string | null
           updated_at: string | null
           user_id: string | null
@@ -536,8 +804,7 @@ export type Database = {
           hash?: string | null
           id?: string
           is_featured?: boolean | null
-          lang?: string | null
-          language?: string | null
+          language?: string
           markdown_path?: string | null
           meta?: Json | null
           mode?: string | null
@@ -545,8 +812,7 @@ export type Database = {
           pdf_path?: string | null
           reused_from_run_id?: string | null
           status?: string | null
-          symbol?: string | null
-          template_id?: string | null
+          symbol: string
           tone?: string | null
           updated_at?: string | null
           user_id?: string | null
@@ -562,8 +828,7 @@ export type Database = {
           hash?: string | null
           id?: string
           is_featured?: boolean | null
-          lang?: string | null
-          language?: string | null
+          language?: string
           markdown_path?: string | null
           meta?: Json | null
           mode?: string | null
@@ -571,8 +836,7 @@ export type Database = {
           pdf_path?: string | null
           reused_from_run_id?: string | null
           status?: string | null
-          symbol?: string | null
-          template_id?: string | null
+          symbol?: string
           tone?: string | null
           updated_at?: string | null
           user_id?: string | null
@@ -583,13 +847,6 @@ export type Database = {
             columns: ["reused_from_run_id"]
             isOneToOne: false
             referencedRelation: "report_runs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "report_runs_template_id_fkey"
-            columns: ["template_id"]
-            isOneToOne: false
-            referencedRelation: "report_templates"
             referencedColumns: ["id"]
           },
           {
@@ -658,7 +915,7 @@ export type Database = {
           created_at: string | null
           embedding: string
           id: string
-          lang: string | null
+          language: string | null
           report_run_id: string
           tone: string | null
         }
@@ -667,7 +924,7 @@ export type Database = {
           created_at?: string | null
           embedding: string
           id?: string
-          lang?: string | null
+          language?: string | null
           report_run_id: string
           tone?: string | null
         }
@@ -676,7 +933,7 @@ export type Database = {
           created_at?: string | null
           embedding?: string
           id?: string
-          lang?: string | null
+          language?: string | null
           report_run_id?: string
           tone?: string | null
         }
@@ -720,75 +977,144 @@ export type Database = {
         }
         Relationships: []
       }
+      user_report_uploads: {
+        Row: {
+          created_at: string | null
+          file_path: string
+          id: string
+          note: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+          version: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          file_path: string
+          id?: string
+          note?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+          version?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          file_path?: string
+          id?: string
+          note?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_report_uploads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      fn_cancel_membership: {
+        Args: { p_immediate?: boolean; p_user_id: string }
+        Returns: Json
+      }
+      fn_claim_daily_reward: {
+        Args: { p_user_id: string }
+        Returns: {
+          message: string
+          remaining_credits: number
+          success: boolean
+        }[]
+      }
       fn_compute_report_hash: {
-        Args: { p_lang: string; p_mode: string; p_symbol: string }
+        Args: { p_language: string; p_symbol: string; p_tone: string }
         Returns: string
       }
-      fn_consume_report_credit:
-        | {
-            Args: { p_metadata?: Json; p_symbol?: string; p_user_id: string }
-            Returns: {
-              remaining_credits: number
-              success: boolean
-            }[]
-          }
-        | {
-            Args: { p_cost: number; p_user_id: string }
-            Returns: {
-              remaining_credits: number
-              success: boolean
-            }[]
-          }
-      fn_find_reusable_report: {
-        Args: { p_lang?: string; p_mode?: string; p_symbol: string }
+      fn_consume_credit: {
+        Args: {
+          p_amount?: number
+          p_metadata?: Json
+          p_symbol?: string
+          p_user_id: string
+        }
         Returns: {
+          message: string
+          remaining_credits: number
+          success: boolean
+        }[]
+      }
+      fn_find_reusable_report: {
+        Args: {
+          p_language: string
+          p_symbol: string
+          p_tone: string
+          p_user_id?: string
+        }
+        Returns: {
+          content_md: string
           created_at: string
-          lang: string
-          mode: string
-          run_id: string
+          id: string
+          language: string
           symbol: string
+          tone: string
+          user_id: string
         }[]
       }
       fn_get_popular_symbols: {
-        Args: { p_limit?: number; p_range_days?: number }
+        Args: { p_days?: number; p_limit?: number }
         Returns: {
-          generation_count: number
-          latest_created_at: string
+          count: number
           symbol: string
         }[]
       }
-      fn_initialize_profile: {
-        Args: { p_email: string; p_user_id: string }
-        Returns: undefined
-      }
-      fn_record_report_run: {
-        Args: {
-          p_report_data: Json
-          p_storage_path: string
-          p_template_id: string
-          p_user_id: string
-        }
-        Returns: string
-      }
-      is_admin: { Args: { user_id: string }; Returns: boolean }
-      match_reports_embeddings: {
-        Args: {
-          p_lang?: string
-          p_match_count?: number
-          p_query_run_id: string
-          p_tone?: string
-          p_user_id: string
-        }
+      fn_get_user_identities: {
+        Args: never
         Returns: {
           created_at: string
+          provider: string
+        }[]
+      }
+      fn_grant_credits: {
+        Args: { p_amount: number; p_reason?: string; p_target_user_id: string }
+        Returns: Json
+      }
+      fn_initialize_profile: {
+        Args: { p_display_name?: string; p_email: string; p_user_id: string }
+        Returns: undefined
+      }
+      fn_upgrade_membership: {
+        Args: {
+          p_plan: string
+          p_stripe_customer_id: string
+          p_stripe_subscription_id: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      fn_user_has_password: { Args: never; Returns: boolean }
+      is_admin: { Args: { check_user_id?: string }; Returns: boolean }
+      match_reports_embeddings: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          id: string
           report_run_id: string
           similarity: number
-          symbol: string
         }[]
       }
     }
@@ -919,6 +1245,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },

@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
     await supabaseAdmin
       .from("audit_logs")
-      .insert({ user_id: adminUserId, action: "user_reset_password", table_name: "profiles", record_id: userId });
+      .insert({ user_id: adminUserId, action: "user_reset_password", resource_type: "profiles", resource_id: userId });
 
     const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
       password: newPassword,

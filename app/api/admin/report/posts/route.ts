@@ -10,7 +10,7 @@ type PostPayload = {
   cover?: string | null;
   theme?: string | null;
   tags?: string[];
-  lang?: string;
+  language?: string;
   status?: "draft" | "published";
   version?: number;
   publishedAt?: string | null;
@@ -80,10 +80,10 @@ export async function POST(request: NextRequest) {
         cover: payload.cover ?? null,
         theme: payload.theme ?? null,
         tags: tags.length ? tags : [],
-        lang: payload.lang ?? "en",
+        language: payload.language ?? "en",
         status,
         version: payload.version ?? 1,
-        author_id: auth.userId,
+        user_id: auth.userId,
         published_at: publishedAt,
       } as never)
       .select("*")
@@ -187,7 +187,7 @@ export async function PATCH(request: NextRequest) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       tags: tags ?? (existing as any).tags ?? [],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      lang: payload.lang ?? (existing as any).lang ?? "en",
+      language: payload.language ?? (existing as any).language ?? "en",
       status,
       version: nextVersion,
       published_at: publishedAt,

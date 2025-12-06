@@ -54,8 +54,8 @@ export async function GET(request: NextRequest) {
     // Call the database function to find reusable report
     const { data, error } = await supabase.rpc("fn_find_reusable_report", {
       p_symbol: symbol,
-      p_lang: lang,
-      p_mode: mode,
+      p_language: lang,
+      p_tone: mode,
     });
 
     if (error) {
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if the reusable report belongs to the current user
-    const reusableReport = data && data.length > 0 ? data[0] as { report_run_id?: string; run_id?: string; created_at?: string; symbol?: string; lang?: string; mode?: string; tone?: string } : null;
+    const reusableReport = data && data.length > 0 ? data[0] as { report_run_id?: string; run_id?: string; created_at?: string; symbol?: string; language?: string; mode?: string; tone?: string } : null;
 
     if (reusableReport) {
       // Verify ownership - use report_run_id or run_id depending on which exists
@@ -106,7 +106,7 @@ export async function GET(request: NextRequest) {
         reusable_run_id: reusableReport.report_run_id,
         created_at: reusableReport.created_at,
         symbol: reusableReport.symbol,
-        lang: reusableReport.lang,
+        language: reusableReport.language,
         mode: reusableReport.tone,
         is_own_report: isOwnReport,
       });

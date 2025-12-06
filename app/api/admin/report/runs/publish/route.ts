@@ -71,10 +71,10 @@ export async function POST(request: NextRequest) {
         cover: cover,
         theme: theme || "investment",
         tags: tags || [run.symbol, "investment", "research"],
-        lang: lang || run.language || "zh",
+        language: lang || run.language || "zh",
         status: "draft", // 默认为草稿,管理员可以后续发布
         version: 1,
-        author_id: userId,
+        user_id: userId,
         symbol: run.symbol,
         markdown_signed_url: run.markdown_path,
         docx_signed_url: run.docx_path,

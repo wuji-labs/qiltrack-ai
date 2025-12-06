@@ -1,35 +1,34 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import { getAuthContextFromRequest, isAdmin } from "@/app/api/_utils/supabase";
+import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { validatePassword } from "@/lib/auth/password-validator";
 
-// Lazily create Supabase admin client to avoid build-time env errors
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error("Missing Supabase admin environment variables");
-  }
-
-  return createClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-}
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const supabaseAdmin = getSupabaseAdmin();
+    const cookieStore = await cookies();
+    const supabase = createServerClient(cookieStore);
 
-    // 1. Verify authentication and authorization
-    const { userId: adminUserId, role } = await getAuthContextFromRequest(request);
+    // 1. Verify authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user?.id) {
+      console.error("Auth error:", authError);
+      return NextResponse.json({ error: "需要登录" }, { status: 401 });
+    }
 
-    if (!adminUserId || !isAdmin(role)) {
+    // 用 service role 获取当前用户角色（绕过 RLS）
+    const supabaseAdmin = createServiceRoleClient();
+    const { data: adminProfile } = await supabaseAdmin
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    const role = adminProfile?.role;
+    if (role !== "super_admin" && role !== "admin") {
       return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
     }
+
+    const adminUserId = user.id;
 
     const body = await request.json();
     const { email, password, display_name, full_name, role: newUserRole, plan, initial_credits } =
@@ -103,8 +102,8 @@ export async function POST(request: Request) {
     await supabaseAdmin.from("audit_logs").insert({
       user_id: adminUserId,
       action: "user_create",
-      table_name: "profiles",
-      record_id: userData.user.id,
+      resource_type: "profiles",
+      resource_id: userData.user.id,
       details: {
         email,
         role: newUserRole || "user",

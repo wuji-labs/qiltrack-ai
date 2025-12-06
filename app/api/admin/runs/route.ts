@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from("report_runs")
       .select(
-        "id, user_id, symbol, created_at, status, is_featured, lang, mode, markdown_path, docx_path, pdf_path, reused_from_run_id",
+        "id, user_id, symbol, created_at, status, is_featured, language, mode, markdown_path, docx_path, pdf_path, reused_from_run_id",
         { count: "exact" }
       )
       .order("created_at", { ascending: false });

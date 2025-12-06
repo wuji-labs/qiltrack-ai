@@ -19,7 +19,7 @@ export async function GET(
     let query = context.supabase
       .from("report_posts")
       .select(
-        "id, title, slug, summary, body, cover, theme, tags, lang, status, version, author_id, published_at, created_at, updated_at"
+        "id, title, slug, summary, body, cover, theme, tags, language, status, version, user_id, published_at, created_at, updated_at"
       )
       .eq("slug" as never, slug)
       .limit(1);

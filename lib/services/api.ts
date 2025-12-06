@@ -165,7 +165,7 @@ export async function fetchCredits(): Promise<CreditsResponse> {
 }
 
 /**
- * Claim daily reward (10 credits)
+ * Claim daily reward (30 credits)
  */
 export async function claimDailyReward(): Promise<DailyRewardResponse> {
   const res = await fetch("/api/report/daily-reward", { method: "POST" });
