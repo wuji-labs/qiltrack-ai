@@ -7,7 +7,7 @@ import { getIndustryCover, getIndustryFromSymbol } from "./industryCoverGradient
 export type UserPermissionContext = {
   isAuthenticated: boolean;
   isAdmin: boolean;
-  userPlan: string | null; // "annual", "monthly", "free", etc.
+  userPlan: string | null; // "ultra", "pro", "free", etc.
 };
 
 /**
@@ -26,12 +26,12 @@ export function canAccessReport(
     case "timed-free":
       // 任何人都能访问（用于 SEO）
       return true;
-    case "monthly":
-      // 仅月费和年费用户可访问
-      return context.userPlan === "monthly" || context.userPlan === "annual";
-    case "annual":
-      // 仅年费用户可访问
-      return context.userPlan === "annual";
+    case "pro":
+      // Pro 和 Ultra 用户可访问
+      return context.userPlan === "pro" || context.userPlan === "ultra";
+    case "ultra":
+      // 仅 Ultra 用户可访问
+      return context.userPlan === "ultra";
     default:
       return false;
   }
@@ -52,12 +52,12 @@ export function getAccessDenialReason(
     return "login_required";
   }
 
-  if (accessLevel === "monthly" && context.userPlan !== "monthly" && context.userPlan !== "annual") {
-    return "monthly_required";
+  if (accessLevel === "pro" && context.userPlan !== "pro" && context.userPlan !== "ultra") {
+    return "pro_required";
   }
 
-  if (accessLevel === "annual" && context.userPlan !== "annual") {
-    return "annual_required";
+  if (accessLevel === "ultra" && context.userPlan !== "ultra") {
+    return "ultra_required";
   }
 
   return null;
@@ -123,7 +123,7 @@ const reportData: ReportSummary[] = [
       "结合 SDB、GPS 精度与航电系统的素材开销，我们还探讨了 RTX 如何用模块化的飞行管道降低交付风险，并附带 3 个版本迭代的验收案例。",
       "结论提示：下一轮的估值提升要靠超声速与自主系统，而不是传统的隐身能力；我们建议关注雷神的 AI 战闸项目，因为它的利润率已经超过 18%。",
     ],
-    accessLevel: "monthly",
+    accessLevel: "pro",
   },
   {
     symbol: "TSLA",
@@ -142,7 +142,7 @@ const reportData: ReportSummary[] = [
       "与 FSD 相关的软硬件绑定也在变得透明。我们分析了 120 份 OTA 更新的日志，发现 Teslarsoft 在弹性控制与视觉识别上降低了 31% 的误识别率，也进一步压缩了保险赔付成本。",
       "最后，本报告还整理了能源站与 Powerpack 的整合 blueprint，说明过去 18 个月 Tesla 是如何把『储能 + 车 + AI』打造成一个统一的企业节奏。",
     ],
-    accessLevel: "monthly",
+    accessLevel: "pro",
   },
   {
     symbol: "NVAX",
@@ -161,7 +161,7 @@ const reportData: ReportSummary[] = [
       "还记录了研发管线中每个候选疫苗的模拟结果，AI 模拟能把 3 million 次实验降到 80 次，以节约预算与时间。",
       "鉴于未来卫生事件的不确定性，我们建议关注公司在西海岸与欧洲的两座新工厂，它们搭载了自动质控系统，使得每百万剂的出货质量控制在 0.1% 误差以内。",
     ],
-    accessLevel: "monthly",
+    accessLevel: "pro",
   },
   {
     symbol: "NFLX",
@@ -180,7 +180,7 @@ const reportData: ReportSummary[] = [
       "国际化方面，减少本地化投入的同时，用 AI 生成内容封面、字幕的生产率翻了一番。报告提供了两套策略：一种在欧洲市场用短片迎合纵深传播，另一种在亚太地区强化社区联动。",
       "结语指出：Netflix 要将流量与广告彻底串起，需要把会员体验与 AI 推荐算法同步调校；我们在附录分享了 3 条优化建议。",
     ],
-    accessLevel: "annual",
+    accessLevel: "ultra",
   },
   {
     symbol: "AAPL",
@@ -218,7 +218,7 @@ const reportData: ReportSummary[] = [
       "搜索体验与生成式 AI 的整合也在进行中，虽然短期内可能影响点击率，但长期用户满意度提升了 19%。",
       "报告提醒投资者留意反垄断风险和隐私监管，这可能限制 Google 的数据优势。同时，我们指出 YouTube 的视频广告转型潜力巨大。",
     ],
-    accessLevel: "monthly",
+    accessLevel: "pro",
   },
   {
     symbol: "AMD",
@@ -256,7 +256,7 @@ const reportData: ReportSummary[] = [
       "Quest 3 的销量超预期，B2B 应用（建筑、教育、物流）正快速增长，年复合增长率达 45%。",
       "报告警示投资者，Meta 的盈利时间表已推迟至 2026 年底，但竞争力正在提升。",
     ],
-    accessLevel: "monthly",
+    accessLevel: "pro",
   },
   {
     symbol: "SSNLF",
@@ -275,7 +275,7 @@ const reportData: ReportSummary[] = [
       "HBM3 存储已进入量产，单价相比 HBM2e 降低 12%，有望成为 AI 芯片的标配。",
       "报告指出代工业的复苏驱动力是 AI 芯片的设计多样化，这给 Samsung 等 #2 代工厂更多机会。",
     ],
-    accessLevel: "monthly",
+    accessLevel: "pro",
   },
   {
     symbol: "BYDDY",
@@ -313,7 +313,7 @@ const reportData: ReportSummary[] = [
       "药物管线中，下一代产品的作用机制差异化有限，定价权正逐步下降。我们评估了 10+ 个临床阶段项目的风险收益。",
       "报告建议投资者关注 Novo 的长期管线创新和国际扩张，但对减肥药的盈利峰值已接近的判断保持警惕。",
     ],
-    accessLevel: "annual",
+    accessLevel: "ultra",
   },
   {
     symbol: "SMCI",
@@ -332,7 +332,7 @@ const reportData: ReportSummary[] = [
       "供应链风险依然存在，但 SMCI 的多源采购策略有效降低了单点故障风险。",
       "报告指出 SMCI 的增长持续依赖于 AI 芯片市场的扩张，而不仅仅是 NVIDIA 的需求。",
     ],
-    accessLevel: "monthly",
+    accessLevel: "pro",
   },
   {
     symbol: "CRWD",
@@ -351,7 +351,7 @@ const reportData: ReportSummary[] = [
       "竞争对手包括 Microsoft、Palo Alto Networks，但 CRWD 在检测精度和响应速度上领先。",
       "报告提示投资者关注网络安全 AI 化的长期趋势，认为安全产品的定价权正在提升。",
     ],
-    accessLevel: "monthly",
+    accessLevel: "pro",
   },
   {
     symbol: "SOFI",
@@ -389,7 +389,7 @@ const reportData: ReportSummary[] = [
       "监管风险依然存在，但美国市场对加密资产的态度正在改善。我们分析了 Coinbase 合规成本的长期趋势。",
       "报告指出 Staking、DeFi 等产品是 Coinbase 未来的高毛利增长点，交易佣金率已逐步下降。",
     ],
-    accessLevel: "monthly",
+    accessLevel: "pro",
   },
   {
     symbol: "UPST",
@@ -408,7 +408,7 @@ const reportData: ReportSummary[] = [
       "合作伙伴拓展正从美国银行扩展到国际金融机构，国际业务占比已达 18%。",
       "报告提示投资者关注 AI 金融模型的监管审查风险，但长期竞争壁垒正在建立。",
     ],
-    accessLevel: "monthly",
+    accessLevel: "pro",
   },
   {
     symbol: "DDOG",
@@ -427,7 +427,7 @@ const reportData: ReportSummary[] = [
       "企业客户留存率维持在 130% 以上，说明现有客户的扩展销售动力强劲。我们评估了国际市场扩张的机遇。",
       "报告指出可观测性已成为云原生基础设施的标配，这给 Datadog 长期增长提供了坚实基础。",
     ],
-    accessLevel: "monthly",
+    accessLevel: "pro",
   },
   {
     symbol: "SNOW",
@@ -446,7 +446,7 @@ const reportData: ReportSummary[] = [
       "数据共享生态已扩展到 3000+ 企业用户，Snowflake 从中获取佣金收入。我们预测未来两年这块业务可达到 $50M 以上。",
       "与 Databricks、BigQuery 的竞争日趋激烈，但 Snowflake 在易用性和成本控制上仍有优势。报告建议投资者关注产品创新的持续性。",
     ],
-    accessLevel: "monthly",
+    accessLevel: "pro",
   },
 ];
 
@@ -607,8 +607,8 @@ export function mapApiPostToCard(post: ReportPost): ReportCard {
     language: post.language ?? null,
     status: post.status ?? null,
     version: post.version ?? null,
-    // Default to "annual" for new reports - premium content
-    accessLevel: (post as any)?.accessLevel || "annual",
+    // Default to "ultra" for new reports - premium content
+    accessLevel: (post as any)?.accessLevel || "ultra",
   };
 }
 

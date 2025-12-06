@@ -76,7 +76,7 @@ export type SearchResult = {
 
 export type ReportTone = "baseline" | "buffett" | "musk" | "muddy";
 
-export type AccessLevel = "timed-free" | "monthly" | "annual";
+export type AccessLevel = "timed-free" | "pro" | "ultra";
 
 export type ReportSummary = {
   symbol: string;

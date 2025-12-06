@@ -76,9 +76,9 @@ interface AuditLog extends Record<string, unknown> {
 }
 
 const PLAN_CONFIGS = {
-  free: { name: "免费版", quota: 60, price: 0 },       // 60初始积分，无月度配额
-  pro: { name: "月费版", quota: 300, price: 14.99 },   // $14.99/月，300积分/月
-  annual: { name: "年费版", quota: 600, price: 119.99 }, // $119.99/年，600积分/月
+  free: { name: "Free", quota: 30, price: 0 },       // 30初始积分，无月度配额
+  pro: { name: "Pro", quota: 300, price: 14.99 },   // $14.99/月，300积分/月
+  ultra: { name: "Ultra", quota: 1500, price: 44.99 }, // $44.99/月，1500积分/月
 };
 
 const ROLE_OPTIONS = [
@@ -90,9 +90,9 @@ const ROLE_OPTIONS = [
 ];
 
 const PLAN_OPTIONS = [
-  { value: "free", label: "免费版 (60初始积分)" },
-  { value: "pro", label: "月费版 (300积分/月, $14.99)" },
-  { value: "annual", label: "年费版 (600积分/月, $119.99/年)" },
+  { value: "free", label: "Free (30初始积分)" },
+  { value: "pro", label: "Pro (300积分/月, $14.99)" },
+  { value: "ultra", label: "Ultra (1500积分/月, $44.99)" },
 ];
 
 export default function UserDetailPage() {

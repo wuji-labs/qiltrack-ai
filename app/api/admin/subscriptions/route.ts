@@ -5,7 +5,7 @@ import { requireAdmin, isAuthError } from "@/lib/auth/admin";
 const PLAN_PRICES = {
   free: 0,
   pro: 14.99,
-  annual: 119.99 / 12, // 月均价
+  ultra: 44.99,
 };
 
 export async function GET() {
@@ -33,7 +33,7 @@ export async function GET() {
     const planCounts: Record<string, number> = {
       free: 0,
       pro: 0,
-      annual: 0,
+      ultra: 0,
     };
 
     profiles?.forEach((p: { plan: string }) => {
@@ -44,7 +44,7 @@ export async function GET() {
     // 计算MRR
     let mrr = 0;
     mrr += planCounts.pro * PLAN_PRICES.pro;
-    mrr += planCounts.annual * PLAN_PRICES.annual;
+    mrr += planCounts.ultra * PLAN_PRICES.ultra;
 
     // 获取活跃订阅数
     const { count: activeSubscriptions } = await supabase

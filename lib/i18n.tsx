@@ -1323,7 +1323,7 @@ const translations: Record<string, TranslationEntry> = {
     "zh-Hant": "加入候補名單",
     "zh-Hans": "加入候补名单",
   },
-  // Monthly plan keys
+  // Monthly plan keys (kept for backward compatibility, aliased to Pro)
   "pricing.plan.monthly.badge": withChineseVariants({
     en: "Most popular",
     ja: "最も人気",
@@ -1367,30 +1367,30 @@ const translations: Record<string, TranslationEntry> = {
     },
   }),
   "pricing.plan.monthly.feature2": withChineseVariants({
-    en: "30 credits daily check-in",
-    ja: "毎日チェックインで30クレジット",
-    ko: "매일 체크인 30 크레딧",
+    en: "15 credits daily check-in",
+    ja: "毎日チェックインで15クレジット",
+    ko: "매일 체크인 15 크레딧",
     zh: {
-      hant: "每日簽到 30 積分",
-      hans: "每日签到 30 积分",
+      hant: "每日簽到 15 積分",
+      hans: "每日签到 15 积分",
     },
   }),
   "pricing.plan.monthly.feature3": withChineseVariants({
-    en: "Export reports as PDF",
-    ja: "PDFでレポートをエクスポート",
-    ko: "PDF로 리포트 내보내기",
+    en: "Export reports as DOCX",
+    ja: "DOCXでレポートをエクスポート",
+    ko: "DOCX로 리포트 내보내기",
     zh: {
-      hant: "導出報告為 PDF",
-      hans: "导出报告为 PDF",
+      hant: "導出報告為 DOCX",
+      hans: "导出报告为 DOCX",
     },
   }),
   "pricing.plan.monthly.feature4": withChineseVariants({
-    en: "Batch generation support",
-    ja: "バッチ生成サポート",
-    ko: "일괄 생성 지원",
+    en: "Batch 3 reports, 2x priority",
+    ja: "3レポートバッチ処理、2倍優先",
+    ko: "3개 리포트 일괄 생성, 2배 우선순위",
     zh: {
-      hant: "批量生成支持",
-      hans: "批量生成支持",
+      hant: "批量生成 3 份，2x 優先速度",
+      hans: "批量生成 3 份，2x 优先速度",
     },
   }),
   "pricing.plan.monthly.cta": withChineseVariants({
@@ -1402,7 +1402,71 @@ const translations: Record<string, TranslationEntry> = {
       hans: "订阅 Pro",
     },
   }),
-  // Annual plan keys
+  // Pro plan keys (new naming)
+  "pricing.plan.pro.badge": withChineseVariants({
+    en: "Most popular",
+    ja: "最も人気",
+    ko: "가장 인기",
+    zh: "最受欢迎",
+  }),
+  "pricing.plan.pro.name": withChineseVariants({
+    en: "Pro",
+    ja: "プロ",
+    ko: "프로",
+    zh: "Pro",
+  }),
+  "pricing.plan.pro.price": withChineseVariants({
+    en: "$14.99 / month",
+    ja: "$14.99 / 月",
+    ko: "$14.99 / 월",
+    zh: "$14.99 / 月",
+  }),
+  "pricing.plan.pro.caption": withChineseVariants({
+    en: "Best for regular investors who need consistent analysis",
+    ja: "定期的に分析が必要な個人投資家に最適",
+    ko: "정기적인 분석이 필요한 개인 투자자에게 최적",
+    zh: {
+      hant: "適合定期需要投資分析的個人投資者",
+      hans: "适合定期需要投资分析的个人投资者",
+    },
+  }),
+  "pricing.plan.pro.feature1": withChineseVariants({
+    en: "300 monthly credits",
+    ja: "月間300クレジット",
+    ko: "월 300 크레딧",
+    zh: "300 月度积分",
+  }),
+  "pricing.plan.pro.feature2": withChineseVariants({
+    en: "15 credits daily check-in",
+    ja: "毎日チェックインで15クレジット",
+    ko: "매일 체크인 15 크레딧",
+    zh: "每日签到 15 积分",
+  }),
+  "pricing.plan.pro.feature3": withChineseVariants({
+    en: "Export reports as DOCX",
+    ja: "DOCXでレポートをエクスポート",
+    ko: "DOCX로 리포트 내보내기",
+    zh: "导出报告为 DOCX",
+  }),
+  "pricing.plan.pro.feature4": withChineseVariants({
+    en: "Batch 3 reports, 2x priority",
+    ja: "3レポートバッチ処理、2倍優先",
+    ko: "3개 리포트 일괄 생성, 2배 우선순위",
+    zh: "批量 3 份，2x 优先",
+  }),
+  "pricing.plan.pro.cta": withChineseVariants({
+    en: "Subscribe Pro",
+    ja: "プロを契約",
+    ko: "프로 구독",
+    zh: "订阅 Pro",
+  }),
+  "pricing.plan.pro.cta.notReady": withChineseVariants({
+    en: "Subscription coming soon",
+    ja: "サブスクリプション間もなく開始",
+    ko: "구독 기능 곧 출시",
+    zh: "订阅功能即将上线",
+  }),
+  // Annual plan keys (kept for backward compatibility)
   "pricing.plan.annual.badge": withChineseVariants({
     en: "Best value",
     ja: "最もお得",
@@ -1492,6 +1556,76 @@ const translations: Record<string, TranslationEntry> = {
       hant: "相比月付節省 33%，專屬年費會員標識",
       hans: "相比月付节省 33%，专属年费会员标识",
     },
+  }),
+  // Ultra plan keys (new naming - replaces annual for feature-based tiers)
+  "pricing.plan.ultra.badge": withChineseVariants({
+    en: "Best value",
+    ja: "最もお得",
+    ko: "최고 혜택",
+    zh: "性价比最高",
+  }),
+  "pricing.plan.ultra.name": withChineseVariants({
+    en: "Ultra",
+    ja: "ウルトラ",
+    ko: "울트라",
+    zh: "Ultra",
+  }),
+  "pricing.plan.ultra.price": withChineseVariants({
+    en: "$44.99 / month",
+    ja: "$44.99 / 月",
+    ko: "$44.99 / 월",
+    zh: "$44.99 / 月",
+  }),
+  "pricing.plan.ultra.caption": withChineseVariants({
+    en: "Best value for professionals and teams",
+    ja: "プロフェッショナルやチームに最適",
+    ko: "전문가 및 팀에게 최적",
+    zh: {
+      hant: "性價比最高，適合專業用戶和團隊",
+      hans: "性价比最高，适合专业用户和团队",
+    },
+  }),
+  "pricing.plan.ultra.feature1": withChineseVariants({
+    en: "1,500 monthly credits",
+    ja: "月間1,500クレジット",
+    ko: "월 1,500 크레딧",
+    zh: "1,500 月度积分",
+  }),
+  "pricing.plan.ultra.feature2": withChineseVariants({
+    en: "PDF + DOCX export, batch 10",
+    ja: "PDF + DOCX出力、10件バッチ処理",
+    ko: "PDF + DOCX 내보내기, 10개 일괄",
+    zh: "PDF + DOCX 导出，批量 10 份",
+  }),
+  "pricing.plan.ultra.feature3": withChineseVariants({
+    en: "4x express speed",
+    ja: "4倍高速生成",
+    ko: "4배 초고속",
+    zh: "4x 极速生成",
+  }),
+  "pricing.plan.ultra.feature4": withChineseVariants({
+    en: "API access, credits rollover 3 months",
+    ja: "API アクセス、3ヶ月クレジット繰越",
+    ko: "API 접근, 3개월 크레딧 이월",
+    zh: "API 访问，积分滚存 3 个月",
+  }),
+  "pricing.plan.ultra.cta": withChineseVariants({
+    en: "Subscribe Ultra",
+    ja: "ウルトラを契約",
+    ko: "울트라 구독",
+    zh: "订阅 Ultra",
+  }),
+  "pricing.plan.ultra.note": withChineseVariants({
+    en: "Save 33% with annual billing",
+    ja: "年払いで33%お得",
+    ko: "연간 결제로 33% 절약",
+    zh: "年付节省 33%",
+  }),
+  "pricing.plan.ultra.cta.notReady": withChineseVariants({
+    en: "Subscription coming soon",
+    ja: "サブスクリプション間もなく開始",
+    ko: "구독 기능 곧 출시",
+    zh: "订阅功能即将上线",
   }),
   "pricing.plan.monthly.cta.notReady": withChineseVariants({
     en: "Subscription coming soon",
@@ -1938,11 +2072,18 @@ const translations: Record<string, TranslationEntry> = {
     "zh-Hans": "限时免费",
   },
   "reports.card.monthlyBadge": {
-    en: "Monthly exclusive",
-    ja: "月額専用",
-    ko: "월간 전용",
-    "zh-Hant": "月費專享",
-    "zh-Hans": "月费专享",
+    en: "Pro exclusive",
+    ja: "Pro専用",
+    ko: "Pro 전용",
+    "zh-Hant": "Pro 專享",
+    "zh-Hans": "Pro 专享",
+  },
+  "reports.card.proBadge": {
+    en: "Pro exclusive",
+    ja: "Pro専用",
+    ko: "Pro 전용",
+    "zh-Hant": "Pro 專享",
+    "zh-Hans": "Pro 专享",
   },
   "reports.category.all": {
     en: "All",
@@ -2901,8 +3042,15 @@ const translations: Record<string, TranslationEntry> = {
     en: "Pro plan",
     ja: "Proプラン",
     ko: "Pro 플랜",
-    "zh-Hant": "月費版",
-    "zh-Hans": "月费版",
+    "zh-Hant": "Pro",
+    "zh-Hans": "Pro",
+  },
+  "quota.plan.ultra": {
+    en: "Ultra plan",
+    ja: "Ultraプラン",
+    ko: "Ultra 플랜",
+    "zh-Hant": "Ultra",
+    "zh-Hans": "Ultra",
   },
   "quota.plan.annual": {
     en: "Annual plan",

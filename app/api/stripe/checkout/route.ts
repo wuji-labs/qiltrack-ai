@@ -6,12 +6,12 @@ import { createServerClient } from "@/lib/supabase/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type PlanKey = "pro" | "annual";
+type PlanKey = "pro" | "ultra";
 
 function getPriceId(plan: PlanKey) {
   const prices: Record<PlanKey, string | undefined> = {
     pro: process.env.STRIPE_PRICE_PRO,
-    annual: process.env.STRIPE_PRICE_ANNUAL,
+    ultra: process.env.STRIPE_PRICE_ULTRA,
   };
 
   const priceId = prices[plan];
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     const stripe = getStripeClient();
     const { plan } = (await req.json()) as { plan?: PlanKey };
 
-    if (plan !== "pro" && plan !== "annual") {
+    if (plan !== "pro" && plan !== "ultra") {
       return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
     }
 

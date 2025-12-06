@@ -48,7 +48,7 @@ const heroHighlightKeys: ReadonlyArray<{ title: TranslationKey; description: Tra
 ];
 
 type PricingPlanKey = {
-  tier: "free" | "monthly" | "annual";
+  tier: "free" | "pro" | "ultra";
   name: TranslationKey;
   badge: TranslationKey;
   price: TranslationKey;
@@ -76,33 +76,33 @@ const pricingPlans: PricingPlanKey[] = [
     cta: "pricing.plan.free.cta",
   },
   {
-    tier: "monthly",
-    name: "pricing.plan.monthly.name",
-    badge: "pricing.plan.monthly.badge",
-    price: "pricing.plan.monthly.price",
-    tagline: "pricing.plan.monthly.caption",
+    tier: "pro",
+    name: "pricing.plan.pro.name",
+    badge: "pricing.plan.pro.badge",
+    price: "pricing.plan.pro.price",
+    tagline: "pricing.plan.pro.caption",
     features: [
-      "pricing.plan.monthly.feature1",
-      "pricing.plan.monthly.feature2",
-      "pricing.plan.monthly.feature3",
-      "pricing.plan.monthly.feature4",
+      "pricing.plan.pro.feature1",
+      "pricing.plan.pro.feature2",
+      "pricing.plan.pro.feature3",
+      "pricing.plan.pro.feature4",
     ],
-    cta: "pricing.plan.monthly.cta",
+    cta: "pricing.plan.pro.cta",
     highlight: true,
   },
   {
-    tier: "annual",
-    name: "pricing.plan.annual.name",
-    badge: "pricing.plan.annual.badge",
-    price: "pricing.plan.annual.price",
-    tagline: "pricing.plan.annual.caption",
+    tier: "ultra",
+    name: "pricing.plan.ultra.name",
+    badge: "pricing.plan.ultra.badge",
+    price: "pricing.plan.ultra.price",
+    tagline: "pricing.plan.ultra.caption",
     features: [
-      "pricing.plan.annual.feature1",
-      "pricing.plan.annual.feature2",
-      "pricing.plan.annual.feature3",
-      "pricing.plan.annual.feature4",
+      "pricing.plan.ultra.feature1",
+      "pricing.plan.ultra.feature2",
+      "pricing.plan.ultra.feature3",
+      "pricing.plan.ultra.feature4",
     ],
-    cta: "pricing.plan.annual.cta",
+    cta: "pricing.plan.ultra.cta",
     secondary: true,
   },
 ];
@@ -322,8 +322,8 @@ export default function Home() {
   // 套餐显示名称映射
   const PLAN_DISPLAY_NAMES: Record<string, string> = {
     free: t("quota.plan.free"),
-    pro: t("quota.plan.pro") || "月费版",
-    annual: t("quota.plan.annual") || "年费版",
+    pro: t("quota.plan.pro") || "Pro",
+    ultra: t("quota.plan.ultra") || "Ultra",
   };
 
   const planLabel = PLAN_DISPLAY_NAMES[userPlan] || t("quota.plan.free");
@@ -356,33 +356,14 @@ export default function Home() {
   };
 
   // TODO: Implement subscription handlers when Stripe checkout is ready
-  const handleSubscribeMonthly = () => {
-    if (!isAuthenticated) {
-      // Redirect to login if not authenticated
-      router.push("/login");
-      return;
-    }
-    // Once authenticated, show a message and fallback to primary CTA
-    // This ensures Stripe integration doesn't break the flow
-    alert(
-      t("pricing.plan.monthly.cta.notReady") ||
-        "Subscription is coming soon. Contact us for early access."
-    );
-    handlePrimaryCta();
+  const handleSubscribePro = () => {
+    // 跳转到定价页面
+    router.push("/pricing");
   };
 
-  const handleSubscribeAnnual = () => {
-    if (!isAuthenticated) {
-      // Redirect to login if not authenticated
-      router.push("/login");
-      return;
-    }
-    // Once authenticated, show a message and fallback to primary CTA
-    alert(
-      t("pricing.plan.annual.cta.notReady") ||
-        "Subscription is coming soon. Contact us for early access."
-    );
-    handlePrimaryCta();
+  const handleSubscribeUltra = () => {
+    // 跳转到定价页面
+    router.push("/pricing");
   };
 
   return (
@@ -709,8 +690,8 @@ export default function Home() {
                     {pricingList.map((plan) => {
                       const handleClick = () => {
                         if (plan.tier === "free") return handlePrimaryCta();
-                        if (plan.tier === "monthly") return handleSubscribeMonthly();
-                        if (plan.tier === "annual") return handleSubscribeAnnual();
+                        if (plan.tier === "pro") return handleSubscribePro();
+                        if (plan.tier === "ultra") return handleSubscribeUltra();
                         return handlePrimaryCta();
                       };
 
@@ -798,10 +779,10 @@ export default function Home() {
                             {plan.cta}
                           </button>
 
-                          {/* Annual plan note */}
-                          {plan.tier === "annual" && (
+                          {/* Ultra plan note */}
+                          {plan.tier === "ultra" && (
                             <p className="text-sm text-center text-subtle">
-                              {t("pricing.plan.annual.note")}
+                              {t("pricing.plan.ultra.note")}
                             </p>
                           )}
                         </article>

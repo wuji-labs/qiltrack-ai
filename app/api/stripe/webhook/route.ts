@@ -6,7 +6,7 @@ import { createServiceRoleClient } from "@/lib/supabase/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type PlanKey = "pro" | "annual";
+type PlanKey = "pro" | "ultra";
 
 export async function POST(req: Request) {
   const signature = req.headers.get("stripe-signature");
@@ -102,7 +102,7 @@ export async function POST(req: Request) {
             .single();
 
           if (profile) {
-            const monthlyQuota = profile.plan === "pro" ? 300 : profile.plan === "annual" ? 600 : 0;
+            const monthlyQuota = profile.plan === "pro" ? 300 : profile.plan === "ultra" ? 1500 : 0;
 
             const { error: creditsError } = await supabase
               .from("report_credits")

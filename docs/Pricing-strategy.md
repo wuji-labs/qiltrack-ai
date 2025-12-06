@@ -1,7 +1,8 @@
-# Qiltrack AI 定价策略 v4.0
+# Qiltrack AI 定价策略 v5.0
 
 > 最后更新: 2025-12-06
 > 状态: 待实施
+> 参考: [TIKR Pricing](https://www.tikr.com/pricing)
 
 ---
 

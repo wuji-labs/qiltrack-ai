@@ -3,9 +3,9 @@ import { cookies } from "next/headers";
 import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
 
 const PLAN_CONFIGS = {
-  free: { name: "免费版", quota: 60, price: 0 },
-  pro: { name: "月费版", quota: 300, price: 14.99 },
-  annual: { name: "年费版", quota: 600, price: 119.99 },
+  free: { name: "Free", quota: 30, price: 0 },
+  pro: { name: "Pro", quota: 300, price: 14.99 },
+  ultra: { name: "Ultra", quota: 1500, price: 44.99 },
 };
 
 export async function POST(request: NextRequest) {

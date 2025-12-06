@@ -16,8 +16,8 @@ export const CREDITS = {
   /** Monthly credits for Pro plan */
   PRO_MONTHLY: 300,
 
-  /** Monthly credits for Annual plan */
-  ANNUAL_MONTHLY: 600,
+  /** Monthly credits for Ultra plan */
+  ULTRA_MONTHLY: 1500,
 
   /** Low credit warning threshold */
   LOW_CREDIT_THRESHOLD: 5,
@@ -38,7 +38,7 @@ export type SubscriptionStatus =
   | "canceled"
   | "trialing";
 
-export type UserPlan = "free" | "pro" | "annual" | "enterprise";
+export type UserPlan = "free" | "pro" | "ultra" | "enterprise";
 
 export type UserRole =
   | "super_admin"
@@ -61,8 +61,8 @@ export function getPlanCredits(plan: UserPlan): number {
   switch (plan) {
     case "pro":
       return CREDITS.PRO_MONTHLY;
-    case "annual":
-      return CREDITS.ANNUAL_MONTHLY;
+    case "ultra":
+      return CREDITS.ULTRA_MONTHLY;
     case "enterprise":
       return 9999; // Unlimited for enterprise
     default:

@@ -29,9 +29,9 @@ interface SubscriptionStats {
 }
 
 const PLAN_CONFIGS: Record<string, { name: string; quota: number; priceMonthly: number; priceYearly: number; color: string }> = {
-  free: { name: "免费版", quota: 60, priceMonthly: 0, priceYearly: 0, color: "#6b7280" },
-  pro: { name: "月费版", quota: 300, priceMonthly: 14.99, priceYearly: 0, color: "#10b981" },
-  annual: { name: "年费版", quota: 600, priceMonthly: 0, priceYearly: 119.99, color: "#8b5cf6" },
+  free: { name: "Free", quota: 30, priceMonthly: 0, priceYearly: 0, color: "#6b7280" },
+  pro: { name: "Pro", quota: 300, priceMonthly: 14.99, priceYearly: 119.88, color: "#10b981" },
+  ultra: { name: "Ultra", quota: 1500, priceMonthly: 44.99, priceYearly: 359.88, color: "#8b5cf6" },
 };
 
 export default function SubscriptionsPage() {

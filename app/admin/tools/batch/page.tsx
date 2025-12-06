@@ -53,9 +53,9 @@ export default function BatchOperationsPage() {
           label: "目标套餐",
           type: "select",
           options: [
-            { value: "free", label: "免费版" },
-            { value: "pro", label: "专业版" },
-            { value: "annual", label: "年度版" },
+            { value: "free", label: "Free" },
+            { value: "pro", label: "Pro" },
+            { value: "ultra", label: "Ultra" },
           ],
         },
       ],

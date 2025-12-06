@@ -143,21 +143,21 @@ export default function AdminDashboard() {
       const activeUsers = new Set(activeUsersData?.filter((r: { user_id: string | null }) => r.user_id).map((r: { user_id: string | null }) => r.user_id) || []).size;
 
       // 套餐分布计算
-      const planCounts: Record<string, number> = { free: 0, pro: 0, annual: 0 };
+      const planCounts: Record<string, number> = { free: 0, pro: 0, ultra: 0 };
       planDistResult.data?.forEach((p: { plan: string | null }) => {
         const plan = p.plan || "free";
         planCounts[plan] = (planCounts[plan] || 0) + 1;
       });
 
       const planDistribution = [
-        { name: "免费版", value: planCounts.free || 0, color: "#6b7280" },
-        { name: "月费版", value: planCounts.pro || 0, color: "#3b82f6" },
-        { name: "年费版", value: planCounts.annual || 0, color: "#8b5cf6" },
+        { name: "Free", value: planCounts.free || 0, color: "#6b7280" },
+        { name: "Pro", value: planCounts.pro || 0, color: "#3b82f6" },
+        { name: "Ultra", value: planCounts.ultra || 0, color: "#8b5cf6" },
       ];
 
       // 计算付费用户和MRR
-      const paidUsers = (planCounts.pro || 0) + (planCounts.annual || 0);
-      const mrr = (planCounts.pro || 0) * 14.99 + (planCounts.annual || 0) * (119.99 / 12);
+      const paidUsers = (planCounts.pro || 0) + (planCounts.ultra || 0);
+      const mrr = (planCounts.pro || 0) * 14.99 + (planCounts.ultra || 0) * 44.99;
       const arr = mrr * 12;
 
       const avgReportsPerUser =

@@ -27,11 +27,11 @@ function AccessBadge({
   labels,
 }: {
   variant: MembershipBadgeVariant;
-  accessLevel: "timed-free" | "monthly" | "annual";
+  accessLevel: "timed-free" | "pro" | "ultra";
   labels: {
     "timed-free": string;
-    monthly: string;
-    annual: string;
+    pro: string;
+    ultra: string;
   };
 }) {
   const label = labels[accessLevel];
@@ -45,14 +45,14 @@ function AccessBadge({
       glow: "shadow-[0_0_20px_rgba(16,185,129,0.3)]",
       icon: "text-emerald-300",
     },
-    monthly: {
+    pro: {
       bg: "bg-amber-600/20",
       border: "border-amber-500/50",
       text: "text-amber-300",
       glow: "shadow-[0_0_20px_rgba(251,146,60,0.3)]",
       icon: "text-amber-300",
     },
-    annual: {
+    ultra: {
       bg: "bg-purple-600/20",
       border: "border-purple-500/50",
       text: "text-purple-300",
@@ -142,11 +142,11 @@ export default function ReportsPage() {
   const auth = useSupabaseAuth();
   const membershipLabel = t("reports.card.membershipBadge");
   const timedFreeLabel = t("reports.card.timedFreeBadge");
-  const monthlyLabel = t("reports.card.monthlyBadge");
+  const proLabel = t("reports.card.proBadge");
   const accessLabels = {
     "timed-free": timedFreeLabel,
-    monthly: monthlyLabel,
-    annual: membershipLabel,
+    pro: proLabel,
+    ultra: membershipLabel,
   };
 
   // Category translation map
@@ -470,17 +470,17 @@ export default function ReportsPage() {
     // 限时免费：任何人都能打开（用于 SEO）
     if (accessLevel === "timed-free") return;
 
-    // 月费和年费：检查用户计划
-    if (accessLevel === "monthly") {
-      // 月费或年费用户可以访问
-      if (userPlan === "monthly" || userPlan === "annual") return;
+    // Pro 内容：Pro 或 Ultra 用户可以访问
+    if (accessLevel === "pro") {
+      // Pro 或 Ultra 用户可以访问
+      if (userPlan === "pro" || userPlan === "ultra") return;
       // 管理员可以访问
       if (isAdmin) return;
     }
 
-    if (accessLevel === "annual") {
-      // 仅年费用户和管理员可访问
-      if (userPlan === "annual" || isAdmin) return;
+    if (accessLevel === "ultra") {
+      // 仅 Ultra 用户和管理员可访问
+      if (userPlan === "ultra" || isAdmin) return;
     }
 
     // 禁止访问：显示提示
@@ -806,7 +806,7 @@ export default function ReportsPage() {
                         {report.accessLevel && (
                           <AccessBadge
                             variant="featured"
-                            accessLevel={report.accessLevel as "timed-free" | "monthly" | "annual"}
+                            accessLevel={report.accessLevel as "timed-free" | "pro" | "ultra"}
                             labels={accessLabels}
                           />
                         )}
@@ -870,7 +870,7 @@ export default function ReportsPage() {
                         {report.accessLevel && (
                           <AccessBadge
                             variant="grid"
-                            accessLevel={report.accessLevel as "timed-free" | "monthly" | "annual"}
+                            accessLevel={report.accessLevel as "timed-free" | "pro" | "ultra"}
                             labels={accessLabels}
                           />
                         )}
