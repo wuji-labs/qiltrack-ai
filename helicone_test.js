@@ -4,7 +4,7 @@ require("dotenv").config();
 
 const heliConeApiKey = process.env.HELICONE_API_KEY;
 const baseUrl = process.env.HELICONE_BASE_URL || "https://ai-gateway.helicone.ai";
-const modelId = process.env.HELICONE_MODEL || "openai/gpt-5.1";
+const modelId = process.env.HELICONE_MODEL || "gpt-5.1";
 
 async function getResponse() {
   if (!heliConeApiKey) {
