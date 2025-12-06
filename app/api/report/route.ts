@@ -1,4 +1,7 @@
 export const runtime = "nodejs";
+// Vercel Pro allows up to 300s (5 min), Hobby plan is limited to 10s
+// LLM report generation typically takes 60-150 seconds
+export const maxDuration = 300;
 
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";

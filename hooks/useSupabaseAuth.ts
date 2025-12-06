@@ -238,7 +238,8 @@ export function useSupabaseAuth() {
 
         // Check if user also has password (hybrid auth)
         try {
-          const { data: hasPassword, error: rpcError } = await supabase.rpc("fn_user_has_password");
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: hasPassword, error: rpcError } = await (supabase.rpc as any)("fn_user_has_password");
 
           if (rpcError) {
             console.warn("RPC fn_user_has_password failed - falling back to OAuth", {
@@ -258,7 +259,8 @@ export function useSupabaseAuth() {
 
       // Step 3: No OAuth identities, check if has password
       try {
-        const { data: hasPassword, error: rpcError } = await supabase.rpc("fn_user_has_password");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: hasPassword, error: rpcError } = await (supabase.rpc as any)("fn_user_has_password");
 
         if (rpcError) {
           console.warn("RPC fn_user_has_password failed - returning unknown", {

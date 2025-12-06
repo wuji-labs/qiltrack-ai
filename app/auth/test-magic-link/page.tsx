@@ -111,11 +111,11 @@ export default function MagicLinkTestPage() {
           <div className="mt-6 pt-6 border-t border-[var(--stroke-soft)]">
             <p className="text-xs text-subtle mb-2">使用步骤:</p>
             <ol className="text-xs text-dim space-y-1 list-decimal list-inside">
-              <li>在邮件中右键点击链接，选择"复制链接地址"</li>
-              <li>点击"从完整 URL 中提取 Token"按钮</li>
+              <li>在邮件中右键点击链接，选择&quot;复制链接地址&quot;</li>
+              <li>点击&quot;从完整 URL 中提取 Token&quot;按钮</li>
               <li>粘贴完整的邮件链接</li>
               <li>或者手动复制 token_hash 参数的值</li>
-              <li>点击"确认并登录"</li>
+              <li>点击&quot;确认并登录&quot;</li>
             </ol>
           </div>
 

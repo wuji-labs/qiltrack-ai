@@ -35,7 +35,8 @@ export default function DataExportPage() {
     setExporting(true);
 
     try {
-      let query = supabase.from(config.resource).select("*");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let query = (supabase as any).from(config.resource).select("*");
 
       // 应用日期范围
       if (config.dateRange !== "all") {

@@ -145,7 +145,7 @@ export default function UsersPage() {
       let activeUsers = 0;
       let paidUsers = 0;
 
-      allProfiles?.forEach((p: { plan?: string; role?: string; updated_at?: string }) => {
+      allProfiles?.forEach((p: { plan: string | null; role: string | null; updated_at: string | null }) => {
         const plan = p.plan || "free";
         const role = p.role || "user";
         byPlan[plan] = (byPlan[plan] || 0) + 1;
@@ -160,7 +160,7 @@ export default function UsersPage() {
       });
 
       // 计算流失风险用户（积分低 + 长时间未活跃）
-      const churnRisk = creditsData?.filter((c: { credits_available?: number }) =>
+      const churnRisk = creditsData?.filter((c: { credits_available: number | null }) =>
         (c.credits_available || 0) < 10
       ).length || 0;
 
@@ -238,16 +238,18 @@ export default function UsersPage() {
           .in("user_id", userIds);
 
         // 合并数据
-        const creditsMap = new Map(creditsData?.map((c: { user_id: string; credits_available: number; credits_used: number }) => [c.user_id, c]));
+        const creditsMap = new Map(creditsData?.map((c: { user_id: string; credits_available: number | null; credits_used: number | null }) => [c.user_id, c]));
         const reportsCount = new Map<string, number>();
-        reportsData?.forEach((r: { user_id: string }) => {
-          reportsCount.set(r.user_id, (reportsCount.get(r.user_id) || 0) + 1);
+        reportsData?.forEach((r: { user_id: string | null }) => {
+          if (r.user_id) {
+            reportsCount.set(r.user_id, (reportsCount.get(r.user_id) || 0) + 1);
+          }
         });
 
         const usersWithCredits: UserWithCredits[] = data.map((user: User) => ({
           ...user,
-          credits_available: (creditsMap.get(user.id) as { credits_available?: number })?.credits_available || 0,
-          credits_used: (creditsMap.get(user.id) as { credits_used?: number })?.credits_used || 0,
+          credits_available: creditsMap.get(user.id)?.credits_available || 0,
+          credits_used: creditsMap.get(user.id)?.credits_used || 0,
           report_count: reportsCount.get(user.id) || 0,
         }));
 

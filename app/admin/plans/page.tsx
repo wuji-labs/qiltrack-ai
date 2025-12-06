@@ -74,7 +74,8 @@ export default function PlansPage() {
     setLoading(true);
     try {
       const supabase = createClient();
-      const { data, error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any)
         .from("subscription_plans")
         .select("*")
         .order("sort_order", { ascending: true });
@@ -104,7 +105,7 @@ export default function PlansPage() {
       const { data } = await supabase.from("profiles").select("plan");
 
       const counts: Record<string, number> = {};
-      data?.forEach((p: { plan?: string }) => {
+      data?.forEach((p: { plan: string | null }) => {
         const plan = p.plan || "free";
         counts[plan] = (counts[plan] || 0) + 1;
       });
@@ -136,7 +137,7 @@ export default function PlansPage() {
           color: editingPlan.color,
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase.from("subscription_plans") as any).insert(insertData);
+        const { error } = await (supabase as any).from("subscription_plans").insert(insertData);
         if (error) throw error;
       } else {
         // 更新现有套餐
@@ -152,7 +153,8 @@ export default function PlansPage() {
           color: editingPlan.color,
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase.from("subscription_plans") as any)
+        const { error } = await (supabase as any)
+          .from("subscription_plans")
           .update(updateData)
           .eq("id", editingPlan.id);
         if (error) throw error;

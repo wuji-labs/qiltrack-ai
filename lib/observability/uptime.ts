@@ -119,8 +119,8 @@ export async function performHealthCheck(): Promise<HealthCheckResult> {
  */
 async function checkDatabase(): Promise<boolean> {
   try {
-    const { createClient } = await import('@/lib/supabase/server');
-    const supabase = await createClient();
+    const { createServiceRoleClient } = await import('@/lib/supabase/server');
+    const supabase = createServiceRoleClient();
     const { error } = await supabase.from('profiles').select('id').limit(1);
     return !error;
   } catch {
