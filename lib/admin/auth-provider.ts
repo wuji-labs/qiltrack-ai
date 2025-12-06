@@ -86,7 +86,9 @@ export const authProvider: AuthProvider = {
 
     const userRole = (profile as { role?: string | null } | null)?.role;
 
-    if (!userRole || userRole !== "admin") {
+    // Check if user has admin privileges (super_admin, admin, editor, developer)
+    const adminRoles = ["super_admin", "admin", "editor", "developer"];
+    if (!userRole || !adminRoles.includes(userRole)) {
       return {
         authenticated: false,
         redirectTo: "/",
