@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
 
+// Handles POST /api/admin/users/grant-credits for single-user credit adjustments
+
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();
@@ -29,7 +31,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { userId, amount, reason } = body;
 
-    if (!userId || amount === undefined) {
+    const numericAmount = Number(amount);
+
+    if (!userId || Number.isNaN(numericAmount)) {
       return NextResponse.json({ error: "缺少必要参数" }, { status: 400 });
     }
 
@@ -42,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     const currentCredits = current?.credits_available || 0;
     const creditsUsed = current?.credits_used || 0;
-    const newCredits = currentCredits + Number(amount);
+    const newCredits = currentCredits + numericAmount;
 
     if (newCredits < 0) {
       return NextResponse.json({ error: "积分不能为负数" }, { status: 400 });
@@ -64,21 +68,21 @@ export async function POST(request: NextRequest) {
     }
 
     // 记录积分事件
-    const eventType = Number(amount) > 0 ? "admin_grant" : "admin_deduct";
+    const eventType = numericAmount > 0 ? "admin_grant" : "admin_deduct";
     await supabaseAdmin.from("report_credit_events").insert({
       user_id: userId,
       event_type: eventType,
-      credits_amount: Math.abs(Number(amount)),
-      reason: reason || (Number(amount) > 0 ? "管理员授予" : "管理员扣除"),
+      credits_amount: Math.abs(numericAmount),
+      reason: reason || (numericAmount > 0 ? "管理员授予" : "管理员扣除"),
     });
 
     // 记录审计日志
     await supabaseAdmin.from("audit_logs").insert({
       user_id: user.id,
-      action: Number(amount) > 0 ? "GRANT_CREDITS" : "REVOKE_CREDITS",
+      action: numericAmount > 0 ? "GRANT_CREDITS" : "REVOKE_CREDITS",
       resource_type: "credits",
       resource_id: userId,
-      details: { amount, reason, new_balance: newCredits },
+      details: { amount: numericAmount, reason, new_balance: newCredits },
     });
 
     return NextResponse.json({
