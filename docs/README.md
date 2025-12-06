@@ -1,19 +1,40 @@
 # 文档索引
 
-- **协作规范**
-  - `CODEX_CLAUDE_COLLAB.md`：Codex/Claude 角色职责、Snapshot/状态更新规则。
-  - `docs/guides/codex-claude-quickstart.md`：一页速查表。
-- **架构与决策**
-  - `docs/decisions/`：Architecture Snapshot（示例：`2025-11-27-supabase-local-cli.md`）。
-  - `docs/design/`：高阶产品与 UX 设计说明。
-- **规划与执行**
-  - `docs/plans/`：任务拆解、工作流看板（`workstreams.md` 建议记录当前分配）。
-  - `docs/reports/`：CAVR、阶段性验证报告。
-- **操作指南**
-  - `docs/guides/`：CLI、PR 工作流、MCP 等实操说明。
-  - 新增 `docs/guides/worktree-multi-team.md`（见下）用于多工作区协作。
-- **环境与部署**
-  - `ENVIRONMENT.md`：全量环境要求 + 常见故障排查。
-  - `README.md` / `docs/setup/`：项目启动、Supabase 配置、脚本入口。
+## 核心文档
+- `Pricing-strategy.md` - 定价策略：v5.0 三档定价 (Free/Pro/Ultra)，积分系统
+- `AI_INSTRUCTIONS.md` - AI 协作指南
+- `admin-accounts.md` - 管理员账号信息
 
-> 入口约定：任何新流程先写 Snapshot，再在 `docs/README.md` 链接对应指南，保持单一事实源。
+## 架构与决策
+- `architecture/` - 架构文档
+  - `ARCHITECTURE.md` - 系统架构总览
+  - `api-development-guide.md` - API 开发指南
+  - `testing-guide.md` - 测试指南
+- `decisions/` - 架构决策记录 (ADR)
+- `design/` - 产品与 UX 设计说明
+
+## 操作指南
+- `guides/` - 操作指南
+  - `BOSS-OPERATION-MANUAL.md` - 运维手册
+  - `admin-operations-guide.md` - 管理操作指南
+  - `ci-cd-setup.md` - CI/CD 配置
+  - `monitoring.md` - 监控指南
+  - `email-configuration.md` - 邮件配置
+  - `worktree-*.md` - 工作区管理相关
+- `setup/` - 环境配置
+  - `supabase-bucket-setup-guide.md` - Supabase 存储桶配置
+
+## 规划与任务
+- `plans/` - 任务规划
+  - `workstreams.md` - 工作流看板
+- `tasks/` - 任务追踪
+- `pr-drafts/` - PR 草稿
+- `troubleshooting/` - 故障排查
+
+## 归档
+- `archive/` - 历史文档归档
+  - `legacy-2025-11/` - 2025年11月遗留文档
+  - `reports-2025-11/` - 2025年11月报告
+
+---
+> 入口约定：新流程先在 `decisions/` 创建 Snapshot，再更新此索引，保持单一事实源。

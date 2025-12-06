@@ -3,81 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
-
-type PlanKey = "free" | "pro" | "ultra";
-type BillingCycle = "monthly" | "annual";
-
-type Plan = {
-  key: PlanKey;
-  name: string;
-  badge: string;
-  monthlyPrice: number;
-  annualPrice: number; // 年付折算月价
-  credits: string;
-  features: string[];
-  description: string;
-  highlight?: boolean;
-  popular?: boolean;
-  isFree?: boolean;
-};
-
-const plans: Plan[] = [
-  {
-    key: "free",
-    name: "Free",
-    badge: "Free",
-    monthlyPrice: 0,
-    annualPrice: 0,
-    credits: "30 初始积分",
-    features: [
-      "注册赠送 30 积分",
-      "每日签到 5 积分",
-      "在线查看报告",
-      "标准响应时间",
-      "社区支持",
-    ],
-    description: "适合尝试体验产品功能的新用户。",
-    isFree: true,
-  },
-  {
-    key: "pro",
-    name: "Pro",
-    badge: "Pro",
-    monthlyPrice: 14.99,
-    annualPrice: 9.99, // 年付折算月价 ($119.88/年)
-    credits: "300 积分 / 月",
-    features: [
-      "300 月度积分",
-      "每日签到 15 积分",
-      "导出报告为 DOCX",
-      "批量生成 3 份",
-      "优先 2x 速度",
-      "报告留存 90 天",
-    ],
-    description: "适合定期需要投资分析的个人投资者。",
-    highlight: true,
-    popular: true,
-  },
-  {
-    key: "ultra",
-    name: "Ultra",
-    badge: "Ultra",
-    monthlyPrice: 44.99,
-    annualPrice: 29.99, // 年付折算月价 ($359.88/年)
-    credits: "1,500 积分 / 月",
-    features: [
-      "1,500 月度积分",
-      "每日签到 30 积分",
-      "导出 PDF + DOCX",
-      "批量生成 10 份",
-      "极速 4x 生成",
-      "积分滚存 3 个月",
-      "API 访问",
-      "报告永久留存",
-    ],
-    description: "性价比最高，适合专业用户和团队。",
-  },
-];
+import { plans, BillingToggle, type PlanKey, type BillingCycle, type Plan } from "@/app/components/PricingCards";
 
 // Feature comparison data
 const comparisonFeatures = [
@@ -119,70 +45,6 @@ const comparisonFeatures = [
     ],
   },
 ];
-
-// Billing Toggle Component
-function BillingToggle({
-  billingCycle,
-  onChange,
-}: {
-  billingCycle: BillingCycle;
-  onChange: (cycle: BillingCycle) => void;
-}) {
-  return (
-    <div className="flex items-center justify-center gap-4 mb-10">
-      <span
-        className={`text-sm font-medium cursor-pointer transition-colors ${
-          billingCycle === "monthly" ? "text-foreground" : "text-dim"
-        }`}
-        onClick={() => onChange("monthly")}
-      >
-        月度账单
-      </span>
-
-      {/* Toggle Switch */}
-      <button
-        type="button"
-        onClick={() => onChange(billingCycle === "annual" ? "monthly" : "annual")}
-        className="relative inline-flex h-7 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
-        style={{
-          background: billingCycle === "annual" ? "var(--accent-emerald)" : "var(--bg-layer)",
-          border: "1px solid var(--stroke-soft)",
-        }}
-        aria-label="Toggle billing cycle"
-      >
-        <span
-          className="inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform"
-          style={{
-            transform: billingCycle === "annual" ? "translateX(30px)" : "translateX(4px)",
-          }}
-        />
-      </button>
-
-      <span
-        className={`text-sm font-medium cursor-pointer transition-colors ${
-          billingCycle === "annual" ? "text-foreground" : "text-dim"
-        }`}
-        onClick={() => onChange("annual")}
-      >
-        年度账单
-      </span>
-
-      {/* Discount Badge */}
-      {billingCycle === "annual" && (
-        <span
-          className="ml-2 px-3 py-1 rounded-full text-xs font-bold"
-          style={{
-            background: "rgba(251, 146, 60, 0.15)",
-            color: "#fb923c",
-            border: "1px solid rgba(251, 146, 60, 0.3)",
-          }}
-        >
-          年付可节省 25% 以上
-        </span>
-      )}
-    </div>
-  );
-}
 
 export default function PricingPage() {
   const router = useRouter();
@@ -283,7 +145,9 @@ export default function PricingPage() {
         </header>
 
         {/* Billing Cycle Toggle */}
-        <BillingToggle billingCycle={billingCycle} onChange={setBillingCycle} />
+        <div className="mb-10">
+          <BillingToggle billingCycle={billingCycle} onChange={setBillingCycle} />
+        </div>
 
         {/* Pricing Cards */}
         <div className="grid gap-6 md:grid-cols-3 lg:gap-8 max-w-6xl mx-auto mb-16">

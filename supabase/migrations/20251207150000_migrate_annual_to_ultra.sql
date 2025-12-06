@@ -3,6 +3,7 @@
 -- Date: 2025-12-07
 -- Description:
 --   - Rename 'annual' plan to 'ultra' in profiles table
+--   - Update CHECK constraint to use 'ultra' instead of 'annual'
 --   - Update subscription_plans table if exists
 --   - Note: access_level is stored in application code, not in DB
 
@@ -11,7 +12,12 @@ UPDATE profiles
 SET plan = 'ultra', updated_at = NOW()
 WHERE plan = 'annual';
 
--- 2. Update subscription_plans table (if exists)
+-- 2. Update CHECK constraint: replace 'annual' with 'ultra'
+ALTER TABLE profiles DROP CONSTRAINT IF EXISTS profiles_plan_check;
+ALTER TABLE profiles ADD CONSTRAINT profiles_plan_check
+  CHECK (plan IN ('free', 'pro', 'ultra', 'enterprise'));
+
+-- 3. Update subscription_plans table (if exists)
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'subscription_plans') THEN
@@ -19,7 +25,7 @@ BEGIN
   END IF;
 END $$;
 
--- 3. Log the migration
+-- 4. Log the migration
 INSERT INTO audit_logs (user_id, action, resource_type, resource_id, details, created_at)
 VALUES (
   NULL,

@@ -38,7 +38,7 @@ export type SubscriptionStatus =
   | "canceled"
   | "trialing";
 
-export type UserPlan = "free" | "pro" | "ultra" | "enterprise";
+export type UserPlan = "free" | "pro" | "ultra";
 
 export type UserRole =
   | "super_admin"
@@ -63,8 +63,6 @@ export function getPlanCredits(plan: UserPlan): number {
       return CREDITS.PRO_MONTHLY;
     case "ultra":
       return CREDITS.ULTRA_MONTHLY;
-    case "enterprise":
-      return 9999; // Unlimited for enterprise
     default:
       return CREDITS.INITIAL_FREE;
   }

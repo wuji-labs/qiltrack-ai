@@ -1,7 +1,7 @@
 # Qiltrack AI 定价策略 v5.0
 
-> 最后更新: 2025-12-06
-> 状态: 待实施
+> 最后更新: 2025-12-07
+> 状态: **已实施** ✅
 > 参考: [TIKR Pricing](https://www.tikr.com/pricing)
 
 ---
@@ -372,7 +372,7 @@ export const YEARLY_DISCOUNT = 0.33; // 33% off
 ### 8.3 数据库 Schema 更新
 
 ```sql
--- profiles 表更新
+-- profiles 表 plan 约束 (已实施)
 ALTER TABLE profiles
   DROP CONSTRAINT IF EXISTS profiles_plan_check;
 
@@ -380,7 +380,7 @@ ALTER TABLE profiles
   ADD CONSTRAINT profiles_plan_check
   CHECK (plan IN ('free', 'pro', 'ultra'));
 
--- 添加 billing_cycle 字段
+-- 添加 billing_cycle 字段 (待实施)
 ALTER TABLE profiles
   ADD COLUMN IF NOT EXISTS billing_cycle TEXT
   DEFAULT 'monthly'
@@ -401,13 +401,15 @@ ALTER TABLE profiles
 
 ### 9.2 实施步骤
 
-1. **Phase 1**: 更新 `lib/constants/credits.ts` 数据结构
-2. **Phase 2**: 更新数据库 Schema
-3. **Phase 3**: 创建 Stripe 产品/价格
-4. **Phase 4**: 更新定价页面 UI
-5. **Phase 5**: 更新积分消费逻辑 (ULTRA 25积分/份)
-6. **Phase 6**: 实现速度分层队列
-7. **Phase 7**: 测试 & 上线
+1. **Phase 1**: ✅ 更新 `lib/constants/credits.ts` 数据结构
+2. **Phase 2**: ✅ 更新数据库 Schema (`annual` → `ultra`, 移除 `enterprise`)
+3. **Phase 3**: ✅ 更新 `Paywall.tsx` 组件 (`isAnnual` → `isUltra`)
+4. **Phase 4**: ✅ 更新 `lib/i18n.tsx` 多语言 (移除重复键)
+5. **Phase 5**: 🔲 创建 Stripe 产品/价格
+6. **Phase 6**: 🔲 更新定价页面 UI
+7. **Phase 7**: 🔲 更新积分消费逻辑 (ULTRA 25积分/份)
+8. **Phase 8**: 🔲 实现速度分层队列
+9. **Phase 9**: 🔲 测试 & 上线
 
 ---
 
@@ -504,7 +506,8 @@ Qiltrack:      FREE      PRO($15)    ULTRA($45)      │
 | v1.0 | 2025-11 | 初始定价 (Free/Pro) |
 | v2.0 | 2025-11 | 添加 Annual |
 | v3.0 | 2025-12 | 草案 (混乱) |
-| **v4.0** | **2025-12-06** | **完整重构 (本文档)** |
+| v4.0 | 2025-12-06 | 完整重构，三档定价 |
+| **v5.0** | **2025-12-07** | **实施: annual→ultra, 移除enterprise** |
 
 ---
 

@@ -5,7 +5,7 @@ import { useMembershipTier, type MembershipTier } from "@/hooks/useMembershipTie
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 interface PaywallProps {
-  requiredTier: "pro" | "annual";
+  requiredTier: "pro" | "ultra";
   feature: string;
   description?: string;
   children: React.ReactNode;
@@ -36,8 +36,8 @@ export function Paywall({ requiredTier, feature, description, children }: Paywal
 
   // 检查权限
   const hasAccess =
-    (requiredTier === "pro" && (membership.isPro || membership.isAnnual) && membership.isActive) ||
-    (requiredTier === "annual" && membership.isAnnual && membership.isActive);
+    (requiredTier === "pro" && (membership.isPro || membership.isUltra) && membership.isActive) ||
+    (requiredTier === "ultra" && membership.isUltra && membership.isActive);
 
   // 有权限：直接显示内容
   if (hasAccess) {
@@ -75,7 +75,7 @@ export function Paywall({ requiredTier, feature, description, children }: Paywal
 
           {/* 描述 */}
           <p className="text-sm text-subtle mb-6">
-            {description || `此功能仅限${requiredTier === "pro" ? "Pro 会员" : "Premium 年费会员"}使用`}
+            {description || `此功能仅限${requiredTier === "pro" ? "Pro 会员" : "Ultra 会员"}使用`}
           </p>
 
           {/* 会员等级说明 */}
@@ -83,7 +83,7 @@ export function Paywall({ requiredTier, feature, description, children }: Paywal
             <div className="flex items-center justify-between text-sm">
               <span className="text-dim">需要会员等级:</span>
               <span className="font-semibold text-amber-300">
-                {requiredTier === "pro" ? "Pro 会员" : "Premium 年费会员"}
+                {requiredTier === "pro" ? "Pro 会员" : "Ultra 会员"}
               </span>
             </div>
           </div>
@@ -123,7 +123,7 @@ export function Paywall({ requiredTier, feature, description, children }: Paywal
 
 // 简化版Paywall：用于按钮禁用
 interface PaywallButtonProps {
-  requiredTier: "pro" | "annual";
+  requiredTier: "pro" | "ultra";
   feature: string;
   onClick?: () => void;
   children: React.ReactNode;
@@ -136,8 +136,8 @@ export function PaywallButton({ requiredTier, feature, onClick, children, classN
   const { isAuthenticated } = useSupabaseAuth();
 
   const hasAccess =
-    (requiredTier === "pro" && (membership.isPro || membership.isAnnual) && membership.isActive) ||
-    (requiredTier === "annual" && membership.isAnnual && membership.isActive);
+    (requiredTier === "pro" && (membership.isPro || membership.isUltra) && membership.isActive) ||
+    (requiredTier === "ultra" && membership.isUltra && membership.isActive);
 
   if (hasAccess) {
     return (
@@ -157,7 +157,7 @@ export function PaywallButton({ requiredTier, feature, onClick, children, classN
         }
       }}
       className={`${className} relative group`}
-      title={`此功能需要${requiredTier === "pro" ? "Pro" : "Premium"}会员`}
+      title={`此功能需要${requiredTier === "pro" ? "Pro" : "Ultra"}会员`}
     >
       {children}
       <svg

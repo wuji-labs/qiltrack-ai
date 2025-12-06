@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { LANGUAGE_LABEL, LANGUAGE_ORDER, type Language } from "@/lib/i18n-config";
+import { LogoIcon } from "@/app/components/Logo";
 
 type NavItem = { label: string; href: string };
 
@@ -104,20 +105,11 @@ export function HeroSection({
     <section className="w-full overflow-x-hidden">
       <div className={`fixed top-3 left-1/2 -translate-x-1/2 z-50 ${navContainer}`}>
         <nav className="flex flex-nowrap items-center gap-2 sm:gap-4 rounded-2xl border border-[var(--stroke-soft)]/80 bg-[var(--bg-frosted)]/85 px-3 sm:px-10 py-3 sm:py-5 min-h-[72px] backdrop-blur-xl shadow-[0_14px_38px_rgba(0,0,0,0.35)] transition-all duration-300 min-w-0">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink-0">
-            <div className="h-9 sm:h-11 w-9 sm:w-11 rounded-2xl bg-[var(--accent-emerald)] flex items-center justify-center text-[10px] sm:text-[12px] font-black tracking-[0.28em] text-slate-950 shadow-[0_10px_28px_rgba(91,224,176,0.35)] flex-shrink-0">
-              IA
-            </div>
-            <div className="flex flex-col leading-tight min-w-0">
-              <span className="text-sm sm:text-lg font-semibold tracking-[0.1em] uppercase text-dim truncate">
-                {t("brand.title")}
-              </span>
-              {t("brand.subtitle") ? (
-                <span className="text-xs sm:text-sm text-subtle tracking-[0.12em] uppercase truncate">
-                  {t("brand.subtitle")}
-                </span>
-              ) : null}
-            </div>
+          <div className="flex items-center gap-2.5 min-w-0 shrink-0">
+            <LogoIcon size={32} className="flex-shrink-0" />
+            <span className="text-base font-medium tracking-tight text-[var(--color-foreground)]">
+              Qiltrack
+            </span>
           </div>
 
           <div className="hidden xl:flex flex-1 min-w-0 items-center justify-center gap-4 xl:gap-5 2xl:gap-6 text-xs 2xl:text-sm font-semibold uppercase tracking-[0.14em] text-dim whitespace-nowrap">

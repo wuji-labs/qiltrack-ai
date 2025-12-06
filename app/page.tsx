@@ -17,6 +17,7 @@ import { fetchCredits } from "@/lib/services/api";
 import type { ReportTone } from "@/types/report";
 import { getFeaturedReports } from "@/lib/content/reportHub";
 import { DailyRewardButton } from "@/app/components/DailyRewardButton";
+import { PricingCards } from "@/app/components/PricingCards";
 
 type TranslationKey = string;
 
@@ -45,66 +46,6 @@ const heroHighlightKeys: ReadonlyArray<{ title: TranslationKey; description: Tra
   { title: "hero.highlight1.title", description: "hero.highlight1.description" },
   { title: "hero.highlight2.title", description: "hero.highlight2.description" },
   { title: "hero.highlight3.title", description: "hero.highlight3.description" },
-];
-
-type PricingPlanKey = {
-  tier: "free" | "pro" | "ultra";
-  name: TranslationKey;
-  badge: TranslationKey;
-  price: TranslationKey;
-  tagline: TranslationKey;
-  features: TranslationKey[];
-  cta: TranslationKey;
-  highlight?: boolean;
-  secondary?: boolean;
-};
-
-const pricingPlans: PricingPlanKey[] = [
-  {
-    tier: "free",
-    name: "pricing.plan.free.name",
-    badge: "pricing.plan.free.badge",
-    price: "pricing.plan.free.price",
-    tagline: "pricing.plan.free.tagline",
-    features: [
-      "pricing.plan.free.feature1",
-      "pricing.plan.free.feature2",
-      "pricing.plan.free.feature3",
-      "pricing.plan.free.feature4",
-      "pricing.plan.free.feature5",
-    ],
-    cta: "pricing.plan.free.cta",
-  },
-  {
-    tier: "pro",
-    name: "pricing.plan.pro.name",
-    badge: "pricing.plan.pro.badge",
-    price: "pricing.plan.pro.price",
-    tagline: "pricing.plan.pro.caption",
-    features: [
-      "pricing.plan.pro.feature1",
-      "pricing.plan.pro.feature2",
-      "pricing.plan.pro.feature3",
-      "pricing.plan.pro.feature4",
-    ],
-    cta: "pricing.plan.pro.cta",
-    highlight: true,
-  },
-  {
-    tier: "ultra",
-    name: "pricing.plan.ultra.name",
-    badge: "pricing.plan.ultra.badge",
-    price: "pricing.plan.ultra.price",
-    tagline: "pricing.plan.ultra.caption",
-    features: [
-      "pricing.plan.ultra.feature1",
-      "pricing.plan.ultra.feature2",
-      "pricing.plan.ultra.feature3",
-      "pricing.plan.ultra.feature4",
-    ],
-    cta: "pricing.plan.ultra.cta",
-    secondary: true,
-  },
 ];
 
 const faqItems: { question: TranslationKey; answer: TranslationKey }[] = [
@@ -305,17 +246,6 @@ export default function Home() {
     title: t(step.title),
     detail: t(step.detail),
   }));
-  const pricingList = pricingPlans.map((plan) => ({
-    tier: plan.tier,
-    name: t(plan.name),
-    badge: t(plan.badge),
-    price: t(plan.price),
-    tagline: t(plan.tagline),
-    features: plan.features.map((key) => t(key)),
-    cta: t(plan.cta),
-    highlight: plan.highlight,
-    secondary: plan.secondary,
-  }));
   const faqList = faqItems.map((item) => ({ question: t(item.question), answer: t(item.answer) }));
   const highlightFallback = highlightFallbackKeys.map((key) => t(key));
 
@@ -353,17 +283,6 @@ export default function Home() {
       return;
     }
     handleSmoothScroll("#generator");
-  };
-
-  // TODO: Implement subscription handlers when Stripe checkout is ready
-  const handleSubscribePro = () => {
-    // 跳转到定价页面
-    router.push("/pricing");
-  };
-
-  const handleSubscribeUltra = () => {
-    // 跳转到定价页面
-    router.push("/pricing");
   };
 
   return (
@@ -666,19 +585,17 @@ export default function Home() {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div className="space-y-1.5">
                       <p className="text-sm uppercase tracking-[0.28em] text-emerald-300">
-                        Pricing
+                        {t("nav.pricing")}
                       </p>
                       <h2 className="text-2xl sm:text-3xl font-semibold">{t("pricing.title")}</h2>
                       <p className={`text-base ${subtleText}`}>{t("pricing.caption")}</p>
                     </div>
                     <div className="flex flex-col gap-2 text-sm text-subtle sm:text-right">
-                      <p>{t("pricing.note1")}</p>
-                      <p>{t("pricing.note2")}</p>
                       <Link
                         href="/pricing"
                         className="inline-flex items-center gap-1 text-emerald-300 hover:text-emerald-200 transition-colors"
                       >
-                        <span>查看完整定价详情</span>
+                        <span>{t("pricing.viewDetails")}</span>
                         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <path d="M4 2L8 6L4 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
@@ -686,109 +603,8 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="grid gap-5 grid-cols-1 lg:grid-cols-3 lg:items-stretch">
-                    {pricingList.map((plan) => {
-                      const handleClick = () => {
-                        if (plan.tier === "free") return handlePrimaryCta();
-                        if (plan.tier === "pro") return handleSubscribePro();
-                        if (plan.tier === "ultra") return handleSubscribeUltra();
-                        return handlePrimaryCta();
-                      };
-
-                      return (
-                        <article
-                          key={plan.name}
-                          className={`rounded-3xl border p-6 sm:p-7 space-y-5 transition-all duration-200 ease-out flex flex-col h-full ${
-                            plan.highlight
-                              ? "border-[var(--accent-emerald)]/50 bg-[var(--bg-layer)]/85 bg-gradient-to-br from-emerald-500/8 via-emerald-400/4 to-cyan-400/6 shadow-[0_20px_50px_rgba(16,185,129,0.25)] hover:shadow-[0_20px_50px_rgba(16,185,129,0.32)] hover:-translate-y-1"
-                              : "border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 hover:border-[var(--stroke-glow)]/50 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.25)]"
-                          }`}
-                        >
-                          {/* Unified badge style */}
-                          {(plan.highlight || plan.secondary) && (
-                            <div>
-                              <span
-                                className={`inline-block text-xs uppercase tracking-[0.24em] px-3 py-1 rounded-full ${
-                                  plan.highlight
-                                    ? "bg-emerald-400/20 text-emerald-200 border border-emerald-400/40"
-                                    : "bg-blue-400/20 text-blue-200 border border-blue-400/40"
-                                }`}
-                              >
-                                {plan.badge}
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Free plan badge text-only */}
-                          {!plan.highlight && !plan.secondary && (
-                            <p className="text-xs uppercase tracking-[0.24em] text-emerald-200">
-                              {plan.badge}
-                            </p>
-                          )}
-
-                          <div>
-                            <h3 className="text-xl sm:text-2xl font-semibold text-[var(--color-foreground)] mb-2">
-                              {plan.name}
-                            </h3>
-                            <p
-                              className={`text-3xl sm:text-4xl font-bold ${
-                                plan.highlight
-                                  ? "text-[var(--accent-emerald)]"
-                                  : plan.secondary
-                                    ? "text-[var(--accent-blue)]"
-                                    : "text-emerald-300"
-                              }`}
-                            >
-                              {plan.price}
-                            </p>
-                          </div>
-
-                          <p className={`text-sm leading-relaxed ${subtleText}`}>{plan.tagline}</p>
-
-                          <ul className="space-y-2 text-base leading-relaxed text-dim flex-1">
-                            {plan.features.map((feature) => (
-                              <li key={feature} className="flex items-start gap-2">
-                                <span
-                                  className={`flex-shrink-0 mt-0.5 ${
-                                    plan.highlight
-                                      ? "text-emerald-300"
-                                      : plan.secondary
-                                        ? "text-[var(--accent-blue)]"
-                                        : "text-emerald-300"
-                                  }`}
-                                  style={{ fontSize: "0.6em" }}
-                                >
-                                  ●
-                                </span>
-                                <span>{feature}</span>
-                              </li>
-                            ))}
-                          </ul>
-
-                          <button
-                            type="button"
-                            className={`mt-auto w-full rounded-full py-3 text-base font-semibold transition-all duration-200 ease-out ${
-                              plan.highlight
-                                ? "bg-emerald-400 text-slate-900 hover:bg-emerald-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.3)] active:translate-y-0.5"
-                                : plan.secondary
-                                  ? "border border-[var(--accent-blue)] text-[var(--accent-blue)] hover:bg-[var(--accent-blue)]/10 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.3)] active:translate-y-0.5"
-                                  : "bg-emerald-400 text-slate-900 hover:bg-emerald-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.3)] active:translate-y-0.5"
-                            }`}
-                            onClick={handleClick}
-                          >
-                            {plan.cta}
-                          </button>
-
-                          {/* Ultra plan note */}
-                          {plan.tier === "ultra" && (
-                            <p className="text-sm text-center text-subtle">
-                              {t("pricing.plan.ultra.note")}
-                            </p>
-                          )}
-                        </article>
-                      );
-                    })}
-                  </div>
+                  {/* Pricing Cards Component */}
+                  <PricingCards />
                 </section>
 
                 <WhySection
