@@ -116,9 +116,25 @@ export async function generateReport(params: FetchReportParams): Promise<ReportR
     search.set("testToken", testToken);
   }
 
-  const res = await fetch(`/api/report?${search.toString()}`);
-  const body = await handleJson<any>(res, "Failed to generate report");
-  return (body as { data?: ReportResponse }).data ?? (body as ReportResponse);
+  // Use AbortController with 3 minute timeout for report generation
+  // LLM generation can take 1-2 minutes for detailed reports
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 180000); // 3 minutes
+
+  try {
+    const res = await fetch(`/api/report?${search.toString()}`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    const body = await handleJson<any>(res, "Failed to generate report");
+    return (body as { data?: ReportResponse }).data ?? (body as ReportResponse);
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('报告生成超时，请稍后重试');
+    }
+    throw error;
+  }
 }
 
 export async function fetchQuote(symbol: string): Promise<QuoteResponse> {
