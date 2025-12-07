@@ -85,8 +85,8 @@ export default function PricingClient() {
 
     try {
       setLoadingPlan(plan);
-      const planData = plans[plan][billingCycle];
-      if (!planData.checkoutUrl) {
+      const planData = plans[plan]?.[billingCycle] as Plan | undefined;
+      if (!planData?.checkoutUrl) {
         // 预留后端发起结账的入口
         router.push(`/login?redirect=/pricing&plan=${plan}&billingCycle=${billingCycle}`);
         return;
