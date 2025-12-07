@@ -52,6 +52,33 @@ function getAuthRedirectBase(): string {
 
 const AUTH_CALLBACK_PATH = "/api/auth/callback";
 
+/**
+ * Check auth rate limit before sending emails
+ * Returns success:true if within limits, otherwise returns rate limit error
+ */
+async function checkAuthRateLimit(): Promise<AuthResult> {
+  try {
+    const response = await fetch("/api/auth/check-rate-limit", {
+      method: "POST",
+    });
+
+    if (response.status === 429) {
+      const data = await response.json();
+      return {
+        success: false,
+        error: data.error || "请求过于频繁，请稍后再试",
+        code: "cooldown",
+      };
+    }
+
+    return { success: true };
+  } catch {
+    // If rate limit check fails, allow the request (fail open)
+    // Supabase still has its own rate limiting as backup
+    return { success: true };
+  }
+}
+
 function mapAuthError(error: unknown): AuthResult {
   if (!error) return { success: false };
   if (typeof error === "object" && error !== null && "message" in error) {
@@ -289,6 +316,12 @@ export function useSupabaseAuth() {
         return { success: false, code: "invalid_email" };
       }
 
+      // Check rate limit before sending email
+      const rateLimitResult = await checkAuthRateLimit();
+      if (!rateLimitResult.success) {
+        return rateLimitResult;
+      }
+
       try {
         const { error } = await supabase.auth.signInWithOtp({
           email: trimmedEmail,
@@ -349,6 +382,12 @@ export function useSupabaseAuth() {
         return { success: false, code: "invalid_email" };
       }
 
+      // Check rate limit before sending confirmation email
+      const rateLimitResult = await checkAuthRateLimit();
+      if (!rateLimitResult.success) {
+        return rateLimitResult;
+      }
+
       try {
         const { error } = await supabase.auth.signUp({
           email: trimmedEmail,
@@ -381,6 +420,12 @@ export function useSupabaseAuth() {
       const trimmedEmail = email.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
         return { success: false, code: "invalid_email" };
+      }
+
+      // Check rate limit before sending reset email
+      const rateLimitResult = await checkAuthRateLimit();
+      if (!rateLimitResult.success) {
+        return rateLimitResult;
       }
 
       try {

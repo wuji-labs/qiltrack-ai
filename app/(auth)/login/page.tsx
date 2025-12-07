@@ -62,9 +62,22 @@ function LoginContent() {
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      router.replace("/");
+      const redirect = searchParams.get("redirect") || "/";
+      // 保留其他参数（如 plan, billingCycle）以便重定向后恢复状态
+      const plan = searchParams.get("plan");
+      const billingCycle = searchParams.get("billingCycle");
+
+      let targetUrl = redirect;
+      if (plan || billingCycle) {
+        const params = new URLSearchParams();
+        if (plan) params.set("plan", plan);
+        if (billingCycle) params.set("billingCycle", billingCycle);
+        targetUrl = `${redirect}?${params.toString()}`;
+      }
+
+      router.replace(targetUrl);
     }
-  }, [isAuthenticated, loading, router]);
+  }, [isAuthenticated, loading, router, searchParams]);
 
   useEffect(() => {
     if (emailStatus === "sent" || emailStatus === "cooldown") {

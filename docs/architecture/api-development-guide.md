@@ -1,6 +1,6 @@
 # API 开发指南
 
-> **最后更新**: 2025-12-01
+> **最后更新**: 2025-12-07
 > **API 版本**: v2.0
 
 ---
@@ -12,8 +12,9 @@
 3. [创建新 API](#创建新-api)
 4. [错误处理](#错误处理)
 5. [认证和授权](#认证和授权)
-6. [测试](#测试)
-7. [最佳实践](#最佳实践)
+6. [Rate Limit (请求限流)](#rate-limit-请求限流)
+7. [测试](#测试)
+8. [最佳实践](#最佳实践)
 
 ---
 
@@ -255,6 +256,94 @@ async function checkAdmin(userId: string) {
   }
 }
 ```
+
+---
+
+## Rate Limit (请求限流)
+
+项目使用 **Upstash Redis** + `@upstash/ratelimit` 实现请求限流，防止滥用和攻击。
+
+### 配置文件
+
+限流器定义在 `lib/api/rate-limit.ts`：
+
+```typescript
+import {
+  authRateLimit,
+  reportGenerationRateLimit,
+  globalRateLimit,
+  checkRateLimit,
+  getIpAddress,
+} from "@/lib/api/rate-limit";
+```
+
+### 已定义的限流器
+
+| 限流器 | 限制 | 标识符 | 用途 |
+|--------|------|--------|------|
+| `authRateLimit` | 5 次/分钟 | IP 地址 | 认证操作（登录、注册、发送验证邮件） |
+| `reportGenerationRateLimit` | 5 次/分钟 | 用户 ID | 报告生成 |
+| `globalRateLimit` | 20 次/秒 | IP 地址 | 全局 API 保护 |
+
+### 在 API 中使用
+
+```typescript
+import { NextResponse } from "next/server";
+import {
+  authRateLimit,
+  checkRateLimit,
+  getIpAddress,
+} from "@/lib/api/rate-limit";
+
+export async function POST(request: Request) {
+  // 获取客户端 IP
+  const ip = getIpAddress(request);
+
+  // 检查限流
+  const result = await checkRateLimit(ip, authRateLimit);
+
+  if (!result.success) {
+    return NextResponse.json(
+      {
+        error: "请求过于频繁，请稍后再试",
+        code: "rate_limited",
+        retryAfter: Math.ceil((result.reset - Date.now()) / 1000),
+      },
+      {
+        status: 429,
+        headers: result.headers, // 包含 X-RateLimit-* headers
+      }
+    );
+  }
+
+  // 正常处理请求...
+}
+```
+
+### 认证流程限流
+
+所有会触发邮件发送的认证操作已集成 Rate Limit：
+
+- Magic Link 登录 (`signInWithEmail`)
+- 邮箱密码注册 (`signUpWithPassword`)
+- 密码重置 (`resetPassword`)
+
+前端会在调用 Supabase 之前先检查 `/api/auth/check-rate-limit`，确保：
+
+1. **同一 IP 每分钟最多 5 次认证请求**（不管请求的邮箱是什么）
+2. 防止攻击者批量发送验证邮件到不同邮箱
+
+### 环境变量
+
+```bash
+# .env.local
+UPSTASH_REDIS_REST_URL=https://xxx.upstash.io
+UPSTASH_REDIS_REST_TOKEN=xxx
+```
+
+### 降级策略
+
+如果 Redis 不可用，限流器会 **fail open**（允许所有请求通过），但会在日志中打印警告。这是有意设计，避免 Redis 故障导致服务完全不可用。
 
 ---
 

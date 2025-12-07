@@ -173,7 +173,7 @@ function PricingCard({
   const getButtonText = () => {
     if (loading) return "处理中...";
     if (plan.isFree) return isAuthenticated ? "前往账户" : "免费注册";
-    return isAuthenticated ? "登录后订阅" : "登录后订阅";
+    return isAuthenticated ? `订阅 ${plan.name}` : "登录后订阅";
   };
 
   return (
@@ -329,7 +329,8 @@ export function PricingCards({ className = "" }: { className?: string }) {
   const handleSubscribe = async (plan: PlanKey) => {
     if (plan === "free") {
       if (!isAuthenticated) {
-        router.push("/login");
+        const params = new URLSearchParams({ redirect: '/pricing' });
+        router.push(`/login?${params.toString()}`);
         return;
       }
       router.push("/account");
@@ -337,7 +338,12 @@ export function PricingCards({ className = "" }: { className?: string }) {
     }
 
     if (!isAuthenticated) {
-      router.push("/login");
+      const params = new URLSearchParams({
+        redirect: '/pricing',
+        plan: plan,
+        billingCycle: billingCycle,
+      });
+      router.push(`/login?${params.toString()}`);
       return;
     }
 

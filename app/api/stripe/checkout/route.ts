@@ -7,20 +7,63 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 type PlanKey = "pro" | "ultra";
+type BillingCycle = "monthly" | "annual";
 
-function getPriceId(plan: PlanKey) {
-  const prices: Record<PlanKey, string | undefined> = {
+/**
+ * 获取 Stripe Price ID
+ *
+ * TODO: 当前只支持单一价格，需要在 Stripe Dashboard 创建月付/年付价格后完善
+ *
+ * 需要创建的 Stripe Prices:
+ * - Pro Monthly (recurring/month)
+ * - Pro Annual (recurring/year)
+ * - Ultra Monthly (recurring/month)
+ * - Ultra Annual (recurring/year)
+ *
+ * 然后添加环境变量:
+ * - STRIPE_PRICE_PRO_MONTHLY=price_xxx
+ * - STRIPE_PRICE_PRO_ANNUAL=price_xxx
+ * - STRIPE_PRICE_ULTRA_MONTHLY=price_xxx
+ * - STRIPE_PRICE_ULTRA_ANNUAL=price_xxx
+ */
+function getPriceId(plan: PlanKey, billingCycle: BillingCycle): string {
+  // 优先使用区分月付/年付的 Price ID
+  const detailedPrices: Record<string, string | undefined> = {
+    "pro-monthly": process.env.STRIPE_PRICE_PRO_MONTHLY,
+    "pro-annual": process.env.STRIPE_PRICE_PRO_ANNUAL,
+    "ultra-monthly": process.env.STRIPE_PRICE_ULTRA_MONTHLY,
+    "ultra-annual": process.env.STRIPE_PRICE_ULTRA_ANNUAL,
+  };
+
+  const detailedKey = `${plan}-${billingCycle}`;
+  const detailedPriceId = detailedPrices[detailedKey];
+
+  if (detailedPriceId) {
+    return detailedPriceId;
+  }
+
+  // 回退到旧的单一 Price ID（兼容现有配置）
+  // TODO: 当所有环境变量配置完成后，可以移除此回退逻辑
+  const fallbackPrices: Record<PlanKey, string | undefined> = {
     pro: process.env.STRIPE_PRICE_PRO,
     ultra: process.env.STRIPE_PRICE_ULTRA,
   };
 
-  const priceId = prices[plan];
+  const fallbackPriceId = fallbackPrices[plan];
 
-  if (!priceId) {
-    throw new Error(`Missing Stripe price id for plan: ${plan}`);
+  if (!fallbackPriceId) {
+    throw new Error(
+      `Missing Stripe price id for plan: ${plan}, billingCycle: ${billingCycle}. ` +
+      `Please set STRIPE_PRICE_${plan.toUpperCase()}_${billingCycle.toUpperCase()} or STRIPE_PRICE_${plan.toUpperCase()}`
+    );
   }
 
-  return priceId;
+  console.warn(
+    `[Stripe] Using fallback price for ${plan}. ` +
+    `Consider setting STRIPE_PRICE_${plan.toUpperCase()}_${billingCycle.toUpperCase()} for proper monthly/annual pricing.`
+  );
+
+  return fallbackPriceId;
 }
 
 function getBaseUrl() {
@@ -49,13 +92,20 @@ export async function POST(req: NextRequest) {
     }
 
     const stripe = getStripeClient();
-    const { plan } = (await req.json()) as { plan?: PlanKey };
+    const { plan, billingCycle = "annual" } = (await req.json()) as {
+      plan?: PlanKey;
+      billingCycle?: BillingCycle;
+    };
 
     if (plan !== "pro" && plan !== "ultra") {
       return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
     }
 
-    const priceId = getPriceId(plan);
+    if (billingCycle !== "monthly" && billingCycle !== "annual") {
+      return NextResponse.json({ error: "Invalid billing cycle" }, { status: 400 });
+    }
+
+    const priceId = getPriceId(plan, billingCycle);
     const baseUrl = getBaseUrl();
 
     const checkoutSession = await stripe.checkout.sessions.create({
@@ -68,11 +118,13 @@ export async function POST(req: NextRequest) {
       metadata: {
         user_id: user.id,
         plan,
+        billingCycle,
       },
       subscription_data: {
         metadata: {
           user_id: user.id,
           plan,
+          billingCycle,
         },
       },
     });

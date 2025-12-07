@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useMembershipTier } from "@/hooks/useMembershipTier";
@@ -18,6 +18,8 @@ type Preferences = {
 
 export default function AccountPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const paymentSuccess = searchParams.get('success') === 'true';
   const { isAuthenticated, user, authMethod, oauthProviders, getReportCredits, signOut } =
     useSupabaseAuth();
   const membership = useMembershipTier();
@@ -33,6 +35,18 @@ export default function AccountPage() {
     credits_available: number;
     credits_used: number;
   } | null>(null);
+  const [showSuccessBanner, setShowSuccessBanner] = useState(paymentSuccess);
+
+  // 清除 URL 中的 success 参数，避免刷新时重复显示
+  useEffect(() => {
+    if (paymentSuccess) {
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, "", newUrl);
+      // 5秒后自动隐藏成功提示
+      const timer = setTimeout(() => setShowSuccessBanner(false), 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [paymentSuccess]);
 
   const PREF_KEY = "ia-account-preferences";
 
@@ -131,6 +145,29 @@ export default function AccountPage() {
         </div>
 
         <div className="rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-6 shadow-[0_18px_60px_rgba(0,0,0,0.35)] space-y-6">
+          {/* 支付成功提示 */}
+          {showSuccessBanner && (
+            <div className="rounded-2xl border border-emerald-500/50 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>
+                  <strong>订阅成功！</strong> 您的会员已激活，积分已到账。感谢您的支持！
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSuccessBanner(false)}
+                className="text-emerald-300 hover:text-emerald-100 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+
           <div className="flex items-center gap-4">
             <span className="h-12 w-12 rounded-full bg-[var(--accent-emerald)]/20 border border-[var(--stroke-soft)] overflow-hidden flex items-center justify-center text-base font-semibold text-[var(--accent-emerald)]">
               {avatarInitial}

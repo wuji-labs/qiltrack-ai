@@ -63,6 +63,26 @@ export const globalRateLimit = redis
   : null;
 
 /**
+ * Authentication Rate Limiter
+ * - Limit: 5 requests per minute per IP
+ * - Sliding window algorithm
+ * - Identifier: IP address
+ *
+ * Protects against:
+ * - Email bombing (sending verification emails to random addresses)
+ * - Brute force login attempts
+ * - Registration spam
+ */
+export const authRateLimit = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(5, '1 m'),
+      analytics: true,
+      prefix: 'ratelimit:auth',
+    })
+  : null;
+
+/**
  * Rate limit response interface
  */
 export interface RateLimitResult {

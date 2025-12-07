@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { plans, BillingToggle, type PlanKey, type BillingCycle, type Plan } from "@/app/components/PricingCards";
 
@@ -48,15 +48,38 @@ const comparisonFeatures = [
 
 export default function PricingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isAuthenticated } = useSupabaseAuth();
   const [loadingPlan, setLoadingPlan] = useState<PlanKey | null>(null);
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("annual"); // 默认年付
+
+  // 从 URL 参数恢复状态（登录后重定向回来时）
+  useEffect(() => {
+    const planParam = searchParams.get("plan") as PlanKey | null;
+    const billingParam = searchParams.get("billingCycle") as BillingCycle | null;
+
+    if (billingParam && (billingParam === "monthly" || billingParam === "annual")) {
+      setBillingCycle(billingParam);
+    }
+
+    // 如果用户已登录且有待处理的套餐，自动触发订阅
+    if (isAuthenticated && planParam && (planParam === "pro" || planParam === "ultra")) {
+      // 清除 URL 参数以避免重复触发
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, "", newUrl);
+      // 自动触发订阅流程
+      handleSubscribe(planParam);
+    }
+  }, [isAuthenticated, searchParams]);
 
   const handleSubscribe = async (plan: PlanKey) => {
     // For free plan, just redirect to account page
     if (plan === "free") {
       if (!isAuthenticated) {
-        router.push("/login");
+        const params = new URLSearchParams({
+          redirect: '/pricing',
+        });
+        router.push(`/login?${params.toString()}`);
         return;
       }
       router.push("/account");
@@ -65,7 +88,12 @@ export default function PricingPage() {
 
     // Require login first
     if (!isAuthenticated) {
-      router.push("/login");
+      const params = new URLSearchParams({
+        redirect: '/pricing',
+        plan: plan,
+        billingCycle: billingCycle,
+      });
+      router.push(`/login?${params.toString()}`);
       return;
     }
 
