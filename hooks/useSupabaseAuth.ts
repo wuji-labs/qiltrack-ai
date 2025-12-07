@@ -28,14 +28,16 @@ type AuthResult =
       success: false;
       error?: string;
       status?: number;
-      code?:
-        | "cooldown"
-        | "invalid_email"
-        | "invalid_credentials"
-        | "user_already_exists"
-        | "turnstile_missing"
-        | "turnstile_failed";
+      code?: AuthErrorCode;
     };
+
+type AuthErrorCode =
+  | "cooldown"
+  | "invalid_email"
+  | "invalid_credentials"
+  | "user_already_exists"
+  | "turnstile_missing"
+  | "turnstile_failed";
 
 /**
  * Get the base URL for auth redirects
@@ -85,7 +87,7 @@ async function verifyTurnstileToken(turnstileToken?: string): Promise<AuthResult
     return {
       success: false,
       status: response.status,
-      code: (data?.code as AuthResult["code"]) || "turnstile_failed",
+      code: (data?.code as AuthErrorCode | undefined) || "turnstile_failed",
       error: data?.error || "Turnstile verification failed",
     };
   } catch {
