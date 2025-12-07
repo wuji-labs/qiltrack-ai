@@ -16,6 +16,11 @@ const links = [
     description: "了解允许与禁止的使用方式、配额要求以及违规处置流程。",
     href: "/legal/acceptable-use",
   },
+  {
+    title: "退款政策",
+    description: "了解订阅取消、退款条件、流程及积分有效期等相关规定。",
+    href: "/legal/refund",
+  },
 ];
 
 const notices = [
@@ -38,7 +43,7 @@ export default function LegalPage() {
           <p className="mt-2 text-xs text-slate-500">最近更新：2025-11-30</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {links.map((link) => (
             <Link
               key={link.href}

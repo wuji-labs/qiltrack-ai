@@ -106,9 +106,9 @@ export function HeroSection({
       <div className={`fixed top-3 left-1/2 -translate-x-1/2 z-50 ${navContainer}`}>
         <nav className="flex flex-nowrap items-center gap-2 sm:gap-4 rounded-2xl border border-[var(--stroke-soft)]/80 bg-[var(--bg-frosted)]/85 px-3 sm:px-10 py-3 sm:py-5 min-h-[72px] backdrop-blur-xl shadow-[0_14px_38px_rgba(0,0,0,0.35)] transition-all duration-300 min-w-0">
           <div className="flex items-center gap-2.5 min-w-0 shrink-0">
-            <LogoIcon size={32} className="flex-shrink-0" />
-            <span className="text-base font-medium tracking-tight text-[var(--color-foreground)]">
-              Qiltrack
+            <LogoIcon size={28} className="flex-shrink-0" />
+            <span className="text-[17px] font-semibold tracking-[-0.02em] text-[var(--color-foreground)]">
+              Qiltrack AI
             </span>
           </div>
 

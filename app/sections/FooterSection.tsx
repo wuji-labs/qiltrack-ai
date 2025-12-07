@@ -19,12 +19,9 @@ export function FooterSection({ disclaimer, dataSource }: FooterSectionProps) {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
           {/* Logo & Tagline */}
           <div className="flex items-center gap-2.5">
-            <LogoIcon size={28} />
-            <span className="text-sm font-medium tracking-tight text-[var(--color-foreground)]">
-              Qiltrack
-            </span>
-            <span className="hidden sm:block text-xs text-[var(--text-subtle)] border-l border-[var(--stroke-soft)] pl-2.5 ml-0.5">
-              {t("footer.tagline")}
+            <LogoIcon size={24} />
+            <span className="text-[15px] font-semibold tracking-[-0.02em] text-[var(--color-foreground)]">
+              Qiltrack AI
             </span>
           </div>
 
@@ -48,6 +45,18 @@ export function FooterSection({ disclaimer, dataSource }: FooterSectionProps) {
             >
               {t("footer.privacy")}
             </Link>
+            <Link
+              href="/legal/refund"
+              className="text-[var(--text-dim)] hover:text-[var(--accent-emerald)] transition-colors"
+            >
+              退款政策
+            </Link>
+            <a
+              href="mailto:support@qiltrack.com"
+              className="text-[var(--text-dim)] hover:text-[var(--accent-emerald)] transition-colors"
+            >
+              联系客服
+            </a>
           </nav>
 
           {/* Copyright */}
