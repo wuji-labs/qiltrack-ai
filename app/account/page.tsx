@@ -1,5 +1,9 @@
 "use client";
 
+// Disable static prerendering for account page to allow search params & client-only data
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
