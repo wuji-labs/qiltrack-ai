@@ -75,7 +75,7 @@ const translations: Record<string, TranslationEntry> = {
     },
   }),
   "nav.pricing": withChineseVariants({
-    en: "Rates",
+    en: "Pricing",
     ja: "料金プラン",
     ko: "요금",
     zh: {

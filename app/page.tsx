@@ -17,7 +17,6 @@ import { fetchCredits } from "@/lib/services/api";
 import type { ReportTone } from "@/types/report";
 import { getFeaturedReports } from "@/lib/content/reportHub";
 import { DailyRewardButton } from "@/app/components/DailyRewardButton";
-import { PricingCards } from "@/app/components/PricingCards";
 
 type TranslationKey = string;
 
@@ -25,7 +24,7 @@ const navItems = [
   { labelKey: "nav.product", href: "#overview" },
   { labelKey: "nav.generator", href: "#generator" },
   { labelKey: "nav.templates", href: "/reports" },
-  { labelKey: "nav.pricing", href: "#pricing" },
+  { labelKey: "nav.pricing", href: "/pricing" },
   { labelKey: "nav.faq", href: "#faq" },
 ] as const;
 
@@ -576,35 +575,6 @@ export default function Home() {
                       {t("gallery.cta")}
                     </Link>
                   </div>
-                </section>
-
-                <section
-                  id="pricing"
-                  className={`rounded-3xl border p-5 sm:p-7 space-y-6 transition-all duration-200 ease-out ${cardSecondary} overflow-hidden`}
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div className="space-y-1.5">
-                      <p className="text-sm uppercase tracking-[0.28em] text-emerald-300">
-                        {t("nav.pricing")}
-                      </p>
-                      <h2 className="text-2xl sm:text-3xl font-semibold">{t("pricing.title")}</h2>
-                      <p className={`text-base ${subtleText}`}>{t("pricing.caption")}</p>
-                    </div>
-                    <div className="flex flex-col gap-2 text-sm text-subtle sm:text-right">
-                      <Link
-                        href="/pricing"
-                        className="inline-flex items-center gap-1 text-emerald-300 hover:text-emerald-200 transition-colors"
-                      >
-                        <span>{t("pricing.viewDetails")}</span>
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M4 2L8 6L4 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </Link>
-                    </div>
-                  </div>
-
-                  {/* Pricing Cards Component */}
-                  <PricingCards />
                 </section>
 
                 <WhySection
