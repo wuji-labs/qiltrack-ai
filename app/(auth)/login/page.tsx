@@ -3,10 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useMemo, useState, type FormEvent } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 
 import { useLanguage } from "@/lib/i18n";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { Turnstile } from "@/app/components/Turnstile";
+import { isTurnstileEnabled } from "@/lib/turnstile";
 
 type EmailStatus = "idle" | "loading" | "sent" | "error" | "cooldown";
 type AuthView = "signin" | "signup" | "magic-link" | "reset-password";
@@ -42,6 +44,10 @@ function LoginContent() {
   const [password, setPassword] = useState("");
   const [emailStatus, setEmailStatus] = useState<EmailStatus>("idle");
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileError, setTurnstileError] = useState(false);
+  const [turnstileKey, setTurnstileKey] = useState(0);
+  const turnstileEnabled = isTurnstileEnabled();
   const {
     signInWithProvider,
     signInWithEmail,
@@ -62,7 +68,19 @@ function LoginContent() {
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      const redirect = searchParams.get("redirect") || "/";
+      const rawRedirect = searchParams.get("redirect") || "/";
+      // 安全验证：只允许相对路径重定向，防止开放重定向攻击
+      let redirect = "/";
+      try {
+        // 检查是否是绝对URL（可能指向外部站点）
+        const isAbsoluteUrl = /^https?:\/\//i.test(rawRedirect) || rawRedirect.startsWith("//");
+        if (!isAbsoluteUrl && rawRedirect.startsWith("/")) {
+          redirect = rawRedirect;
+        }
+      } catch {
+        redirect = "/";
+      }
+
       // 保留其他参数（如 plan, billingCycle）以便重定向后恢复状态
       const plan = searchParams.get("plan");
       const billingCycle = searchParams.get("billingCycle");
@@ -87,6 +105,72 @@ function LoginContent() {
     return;
   }, [emailStatus]);
 
+  const resetTurnstile = useCallback(() => {
+    setTurnstileToken(null);
+    setTurnstileError(false);
+    setTurnstileKey((key) => key + 1);
+  }, []);
+
+  const ensureTurnstileReady = useCallback(() => {
+    if (!turnstileEnabled) return true;
+    if (turnstileToken) return true;
+    setTurnstileError(true);
+    setMessage({ type: "error", text: t("auth.error.turnstile") });
+    return false;
+  }, [t, turnstileEnabled, turnstileToken]);
+
+  const handleTurnstileSuccess = useCallback((token: string) => {
+    setTurnstileToken(token);
+    setTurnstileError(false);
+    setMessage(null);
+  }, []);
+
+  const handleTurnstileError = useCallback(() => {
+    setTurnstileToken(null);
+    setTurnstileError(true);
+    setMessage({ type: "error", text: t("auth.error.turnstileFail") });
+  }, [t]);
+
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileToken(null);
+    setTurnstileError(true);
+  }, []);
+
+  const renderTurnstile = useCallback(
+    () =>
+      turnstileEnabled ? (
+        <div className="space-y-2">
+          <Turnstile
+            key={`${view}-${turnstileKey}`}
+            onSuccess={handleTurnstileSuccess}
+            onError={handleTurnstileError}
+            onExpire={handleTurnstileExpire}
+            className="flex justify-center"
+            action="auth"
+          />
+          {turnstileError && (
+            <p className="text-xs text-amber-300 text-center">{t("auth.error.turnstile")}</p>
+          )}
+        </div>
+      ) : null,
+    [
+      handleTurnstileError,
+      handleTurnstileExpire,
+      handleTurnstileSuccess,
+      t,
+      turnstileEnabled,
+      turnstileError,
+      turnstileKey,
+      view,
+    ]
+  );
+
+  const handleSwitchView = useCallback(() => {
+    resetTurnstile();
+    setMessage(null);
+    setEmailStatus("idle");
+  }, [resetTurnstile]);
+
   const handleProvider = async () => {
     setMessage(null);
     setPendingGoogle(true);
@@ -105,8 +189,22 @@ function LoginContent() {
     setMessage(null);
     setEmailStatus("loading");
 
-    const result = await signInWithPassword(email, password);
+    if (!ensureTurnstileReady()) {
+      setEmailStatus("error");
+      return;
+    }
+
+    const result = await signInWithPassword(email, password, turnstileToken ?? undefined);
     if (!result.success) {
+      if (result.code === "turnstile_missing" || result.code === "turnstile_failed") {
+        setMessage({
+          type: "error",
+          text: result.code === "turnstile_missing" ? t("auth.error.turnstile") : t("auth.error.turnstileFail"),
+        });
+        resetTurnstile();
+        setEmailStatus("error");
+        return;
+      }
       setEmailStatus("error");
       setMessage({
         type: "error",
@@ -126,14 +224,28 @@ function LoginContent() {
     setMessage(null);
     setEmailStatus("loading");
 
+    if (!ensureTurnstileReady()) {
+      setEmailStatus("error");
+      return;
+    }
+
     if (password.length < 8) {
       setEmailStatus("error");
       setMessage({ type: "error", text: t("auth.error.passwordTooShort") });
       return;
     }
 
-    const result = await signUpWithPassword(email, password);
+    const result = await signUpWithPassword(email, password, turnstileToken ?? undefined);
     if (!result.success) {
+      if (result.code === "turnstile_missing" || result.code === "turnstile_failed") {
+        setMessage({
+          type: "error",
+          text: result.code === "turnstile_missing" ? t("auth.error.turnstile") : t("auth.error.turnstileFail"),
+        });
+        resetTurnstile();
+        setEmailStatus("error");
+        return;
+      }
       setEmailStatus("error");
       setMessage({
         type: "error",
@@ -154,8 +266,22 @@ function LoginContent() {
     setMessage(null);
     setEmailStatus("loading");
 
-    const result = await signInWithEmail(email);
+    if (!ensureTurnstileReady()) {
+      setEmailStatus("error");
+      return;
+    }
+
+    const result = await signInWithEmail(email, turnstileToken ?? undefined);
     if (!result.success) {
+      if (result.code === "turnstile_missing" || result.code === "turnstile_failed") {
+        setMessage({
+          type: "error",
+          text: result.code === "turnstile_missing" ? t("auth.error.turnstile") : t("auth.error.turnstileFail"),
+        });
+        resetTurnstile();
+        setEmailStatus("error");
+        return;
+      }
       if (result.code === "invalid_email") {
         setEmailStatus("error");
         setMessage({ type: "error", text: t("auth.email.invalid") });
@@ -180,8 +306,22 @@ function LoginContent() {
     setMessage(null);
     setEmailStatus("loading");
 
-    const result = await resetPassword(email);
+    if (!ensureTurnstileReady()) {
+      setEmailStatus("error");
+      return;
+    }
+
+    const result = await resetPassword(email, turnstileToken ?? undefined);
     if (!result.success) {
+      if (result.code === "turnstile_missing" || result.code === "turnstile_failed") {
+        setMessage({
+          type: "error",
+          text: result.code === "turnstile_missing" ? t("auth.error.turnstile") : t("auth.error.turnstileFail"),
+        });
+        resetTurnstile();
+        setEmailStatus("error");
+        return;
+      }
       if (result.code === "cooldown") {
         setEmailStatus("cooldown");
         setMessage({ type: "error", text: t("auth.error.rateLimited") });
@@ -204,7 +344,6 @@ function LoginContent() {
   const emailDisabled =
     emailStatus === "loading" || emailStatus === "sent" || emailStatus === "cooldown";
   const localSupabase = isLocalSupabase();
-  const isSignInView = view === "signin" || view === "magic-link" || view === "reset-password";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 flex items-center justify-center px-4 py-10">
@@ -241,6 +380,7 @@ function LoginContent() {
             <div className="flex gap-2 border-b border-slate-800">
               <Link
                 href="/login?view=signin"
+                onClick={handleSwitchView}
                 className={`flex-1 py-3 text-center font-semibold transition-colors relative ${
                   view === "signin" ? "text-emerald-400" : "text-slate-400 hover:text-slate-300"
                 }`}
@@ -252,6 +392,7 @@ function LoginContent() {
               </Link>
               <Link
                 href="/login?view=signup"
+                onClick={handleSwitchView}
                 className={`flex-1 py-3 text-center font-semibold transition-colors relative ${
                   view === "signup" ? "text-emerald-400" : "text-slate-400 hover:text-slate-300"
                 }`}
@@ -294,10 +435,12 @@ function LoginContent() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full rounded-xl border border-slate-800 bg-slate-800/50 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/60 focus:border-emerald-400"
-                  required
-                  autoComplete="current-password"
-                />
-              </div>
+                required
+                autoComplete="current-password"
+              />
+            </div>
+
+              {renderTurnstile()}
 
               <button
                 type="submit"
@@ -312,12 +455,14 @@ function LoginContent() {
               <div className="flex justify-center gap-4 text-sm">
                 <Link
                   href="/login?view=reset-password"
+                  onClick={handleSwitchView}
                   className="text-emerald-400 hover:text-emerald-300 transition-colors"
                 >
                   {t("auth.signin.forgotPassword")}
                 </Link>
                 <Link
                   href="/login?view=magic-link"
+                  onClick={handleSwitchView}
                   className="text-emerald-400 hover:text-emerald-300 transition-colors"
                 >
                   {t("auth.signin.magicLink")}
@@ -366,6 +511,8 @@ function LoginContent() {
                 <p className="text-xs text-slate-500">{t("auth.signup.passwordHint")}</p>
               </div>
 
+              {renderTurnstile()}
+
               <button
                 type="submit"
                 disabled={emailDisabled}
@@ -397,6 +544,8 @@ function LoginContent() {
                 />
               </div>
 
+              {renderTurnstile()}
+
               <button
                 type="submit"
                 disabled={emailDisabled}
@@ -414,6 +563,7 @@ function LoginContent() {
               <div className="text-center">
                 <Link
                   href="/login?view=signin"
+                  onClick={handleSwitchView}
                   className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
                 >
                   {t("auth.magicLink.backToPassword")}
@@ -457,6 +607,8 @@ function LoginContent() {
                 />
               </div>
 
+              {renderTurnstile()}
+
               <button
                 type="submit"
                 disabled={emailDisabled}
@@ -474,6 +626,7 @@ function LoginContent() {
               <div className="text-center">
                 <Link
                   href="/login?view=signin"
+                  onClick={handleSwitchView}
                   className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
                 >
                   {t("auth.resetPassword.backToSignin")}

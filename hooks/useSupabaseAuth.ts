@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { isTurnstileEnabled } from "@/lib/turnstile";
 import type { Session, User } from "@supabase/supabase-js";
-import type { Database } from "@/types/database";
 
 /**
  * Authentication method types
@@ -28,7 +28,13 @@ type AuthResult =
       success: false;
       error?: string;
       status?: number;
-      code?: "cooldown" | "invalid_email" | "invalid_credentials" | "user_already_exists";
+      code?:
+        | "cooldown"
+        | "invalid_email"
+        | "invalid_credentials"
+        | "user_already_exists"
+        | "turnstile_missing"
+        | "turnstile_failed";
     };
 
 /**
@@ -51,6 +57,41 @@ function getAuthRedirectBase(): string {
 }
 
 const AUTH_CALLBACK_PATH = "/api/auth/callback";
+
+async function verifyTurnstileToken(turnstileToken?: string): Promise<AuthResult> {
+  if (!isTurnstileEnabled()) return { success: true };
+
+  if (!turnstileToken) {
+    return { success: false, code: "turnstile_missing", error: "Turnstile token required" };
+  }
+
+  try {
+    const response = await fetch("/api/auth/verify-turnstile", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ token: turnstileToken }),
+    });
+
+    if (response.ok) {
+      return { success: true };
+    }
+
+    const data = (await response.json().catch(() => null)) as
+      | { code?: string; error?: string }
+      | null;
+
+    return {
+      success: false,
+      status: response.status,
+      code: (data?.code as AuthResult["code"]) || "turnstile_failed",
+      error: data?.error || "Turnstile verification failed",
+    };
+  } catch {
+    return { success: false, code: "turnstile_failed", error: "Turnstile verification failed" };
+  }
+}
 
 /**
  * Check auth rate limit before sending emails
@@ -309,11 +350,16 @@ export function useSupabaseAuth() {
   }, [user, supabase]);
 
   const signInWithEmail = useCallback(
-    async (email: string): Promise<AuthResult> => {
+    async (email: string, turnstileToken?: string): Promise<AuthResult> => {
       if (!supabase) return { success: false, error: "Supabase not configured" };
       const trimmedEmail = email.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
         return { success: false, code: "invalid_email" };
+      }
+
+      const turnstileResult = await verifyTurnstileToken(turnstileToken);
+      if (!turnstileResult.success) {
+        return turnstileResult;
       }
 
       // Check rate limit before sending email
@@ -344,11 +390,16 @@ export function useSupabaseAuth() {
   );
 
   const signInWithPassword = useCallback(
-    async (email: string, password: string): Promise<AuthResult> => {
+    async (email: string, password: string, turnstileToken?: string): Promise<AuthResult> => {
       if (!supabase) return { success: false, error: "Supabase not configured" };
       const trimmedEmail = email.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
         return { success: false, code: "invalid_email" };
+      }
+
+      const turnstileResult = await verifyTurnstileToken(turnstileToken);
+      if (!turnstileResult.success) {
+        return turnstileResult;
       }
 
       try {
@@ -375,11 +426,16 @@ export function useSupabaseAuth() {
   );
 
   const signUpWithPassword = useCallback(
-    async (email: string, password: string): Promise<AuthResult> => {
+    async (email: string, password: string, turnstileToken?: string): Promise<AuthResult> => {
       if (!supabase) return { success: false, error: "Supabase not configured" };
       const trimmedEmail = email.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
         return { success: false, code: "invalid_email" };
+      }
+
+      const turnstileResult = await verifyTurnstileToken(turnstileToken);
+      if (!turnstileResult.success) {
+        return turnstileResult;
       }
 
       // Check rate limit before sending confirmation email
@@ -415,11 +471,16 @@ export function useSupabaseAuth() {
   );
 
   const resetPassword = useCallback(
-    async (email: string): Promise<AuthResult> => {
+    async (email: string, turnstileToken?: string): Promise<AuthResult> => {
       if (!supabase) return { success: false, error: "Supabase not configured" };
       const trimmedEmail = email.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
         return { success: false, code: "invalid_email" };
+      }
+
+      const turnstileResult = await verifyTurnstileToken(turnstileToken);
+      if (!turnstileResult.success) {
+        return turnstileResult;
       }
 
       // Check rate limit before sending reset email

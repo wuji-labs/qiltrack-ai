@@ -2242,6 +2242,24 @@ const translations: Record<string, TranslationEntry> = {
     "zh-Hant": "此操作每 60 秒僅能執行一次，請稍後再試。",
     "zh-Hans": "此操作每 60 秒只能执行一次，请稍后再试。",
   },
+  "auth.error.turnstile": withChineseVariants({
+    en: "Please complete verification to continue.",
+    ja: "続行するには認証を完了してください。",
+    ko: "계속하려면 인증을 완료하세요.",
+    zh: {
+      hant: "請完成驗證後再試。",
+      hans: "请先完成验证。",
+    },
+  }),
+  "auth.error.turnstileFail": withChineseVariants({
+    en: "Verification failed. Please retry.",
+    ja: "認証に失敗しました。もう一度お試しください。",
+    ko: "인증에 실패했습니다. 다시 시도해주세요.",
+    zh: {
+      hant: "驗證未通過，請重試。",
+      hans: "验证未通过，请重试。",
+    },
+  }),
   "auth.loading": {
     en: "Loading...",
     ja: "読み込み中...",
