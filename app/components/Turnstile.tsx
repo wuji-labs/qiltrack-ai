@@ -40,7 +40,7 @@ export interface TurnstileProps {
  */
 export function Turnstile({ action = "auth", cData, className, onSuccess, onError, onExpire }: TurnstileProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const widgetIdRef = useRef<string | undefined>();
+  const widgetIdRef = useRef<string | undefined>(undefined);
 
   const renderWidget = useCallback(() => {
     if (!containerRef.current || !window.turnstile || !turnstileSiteKey) {
