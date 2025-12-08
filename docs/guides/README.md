@@ -7,3 +7,4 @@
 - Supabase 报告 Stage2 CAVR：`supabase-report-stage2-cavr.md`
 - Chrome DevTools MCP 使用：`chrome-devtools-mcp-guide.md`
 - Context7 MCP 使用：`context7-mcp-guide.md`
+- **数据库备份恢复：`database-backup-restore.md`**
