@@ -2781,6 +2781,13 @@ const translations: Record<string, TranslationEntry> = {
     "zh-Hant": "帳戶設定",
     "zh-Hans": "账户设置",
   },
+  "account.menu.settings": {
+    en: "Account settings",
+    ja: "アカウント設定",
+    ko: "계정 설정",
+    "zh-Hant": "帳戶設定",
+    "zh-Hans": "账号设置",
+  },
   "account.page.subtitle": {
     en: "Manage your plan, credits, and preferences in one place.",
     ja: "プランやクレジット、設定をこの画面で管理できます。",
@@ -3070,11 +3077,11 @@ const translations: Record<string, TranslationEntry> = {
     "zh-Hans": "{{email}} · 方案：{{plan}}",
   },
   "quota.card.heading": {
-    en: "Credits · {{plan}}",
-    ja: "クレジット · {{plan}}",
-    ko: "크레딧 · {{plan}}",
-    "zh-Hant": "積分 · {{plan}}",
-    "zh-Hans": "积分 · {{plan}}",
+    en: "Plan: {{plan}}",
+    ja: "プラン：{{plan}}",
+    ko: "플랜: {{plan}}",
+    "zh-Hant": "套餐：{{plan}}",
+    "zh-Hans": "套餐：{{plan}}",
   },
   "quota.card.email": {
     en: "{{email}}",
@@ -3111,6 +3118,34 @@ const translations: Record<string, TranslationEntry> = {
     "zh-Hant": "查看示例",
     "zh-Hans": "查看示例",
   },
+  "quota.card.balance": {
+    en: "Credit Balance",
+    ja: "クレジット残高",
+    ko: "크레딧 잔액",
+    "zh-Hant": "積分餘額",
+    "zh-Hans": "积分余额",
+  },
+  "quota.card.unit": {
+    en: "credits",
+    ja: "クレジット",
+    ko: "크레딧",
+    "zh-Hant": "積分",
+    "zh-Hans": "积分",
+  },
+  "quota.card.upgradeCta": {
+    en: "Upgrade Plan",
+    ja: "プランをアップグレード",
+    ko: "플랜 업그레이드",
+    "zh-Hant": "升級套餐",
+    "zh-Hans": "升级套餐",
+  },
+  "quota.card.generateCta": {
+    en: "Generate Report",
+    ja: "レポート生成",
+    ko: "리포트 생성",
+    "zh-Hant": "生成報告",
+    "zh-Hans": "生成报告",
+  },
   "error.submit.generic": {
     en: "Server returned an error. Please try again or switch to another ticker.",
     ja: "サーバーでエラーが発生しました。しばらくしてから、もしくは別のティッカーで再試行してください。",
@@ -3131,6 +3166,13 @@ const translations: Record<string, TranslationEntry> = {
     ko: "현재 크레딧 잔액: {{count}}",
     "zh-Hant": "當前積分餘額：{{count}} 分",
     "zh-Hans": "当前积分余额：{{count}} 分",
+  },
+  "generator.account.statusWithCost": {
+    en: "● Balance: {{count}} | -{{cost}}",
+    ja: "● 残高: {{count}} | -{{cost}}",
+    ko: "● 잔액: {{count}} | -{{cost}}",
+    "zh-Hant": "● 餘額：{{count}} | -{{cost}}",
+    "zh-Hans": "● 余额：{{count}} | -{{cost}}",
   },
   "generator.account.cta": {
     en: "Sign in to unlock structured reports and track your credits.",
@@ -3282,7 +3324,7 @@ const translations: Record<string, TranslationEntry> = {
     ko: "티커를 입력하고 페르소나를 고른 다음 생성을 누르면 AI 리포트가 만들어집니다. 이 카드가 그 흐름을 안내하며 완료되면 리포트와 복사/내보내기 기능으로 교체됩니다。",
     "zh-Hant":
       "輸入代碼、選擇模板，點擊「生成」讓 AI 整理出報告。這個提示會說明步驟，報告一生成即替換成輸出與複製/匯出操作。",
-    "zh-Hans": "选择模板、输入代码，点击“生成 AI 投研报告”。完成后即可复制/导出Word。",
+    "zh-Hans": "输入股票代码后点击生成，AI将为您分析并输出结构化投研报告。",
   },
   "report.tip.action": {
     en: "Follow the steps above to start the generation; after the report finishes, this same card will host the copy/export buttons.",

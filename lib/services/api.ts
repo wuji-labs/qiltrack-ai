@@ -57,7 +57,7 @@ type DailyRewardResponse = {
 };
 
 type ApiErrorResponse = {
-  error: string;
+  error: string | { code?: string; message?: string };
   code?:
     | "unauthorized"
     | "quota_exceeded"
@@ -79,9 +79,19 @@ async function handleJson<T>(
 
   if (!res.ok) {
     const apiError = body as ApiErrorResponse;
-    const message = typeof apiError?.error === "string" ? apiError.error : defaultMessage;
+    // Handle both string error and object error formats
+    let message = defaultMessage;
+    let code = apiError?.code;
+
+    if (typeof apiError?.error === "string") {
+      message = apiError.error;
+    } else if (typeof apiError?.error === "object" && apiError.error !== null) {
+      message = apiError.error.message || defaultMessage;
+      code = code || apiError.error.code as typeof code;
+    }
+
     const error = new Error(message) as unknown as Error & { code?: string; statusCode?: number };
-    error.code = apiError?.code;
+    error.code = code;
     error.statusCode = res.status;
     throw error;
   }
@@ -170,6 +180,21 @@ export async function fetchCredits(): Promise<CreditsResponse> {
 export async function claimDailyReward(): Promise<DailyRewardResponse> {
   const res = await fetch("/api/report/daily-reward", { method: "POST" });
   return handleJson<DailyRewardResponse>(res, "Failed to claim daily reward");
+}
+
+type DailyRewardStatusResponse = {
+  hasClaimed: boolean;
+  streakCount: number;
+  dailyRewardAmount: number;
+  tier: string;
+};
+
+/**
+ * Check daily reward status
+ */
+export async function fetchDailyRewardStatus(): Promise<DailyRewardStatusResponse> {
+  const res = await fetch("/api/report/daily-reward/status");
+  return handleJson<DailyRewardStatusResponse>(res, "Failed to fetch daily reward status");
 }
 
 export async function fetchSimilarReports(params: {

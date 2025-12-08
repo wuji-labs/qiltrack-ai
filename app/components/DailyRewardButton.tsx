@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { claimDailyReward } from "@/lib/services/api";
+import { claimDailyReward, fetchDailyRewardStatus } from "@/lib/services/api";
 
 interface DailyRewardButtonProps {
   onRewardClaimed?: (credits: number) => void;
@@ -12,9 +12,32 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
   const [claiming, setClaiming] = useState(false);
   const [claimed, setClaimed] = useState(false);
   const [streak, setStreak] = useState(0);
+  const [dailyRewardAmount, setDailyRewardAmount] = useState(10);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Check daily reward status on mount
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const status = await fetchDailyRewardStatus();
+        setClaimed(status.hasClaimed);
+        setStreak(status.streakCount);
+        setDailyRewardAmount(status.dailyRewardAmount);
+      } catch (err) {
+        console.error("Failed to check daily reward status:", err);
+        // On error, assume not claimed so user can try
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkStatus();
+  }, []);
 
   const handleClaim = async () => {
+    if (claimed) return;
+
     setClaiming(true);
     setError(null);
 
@@ -35,15 +58,42 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
           detail: { credits: result.remainingCredits }
         }));
       } else {
-        setError(result.message || "领取失败");
+        // Check if already claimed today
+        if (result.message?.includes("already claimed") || result.message?.includes("已领取")) {
+          setClaimed(true);
+        } else {
+          setError(result.message || "领取失败");
+        }
       }
     } catch (err) {
       console.error("Failed to claim daily reward:", err);
-      setError("网络错误，请稍后再试");
+      const errorMessage = err instanceof Error ? err.message : "网络错误，请稍后再试";
+      // Check if already claimed
+      if (errorMessage.includes("already claimed") || errorMessage.includes("已领取")) {
+        setClaimed(true);
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setClaiming(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className={`daily-reward-card rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-5 ${className}`}>
+        <div className="flex items-center gap-4">
+          <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10">
+            <div className="h-8 w-8 animate-pulse rounded-full bg-emerald-400/20"></div>
+          </div>
+          <div className="flex-1 space-y-2">
+            <div className="h-4 w-20 animate-pulse rounded bg-[var(--bg-layer)]"></div>
+            <div className="h-3 w-32 animate-pulse rounded bg-[var(--bg-layer)]"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`daily-reward-card rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-5 ${className}`}>
@@ -51,7 +101,7 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
         {/* 礼物图标 */}
         <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10">
           <div className="absolute inset-0 rounded-xl bg-emerald-400/10 blur-xl"></div>
-          <span className="relative text-3xl">🎁</span>
+          <span className="relative text-3xl">{claimed ? "✅" : "🎁"}</span>
         </div>
 
         {/* 内容 */}
@@ -62,7 +112,11 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
               连续签到 <span className="font-semibold text-emerald-300">{streak}</span> 天
             </p>
           )}
-          <p className="text-sm text-emerald-300 mt-1 font-medium">今日可领取 30 积分</p>
+          <p className={`text-sm mt-1 font-medium ${claimed ? "text-slate-400" : "text-emerald-300"}`}>
+            {claimed
+              ? `今日已领取 ${dailyRewardAmount} 积分`
+              : `今日可领取 ${dailyRewardAmount} 积分`}
+          </p>
           {error && (
             <p className="text-xs text-red-400 mt-1">{error}</p>
           )}

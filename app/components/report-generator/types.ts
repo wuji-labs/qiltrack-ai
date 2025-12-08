@@ -10,6 +10,7 @@ export type ToneOption = {
   title: string;
   badge: string;
   description: string;
+  credits: number;
 };
 
 export type AuthInfo = {

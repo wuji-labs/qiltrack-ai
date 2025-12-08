@@ -142,11 +142,11 @@ export default function AccountPage() {
                 {membership.loading ? (
                   "..."
                 ) : membership.tier === "free" ? (
-                  "免费版"
+                  <span className="text-slate-400">Free</span>
                 ) : membership.tier === "pro" ? (
-                  <span className="text-amber-300">Pro 月费会员</span>
+                  <span className="text-amber-300">Pro</span>
                 ) : (
-                  <span className="text-purple-300">年费会员</span>
+                  <span className="text-purple-300">Ultra</span>
                 )}
                 {membership.isActive && membership.expiresAt && (
                   <span className="text-xs ml-2 text-dim">
@@ -188,7 +188,7 @@ export default function AccountPage() {
             <div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 space-y-2">
               <p className="text-sm text-subtle">{t("account.page.planSectionTitle")}</p>
               <p className="text-base text-[var(--color-foreground)]">
-                {t("account.page.planStatus", { plan: "free" })}
+                {t("account.page.planStatus", { plan: membership.tier === "free" ? "Free" : membership.tier === "pro" ? "Pro" : "Ultra" })}
               </p>
               <p className="text-sm text-dim">{t("account.page.planNote")}</p>
             </div>

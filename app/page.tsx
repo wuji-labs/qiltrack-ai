@@ -64,6 +64,7 @@ type ToneOption = {
   titleKey: TranslationKey;
   badgeKey: TranslationKey;
   descriptionKey: TranslationKey;
+  credits: number;
 };
 
 const toneOptions: ToneOption[] = [
@@ -73,6 +74,7 @@ const toneOptions: ToneOption[] = [
     titleKey: "tone.baseline.title",
     badgeKey: "tone.baseline.badge",
     descriptionKey: "tone.baseline.description",
+    credits: 30,
   },
   {
     id: "buffett",
@@ -80,6 +82,7 @@ const toneOptions: ToneOption[] = [
     titleKey: "tone.buffett.title",
     badgeKey: "tone.buffett.badge",
     descriptionKey: "tone.buffett.description",
+    credits: 40,
   },
   {
     id: "musk",
@@ -87,6 +90,7 @@ const toneOptions: ToneOption[] = [
     titleKey: "tone.musk.title",
     badgeKey: "tone.musk.badge",
     descriptionKey: "tone.musk.description",
+    credits: 40,
   },
   {
     id: "muddy",
@@ -94,6 +98,7 @@ const toneOptions: ToneOption[] = [
     titleKey: "tone.muddy.title",
     badgeKey: "tone.muddy.badge",
     descriptionKey: "tone.muddy.description",
+    credits: 50,
   },
 ];
 
@@ -210,6 +215,7 @@ export default function Home() {
     title: t(option.titleKey),
     badge: t(option.badgeKey),
     description: t(option.descriptionKey),
+    credits: option.credits,
   }));
   const toneLabelList = useMemo(
     () => toneOptionsLabeled.map((option) => option.title).join(" / "),

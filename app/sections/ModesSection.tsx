@@ -10,6 +10,7 @@ type ModeOption = {
   title: string;
   badge: string;
   description: string;
+  credits: number;
 };
 
 type ModesSectionProps = {
