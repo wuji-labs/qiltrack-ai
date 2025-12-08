@@ -7,6 +7,7 @@ import { Suspense, useEffect, useMemo, useState, type FormEvent } from "react";
 
 import { useLanguage } from "@/lib/i18n";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { Turnstile, useTurnstile } from "@/app/components/Turnstile";
 
 type EmailStatus = "idle" | "loading" | "sent" | "error" | "cooldown";
 type AuthView = "signin" | "signup" | "magic-link" | "reset-password";
@@ -52,6 +53,17 @@ function LoginContent() {
     isAuthenticated,
   } = useSupabaseAuth();
 
+  const {
+    token: turnstileToken,
+    isVerified: isTurnstileVerified,
+    handleVerify: handleTurnstileVerify,
+    handleExpire: handleTurnstileExpire,
+    handleError: handleTurnstileError,
+    reset: resetTurnstile,
+  } = useTurnstile();
+
+  const isTurnstileEnabled = !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+
   const banner = useMemo(() => {
     if (message) return message;
     if (requestError) {
@@ -90,17 +102,27 @@ function LoginContent() {
   const handlePasswordSignIn = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage(null);
+
+    // Check Turnstile verification
+    if (isTurnstileEnabled && !isTurnstileVerified) {
+      setMessage({ type: "error", text: t("auth.error.captchaRequired") });
+      return;
+    }
+
     setEmailStatus("loading");
 
-    const result = await signInWithPassword(email, password);
+    const result = await signInWithPassword(email, password, turnstileToken ?? undefined);
     if (!result.success) {
       setEmailStatus("error");
+      resetTurnstile();
       setMessage({
         type: "error",
         text:
           result.code === "invalid_credentials"
             ? t("auth.error.invalidCredentials")
-            : t("auth.error.generic"),
+            : result.code === "captcha_failed"
+              ? t("auth.error.captchaFailed")
+              : t("auth.error.generic"),
       });
       return;
     }
@@ -111,6 +133,13 @@ function LoginContent() {
   const handleSignUp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage(null);
+
+    // Check Turnstile verification
+    if (isTurnstileEnabled && !isTurnstileVerified) {
+      setMessage({ type: "error", text: t("auth.error.captchaRequired") });
+      return;
+    }
+
     setEmailStatus("loading");
 
     if (password.length < 8) {
@@ -119,15 +148,18 @@ function LoginContent() {
       return;
     }
 
-    const result = await signUpWithPassword(email, password);
+    const result = await signUpWithPassword(email, password, turnstileToken ?? undefined);
     if (!result.success) {
       setEmailStatus("error");
+      resetTurnstile();
       setMessage({
         type: "error",
         text:
           result.code === "user_already_exists"
             ? t("auth.error.userExists")
-            : t("auth.error.generic"),
+            : result.code === "captcha_failed"
+              ? t("auth.error.captchaFailed")
+              : t("auth.error.generic"),
       });
       return;
     }
@@ -286,11 +318,23 @@ function LoginContent() {
                 />
               </div>
 
+              {/* Turnstile Widget */}
+              {isTurnstileEnabled && (
+                <div className="flex justify-center">
+                  <Turnstile
+                    onVerify={handleTurnstileVerify}
+                    onExpire={handleTurnstileExpire}
+                    onError={handleTurnstileError}
+                    theme="dark"
+                  />
+                </div>
+              )}
+
               <button
                 type="submit"
-                disabled={emailDisabled}
+                disabled={emailDisabled || (isTurnstileEnabled && !isTurnstileVerified)}
                 className={`w-full rounded-xl bg-emerald-500 px-4 py-3 text-base font-semibold text-white hover:bg-emerald-600 transition-colors ${
-                  emailDisabled ? "opacity-60 cursor-not-allowed" : ""
+                  emailDisabled || (isTurnstileEnabled && !isTurnstileVerified) ? "opacity-60 cursor-not-allowed" : ""
                 }`}
               >
                 {emailStatus === "loading" ? t("auth.form.loading") : t("auth.signin.submit")}
@@ -353,11 +397,23 @@ function LoginContent() {
                 <p className="text-xs text-slate-500">{t("auth.signup.passwordHint")}</p>
               </div>
 
+              {/* Turnstile Widget */}
+              {isTurnstileEnabled && (
+                <div className="flex justify-center">
+                  <Turnstile
+                    onVerify={handleTurnstileVerify}
+                    onExpire={handleTurnstileExpire}
+                    onError={handleTurnstileError}
+                    theme="dark"
+                  />
+                </div>
+              )}
+
               <button
                 type="submit"
-                disabled={emailDisabled}
+                disabled={emailDisabled || (isTurnstileEnabled && !isTurnstileVerified)}
                 className={`w-full rounded-xl bg-emerald-500 px-4 py-3 text-base font-semibold text-white hover:bg-emerald-600 transition-colors ${
-                  emailDisabled ? "opacity-60 cursor-not-allowed" : ""
+                  emailDisabled || (isTurnstileEnabled && !isTurnstileVerified) ? "opacity-60 cursor-not-allowed" : ""
                 }`}
               >
                 {emailStatus === "loading" ? t("auth.form.loading") : t("auth.signup.submit")}
