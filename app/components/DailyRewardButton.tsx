@@ -60,9 +60,11 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
           detail: { credits: result.remainingCredits }
         }));
       } else {
-        // Check if already claimed today
-        if (result.message?.includes("already claimed") || result.message?.includes("已领取")) {
+        // Check if already claimed today (case-insensitive)
+        const msg = result.message?.toLowerCase() || "";
+        if (msg.includes("already claimed") || msg.includes("已领取")) {
           setClaimed(true);
+          // Don't show error for already claimed
         } else {
           setError(result.message || t("dailyReward.error" as any));
         }
@@ -70,9 +72,10 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
     } catch (err) {
       console.error("Failed to claim daily reward:", err);
       const errorMessage = err instanceof Error ? err.message : t("error.network" as any);
-      // Check if already claimed
-      if (errorMessage.includes("already claimed") || errorMessage.includes("已领取")) {
+      // Check if already claimed (case-insensitive)
+      if (errorMessage.toLowerCase().includes("already claimed") || errorMessage.includes("已领取")) {
         setClaimed(true);
+        // Don't show error for already claimed
       } else {
         setError(errorMessage);
       }
