@@ -108,16 +108,16 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
 
         {/* 内容 */}
         <div className="flex-1">
-          <h3 className="text-base font-semibold text-[var(--color-foreground)]">{t("dailyReward.title")}</h3>
+          <h3 className="text-base font-semibold text-[var(--color-foreground)]">{t("dailyReward.title" as any)}</h3>
           {streak > 0 && (
             <p className="text-xs text-subtle mt-0.5">
-              {t("dailyReward.streak", { count: String(streak) })}
+              {t("dailyReward.streak" as any, { count: String(streak) })}
             </p>
           )}
           <p className={`text-sm mt-1 font-medium ${claimed ? "text-slate-400" : "text-emerald-300"}`}>
             {claimed
-              ? t("dailyReward.claimed", { credits: String(dailyRewardAmount) })
-              : t("dailyReward.canClaim", { credits: String(dailyRewardAmount) })}
+              ? t("dailyReward.claimed" as any, { credits: String(dailyRewardAmount) })
+              : t("dailyReward.canClaim" as any, { credits: String(dailyRewardAmount) })}
           </p>
           {error && (
             <p className="text-xs text-red-400 mt-1">{error}</p>
@@ -140,17 +140,17 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              {t("dailyReward.claiming")}
+              {t("dailyReward.claiming" as any)}
             </span>
           ) : claimed ? (
             <span className="flex items-center gap-1.5">
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              {t("dailyReward.alreadyClaimed")}
+              {t("dailyReward.alreadyClaimed" as any)}
             </span>
           ) : (
-            t("dailyReward.claimNow")
+            t("dailyReward.claimNow" as any)
           )}
         </button>
       </div>
@@ -171,8 +171,8 @@ export function DailyRewardCalendar({ streak, className = "" }: DailyRewardCalen
   return (
     <div className={`daily-reward-calendar ${className}`}>
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-[var(--color-foreground)]">{t("dailyReward.calendar.title")}</h4>
-        <span className="text-xs text-subtle">{t("dailyReward.calendar.thisWeek")}</span>
+        <h4 className="text-sm font-semibold text-[var(--color-foreground)]">{t("dailyReward.calendar.title" as any)}</h4>
+        <span className="text-xs text-subtle">{t("dailyReward.calendar.thisWeek" as any)}</span>
       </div>
 
       <div className="grid grid-cols-7 gap-2">
@@ -212,7 +212,7 @@ export function DailyRewardCalendar({ streak, className = "" }: DailyRewardCalen
       {streak >= 7 && (
         <div className="mt-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 px-3 py-2">
           <p className="text-xs text-center text-emerald-300">
-            {t("dailyReward.calendar.congrats")}
+            {t("dailyReward.calendar.congrats" as any)}
           </p>
         </div>
       )}

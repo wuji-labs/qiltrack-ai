@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
-import { plans, BillingToggle, type PlanKey, type BillingCycle, type Plan } from "@/app/components/PricingCards";
+import { useTranslatedPlans, BillingToggle, type PlanKey, type BillingCycle, type Plan } from "@/app/components/PricingCards";
+import { useLanguage } from "@/lib/i18n";
 
 // Feature comparison data
 const comparisonFeatures = [
@@ -49,6 +50,8 @@ const comparisonFeatures = [
 export default function PricingPage() {
   const router = useRouter();
   const { isAuthenticated } = useSupabaseAuth();
+  const { t } = useLanguage();
+  const plans = useTranslatedPlans();
   const [loadingPlan, setLoadingPlan] = useState<PlanKey | null>(null);
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("annual"); // 默认年付
 

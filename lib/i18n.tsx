@@ -4229,6 +4229,25 @@ const translations: Record<string, TranslationEntry> = {
       hans: "领取失败",
     },
   }),
+  // Pricing page additional translations
+  "pricing.perMonth": withChineseVariants({
+    en: "/ month",
+    ja: "/ 月",
+    ko: "/ 월",
+    zh: "/ 月",
+  }),
+  "pricing.save": withChineseVariants({
+    en: "Save {{percent}}%",
+    ja: "{{percent}}%お得",
+    ko: "{{percent}}% 절약",
+    zh: "省 {{percent}}%",
+  }),
+  "pricing.noCreditCard": withChineseVariants({
+    en: "No credit card required · Cancel anytime",
+    ja: "クレジットカード不要 · いつでもキャンセル可能",
+    ko: "신용카드 불필요 · 언제든지 취소 가능",
+    zh: "无需信用卡即可体验 · 随时取消",
+  }),
 } as const satisfies Record<string, TranslationEntry>;
 
 export type TranslationKey = keyof typeof translations;
