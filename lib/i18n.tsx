@@ -1252,11 +1252,11 @@ const translations: Record<string, TranslationEntry> = {
     "zh-Hans": "注册赠送 30 积分",
   },
   "pricing.plan.free.feature2": {
-    en: "5 credits daily check-in",
-    ja: "毎日チェックインで5クレジット",
-    ko: "매일 체크인 5 크레딧",
-    "zh-Hant": "每日簽到 5 積分",
-    "zh-Hans": "每日签到 5 积分",
+    en: "10 credits daily check-in",
+    ja: "毎日チェックインで10クレジット",
+    ko: "매일 체크인 10 크레딧",
+    "zh-Hant": "每日簽到 10 積分",
+    "zh-Hans": "每日签到 10 积分",
   },
   "pricing.plan.free.feature3": {
     en: "View reports online",
@@ -3324,7 +3324,7 @@ const translations: Record<string, TranslationEntry> = {
     ko: "티커를 입력하고 페르소나를 고른 다음 생성을 누르면 AI 리포트가 만들어집니다. 이 카드가 그 흐름을 안내하며 완료되면 리포트와 복사/내보내기 기능으로 교체됩니다。",
     "zh-Hant":
       "輸入代碼、選擇模板，點擊「生成」讓 AI 整理出報告。這個提示會說明步驟，報告一生成即替換成輸出與複製/匯出操作。",
-    "zh-Hans": "输入股票代码后点击生成，AI将为您分析并输出结构化投研报告。",
+    "zh-Hans": "",
   },
   "report.tip.action": {
     en: "Follow the steps above to start the generation; after the report finishes, this same card will host the copy/export buttons.",

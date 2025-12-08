@@ -28,9 +28,9 @@ export const plans: Plan[] = [
     badge: "FREE",
     monthlyPrice: 0,
     annualPrice: 0,
-    credits: "40 初始积分",
+    credits: "30 初始积分",
     features: [
-      "注册赠送 40 积分",
+      "注册赠送 30 积分",
       "每日签到 10 积分",
       "在线查看报告",
       "标准响应时间",

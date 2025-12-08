@@ -20,40 +20,61 @@ export function CreditsDisplay({
 }: CreditsDisplayProps) {
   // 已登录状态 - 显示会员卡风格
   if (auth.isAuthenticated) {
-    const tierColors = {
+    const tierStyles = {
       free: {
-        bg: "from-slate-800/90 to-slate-900/90",
-        border: "border-slate-600/50",
+        // 深邃的深蓝灰色调，专业稳重
+        bg: "from-[#1a1f2e] via-[#1e2436] to-[#141820]",
+        border: "border-slate-600/30",
         accent: "text-slate-300",
-        badge: "bg-slate-700 text-slate-300",
+        badge: "bg-slate-700/80 text-slate-200",
+        glow1: "bg-slate-500/8",
+        glow2: "bg-slate-400/5",
+        pattern: "opacity-[0.03]",
       },
       pro: {
-        bg: "from-amber-900/40 to-amber-950/60",
-        border: "border-amber-500/40",
-        accent: "text-amber-300",
-        badge: "bg-amber-500/20 text-amber-300 border border-amber-500/30",
+        // 高级金色渐变，奢华感
+        bg: "from-[#1f1a14] via-[#2a2318] to-[#1a1610]",
+        border: "border-amber-600/30",
+        accent: "text-amber-200",
+        badge: "bg-gradient-to-r from-amber-600/90 to-amber-500/90 text-amber-50",
+        glow1: "bg-amber-500/10",
+        glow2: "bg-amber-400/8",
+        pattern: "opacity-[0.04]",
       },
       ultra: {
-        bg: "from-purple-900/40 to-purple-950/60",
-        border: "border-purple-500/40",
-        accent: "text-purple-300",
-        badge: "bg-purple-500/20 text-purple-300 border border-purple-500/30",
+        // 尊贵紫金渐变，顶级会员
+        bg: "from-[#1a1424] via-[#201830] to-[#14101c]",
+        border: "border-purple-500/30",
+        accent: "text-purple-200",
+        badge: "bg-gradient-to-r from-purple-600/90 to-violet-500/90 text-purple-50",
+        glow1: "bg-purple-500/12",
+        glow2: "bg-violet-400/8",
+        pattern: "opacity-[0.05]",
       },
     };
 
-    const tier = auth.planLabel?.toLowerCase() as keyof typeof tierColors;
-    const colors = tierColors[tier] || tierColors.free;
+    const tier = auth.planLabel?.toLowerCase() as keyof typeof tierStyles;
+    const styles = tierStyles[tier] || tierStyles.free;
 
     return (
-      <div className={`relative overflow-hidden rounded-2xl border ${colors.border} bg-gradient-to-br ${colors.bg} p-5`}>
-        {/* 背景装饰 */}
-        <div className="pointer-events-none absolute inset-0 opacity-50">
+      <div className={`relative overflow-hidden rounded-2xl border ${styles.border} bg-gradient-to-br ${styles.bg} p-5`}>
+        {/* 高级背景装饰 - 多层光晕效果 */}
+        <div className="pointer-events-none absolute inset-0">
+          {/* 主光晕 */}
           <div
-            className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/5 blur-3xl"
+            className={`absolute -right-16 -top-16 h-48 w-48 rounded-full ${styles.glow1} blur-3xl`}
             aria-hidden
           />
           <div
-            className="absolute -left-10 bottom-0 h-32 w-32 rounded-full bg-white/3 blur-2xl"
+            className={`absolute -left-12 -bottom-8 h-40 w-40 rounded-full ${styles.glow2} blur-3xl`}
+            aria-hidden
+          />
+          {/* 细微纹理图案 */}
+          <div
+            className={`absolute inset-0 ${styles.pattern}`}
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            }}
             aria-hidden
           />
         </div>
@@ -61,10 +82,10 @@ export function CreditsDisplay({
         <div className="relative">
           {/* 顶部：套餐标识 */}
           <div className="flex items-center justify-between mb-4">
-            <span className={`text-xs uppercase tracking-[0.2em] ${colors.accent}`}>
+            <span className={`text-xs uppercase tracking-[0.2em] ${styles.accent}`}>
               Qiltrack AI
             </span>
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${colors.badge}`}>
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold shadow-sm ${styles.badge}`}>
               {auth.planLabel || "Free"}
             </span>
           </div>
