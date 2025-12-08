@@ -64,12 +64,12 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
         if (result.message?.includes("already claimed") || result.message?.includes("已领取")) {
           setClaimed(true);
         } else {
-          setError(result.message || "领取失败");
+          setError(result.message || t("dailyReward.error" as any));
         }
       }
     } catch (err) {
       console.error("Failed to claim daily reward:", err);
-      const errorMessage = err instanceof Error ? err.message : "网络错误，请稍后再试";
+      const errorMessage = err instanceof Error ? err.message : t("error.network" as any);
       // Check if already claimed
       if (errorMessage.includes("already claimed") || errorMessage.includes("已领取")) {
         setClaimed(true);

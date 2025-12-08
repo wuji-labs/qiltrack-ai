@@ -6,43 +6,43 @@ import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useTranslatedPlans, BillingToggle, type PlanKey, type BillingCycle, type Plan } from "@/app/components/PricingCards";
 import { useLanguage } from "@/lib/i18n";
 
-// Feature comparison data
-const comparisonFeatures = [
+// Feature comparison data - using translation keys
+const getComparisonFeatures = (t: (key: string, vars?: Record<string, string>) => string) => [
   {
-    category: "积分配额",
+    category: t("pricing.comparison.category.credits" as any),
     features: [
-      { name: "初始积分", free: "30", pro: "30", ultra: "30" },
-      { name: "月度积分", free: "0", pro: "300", ultra: "1,500" },
-      { name: "每日签到", free: "5", pro: "15", ultra: "30" },
-      { name: "报告成本", free: "30", pro: "30", ultra: "25" },
-      { name: "积分滚存", free: "-", pro: "1 个月", ultra: "3 个月" },
+      { name: t("pricing.comparison.feature.initialCredits" as any), free: "30", pro: "30", ultra: "30" },
+      { name: t("pricing.comparison.feature.monthlyCredits" as any), free: "0", pro: "300", ultra: "1,500" },
+      { name: t("pricing.comparison.feature.dailyCheckin" as any), free: "10", pro: "30", ultra: "60" },
+      { name: t("pricing.comparison.feature.reportCost" as any), free: "30", pro: "30", ultra: "25" },
+      { name: t("pricing.comparison.feature.creditRollover" as any), free: "-", pro: t("pricing.comparison.value.1month" as any), ultra: t("pricing.comparison.value.3months" as any) },
     ],
   },
   {
-    category: "核心功能",
+    category: t("pricing.comparison.category.core" as any),
     features: [
-      { name: "报告生成", free: true, pro: true, ultra: true },
-      { name: "生成速度", free: "Standard", pro: "2x Priority", ultra: "4x Express" },
-      { name: "DOCX 导出", free: false, pro: true, ultra: true },
-      { name: "PDF 导出", free: false, pro: false, ultra: true },
-      { name: "批量生成", free: "1 份", pro: "3 份", ultra: "10 份" },
-      { name: "报告留存", free: "7 天", pro: "90 天", ultra: "永久" },
+      { name: t("pricing.comparison.feature.reportGeneration" as any), free: true, pro: true, ultra: true },
+      { name: t("pricing.comparison.feature.generationSpeed" as any), free: t("pricing.comparison.value.standard" as any), pro: t("pricing.comparison.value.priority" as any), ultra: t("pricing.comparison.value.express" as any) },
+      { name: t("pricing.comparison.feature.docxExport" as any), free: false, pro: true, ultra: true },
+      { name: t("pricing.comparison.feature.pdfExport" as any), free: false, pro: false, ultra: true },
+      { name: t("pricing.comparison.feature.batchGeneration" as any), free: t("pricing.comparison.value.1report" as any), pro: t("pricing.comparison.value.3reports" as any), ultra: t("pricing.comparison.value.10reports" as any) },
+      { name: t("pricing.comparison.feature.reportRetention" as any), free: t("pricing.comparison.value.7days" as any), pro: t("pricing.comparison.value.90days" as any), ultra: t("pricing.comparison.value.forever" as any) },
     ],
   },
   {
-    category: "高级功能",
+    category: t("pricing.comparison.category.advanced" as any),
     features: [
-      { name: "自定义模板", free: false, pro: false, ultra: true },
-      { name: "API 访问", free: false, pro: false, ultra: true },
-      { name: "Webhook", free: false, pro: false, ultra: true },
+      { name: t("pricing.comparison.feature.customTemplates" as any), free: false, pro: false, ultra: true },
+      { name: t("pricing.comparison.feature.apiAccess" as any), free: false, pro: false, ultra: true },
+      { name: t("pricing.comparison.feature.webhook" as any), free: false, pro: false, ultra: true },
     ],
   },
   {
-    category: "服务支持",
+    category: t("pricing.comparison.category.support" as any),
     features: [
-      { name: "响应时间", free: "48 小时", pro: "24 小时", ultra: "4 小时" },
-      { name: "支持渠道", free: "社区", pro: "邮件", ultra: "专属客服" },
-      { name: "会员标识", free: false, pro: true, ultra: true },
+      { name: t("pricing.comparison.feature.responseTime" as any), free: t("pricing.comparison.value.48hours" as any), pro: t("pricing.comparison.value.24hours" as any), ultra: t("pricing.comparison.value.4hours" as any) },
+      { name: t("pricing.comparison.feature.supportChannel" as any), free: t("pricing.comparison.value.community" as any), pro: t("pricing.comparison.value.email" as any), ultra: t("pricing.comparison.value.dedicated" as any) },
+      { name: t("pricing.comparison.feature.memberBadge" as any), free: false, pro: true, ultra: true },
     ],
   },
 ];
@@ -129,7 +129,7 @@ export default function PricingPage() {
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          返回首页
+          {t("pricing.page.backHome" as any)}
         </button>
       </div>
 
@@ -137,13 +137,13 @@ export default function PricingPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 sm:py-12">
         <header className="mb-8 text-center space-y-4">
           <div className="inline-block px-4 py-1.5 rounded-full text-xs uppercase tracking-[0.28em]" style={{ background: "var(--bg-layer)", border: "1px solid var(--stroke-soft)", color: "var(--accent-emerald)" }}>
-            定价方案
+            {t("pricing.page.badge" as any)}
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold" style={{ color: "var(--color-foreground)" }}>
-            适合各级别投资者的计划
+            {t("pricing.page.title" as any)}
           </h1>
           <p className="text-base sm:text-lg text-dim max-w-2xl mx-auto">
-            所有套餐均支持随时取消，通过 Stripe 安全支付。注册即送初始积分。
+            {t("pricing.page.subtitle" as any)}
           </p>
         </header>
 
@@ -169,7 +169,7 @@ export default function PricingPage() {
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-[0.24em]" style={{ background: "var(--accent-emerald)", color: "#04110c" }}>
-                  最受欢迎
+                  {t("pricing.page.mostPopular" as any)}
                 </div>
               )}
 
@@ -191,14 +191,14 @@ export default function PricingPage() {
                     {getDisplayPrice(plan)}
                   </span>
                   {!plan.isFree && (
-                    <span className="text-base text-subtle">/ 月</span>
+                    <span className="text-base text-subtle">{t("pricing.perMonth" as any)}</span>
                   )}
                 </div>
                 {/* Original price strikethrough for annual billing */}
                 {getOriginalPrice(plan) && (
                   <p className="text-sm text-dim">
-                    <span className="line-through opacity-60">{getOriginalPrice(plan)}/月</span>
-                    <span className="ml-2 text-orange-400 font-medium">省 {getSavingsPercent(plan)}%</span>
+                    <span className="line-through opacity-60">{getOriginalPrice(plan)}{t("pricing.perMonth" as any)}</span>
+                    <span className="ml-2 text-orange-400 font-medium">{t("pricing.save" as any, { percent: String(getSavingsPercent(plan)) })}</span>
                   </p>
                 )}
                 <p className="text-sm font-medium text-dim mt-2">{plan.credits}</p>
@@ -231,12 +231,18 @@ export default function PricingPage() {
                   cursor: loadingPlan === plan.key ? "not-allowed" : "pointer",
                 }}
               >
-                {loadingPlan === plan.key ? "处理中..." : plan.isFree ? (isAuthenticated ? "前往账户" : "免费注册") : isAuthenticated ? `订阅 ${plan.name}` : "登录后订阅"}
+                {loadingPlan === plan.key
+                  ? t("pricing.page.processing" as any)
+                  : plan.isFree
+                    ? (isAuthenticated ? t("pricing.page.goToAccount" as any) : t("pricing.page.freeSignup" as any))
+                    : isAuthenticated
+                      ? t("pricing.page.subscribe" as any, { plan: plan.name })
+                      : t("pricing.page.loginToSubscribe" as any)}
               </button>
 
               {!plan.isFree && (
                 <p className="mt-3 text-xs text-center text-subtle">
-                  无需信用卡即可体验 · 随时取消
+                  {t("pricing.noCreditCard" as any)}
                 </p>
               )}
             </article>
@@ -246,7 +252,7 @@ export default function PricingPage() {
         {/* Feature Comparison Table */}
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-8" style={{ color: "var(--color-foreground)" }}>
-            功能对比
+            {t("pricing.page.comparison.title" as any)}
           </h2>
 
           <div className="glass-card overflow-hidden">
@@ -254,14 +260,14 @@ export default function PricingPage() {
               <table className="w-full">
                 <thead>
                   <tr style={{ background: "var(--bg-layer)" }}>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-dim">功能</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-dim">{t("pricing.page.comparison.feature" as any)}</th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-dim">Free</th>
                     <th className="px-6 py-4 text-center text-sm font-semibold" style={{ color: "var(--accent-emerald)" }}>Pro</th>
                     <th className="px-6 py-4 text-center text-sm font-semibold" style={{ color: "#a78bfa" }}>Ultra</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {comparisonFeatures.map((category, idx) => (
+                  {getComparisonFeatures(t).map((category, idx) => (
                     <>
                       <tr key={`category-${idx}`} style={{ background: "var(--bg-layer)", borderTop: "1px solid var(--stroke-soft)" }}>
                         <td colSpan={4} className="px-6 py-3 text-sm font-bold uppercase tracking-wider" style={{ color: "var(--accent-emerald)" }}>
@@ -337,10 +343,10 @@ export default function PricingPage() {
         {/* Footer Note */}
         <div className="mt-12 text-center space-y-2">
           <p className="text-sm text-subtle">
-            所有订阅均可随时取消。支付通过 Stripe 安全处理。
+            {t("pricing.page.footer.cancel" as any)}
           </p>
           <p className="text-xs text-subtle">
-            积分用于生成投资分析报告。不同报告类型消耗不同积分。
+            {t("pricing.page.footer.credits" as any)}
           </p>
         </div>
       </div>

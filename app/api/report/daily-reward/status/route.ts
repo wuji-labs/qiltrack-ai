@@ -47,12 +47,12 @@ export async function GET(request: NextRequest) {
 
     // Get user's membership tier for daily reward amount
     const { data: profileData } = await supabase
-      .from("user_profiles" as any)
-      .select("membership_tier")
-      .eq("user_id", userId)
+      .from("profiles")
+      .select("plan")
+      .eq("id", userId)
       .single();
 
-    const tier = (profileData as any)?.membership_tier || "free";
+    const plan = profileData?.plan || "free";
 
     // Daily reward amounts based on tier
     const dailyRewardAmounts: Record<string, number> = {
@@ -61,22 +61,22 @@ export async function GET(request: NextRequest) {
       ultra: 60,
     };
 
-    const dailyRewardAmount = dailyRewardAmounts[tier] || 10;
+    const dailyRewardAmount = dailyRewardAmounts[plan] || 10;
 
-    // Get streak count from user_profiles
+    // Get streak count from daily_rewards table
     const { data: streakData } = await supabase
-      .from("user_profiles" as any)
-      .select("daily_streak")
+      .from("daily_rewards")
+      .select("streak_count")
       .eq("user_id", userId)
       .single();
 
-    const streakCount = (streakData as any)?.daily_streak || 0;
+    const streakCount = streakData?.streak_count || 0;
 
     const response = NextResponse.json({
       hasClaimed,
       streakCount,
       dailyRewardAmount,
-      tier,
+      tier: plan,
     });
 
     responseCookies.forEach(({ name, value }) =>
