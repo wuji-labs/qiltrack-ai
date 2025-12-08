@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { claimDailyReward, fetchDailyRewardStatus } from "@/lib/services/api";
+import { useLanguage } from "@/lib/i18n";
 
 interface DailyRewardButtonProps {
   onRewardClaimed?: (credits: number) => void;
@@ -9,6 +10,7 @@ interface DailyRewardButtonProps {
 }
 
 export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewardButtonProps) {
+  const { t } = useLanguage();
   const [claiming, setClaiming] = useState(false);
   const [claimed, setClaimed] = useState(false);
   const [streak, setStreak] = useState(0);
@@ -106,16 +108,16 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
 
         {/* 内容 */}
         <div className="flex-1">
-          <h3 className="text-base font-semibold text-[var(--color-foreground)]">每日签到</h3>
+          <h3 className="text-base font-semibold text-[var(--color-foreground)]">{t("dailyReward.title")}</h3>
           {streak > 0 && (
             <p className="text-xs text-subtle mt-0.5">
-              连续签到 <span className="font-semibold text-emerald-300">{streak}</span> 天
+              {t("dailyReward.streak", { count: String(streak) })}
             </p>
           )}
           <p className={`text-sm mt-1 font-medium ${claimed ? "text-slate-400" : "text-emerald-300"}`}>
             {claimed
-              ? `今日已领取 ${dailyRewardAmount} 积分`
-              : `今日可领取 ${dailyRewardAmount} 积分`}
+              ? t("dailyReward.claimed", { credits: String(dailyRewardAmount) })
+              : t("dailyReward.canClaim", { credits: String(dailyRewardAmount) })}
           </p>
           {error && (
             <p className="text-xs text-red-400 mt-1">{error}</p>
@@ -138,17 +140,17 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              领取中
+              {t("dailyReward.claiming")}
             </span>
           ) : claimed ? (
             <span className="flex items-center gap-1.5">
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              已领取
+              {t("dailyReward.alreadyClaimed")}
             </span>
           ) : (
-            "立即领取"
+            t("dailyReward.claimNow")
           )}
         </button>
       </div>
@@ -163,13 +165,14 @@ interface DailyRewardCalendarProps {
 }
 
 export function DailyRewardCalendar({ streak, className = "" }: DailyRewardCalendarProps) {
+  const { t } = useLanguage();
   const days = Array.from({ length: 7 }, (_, i) => i + 1);
 
   return (
     <div className={`daily-reward-calendar ${className}`}>
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-[var(--color-foreground)]">连续签到进度</h4>
-        <span className="text-xs text-subtle">本周</span>
+        <h4 className="text-sm font-semibold text-[var(--color-foreground)]">{t("dailyReward.calendar.title")}</h4>
+        <span className="text-xs text-subtle">{t("dailyReward.calendar.thisWeek")}</span>
       </div>
 
       <div className="grid grid-cols-7 gap-2">
@@ -209,7 +212,7 @@ export function DailyRewardCalendar({ streak, className = "" }: DailyRewardCalen
       {streak >= 7 && (
         <div className="mt-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 px-3 py-2">
           <p className="text-xs text-center text-emerald-300">
-            🎉 恭喜！连续签到7天，再接再厉！
+            {t("dailyReward.calendar.congrats")}
           </p>
         </div>
       )}

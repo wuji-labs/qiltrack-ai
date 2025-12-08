@@ -53,8 +53,26 @@ export function CreditsDisplay({
       },
     };
 
-    const tier = auth.planLabel?.toLowerCase() as keyof typeof tierStyles;
-    const styles = tierStyles[tier] || tierStyles.free;
+    // Normalize planLabel to tier key - handle translated labels
+    const normalizeTier = (label: string | undefined): keyof typeof tierStyles => {
+      if (!label) return "free";
+      const lowerLabel = label.toLowerCase();
+      // Direct match for English labels
+      if (lowerLabel === "free" || lowerLabel === "pro" || lowerLabel === "ultra") {
+        return lowerLabel as keyof typeof tierStyles;
+      }
+      // Match translated labels (Chinese, Japanese, Korean, etc.)
+      if (lowerLabel.includes("pro") || lowerLabel.includes("プロ") || lowerLabel.includes("프로") || lowerLabel.includes("月费") || lowerLabel.includes("月費")) {
+        return "pro";
+      }
+      if (lowerLabel.includes("ultra") || lowerLabel.includes("ウルトラ") || lowerLabel.includes("울트라")) {
+        return "ultra";
+      }
+      return "free";
+    };
+
+    const tier = normalizeTier(auth.planLabel);
+    const styles = tierStyles[tier];
 
     return (
       <div className={`relative overflow-hidden rounded-2xl border ${styles.border} bg-gradient-to-br ${styles.bg} p-5`}>

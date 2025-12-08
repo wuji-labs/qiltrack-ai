@@ -1255,8 +1255,8 @@ const translations: Record<string, TranslationEntry> = {
     en: "10 credits daily check-in",
     ja: "毎日チェックインで10クレジット",
     ko: "매일 체크인 10 크레딧",
-    "zh-Hant": "每日簽到 10 積分",
-    "zh-Hans": "每日签到 10 积分",
+    "zh-Hant": "每日簽到可領 10 積分",
+    "zh-Hans": "每日签到可领 10 积分",
   },
   "pricing.plan.free.feature3": {
     en: "View reports online",
@@ -1332,12 +1332,12 @@ const translations: Record<string, TranslationEntry> = {
     },
   }),
   "pricing.plan.monthly.feature2": withChineseVariants({
-    en: "15 credits daily check-in",
-    ja: "毎日チェックインで15クレジット",
-    ko: "매일 체크인 15 크레딧",
+    en: "30 credits daily check-in",
+    ja: "毎日チェックインで30クレジット",
+    ko: "매일 체크인 30 크레딧",
     zh: {
-      hant: "每日簽到 15 積分",
-      hans: "每日签到 15 积分",
+      hant: "每日簽到可領 30 積分",
+      hans: "每日签到可领 30 积分",
     },
   }),
   "pricing.plan.monthly.feature3": withChineseVariants({
@@ -1402,10 +1402,10 @@ const translations: Record<string, TranslationEntry> = {
     zh: "300 月度积分",
   }),
   "pricing.plan.pro.feature2": withChineseVariants({
-    en: "15 credits daily check-in",
-    ja: "毎日チェックインで15クレジット",
-    ko: "매일 체크인 15 크레딧",
-    zh: "每日签到 15 积分",
+    en: "30 credits daily check-in",
+    ja: "毎日チェックインで30クレジット",
+    ko: "매일 체크인 30 크레딧",
+    zh: "每日签到可领 30 积分",
   }),
   "pricing.plan.pro.feature3": withChineseVariants({
     en: "Export reports as DOCX",
@@ -1484,12 +1484,12 @@ const translations: Record<string, TranslationEntry> = {
     },
   }),
   "pricing.plan.annual.feature2": withChineseVariants({
-    en: "30 credits daily check-in",
-    ja: "毎日チェックインで30クレジット",
-    ko: "매일 체크인 30 크레딧",
+    en: "60 credits daily check-in",
+    ja: "毎日チェックインで60クレジット",
+    ko: "매일 체크인 60 크레딧",
     zh: {
-      hant: "每日簽到 30 積分",
-      hans: "每日签到 30 积分",
+      hant: "每日簽到可領 60 積分",
+      hans: "每日签到可领 60 积分",
     },
   }),
   "pricing.plan.annual.feature3": withChineseVariants({
@@ -1563,10 +1563,10 @@ const translations: Record<string, TranslationEntry> = {
     zh: "1,500 月度积分",
   }),
   "pricing.plan.ultra.feature2": withChineseVariants({
-    en: "30 credits daily check-in",
-    ja: "毎日チェックインで30クレジット",
-    ko: "매일 체크인 30 크레딧",
-    zh: "每日签到 30 积分",
+    en: "60 credits daily check-in",
+    ja: "毎日チェックインで60クレジット",
+    ko: "매일 체크인 60 크레딧",
+    zh: "每日签到可领 60 积分",
   }),
   "pricing.plan.ultra.feature3": withChineseVariants({
     en: "PDF + DOCX export",
@@ -4127,6 +4127,106 @@ const translations: Record<string, TranslationEntry> = {
     zh: {
       hant: "領取 30 積分",
       hans: "领取 30 积分",
+    },
+  }),
+  // Daily reward component translations
+  "dailyReward.title": withChineseVariants({
+    en: "Daily Check-in",
+    ja: "毎日チェックイン",
+    ko: "매일 체크인",
+    zh: {
+      hant: "每日簽到",
+      hans: "每日签到",
+    },
+  }),
+  "dailyReward.streak": withChineseVariants({
+    en: "Streak: {{count}} days",
+    ja: "連続 {{count}} 日",
+    ko: "연속 {{count}} 일",
+    zh: {
+      hant: "連續簽到 {{count}} 天",
+      hans: "连续签到 {{count}} 天",
+    },
+  }),
+  "dailyReward.canClaim": withChineseVariants({
+    en: "Claim {{credits}} credits today",
+    ja: "本日 {{credits}} クレジット獲得可能",
+    ko: "오늘 {{credits}} 크레딧 받기",
+    zh: {
+      hant: "今日可領取 {{credits}} 積分",
+      hans: "今日可领取 {{credits}} 积分",
+    },
+  }),
+  "dailyReward.claimed": withChineseVariants({
+    en: "Claimed {{credits}} credits today",
+    ja: "本日 {{credits}} クレジット取得済み",
+    ko: "오늘 {{credits}} 크레딧 받음",
+    zh: {
+      hant: "今日已領取 {{credits}} 積分",
+      hans: "今日已领取 {{credits}} 积分",
+    },
+  }),
+  "dailyReward.claimNow": withChineseVariants({
+    en: "Claim Now",
+    ja: "今すぐ取得",
+    ko: "지금 받기",
+    zh: {
+      hant: "立即領取",
+      hans: "立即领取",
+    },
+  }),
+  "dailyReward.alreadyClaimed": withChineseVariants({
+    en: "Claimed",
+    ja: "取得済み",
+    ko: "받음",
+    zh: {
+      hant: "已領取",
+      hans: "已领取",
+    },
+  }),
+  "dailyReward.claiming": withChineseVariants({
+    en: "Claiming...",
+    ja: "取得中...",
+    ko: "받는 중...",
+    zh: {
+      hant: "領取中...",
+      hans: "领取中...",
+    },
+  }),
+  "dailyReward.calendar.title": withChineseVariants({
+    en: "Check-in Progress",
+    ja: "チェックイン進捗",
+    ko: "체크인 진행",
+    zh: {
+      hant: "連續簽到進度",
+      hans: "连续签到进度",
+    },
+  }),
+  "dailyReward.calendar.thisWeek": withChineseVariants({
+    en: "This week",
+    ja: "今週",
+    ko: "이번 주",
+    zh: {
+      hant: "本週",
+      hans: "本周",
+    },
+  }),
+  "dailyReward.calendar.congrats": withChineseVariants({
+    en: "Congrats! 7-day streak achieved!",
+    ja: "おめでとう！7日連続達成！",
+    ko: "축하합니다! 7일 연속 달성!",
+    zh: {
+      hant: "🎉 恭喜！連續簽到7天，再接再厲！",
+      hans: "🎉 恭喜！连续签到7天，再接再厉！",
+    },
+  }),
+  "dailyReward.error": withChineseVariants({
+    en: "Failed to claim",
+    ja: "取得に失敗しました",
+    ko: "받기 실패",
+    zh: {
+      hant: "領取失敗",
+      hans: "领取失败",
     },
   }),
 } as const satisfies Record<string, TranslationEntry>;
