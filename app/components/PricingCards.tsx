@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useLanguage } from "@/lib/i18n";
 
 export type PlanKey = "free" | "pro" | "ultra";
 export type BillingCycle = "monthly" | "annual";
@@ -13,30 +14,19 @@ export type Plan = {
   badge: string;
   monthlyPrice: number;
   annualPrice: number;
-  credits: string;
-  features: string[];
-  description: string;
   highlight?: boolean;
   popular?: boolean;
   isFree?: boolean;
 };
 
-export const plans: Plan[] = [
+// Plan configuration without translated text
+export const planConfigs: Plan[] = [
   {
     key: "free",
     name: "Free",
     badge: "FREE",
     monthlyPrice: 0,
     annualPrice: 0,
-    credits: "30 初始积分",
-    features: [
-      "注册赠送 30 积分",
-      "每日签到 5 积分",
-      "在线查看报告",
-      "标准响应时间",
-      "社区支持",
-    ],
-    description: "适合尝试体验产品功能的新用户。",
     isFree: true,
   },
   {
@@ -45,16 +35,6 @@ export const plans: Plan[] = [
     badge: "PRO",
     monthlyPrice: 14.99,
     annualPrice: 9.99,
-    credits: "300 积分 / 月",
-    features: [
-      "300 月度积分",
-      "每日签到 15 积分",
-      "导出报告为 DOCX",
-      "批量生成 3 份",
-      "优先 2x 速度",
-      "报告留存 90 天",
-    ],
-    description: "适合定期需要投资分析的个人投资者。",
     highlight: true,
     popular: true,
   },
@@ -64,20 +44,47 @@ export const plans: Plan[] = [
     badge: "ULTRA",
     monthlyPrice: 44.99,
     annualPrice: 29.99,
-    credits: "1,500 积分 / 月",
-    features: [
-      "1,500 月度积分",
-      "每日签到 30 积分",
-      "导出 PDF + DOCX",
-      "批量生成 10 份",
-      "极速 4x 生成",
-      "积分滚存 3 个月",
-      "API 访问",
-      "报告永久留存",
-    ],
-    description: "性价比最高，适合专业用户和团队。",
   },
 ];
+
+// Hook to get translated plan data
+export function useTranslatedPlans() {
+  const { t } = useLanguage();
+
+  return planConfigs.map((plan) => ({
+    ...plan,
+    credits: t(`pricing.plan.${plan.key}.feature1` as any),
+    description: t(`pricing.plan.${plan.key}.caption` as any),
+    features: plan.key === "free"
+      ? [
+          t("pricing.plan.free.feature1" as any),
+          t("pricing.plan.free.feature2" as any),
+          t("pricing.plan.free.feature3" as any),
+          t("pricing.plan.free.feature4" as any),
+          t("pricing.plan.free.feature5" as any),
+        ]
+      : plan.key === "pro"
+      ? [
+          t("pricing.plan.pro.feature1" as any),
+          t("pricing.plan.pro.feature2" as any),
+          t("pricing.plan.pro.feature3" as any),
+          t("pricing.plan.pro.feature4" as any),
+          t("pricing.plan.pro.feature5" as any),
+        ]
+      : [
+          t("pricing.plan.ultra.feature1" as any),
+          t("pricing.plan.ultra.feature2" as any),
+          t("pricing.plan.ultra.feature3" as any),
+          t("pricing.plan.ultra.feature4" as any),
+          t("pricing.plan.ultra.feature5" as any),
+          t("pricing.plan.ultra.feature6" as any),
+          t("pricing.plan.ultra.feature7" as any),
+        ],
+  }));
+}
+
+// Keep legacy export for backward compatibility
+export const plans = planConfigs;
 
 // Billing Toggle Component
 export function BillingToggle({
@@ -87,6 +94,8 @@ export function BillingToggle({
   billingCycle: BillingCycle;
   onChange: (cycle: BillingCycle) => void;
 }) {
+  const { t } = useLanguage();
+
   return (
     <div className="flex items-center justify-center gap-4">
       <span
@@ -95,7 +104,7 @@ export function BillingToggle({
         }`}
         onClick={() => onChange("monthly")}
       >
-        月度账单
+        {t("pricing.billing.monthly" as any)}
       </span>
 
       <button
@@ -122,7 +131,7 @@ export function BillingToggle({
         }`}
         onClick={() => onChange("annual")}
       >
-        年度账单
+        {t("pricing.billing.annual" as any)}
       </span>
 
       <span
@@ -133,11 +142,18 @@ export function BillingToggle({
           border: "1px solid rgba(251, 146, 60, 0.3)",
         }}
       >
-        年付节省 33%
+        {t("pricing.billing.save33" as any)}
       </span>
     </div>
   );
 }
+
+// Extended plan type with translated content
+type TranslatedPlan = Plan & {
+  credits?: string;
+  description?: string;
+  features?: string[];
+};
 
 // Pricing Card Component
 function PricingCard({
@@ -147,12 +163,14 @@ function PricingCard({
   loading,
   isAuthenticated,
 }: {
-  plan: Plan;
+  plan: TranslatedPlan;
   billingCycle: BillingCycle;
   onSubscribe: (key: PlanKey) => void;
   loading: boolean;
   isAuthenticated: boolean;
 }) {
+  const { t } = useLanguage();
+
   const getDisplayPrice = () => {
     if (plan.isFree) return "$0";
     return billingCycle === "annual"
@@ -171,9 +189,9 @@ function PricingCard({
   };
 
   const getButtonText = () => {
-    if (loading) return "处理中...";
-    if (plan.isFree) return isAuthenticated ? "前往账户" : "免费注册";
-    return isAuthenticated ? "登录后订阅" : "登录后订阅";
+    if (loading) return t("auth.form.loading" as any);
+    if (plan.isFree) return isAuthenticated ? t("pricing.plan.free.cta" as any) : t("pricing.plan.free.cta" as any);
+    return t(`pricing.plan.${plan.key}.cta` as any);
   };
 
   return (
@@ -194,7 +212,7 @@ function PricingCard({
           className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-[0.24em]"
           style={{ background: "var(--accent-emerald)", color: "#04110c" }}
         >
-          最受欢迎
+          {t("pricing.plan.pro.badge" as any)}
         </div>
       )}
 
@@ -246,19 +264,19 @@ function PricingCard({
           >
             {getDisplayPrice()}
           </span>
-          {!plan.isFree && <span className="text-base text-subtle">/ 月</span>}
+          {!plan.isFree && <span className="text-base text-subtle">{t("pricing.perMonth" as any)}</span>}
         </div>
         {getOriginalPrice() && (
           <p className="text-sm text-dim">
-            <span className="line-through opacity-60">{getOriginalPrice()}/月</span>
-            <span className="ml-2 text-orange-400 font-medium">省 {getSavingsPercent()}%</span>
+            <span className="line-through opacity-60">{getOriginalPrice()}{t("pricing.perMonth" as any)}</span>
+            <span className="ml-2 text-orange-400 font-medium">{t("pricing.save" as any, { percent: String(getSavingsPercent()) })}</span>
           </p>
         )}
         <p className="text-sm font-medium text-dim mt-2">{plan.credits}</p>
       </div>
 
       <ul className="space-y-3 mb-8 flex-1">
-        {plan.features.map((feature) => (
+        {(plan.features || []).map((feature) => (
           <li key={feature} className="flex items-start gap-3 text-sm text-dim">
             <span
               className="flex-shrink-0 mt-1 w-5 h-5 rounded-full flex items-center justify-center"
@@ -313,7 +331,7 @@ function PricingCard({
       </button>
 
       {!plan.isFree && (
-        <p className="mt-3 text-xs text-center text-subtle">无需信用卡即可体验 · 随时取消</p>
+        <p className="mt-3 text-xs text-center text-subtle">{t("pricing.noCreditCard" as any)}</p>
       )}
     </article>
   );
@@ -323,6 +341,8 @@ function PricingCard({
 export function PricingCards({ className = "" }: { className?: string }) {
   const router = useRouter();
   const { isAuthenticated } = useSupabaseAuth();
+  const { t } = useLanguage();
+  const translatedPlans = useTranslatedPlans();
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("annual");
   const [loadingPlan, setLoadingPlan] = useState<PlanKey | null>(null);
 
@@ -362,7 +382,7 @@ export function PricingCards({ className = "" }: { className?: string }) {
       window.location.href = data.url;
     } catch (error) {
       console.error("[Pricing] checkout error", error);
-      alert("创建订阅失败，请稍后重试。");
+      alert(t("error.submit.generic" as any));
     } finally {
       setLoadingPlan(null);
     }
@@ -375,7 +395,7 @@ export function PricingCards({ className = "" }: { className?: string }) {
 
       {/* Pricing Cards */}
       <div className="grid gap-6 md:grid-cols-3 lg:gap-8 mt-12">
-        {plans.map((plan) => (
+        {translatedPlans.map((plan) => (
           <PricingCard
             key={plan.key}
             plan={plan}

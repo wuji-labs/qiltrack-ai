@@ -245,7 +245,7 @@ export function HeroSection({
                           onClick={() => setAccountMenuOpen(false)}
                           className="w-full rounded-xl border border-[var(--stroke-soft)] px-3 py-2 text-left text-dim hover:text-[var(--color-foreground)] hover:border-[var(--stroke-glow)]/70"
                         >
-                          账号设置
+                          {t("account.menu.settings")}
                         </Link>
                       </div>
                       <button
@@ -359,7 +359,7 @@ export function HeroSection({
                     onClick={() => setMobileDrawerOpen(false)}
                     className="block px-4 py-2.5 text-sm rounded-lg text-dim hover:text-[var(--color-foreground)] hover:bg-[var(--bg-layer)]/50 transition"
                   >
-                    账号设置
+                    {t("account.menu.settings")}
                   </Link>
                   <button
                     type="button"

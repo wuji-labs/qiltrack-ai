@@ -631,6 +631,7 @@ export function ReportGeneratorSection({
           quotaInfo={{
             isAuthenticated: auth.isAuthenticated,
             remainingQuota: auth.remainingQuota,
+            currentModeCredits: selectedToneInfo.credits,
           }}
         />
 

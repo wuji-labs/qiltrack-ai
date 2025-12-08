@@ -80,12 +80,11 @@ export async function POST(request: NextRequest) {
 
     // 4. 初始化积分 (使用 report_credits 表)
     const planCredits: Record<string, number> = {
-      free: 30,
-      basic: 50,
-      pro: 200,
-      enterprise: 999,
+      free: 40,
+      pro: 600,
+      ultra: 3000,
     };
-    const creditsToGrant = initial_credits || planCredits[plan || "free"] || 30;
+    const creditsToGrant = initial_credits || planCredits[plan || "free"] || 40;
 
     const { error: creditsError } = await supabaseAdmin.from("report_credits").insert({
       user_id: userData.user.id,
