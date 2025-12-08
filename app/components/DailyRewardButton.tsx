@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { claimDailyReward } from "@/lib/services/api";
+import { claimDailyReward, fetchDailyRewardStatus } from "@/lib/services/api";
+import { useLanguage } from "@/lib/i18n";
 
 interface DailyRewardButtonProps {
   onRewardClaimed?: (credits: number) => void;
@@ -9,12 +10,36 @@ interface DailyRewardButtonProps {
 }
 
 export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewardButtonProps) {
+  const { t } = useLanguage();
   const [claiming, setClaiming] = useState(false);
   const [claimed, setClaimed] = useState(false);
   const [streak, setStreak] = useState(0);
+  const [dailyRewardAmount, setDailyRewardAmount] = useState(10);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Check daily reward status on mount
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const status = await fetchDailyRewardStatus();
+        setClaimed(status.hasClaimed);
+        setStreak(status.streakCount);
+        setDailyRewardAmount(status.dailyRewardAmount);
+      } catch (err) {
+        console.error("Failed to check daily reward status:", err);
+        // On error, assume not claimed so user can try
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkStatus();
+  }, []);
 
   const handleClaim = async () => {
+    if (claimed) return;
+
     setClaiming(true);
     setError(null);
 
@@ -35,15 +60,45 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
           detail: { credits: result.remainingCredits }
         }));
       } else {
-        setError(result.message || "领取失败");
+        // Check if already claimed today (case-insensitive)
+        const msg = result.message?.toLowerCase() || "";
+        if (msg.includes("already claimed") || msg.includes("已领取")) {
+          setClaimed(true);
+          // Don't show error for already claimed
+        } else {
+          setError(result.message || t("dailyReward.error" as any));
+        }
       }
     } catch (err) {
       console.error("Failed to claim daily reward:", err);
-      setError("网络错误，请稍后再试");
+      const errorMessage = err instanceof Error ? err.message : t("error.network" as any);
+      // Check if already claimed (case-insensitive)
+      if (errorMessage.toLowerCase().includes("already claimed") || errorMessage.includes("已领取")) {
+        setClaimed(true);
+        // Don't show error for already claimed
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setClaiming(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className={`daily-reward-card rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-5 ${className}`}>
+        <div className="flex items-center gap-4">
+          <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10">
+            <div className="h-8 w-8 animate-pulse rounded-full bg-emerald-400/20"></div>
+          </div>
+          <div className="flex-1 space-y-2">
+            <div className="h-4 w-20 animate-pulse rounded bg-[var(--bg-layer)]"></div>
+            <div className="h-3 w-32 animate-pulse rounded bg-[var(--bg-layer)]"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`daily-reward-card rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-5 ${className}`}>
@@ -51,18 +106,22 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
         {/* 礼物图标 */}
         <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/10">
           <div className="absolute inset-0 rounded-xl bg-emerald-400/10 blur-xl"></div>
-          <span className="relative text-3xl">🎁</span>
+          <span className="relative text-3xl">{claimed ? "✅" : "🎁"}</span>
         </div>
 
         {/* 内容 */}
         <div className="flex-1">
-          <h3 className="text-base font-semibold text-[var(--color-foreground)]">每日签到</h3>
+          <h3 className="text-base font-semibold text-[var(--color-foreground)]">{t("dailyReward.title" as any)}</h3>
           {streak > 0 && (
             <p className="text-xs text-subtle mt-0.5">
-              连续签到 <span className="font-semibold text-emerald-300">{streak}</span> 天
+              {t("dailyReward.streak" as any, { count: String(streak) })}
             </p>
           )}
-          <p className="text-sm text-emerald-300 mt-1 font-medium">今日可领取 30 积分</p>
+          <p className={`text-sm mt-1 font-medium ${claimed ? "text-slate-400" : "text-emerald-300"}`}>
+            {claimed
+              ? t("dailyReward.claimed" as any, { credits: String(dailyRewardAmount) })
+              : t("dailyReward.canClaim" as any, { credits: String(dailyRewardAmount) })}
+          </p>
           {error && (
             <p className="text-xs text-red-400 mt-1">{error}</p>
           )}
@@ -84,17 +143,17 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              领取中
+              {t("dailyReward.claiming" as any)}
             </span>
           ) : claimed ? (
             <span className="flex items-center gap-1.5">
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              已领取
+              {t("dailyReward.alreadyClaimed" as any)}
             </span>
           ) : (
-            "立即领取"
+            t("dailyReward.claimNow" as any)
           )}
         </button>
       </div>
@@ -109,13 +168,14 @@ interface DailyRewardCalendarProps {
 }
 
 export function DailyRewardCalendar({ streak, className = "" }: DailyRewardCalendarProps) {
+  const { t } = useLanguage();
   const days = Array.from({ length: 7 }, (_, i) => i + 1);
 
   return (
     <div className={`daily-reward-calendar ${className}`}>
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-[var(--color-foreground)]">连续签到进度</h4>
-        <span className="text-xs text-subtle">本周</span>
+        <h4 className="text-sm font-semibold text-[var(--color-foreground)]">{t("dailyReward.calendar.title" as any)}</h4>
+        <span className="text-xs text-subtle">{t("dailyReward.calendar.thisWeek" as any)}</span>
       </div>
 
       <div className="grid grid-cols-7 gap-2">
@@ -155,7 +215,7 @@ export function DailyRewardCalendar({ streak, className = "" }: DailyRewardCalen
       {streak >= 7 && (
         <div className="mt-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 px-3 py-2">
           <p className="text-xs text-center text-emerald-300">
-            🎉 恭喜！连续签到7天，再接再厉！
+            {t("dailyReward.calendar.congrats" as any)}
           </p>
         </div>
       )}

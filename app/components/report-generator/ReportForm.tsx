@@ -19,6 +19,7 @@ type ReportFormProps = {
   quotaInfo: {
     isAuthenticated: boolean;
     remainingQuota: number;
+    currentModeCredits: number;
   };
 };
 
@@ -115,13 +116,28 @@ export function ReportForm({
           <span>{t("generator.input.label")}</span>
         </div>
         <span className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)]/70 bg-[var(--bg-layer)]/85 px-3.5 py-1.5 text-sm text-[var(--color-foreground)] whitespace-nowrap">
-          <span
-            className="h-2 w-2 rounded-full bg-[var(--accent-emerald)] animate-pulse"
-            aria-hidden
-          />
-          {quotaInfo.isAuthenticated
-            ? t("generator.account.status", { count: quotaInfo.remainingQuota.toString() })
-            : t("generator.account.cta")}
+          {quotaInfo.isAuthenticated ? (
+            <>
+              <span
+                className="h-2 w-2 rounded-full bg-[var(--accent-emerald)] animate-pulse"
+                aria-hidden
+              />
+              <span>余额：{quotaInfo.remainingQuota}</span>
+              {quotaInfo.currentModeCredits > 0 && (
+                <span className="text-amber-400 font-medium">
+                  | -{quotaInfo.currentModeCredits}
+                </span>
+              )}
+            </>
+          ) : (
+            <>
+              <span
+                className="h-2 w-2 rounded-full bg-[var(--accent-emerald)] animate-pulse"
+                aria-hidden
+              />
+              {t("generator.account.cta")}
+            </>
+          )}
         </span>
       </div>
 

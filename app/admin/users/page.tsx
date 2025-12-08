@@ -37,9 +37,9 @@ interface UserStats {
 }
 
 const PLAN_CONFIGS: Record<string, { name: string; quota: number; color: string; price: number }> = {
-  free: { name: "Free", quota: 30, color: "#6b7280", price: 0 },
-  pro: { name: "Pro", quota: 300, color: "#10b981", price: 14.99 },
-  ultra: { name: "Ultra", quota: 1500, color: "#8b5cf6", price: 44.99 },
+  free: { name: "Free", quota: 40, color: "#6b7280", price: 0 },
+  pro: { name: "Pro", quota: 600, color: "#10b981", price: 14.99 },
+  ultra: { name: "Ultra", quota: 3000, color: "#8b5cf6", price: 44.99 },
 };
 
 const ROLE_CONFIGS: Record<string, { name: string; color: string; icon: string }> = {
