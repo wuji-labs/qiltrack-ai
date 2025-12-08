@@ -2760,6 +2760,20 @@ const translations: Record<string, TranslationEntry> = {
     "zh-Hant": "密碼至少需要 8 個字元",
     "zh-Hans": "密码至少需要 8 个字符",
   },
+  "auth.error.captchaRequired": {
+    en: "Please complete the security verification",
+    ja: "セキュリティ認証を完了してください",
+    ko: "보안 인증을 완료해주세요",
+    "zh-Hant": "請完成安全驗證",
+    "zh-Hans": "请完成安全验证",
+  },
+  "auth.error.captchaFailed": {
+    en: "Security verification failed. Please try again.",
+    ja: "セキュリティ認証に失敗しました。もう一度お試しください。",
+    ko: "보안 인증에 실패했습니다. 다시 시도해주세요.",
+    "zh-Hant": "安全驗證失敗，請重試。",
+    "zh-Hans": "安全验证失败，请重试。",
+  },
   "account.page.title": {
     en: "Account settings",
     ja: "アカウント設定",

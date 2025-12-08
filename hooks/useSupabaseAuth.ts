@@ -28,7 +28,7 @@ type AuthResult =
       success: false;
       error?: string;
       status?: number;
-      code?: "cooldown" | "invalid_email" | "invalid_credentials" | "user_already_exists";
+      code?: "cooldown" | "invalid_email" | "invalid_credentials" | "user_already_exists" | "captcha_failed";
     };
 
 /**
@@ -311,7 +311,7 @@ export function useSupabaseAuth() {
   );
 
   const signInWithPassword = useCallback(
-    async (email: string, password: string): Promise<AuthResult> => {
+    async (email: string, password: string, captchaToken?: string): Promise<AuthResult> => {
       if (!supabase) return { success: false, error: "Supabase not configured" };
       const trimmedEmail = email.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
@@ -322,10 +322,16 @@ export function useSupabaseAuth() {
         const { error } = await supabase.auth.signInWithPassword({
           email: trimmedEmail,
           password,
+          options: captchaToken
+            ? { captchaToken }
+            : undefined,
         });
 
         if (error) {
           const normalizedMessage = error.message.toLowerCase();
+          if (normalizedMessage.includes("captcha")) {
+            return { success: false, error: error.message, code: "captcha_failed" };
+          }
           if (normalizedMessage.includes("invalid") || normalizedMessage.includes("credentials")) {
             return { success: false, error: error.message, code: "invalid_credentials" };
           }
@@ -342,7 +348,7 @@ export function useSupabaseAuth() {
   );
 
   const signUpWithPassword = useCallback(
-    async (email: string, password: string): Promise<AuthResult> => {
+    async (email: string, password: string, captchaToken?: string): Promise<AuthResult> => {
       if (!supabase) return { success: false, error: "Supabase not configured" };
       const trimmedEmail = email.trim();
       if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
@@ -355,11 +361,15 @@ export function useSupabaseAuth() {
           password,
           options: {
             emailRedirectTo: `${getAuthRedirectBase()}${AUTH_CALLBACK_PATH}`,
+            ...(captchaToken ? { captchaToken } : {}),
           },
         });
 
         if (error) {
           const normalizedMessage = error.message.toLowerCase();
+          if (normalizedMessage.includes("captcha")) {
+            return { success: false, error: error.message, code: "captcha_failed" };
+          }
           if (normalizedMessage.includes("already") || normalizedMessage.includes("exists")) {
             return { success: false, error: error.message, code: "user_already_exists" };
           }
