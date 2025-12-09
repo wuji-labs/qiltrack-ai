@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit, searchRateLimit, getIpAddress } from "@/lib/api/rate-limit";
+import { searchStockNameMappings } from "@/lib/data/stock-name-mappings";
 
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
 
@@ -50,6 +51,22 @@ export async function GET(request: NextRequest) {
   // 测试 token 直接返回本地候选，不再访问 Finnhub，保证页面下拉可用
   if (isTestBypass) {
     return buildFallbackResponse(q, `${q.toUpperCase()} (测试模式，本地候选)`, "test");
+  }
+
+  // 先在本地映射表中搜索（支持中文/日文/韩文）
+  const localMatches = searchStockNameMappings(q);
+  if (localMatches.length > 0) {
+    const results = localMatches.slice(0, 10).map((item) => ({
+      symbol: item.symbol,
+      description: item.description,
+      displaySymbol: item.symbol,
+      type: item.type || "Common Stock",
+    }));
+
+    return NextResponse.json({
+      query: q,
+      results,
+    });
   }
 
   const apiKey = process.env.FINNHUB_API_KEY;
