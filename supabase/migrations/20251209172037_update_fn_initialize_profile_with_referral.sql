@@ -16,10 +16,10 @@ DECLARE
   v_initial_credits INT := 30;
   v_user_referral_code TEXT;
 BEGIN
-  -- (7êñ„€÷
+  -- Generate user's own referral code
   v_user_referral_code := UPPER(SUBSTRING(MD5(RANDOM()::TEXT || p_user_id::TEXT) FROM 1 FOR 8));
 
-  -- úprofile
+  -- Create profile
   INSERT INTO public.profiles (id, email, display_name, plan, role, subscription_status, referral_code)
   VALUES (
     p_user_id,
@@ -36,21 +36,21 @@ BEGIN
     referral_code = COALESCE(profiles.referral_code, EXCLUDED.referral_code),
     updated_at = NOW();
 
-  -- úï°U
+  -- Create credits record
   INSERT INTO public.report_credits (user_id, credits_available, credits_used)
   VALUES (p_user_id, v_initial_credits, 0)
   ON CONFLICT (user_id) DO NOTHING;
 
-  -- °UËï‹ö
+  -- Record initial credits event
   INSERT INTO public.report_credit_events (user_id, event_type, delta, balance_after, reason)
   VALUES (p_user_id, 'granted', v_initial_credits, v_initial_credits, 'Initial signup bonus');
 
-  -- €÷V±
+  -- Handle referral reward
   IF p_referral_code IS NOT NULL AND p_referral_code != '' THEN
     PERFORM fn_claim_referral_signup(p_user_id, p_referral_code);
   END IF;
 
-  -- Ñ"Îå
+  -- Send welcome notification
   INSERT INTO public.notifications (user_id, type, title, message)
   VALUES (
     p_user_id, 'welcome', 'Welcome to Qiltrack AI!',
