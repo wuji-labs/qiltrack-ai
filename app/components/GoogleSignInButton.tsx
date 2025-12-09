@@ -116,8 +116,27 @@ export function GoogleSignInButton({
         return;
       }
 
-      if (data) {
+      if (data?.user) {
         console.log("Google 登录成功");
+
+        // 初始化 profile 和 credits（30 积分）
+        try {
+          const { error: rpcError } = await supabase.rpc("fn_initialize_profile", {
+            p_user_id: data.user.id,
+            p_email: data.user.email || "",
+          } as never);
+
+          if (rpcError) {
+            console.error("初始化 profile 失败:", rpcError);
+            // 不阻断登录流程
+          } else {
+            console.log("Profile 初始化成功");
+          }
+        } catch (err) {
+          console.error("调用 fn_initialize_profile 异常:", err);
+          // 不阻断登录流程
+        }
+
         onSuccess?.();
         router.refresh();
       }
@@ -142,12 +161,28 @@ export function GoogleSignInButton({
     );
   }
 
-  // 使用 Google 渲染的按钮（功能性优先）
+  const isButtonDisabled = disabled || !isGoogleReady;
+
   return (
-    <div
-      id="google-signin-button"
-      className="w-full"
-      style={{ minHeight: "44px" }}
-    />
+    <div className="relative w-full">
+      {/* 背景：好看的自定义按钮样式 */}
+      <div
+        className={`w-full inline-flex items-center justify-center gap-3 rounded-xl bg-white text-slate-900 px-4 py-3 text-base font-semibold shadow-lg hover:shadow-xl hover:bg-slate-50 transition-all ${
+          isButtonDisabled ? "opacity-70 cursor-not-allowed" : ""
+        }`}
+      >
+        <Image src="/providers/google.svg" alt="google" width={22} height={22} priority />
+        <span>{!isGoogleReady ? "加载中..." : text}</span>
+      </div>
+
+      {/* 前景：Google 按钮（透明覆盖层，提供实际点击功能） */}
+      <div
+        id="google-signin-button"
+        className="absolute inset-0 opacity-0 cursor-pointer"
+        style={{
+          pointerEvents: isButtonDisabled ? 'none' : 'auto'
+        }}
+      />
+    </div>
   );
 }
