@@ -57,9 +57,12 @@ export function ReportForm({
         setFocusedIndex((prev) => (prev > 0 ? prev - 1 : -1));
         break;
       case "Enter":
-        if (focusedIndex >= 0) {
-          e.preventDefault();
-          onSelectResult(visibleResults[focusedIndex].symbol);
+        e.preventDefault();
+        // 如果用户已经用键盘选择了某个项，使用该项
+        // 否则自动选择第一个结果
+        const indexToSelect = focusedIndex >= 0 ? focusedIndex : 0;
+        if (visibleResults[indexToSelect]) {
+          onSelectResult(visibleResults[indexToSelect].symbol);
           setFocusedIndex(-1);
         }
         break;

@@ -178,29 +178,57 @@ export function ReportGeneratorSection({
     setSearchResults([]);
     suppressNextSearchRef.current = true;
     setDropdownClosed(true);
+    // 清除之前的错误状态
+    setErrorState(null);
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>, forceRegenerate: boolean = false) => {
     e.preventDefault();
-    const raw = inputValue.trim().toUpperCase();
+    const raw = inputValue.trim();
     if (!raw) {
       setErrorState({ type: "generic", message: t("error.submit.empty") });
       return;
     }
-    if (!/^[A-Z]+$/.test(raw)) {
+    // 允许字母、数字、点号、连字符以及中文/日文/韩文（如BRK.A, 苹果, アップル, 애플）
+    const rawUpper = raw.toUpperCase();
+    if (!/^[A-Z0-9.\-\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\s]+$/.test(rawUpper)) {
       setErrorState({ type: "generic", message: t("error.submit.format") });
       return;
     }
-    const validResults = searchResults.filter(
-      (item) => item.type !== "test" && item.type !== "fallback"
-    );
-    const matchedFromResults = validResults.some((item) => item.symbol.toUpperCase() === raw);
-    const matchedFromSelection = selectedSymbol ? selectedSymbol.toUpperCase() === raw : false;
-    if (!matchedFromResults && !matchedFromSelection) {
+
+    // 如果正在搜索，等待搜索完成
+    if (searching) {
+      // 等待最多2秒让搜索完成
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+
+    // 确定要使用的symbol：优先使用selectedSymbol，否则从搜索结果中查找匹配项
+    let symbolToUse = selectedSymbol;
+
+    if (!symbolToUse) {
+      const validResults = searchResults.filter(
+        (item) => item.type !== "test" && item.type !== "fallback"
+      );
+
+      // 尝试从搜索结果中找到精确匹配的symbol
+      const exactMatch = validResults.find((item) => item.symbol.toUpperCase() === raw.toUpperCase());
+      if (exactMatch) {
+        symbolToUse = exactMatch.symbol;
+      } else if (validResults.length > 0) {
+        // 如果没有精确匹配但有搜索结果，使用第一个结果
+        symbolToUse = validResults[0].symbol;
+      }
+    }
+
+    // 如果仍然没有找到有效的symbol，显示错误
+    if (!symbolToUse) {
       setErrorState({ type: "generic", message: t("error.submit.notFound") });
       return;
     }
+
     setSearchResults([]);
+    // 清除错误状态
+    setErrorState(null);
 
     if (!auth.isAuthenticated && !canBypassAuth) {
       setErrorState({ type: "unauthorized", message: t("generator.alert.unregistered") });
@@ -225,12 +253,12 @@ export function ReportGeneratorSection({
     if (!forceRegenerate) {
       try {
         const availability = await fetchReportAvailability({
-          symbol: raw,
+          symbol: symbolToUse,
           lang: language,
           mode: "production",
         });
         if (availability.reusable && availability.reusable_run_id) {
-          setPendingSymbol(raw);
+          setPendingSymbol(symbolToUse);
           setReuseRunId(availability.reusable_run_id);
           setShowReuseDialog(true);
           return;
@@ -248,7 +276,7 @@ export function ReportGeneratorSection({
     progress.start(t("generator.progress.init"));
 
     try {
-      const data = await generateReport({ symbol: raw, lang: language, tone: selectedTone });
+      const data = await generateReport({ symbol: symbolToUse, lang: language, tone: selectedTone });
       await progress.complete(t("generator.progress.done"));
       setReportData(data);
       await auth.refreshSession();

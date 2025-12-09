@@ -1,0 +1,145 @@
+[
+  {
+    "symbol": "104540",
+    "names": {
+      "zh": null,
+      "ja": null,
+      "ko": [
+        "코렌텍"
+      ],
+      "en": [
+        "Corentec Co. Ltd."
+      ]
+    },
+    "description": "Corentec Co. Ltd.",
+    "type": "Common Stock"
+  },
+  {
+    "symbol": "3858",
+    "names": {
+      "zh": [
+        "佳鑫國際資源投資"
+      ],
+      "ja": null,
+      "ko": null,
+      "en": [
+        "Jiaxin International Resources Investment"
+      ]
+    },
+    "description": "Jiaxin International Resources Investment",
+    "type": "Common Stock"
+  },
+  {
+    "symbol": "600749",
+    "names": {
+      "zh": [
+        "西藏旅游公司"
+      ],
+      "ja": null,
+      "ko": null,
+      "en": [
+        "Tibet Tourism"
+      ]
+    },
+    "description": "Tibet Tourism",
+    "type": "Common Stock"
+  },
+  {
+    "symbol": "6516.T",
+    "names": {
+      "zh": [
+        "山洋電氣"
+      ],
+      "ja": [
+        "山洋電気"
+      ],
+      "ko": null,
+      "en": [
+        "Sanyo Denki"
+      ]
+    },
+    "description": "Sanyo Denki",
+    "type": "Common Stock"
+  },
+  {
+    "symbol": "7790",
+    "names": {
+      "zh": null,
+      "ja": [
+        "バルコス"
+      ],
+      "ko": null,
+      "en": [
+        "Barcos"
+      ]
+    },
+    "description": "Barcos",
+    "type": "Common Stock"
+  },
+  {
+    "symbol": "DEKEQ.L",
+    "names": {
+      "zh": [
+        "迪克動畫"
+      ],
+      "ja": [
+        "DICエンターテイメント"
+      ],
+      "ko": [
+        "DIC 엔터테인먼트"
+      ],
+      "en": [
+        "DIC Entertainment Corporation"
+      ]
+    },
+    "description": "DIC Entertainment Corporation",
+    "type": "Common Stock"
+  },
+  {
+    "symbol": "SLM",
+    "names": {
+      "zh": null,
+      "ja": [
+        "サリー・メイ"
+      ],
+      "ko": [
+        "Sallie Mae"
+      ],
+      "en": [
+        "Sallie Mae"
+      ]
+    },
+    "description": "Sallie Mae",
+    "type": "Common Stock"
+  },
+  {
+    "symbol": "SXGE",
+    "names": {
+      "zh": null,
+      "ja": [
+        "スイスパフォーマンス指数"
+      ],
+      "ko": null,
+      "en": [
+        "Swiss Performance Index"
+      ]
+    },
+    "description": "Swiss Performance Index",
+    "type": "Common Stock"
+  },
+  {
+    "symbol": "SZ000582",
+    "names": {
+      "zh": [
+        "北部湾港"
+      ],
+      "ja": null,
+      "ko": null,
+      "en": [
+        "Q10904015"
+      ]
+    },
+    "description": "Q10904015",
+    "type": "Common Stock"
+  }
+]
