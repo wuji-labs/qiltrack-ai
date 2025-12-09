@@ -6364,6 +6364,259 @@ export const STOCK_NAME_MAPPINGS: StockNameMapping[] = [
     description: "Chunghwa Telecom",
     type: "Common Stock"
   },
+  {
+    symbol: "CHL",
+    names: {
+      zh: ["中国移动", "中國移動"],
+      ja: ["チャイナ・モバイル"],
+      ko: ["차이나 모바일"],
+      en: ["China Mobile"]
+    },
+    description: "China Mobile",
+    type: "Common Stock"
+  },
+  {
+    symbol: "CHA",
+    names: {
+      zh: ["中国电信", "中國電信"],
+      ja: ["チャイナ・テレコム"],
+      ko: ["차이나 텔레콤"],
+      en: ["China Telecom"]
+    },
+    description: "China Telecom",
+    type: "Common Stock"
+  },
+  {
+    symbol: "CHU",
+    names: {
+      zh: ["中国联通", "中國聯通"],
+      ja: ["チャイナ・ユニコム"],
+      ko: ["차이나 유니콤"],
+      en: ["China Unicom"]
+    },
+    description: "China Unicom",
+    type: "Common Stock"
+  },
+  {
+    symbol: "PTR",
+    names: {
+      zh: ["中国石油", "中國石油", "中石油"],
+      ja: ["ペトロチャイナ"],
+      ko: ["페트로차이나"],
+      en: ["PetroChina"]
+    },
+    description: "PetroChina",
+    type: "Common Stock"
+  },
+  {
+    symbol: "SNP",
+    names: {
+      zh: ["中国石化", "中國石化", "中石化"],
+      ja: ["シノペック"],
+      ko: ["시노펙"],
+      en: ["Sinopec"]
+    },
+    description: "China Petroleum & Chemical (Sinopec)",
+    type: "Common Stock"
+  },
+  {
+    symbol: "LFC",
+    names: {
+      zh: ["中国人寿", "中國人壽"],
+      ja: ["チャイナ・ライフ"],
+      ko: ["차이나 라이프"],
+      en: ["China Life"]
+    },
+    description: "China Life Insurance",
+    type: "Common Stock"
+  },
+  {
+    symbol: "PNGAY",
+    names: {
+      zh: ["中国平安", "中國平安", "平安"],
+      ja: ["ピンアン"],
+      ko: ["핑안"],
+      en: ["Ping An"]
+    },
+    description: "Ping An Insurance",
+    type: "Common Stock"
+  },
+  {
+    symbol: "CICHY",
+    names: {
+      zh: ["建设银行", "建設銀行", "建行"],
+      ja: ["中国建設銀行"],
+      ko: ["중국건설은행"],
+      en: ["China Construction Bank", "CCB"]
+    },
+    description: "China Construction Bank",
+    type: "Common Stock"
+  },
+  {
+    symbol: "CIHKY",
+    names: {
+      zh: ["招商银行", "招商銀行", "招行"],
+      ja: ["招商銀行"],
+      ko: ["자오상은행"],
+      en: ["China Merchants Bank", "CMB"]
+    },
+    description: "China Merchants Bank",
+    type: "Common Stock"
+  },
+  {
+    symbol: "BYDDY",
+    names: {
+      zh: ["比亚迪", "比亞迪"],
+      ja: ["BYD"],
+      ko: ["BYD"],
+      en: ["BYD"]
+    },
+    description: "BYD Company",
+    type: "Common Stock"
+  },
+  {
+    symbol: "GELYY",
+    names: {
+      zh: ["吉利", "吉利汽车", "吉利汽車"],
+      ja: ["吉利汽車"],
+      ko: ["지리 자동차"],
+      en: ["Geely"]
+    },
+    description: "Geely Automobile",
+    type: "Common Stock"
+  },
+  {
+    symbol: "XIACF",
+    names: {
+      zh: ["小米"],
+      ja: ["シャオミ"],
+      ko: ["샤오미"],
+      en: ["Xiaomi"]
+    },
+    description: "Xiaomi",
+    type: "Common Stock"
+  },
+  {
+    symbol: "SFTBY",
+    names: {
+      zh: ["软银", "軟銀"],
+      ja: ["ソフトバンク"],
+      ko: ["소프트뱅크"],
+      en: ["SoftBank"]
+    },
+    description: "SoftBank Group",
+    type: "Common Stock"
+  },
+  {
+    symbol: "MSBHY",
+    names: {
+      zh: ["三菱"],
+      ja: ["三菱"],
+      ko: ["미쓰비시"],
+      en: ["Mitsubishi"]
+    },
+    description: "Mitsubishi",
+    type: "Common Stock"
+  },
+  {
+    symbol: "PCRFY",
+    names: {
+      zh: ["松下", "松下电器"],
+      ja: ["パナソニック"],
+      ko: ["파나소닉"],
+      en: ["Panasonic"]
+    },
+    description: "Panasonic",
+    type: "Common Stock"
+  },
+  {
+    symbol: "NTTYY",
+    names: {
+      zh: ["日本电信", "日本電信"],
+      ja: ["NTT", "日本電信電話"],
+      ko: ["NTT"],
+      en: ["NTT", "Nippon Telegraph and Telephone"]
+    },
+    description: "NTT",
+    type: "Common Stock"
+  },
+  {
+    symbol: "HTHIY",
+    names: {
+      zh: ["日立", "日立制作所"],
+      ja: ["日立", "日立製作所"],
+      ko: ["히타치"],
+      en: ["Hitachi"]
+    },
+    description: "Hitachi",
+    type: "Common Stock"
+  },
+  {
+    symbol: "TOSYY",
+    names: {
+      zh: ["东芝", "東芝"],
+      ja: ["東芝"],
+      ko: ["도시바"],
+      en: ["Toshiba"]
+    },
+    description: "Toshiba",
+    type: "Common Stock"
+  },
+  {
+    symbol: "SHCAY",
+    names: {
+      zh: ["夏普"],
+      ja: ["シャープ"],
+      ko: ["샤프"],
+      en: ["Sharp"]
+    },
+    description: "Sharp",
+    type: "Common Stock"
+  },
+  {
+    symbol: "BRDCY",
+    names: {
+      zh: ["普利司通"],
+      ja: ["ブリヂストン"],
+      ko: ["브리지스톤"],
+      en: ["Bridgestone"]
+    },
+    description: "Bridgestone",
+    type: "Common Stock"
+  },
+  {
+    symbol: "SSNLF",
+    names: {
+      zh: ["三星电子", "三星電子"],
+      ja: ["サムスン電子"],
+      ko: ["삼성전자"],
+      en: ["Samsung Electronics"]
+    },
+    description: "Samsung Electronics",
+    type: "Common Stock"
+  },
+  {
+    symbol: "HYMTF",
+    names: {
+      zh: ["现代汽车", "現代汽車"],
+      ja: ["ヒュンダイ"],
+      ko: ["현대자동차"],
+      en: ["Hyundai Motor"]
+    },
+    description: "Hyundai Motor",
+    type: "Common Stock"
+  },
+  {
+    symbol: "LGEAF",
+    names: {
+      zh: ["LG电子", "LG電子"],
+      ja: ["LG電子"],
+      ko: ["LG전자"],
+      en: ["LG Electronics"]
+    },
+    description: "LG Electronics",
+    type: "Common Stock"
+  },
 ];
 
 /**
