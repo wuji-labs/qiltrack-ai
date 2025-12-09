@@ -158,6 +158,7 @@ export default function Home() {
   const [remainingQuota, setRemainingQuota] = useState(0);
   const [quotaLoaded, setQuotaLoaded] = useState(false);
   const [userPlan, setUserPlan] = useState<string>("free");
+  const [userProfile, setUserProfile] = useState<{ avatar_url: string | null; display_name: string | null } | null>(null);
 
   // Language detection and prompt
   const {
@@ -185,11 +186,16 @@ export default function Home() {
         setRemainingQuota(creditsData.credits?.remaining_credits ?? 0);
         setQuotaLoaded(true);
         setUserPlan(profile?.plan || "free");
+        setUserProfile({
+          avatar_url: profile?.avatar_url || null,
+          display_name: profile?.display_name || null,
+        });
       } catch (err) {
         console.error("Failed to load user data:", err);
         setRemainingQuota(0);
         setQuotaLoaded(true);
         setUserPlan("free");
+        setUserProfile(null);
       }
     };
 
@@ -326,7 +332,8 @@ export default function Home() {
             setLanguage={setLanguage}
             planLabel={planLabel}
             userEmail={user?.email ?? null}
-            userImage={user?.user_metadata?.avatar_url}
+            userImage={userProfile?.avatar_url ?? null}
+            userName={userProfile?.display_name ?? null}
             isAuthenticated={isAuthenticated}
             onPrimaryCta={handlePrimaryCta}
             onSmoothScroll={handleSmoothScroll}
