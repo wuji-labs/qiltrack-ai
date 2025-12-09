@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, searchRateLimit, getIpAddress } from "@/lib/api/rate-limit";
 
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
 
@@ -28,6 +29,22 @@ export async function GET(request: NextRequest) {
 
   if (!q) {
     return NextResponse.json({ error: "Missing q query parameter" }, { status: 400 });
+  }
+
+  // Rate limit check by IP address (skip for test bypass)
+  if (!isTestBypass) {
+    const ipAddress = getIpAddress(request);
+    const { success, headers } = await checkRateLimit(
+      ipAddress,
+      searchRateLimit
+    );
+
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many search requests. Please try again later." },
+        { status: 429, headers }
+      );
+    }
   }
 
   // 测试 token 直接返回本地候选，不再访问 Finnhub，保证页面下拉可用

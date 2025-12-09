@@ -15,6 +15,7 @@ import { UnauthorizedError, InsufficientCreditsError, ValidationError } from "@/
 import { DEFAULT_LANGUAGE, type Language } from "@/lib/i18n-config";
 import type { ReportTone } from "@/lib/core/reports/types";
 import { reportGenerationRateLimit, checkRateLimit } from "@/lib/api/rate-limit";
+import { appendCookies } from "@/lib/utils/cookie-helper";
 
 /**
  * Check for test bypass token
@@ -89,6 +90,11 @@ export async function GET(request: NextRequest) {
       throw new ValidationError("Missing required parameter: symbol");
     }
 
+    // Validate symbol length to prevent abuse
+    if (symbol.length > 10) {
+      throw new ValidationError("Invalid symbol: too long (max 10 characters)");
+    }
+
     const sanitizer = new ContentSanitizer();
     const language = sanitizer.normalizeLanguage(searchParams.get("lang"));
     const tone = (searchParams.get("tone") || "baseline") as ReportTone;
@@ -112,9 +118,7 @@ export async function GET(request: NextRequest) {
           { status: 429, headers }
         );
 
-        responseCookies.forEach(({ name, value }) => {
-          response.headers.append("Set-Cookie", `${name}=${value}`);
-        });
+        appendCookies(response, responseCookies);
 
         return response;
       }
@@ -176,9 +180,7 @@ export async function GET(request: NextRequest) {
             message: "Using existing report from the last 7 days",
           });
 
-          responseCookies.forEach(({ name, value }) => {
-            response.headers.append("Set-Cookie", `${name}=${value}`);
-          });
+          appendCookies(response, responseCookies);
 
           return response;
         }
@@ -230,9 +232,7 @@ export async function GET(request: NextRequest) {
             message: "Using existing report from today",
           });
 
-          responseCookies.forEach(({ name, value }) => {
-            response.headers.append("Set-Cookie", `${name}=${value}`);
-          });
+          appendCookies(response, responseCookies);
 
           return response;
         }
@@ -294,9 +294,7 @@ export async function GET(request: NextRequest) {
             reused: false, // Silent reuse - don't tell the user
           });
 
-          responseCookies.forEach(({ name, value }) => {
-            response.headers.append("Set-Cookie", `${name}=${value}`);
-          });
+          appendCookies(response, responseCookies);
 
           return response;
         }
@@ -404,9 +402,7 @@ export async function GET(request: NextRequest) {
       metadata: generatedReport.metadata,
     });
 
-    responseCookies.forEach(({ name, value }) => {
-      response.headers.append("Set-Cookie", `${name}=${value}`);
-    });
+    appendCookies(response, responseCookies);
 
     return response;
   } catch (error) {
@@ -414,9 +410,7 @@ export async function GET(request: NextRequest) {
 
     const errorResponse = handleApiError(error);
 
-    responseCookies.forEach(({ name, value }) => {
-      errorResponse.headers.append("Set-Cookie", `${name}=${value}`);
-    });
+    appendCookies(errorResponse, responseCookies);
 
     return errorResponse;
   }

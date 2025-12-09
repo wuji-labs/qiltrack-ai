@@ -17,11 +17,11 @@ export interface PasswordValidationResult {
 }
 
 export const DEFAULT_PASSWORD_REQUIREMENTS: PasswordRequirements = {
-  minLength: 8,
-  requireUppercase: false,
-  requireLowercase: false,
-  requireNumbers: false,
-  requireSymbols: false,
+  minLength: 12,
+  requireUppercase: true,
+  requireLowercase: true,
+  requireNumbers: true,
+  requireSymbols: true,
 };
 
 // Common weak passwords to reject

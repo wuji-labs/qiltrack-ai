@@ -93,7 +93,7 @@ export class CreditManager {
       // Use batch consumption for multiple credits
       const { data, error } = await supabase.rpc("fn_consume_credit", {
         p_user_id: userId,
-        p_cost: amount,
+        p_amount: amount,
       });
 
       if (error) {

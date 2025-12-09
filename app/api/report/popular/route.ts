@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { appendCookies } from "@/lib/utils/cookie-helper";
 
 /**
  * GET /api/report/popular
@@ -21,8 +22,8 @@ export async function GET(request: NextRequest) {
     });
 
     const { searchParams } = new URL(request.url);
-    const range = parseInt(searchParams.get("range") || "30");
-    const limit = Math.min(50, parseInt(searchParams.get("limit") || "20"));
+    const range = parseInt(searchParams.get("range") || "30", 10);
+    const limit = Math.min(50, parseInt(searchParams.get("limit") || "20", 10));
 
     // Call the database function to get popular symbols
     const { data, error } = await supabase.rpc("fn_get_popular_symbols", {
@@ -36,9 +37,7 @@ export async function GET(request: NextRequest) {
         { error: "Failed to fetch popular symbols" },
         { status: 500 }
       );
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
+      appendCookies(response, responseCookies);
       return response;
     }
 
@@ -48,9 +47,7 @@ export async function GET(request: NextRequest) {
       limit,
     });
 
-    responseCookies.forEach(({ name, value }) => {
-      response.headers.append("Set-Cookie", `${name}=${value}`);
-    });
+    appendCookies(response, responseCookies);
 
     return response;
   } catch (err) {

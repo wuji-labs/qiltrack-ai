@@ -63,6 +63,81 @@ export const globalRateLimit = redis
   : null;
 
 /**
+ * Password Change Rate Limiter
+ * - Limit: 5 requests per hour per user
+ * - Prevents brute force password attacks
+ * - Identifier: user_id
+ */
+export const passwordChangeRateLimit = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(5, '1 h'),
+      analytics: true,
+      prefix: 'ratelimit:password-change',
+    })
+  : null;
+
+/**
+ * Admin Action Rate Limiter
+ * - Limit: 20 requests per hour per admin
+ * - Prevents abuse of admin operations
+ * - Identifier: admin_user_id
+ */
+export const adminActionRateLimit = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(20, '1 h'),
+      analytics: true,
+      prefix: 'ratelimit:admin-action',
+    })
+  : null;
+
+/**
+ * File Upload Rate Limiter
+ * - Limit: 10 requests per hour per user
+ * - Prevents storage exhaustion
+ * - Identifier: user_id
+ */
+export const fileUploadRateLimit = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(10, '1 h'),
+      analytics: true,
+      prefix: 'ratelimit:file-upload',
+    })
+  : null;
+
+/**
+ * Search API Rate Limiter
+ * - Limit: 30 requests per minute per IP
+ * - Prevents API quota exhaustion
+ * - Identifier: IP address
+ */
+export const searchRateLimit = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(30, '1 m'),
+      analytics: true,
+      prefix: 'ratelimit:search',
+    })
+  : null;
+
+/**
+ * Webhook Rate Limiter
+ * - Limit: 100 requests per minute per IP
+ * - Protects against webhook DDoS
+ * - Identifier: IP address
+ */
+export const webhookRateLimit = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(100, '1 m'),
+      analytics: true,
+      prefix: 'ratelimit:webhook',
+    })
+  : null;
+
+/**
  * Rate limit response interface
  */
 export interface RateLimitResult {

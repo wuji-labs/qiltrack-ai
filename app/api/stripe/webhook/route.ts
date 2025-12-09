@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { getStripeClient } from "@/lib/stripe/client";
 import { createServiceRoleClient } from "@/lib/supabase/server";
+import { checkRateLimit, webhookRateLimit, getIpAddress } from "@/lib/api/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -9,6 +10,20 @@ export const dynamic = "force-dynamic";
 type PlanKey = "pro" | "ultra";
 
 export async function POST(req: Request) {
+  // Rate limit check by IP address to prevent webhook DDoS
+  const ipAddress = getIpAddress(req);
+  const { success, headers } = await checkRateLimit(
+    ipAddress,
+    webhookRateLimit
+  );
+
+  if (!success) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      { status: 429, headers }
+    );
+  }
+
   const signature = req.headers.get("stripe-signature");
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 

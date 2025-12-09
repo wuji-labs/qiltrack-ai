@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getAuthContextFromRequest, isAdmin } from "@/app/api/_utils/supabase";
+import { checkRateLimit, adminActionRateLimit } from "@/lib/api/rate-limit";
 
 function getSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -25,6 +26,19 @@ export async function POST(request: Request) {
 
     if (!adminUserId || !isAdmin(role)) {
       return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
+    }
+
+    // Rate limit check for admin actions
+    const { success, headers } = await checkRateLimit(
+      adminUserId,
+      adminActionRateLimit
+    );
+
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many admin actions. Please try again later." },
+        { status: 429, headers }
+      );
     }
 
     const { userId, newPassword } = await request.json();

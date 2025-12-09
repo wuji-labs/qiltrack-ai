@@ -79,7 +79,18 @@ export function createServerClient(
       setAll(cookiesToSet: Array<{ name: string; value: string; options?: unknown }>) {
         // Pass updated cookies to response handler if provided
         if (cookieSetter) {
-          cookieSetter(cookiesToSet);
+          // Ensure cookies have proper serialization with all options
+          const cookiesWithOptions = cookiesToSet.map((cookie) => ({
+            ...cookie,
+            options: cookie.options || {
+              path: "/",
+              maxAge: 60 * 60 * 24 * 7, // 7 days
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production",
+              sameSite: "lax" as const,
+            },
+          }));
+          cookieSetter(cookiesWithOptions);
         }
       },
     },

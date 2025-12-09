@@ -72,7 +72,32 @@ export class ReportPersistence {
       console.warn(`[ReportPersistence] Failed to generate or upload DOCX file:`, err);
     }
 
-    // Save to database (report_posts) - use service role to bypass RLS
+    // IMPORTANT: Create report_runs record FIRST (must exist before report_posts due to foreign key constraint)
+    const { data: runData, error: runError } = await supabaseServiceRole
+      .from("report_runs")
+      .insert({
+        id: reportRunId,
+        user_id: userId ?? null,
+        symbol: report.symbol,
+        tone: report.tone,
+        language: report.language,
+        status: "completed",
+        markdown_path: markdownPath,
+        docx_path: docxPath,
+        mode: "production",
+        created_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (runError) {
+      console.error(`[ReportPersistence] Failed to create report_runs record:`, runError);
+      throw new Error(`Failed to create report_runs: ${runError.message}`);
+    }
+
+    console.info(`[ReportPersistence] Created report_runs record: ${reportRunId}`);
+
+    // Now save to report_posts (references report_runs via foreign key)
     const { data, error } = await supabaseServiceRole
       .from("report_posts")
       .insert({
@@ -93,34 +118,6 @@ export class ReportPersistence {
 
     if (error) {
       throw new Error(`Failed to save report: ${error.message}`);
-    }
-
-    // Create report_runs record for report history tracking
-    try {
-      const { data: runData, error: runError } = await supabaseServiceRole
-        .from("report_runs")
-        .insert({
-          id: reportRunId,
-          user_id: userId ?? null,
-          symbol: report.symbol,
-          tone: report.tone,
-          language: report.language,
-          status: "completed",
-          markdown_path: markdownPath,
-          docx_path: docxPath,
-          mode: "production",
-          created_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-
-      if (runError) {
-        console.error(`[ReportPersistence] Failed to create report_runs record:`, runError);
-      } else {
-        console.info(`[ReportPersistence] Created report_runs record: ${reportRunId}`);
-      }
-    } catch (err) {
-      console.error(`[ReportPersistence] Error creating report_runs record:`, err);
     }
 
     return {

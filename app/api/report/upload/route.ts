@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServiceRoleClient, uploadToStorage } from "@/lib/supabase/server";
 import { getAuthContext, initSupabase } from "@/app/api/_utils/supabase";
 import { validateFile, sanitizeFilename } from "@/lib/api/file-validator";
+import { checkRateLimit, fileUploadRateLimit } from "@/lib/api/rate-limit";
 
 const MAX_UPLOAD_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -12,6 +13,20 @@ export async function POST(request: NextRequest) {
     const { userId } = await getAuthContext(context);
     if (!userId) {
       const response = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return context.applyCookies(response);
+    }
+
+    // Rate limit check for file uploads
+    const { success, headers } = await checkRateLimit(
+      userId,
+      fileUploadRateLimit
+    );
+
+    if (!success) {
+      const response = NextResponse.json(
+        { error: "Too many upload attempts. Please try again later." },
+        { status: 429, headers }
+      );
       return context.applyCookies(response);
     }
 

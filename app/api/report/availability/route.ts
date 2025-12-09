@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { appendCookies } from "@/lib/utils/cookie-helper";
 
 /**
  * GET /api/report/availability
@@ -31,9 +32,7 @@ export async function GET(request: NextRequest) {
 
     if (sessionError || !session?.user?.id) {
       const response = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
+      appendCookies(response, responseCookies);
       return response;
     }
 
@@ -45,9 +44,7 @@ export async function GET(request: NextRequest) {
 
     if (!symbol) {
       const response = NextResponse.json({ error: "Missing symbol parameter" }, { status: 400 });
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
+      appendCookies(response, responseCookies);
       return response;
     }
 
@@ -64,9 +61,7 @@ export async function GET(request: NextRequest) {
         { error: "Failed to check report availability" },
         { status: 500 }
       );
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
+      appendCookies(response, responseCookies);
       return response;
     }
 
@@ -92,9 +87,7 @@ export async function GET(request: NextRequest) {
           mode,
           is_own_report: false,
         });
-        responseCookies.forEach(({ name, value }) => {
-          response.headers.append("Set-Cookie", `${name}=${value}`);
-        });
+        appendCookies(response, responseCookies);
         return response;
       }
 
@@ -110,9 +103,7 @@ export async function GET(request: NextRequest) {
         mode: reusableReport.tone,
         is_own_report: isOwnReport,
       });
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
+      appendCookies(response, responseCookies);
       return response;
     }
 
@@ -126,9 +117,7 @@ export async function GET(request: NextRequest) {
       mode,
       is_own_report: false,
     });
-    responseCookies.forEach(({ name, value }) => {
-      response.headers.append("Set-Cookie", `${name}=${value}`);
-    });
+    appendCookies(response, responseCookies);
     return response;
   } catch (err) {
     console.error("Report availability error:", err);

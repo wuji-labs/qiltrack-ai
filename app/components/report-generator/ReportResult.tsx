@@ -2,6 +2,7 @@
 
 import { useMemo, useRef } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
+import remarkGfm from "remark-gfm";
 import type { ReportResponse } from "@/types/report";
 import type { ToneOption } from "./types";
 import KpiCard from "@/app/components/KpiCard";
@@ -91,6 +92,47 @@ const markdownComponents: Components = {
     return (
       <blockquote
         className="border-l-4 border-[var(--accent-emerald)]/50 pl-4 pr-4 py-2 my-4 italic text-[var(--text-dim)] bg-[var(--bg-layer)]/50 rounded-r-lg"
+        {...props}
+      />
+    );
+  },
+  table: ({ node, ...props }) => {
+    void node;
+    return (
+      <div className="my-6 overflow-x-auto">
+        <table
+          className="min-w-full border-collapse border border-[var(--stroke-soft)] rounded-lg overflow-hidden"
+          {...props}
+        />
+      </div>
+    );
+  },
+  thead: ({ node, ...props }) => {
+    void node;
+    return <thead className="bg-[var(--accent-emerald)]/10" {...props} />;
+  },
+  tbody: ({ node, ...props }) => {
+    void node;
+    return <tbody className="divide-y divide-[var(--stroke-soft)]" {...props} />;
+  },
+  tr: ({ node, ...props }) => {
+    void node;
+    return <tr className="hover:bg-[var(--bg-layer)]/30 transition-colors" {...props} />;
+  },
+  th: ({ node, ...props }) => {
+    void node;
+    return (
+      <th
+        className="px-4 py-3 text-left text-sm font-semibold text-[var(--accent-emerald)] border border-[var(--stroke-soft)]"
+        {...props}
+      />
+    );
+  },
+  td: ({ node, ...props }) => {
+    void node;
+    return (
+      <td
+        className="px-4 py-3 text-sm text-[var(--text-subtle)] border border-[var(--stroke-soft)]"
         {...props}
       />
     );
@@ -355,7 +397,9 @@ export function ReportResult({
         ref={reportContentRef}
         className="report-markdown-content text-base sm:text-lg leading-relaxed text-dim mt-8"
       >
-        <ReactMarkdown components={markdownComponents}>{reportData.report}</ReactMarkdown>
+        <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
+          {reportData.report}
+        </ReactMarkdown>
       </div>
 
       <details className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/50 p-3">

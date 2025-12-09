@@ -140,10 +140,34 @@ export async function validateFile(file: File): Promise<FileValidationResult> {
 }
 
 /**
- * Sanitize filename
+ * Sanitize filename to prevent path traversal and other attacks
  */
 export function sanitizeFilename(filename: string): string {
+  // Extract basename and remove path separators
   const basename = filename.split(/[/\\]/).pop() || 'upload';
-  const sanitized = basename.replace(/[^\w.\-]+/g, '-');
-  return sanitized.replace(/-+/g, '-');
+
+  // Limit length to prevent issues
+  const truncated = basename.slice(0, 100);
+
+  // Extract extension separately to preserve it
+  const lastDotIndex = truncated.lastIndexOf('.');
+  let name = truncated;
+  let ext = '';
+
+  if (lastDotIndex > 0) {
+    name = truncated.substring(0, lastDotIndex);
+    ext = truncated.substring(lastDotIndex);
+  }
+
+  // Only allow alphanumeric, underscore, and hyphen in filename
+  // Remove dots from name part to prevent path traversal like "../../../etc/passwd"
+  const sanitizedName = name.replace(/[^\w\-]/g, '-');
+
+  // Remove consecutive hyphens
+  const cleanName = sanitizedName.replace(/-+/g, '-');
+
+  // Validate extension contains only alphanumeric characters
+  const sanitizedExt = ext.replace(/[^\w]/g, '');
+
+  return sanitizedExt ? `${cleanName}.${sanitizedExt}` : cleanName;
 }

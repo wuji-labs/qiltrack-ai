@@ -15,6 +15,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "缺少用户ID列表" }, { status: 400 });
     }
 
+    // Limit batch size to prevent abuse and performance issues
+    const MAX_BATCH_SIZE = 100;
+    if (userIds.length > MAX_BATCH_SIZE) {
+      return NextResponse.json(
+        { error: `批量操作数量超过限制（最多${MAX_BATCH_SIZE}个用户）` },
+        { status: 400 }
+      );
+    }
+
     if (!action) {
       return NextResponse.json({ error: "缺少操作类型" }, { status: 400 });
     }

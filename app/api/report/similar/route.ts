@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { appendCookies } from "@/lib/utils/cookie-helper";
 
 export async function GET(request: NextRequest) {
   const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
@@ -41,9 +42,7 @@ export async function GET(request: NextRequest) {
 
     if (sessionError || !session?.user?.id) {
       const response = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
+      appendCookies(response, responseCookies);
       return response;
     }
     userId = session.user.id;
@@ -70,15 +69,11 @@ export async function GET(request: NextRequest) {
       { error: "Failed to fetch similar reports" },
       { status: 500 }
     );
-    responseCookies.forEach(({ name, value }) => {
-      response.headers.append("Set-Cookie", `${name}=${value}`);
-    });
+    appendCookies(response, responseCookies);
     return response;
   }
 
   const response = NextResponse.json({ similar: data ?? [] });
-  responseCookies.forEach(({ name, value }) => {
-    response.headers.append("Set-Cookie", `${name}=${value}`);
-  });
+  appendCookies(response, responseCookies);
   return response;
 }

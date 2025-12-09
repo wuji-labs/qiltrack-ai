@@ -102,7 +102,7 @@ export class ReportGenerator {
         userPrompt,
         {
           temperature: 0.7,
-          maxTokens: 4096,
+          maxTokens: 16384,
           metadata: { symbol: params.symbol, language, tone },
         }
       );
