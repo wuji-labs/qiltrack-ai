@@ -331,6 +331,38 @@ supabase gen types typescript --local --schema public > types/database.ts
 supabase gen types typescript --linked --schema public > types/database.ts
 ```
 
+### 问题 5：注册功能失败 - "登录暂不可用"
+
+**症状：**
+- 用户注册时显示"登录暂不可用，请稍后再试"
+- Auth 日志显示：`ERROR: function public.fn_initialize_profile(...) is not unique`
+
+**原因：** 多个 worktree 创建了不同版本的 `fn_initialize_profile` 函数，数据库无法确定调用哪个
+
+**解决方案：**
+```bash
+# 1. 检查是否有重复函数
+docker exec supabase_db_qiltrack-ai psql -U postgres -d postgres \
+  -c "SELECT proname, pronargs FROM pg_proc WHERE proname = 'fn_initialize_profile';"
+
+# 2. 如果显示多个结果，删除旧版本
+docker exec supabase_db_qiltrack-ai psql -U postgres -d postgres \
+  -c "DROP FUNCTION IF EXISTS public.fn_initialize_profile(uuid, text, text);"
+
+# 3. 重启 Supabase 服务
+supabase stop && supabase start
+
+# 4. 应用修复迁移（如果存在）
+supabase db push --include-all
+
+# 5. 测试注册功能
+```
+
+**预防措施：**
+- 在创建新函数前，先同步最新代码：`git pull origin develop`
+- 使用 `CREATE OR REPLACE FUNCTION` 而不是 `CREATE FUNCTION`
+- 在 PR 中明确标注新增或修改的数据库函数
+
 ---
 
 ## 📚 相关文档
