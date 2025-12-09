@@ -6056,6 +6056,50 @@ export const STOCK_NAME_MAPPINGS: StockNameMapping[] = [
     description: "GlobalFoundries",
     type: "Common Stock"
   },
+  {
+    symbol: "TCEHY",
+    names: {
+      zh: ["腾讯", "騰訊"],
+      ja: ["テンセント"],
+      ko: ["텐센트"],
+      en: ["Tencent"]
+    },
+    description: "Tencent Holdings",
+    type: "Common Stock"
+  },
+  {
+    symbol: "BEKE",
+    names: {
+      zh: ["贝壳", "貝殼"],
+      ja: ["ベイクー"],
+      ko: ["베이커"],
+      en: ["KE Holdings", "Beike"]
+    },
+    description: "KE Holdings (Beike)",
+    type: "Common Stock"
+  },
+  {
+    symbol: "TME",
+    names: {
+      zh: ["腾讯音乐", "騰訊音樂"],
+      ja: ["テンセント・ミュージック"],
+      ko: ["텐센트 뮤직"],
+      en: ["Tencent Music"]
+    },
+    description: "Tencent Music Entertainment",
+    type: "Common Stock"
+  },
+  {
+    symbol: "BILI",
+    names: {
+      zh: ["哔哩哔哩", "嗶哩嗶哩", "B站"],
+      ja: ["ビリビリ"],
+      ko: ["빌리빌리"],
+      en: ["Bilibili"]
+    },
+    description: "Bilibili",
+    type: "Common Stock"
+  },
 ];
 
 /**
