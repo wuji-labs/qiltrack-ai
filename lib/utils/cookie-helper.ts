@@ -2,12 +2,12 @@
  * Helper utility to properly set cookies in API responses
  */
 
-import { serialize, type CookieSerializeOptions } from "cookie";
+import { serialize, type SerializeOptions } from "cookie";
 
 export interface CookieToSet {
   name: string;
   value: string;
-  options?: CookieSerializeOptions;
+  options?: any;
 }
 
 /**
@@ -17,7 +17,7 @@ export interface CookieToSet {
  */
 export function appendCookies(response: Response, cookies: CookieToSet[]) {
   cookies.forEach(({ name, value, options }) => {
-    const defaultOptions: CookieSerializeOptions = {
+    const defaultOptions: SerializeOptions = {
       path: "/",
       maxAge: 60 * 60 * 24 * 7, // 7 days
       httpOnly: true,
