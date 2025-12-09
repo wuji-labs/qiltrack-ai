@@ -5946,6 +5946,116 @@ export const STOCK_NAME_MAPPINGS: StockNameMapping[] = [
     description: "Wynn Resorts",
     type: "Common Stock"
   },
+  {
+    symbol: "AZN",
+    names: {
+      zh: ["阿斯利康", "阿斯利康"],
+      ja: ["アストラゼネカ"],
+      ko: ["아스트라제네카"],
+      en: ["AstraZeneca"]
+    },
+    description: "AstraZeneca",
+    type: "Common Stock"
+  },
+  {
+    symbol: "NTES",
+    names: {
+      zh: ["网易", "網易"],
+      ja: ["ネットイース"],
+      ko: ["넷이즈"],
+      en: ["NetEase"]
+    },
+    description: "NetEase",
+    type: "Common Stock"
+  },
+  {
+    symbol: "ZM",
+    names: {
+      zh: ["Zoom"],
+      ja: ["ズーム"],
+      ko: ["줌"],
+      en: ["Zoom"]
+    },
+    description: "Zoom",
+    type: "Common Stock"
+  },
+  {
+    symbol: "ZS",
+    names: {
+      zh: ["Zscaler"],
+      ja: ["ズィースケーラー"],
+      ko: ["지스케일러"],
+      en: ["Zscaler"]
+    },
+    description: "Zscaler",
+    type: "Common Stock"
+  },
+  {
+    symbol: "TEAM",
+    names: {
+      zh: ["Atlassian"],
+      ja: ["アトラシアン"],
+      ko: ["아틀라시안"],
+      en: ["Atlassian"]
+    },
+    description: "Atlassian",
+    type: "Common Stock"
+  },
+  {
+    symbol: "ILMN",
+    names: {
+      zh: ["Illumina", "因美纳"],
+      ja: ["イルミナ"],
+      ko: ["일루미나"],
+      en: ["Illumina"]
+    },
+    description: "Illumina",
+    type: "Common Stock"
+  },
+  {
+    symbol: "RIVN",
+    names: {
+      zh: ["Rivian", "里维安"],
+      ja: ["リビアン"],
+      ko: ["리비안"],
+      en: ["Rivian"]
+    },
+    description: "Rivian",
+    type: "Common Stock"
+  },
+  {
+    symbol: "LCID",
+    names: {
+      zh: ["Lucid", "路希德"],
+      ja: ["ルーシッド"],
+      ko: ["루시드"],
+      en: ["Lucid"]
+    },
+    description: "Lucid",
+    type: "Common Stock"
+  },
+  {
+    symbol: "SIRI",
+    names: {
+      zh: ["SiriusXM"],
+      ja: ["シリウスXM"],
+      ko: ["시리우스XM"],
+      en: ["SiriusXM"]
+    },
+    description: "SiriusXM",
+    type: "Common Stock"
+  },
+  {
+    symbol: "GFS",
+    names: {
+      zh: ["格芯", "格芯"],
+      ja: ["グローバルファウンドリーズ"],
+      ko: ["글로벌파운드리스"],
+      en: ["GlobalFoundries"]
+    },
+    description: "GlobalFoundries",
+    type: "Common Stock"
+  },
 ];
 
 /**
