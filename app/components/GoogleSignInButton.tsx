@@ -142,12 +142,40 @@ export function GoogleSignInButton({
     );
   }
 
-  // 使用 Google 渲染的按钮（功能性优先）
+  const handleCustomButtonClick = () => {
+    if (disabled || !isGoogleReady) return;
+
+    // 触发隐藏的 Google 按钮点击
+    const googleButton = document.querySelector('#google-signin-button iframe');
+    if (googleButton) {
+      // @ts-ignore
+      googleButton.click();
+    }
+  };
+
+  const isButtonDisabled = disabled || !isGoogleReady;
+
   return (
-    <div
-      id="google-signin-button"
-      className="w-full"
-      style={{ minHeight: "44px" }}
-    />
+    <div className="relative w-full">
+      {/* 隐藏的 Google 按钮（提供功能） */}
+      <div
+        id="google-signin-button"
+        className="absolute opacity-0 pointer-events-none"
+        style={{ width: '400px' }}
+      />
+
+      {/* 自定义好看的按钮（用户看到的） */}
+      <button
+        type="button"
+        onClick={handleCustomButtonClick}
+        disabled={isButtonDisabled}
+        className={`w-full inline-flex items-center justify-center gap-3 rounded-xl bg-white text-slate-900 px-4 py-3 text-base font-semibold shadow-lg hover:shadow-xl hover:bg-slate-50 transition-all ${
+          isButtonDisabled ? "opacity-70 cursor-not-allowed" : ""
+        }`}
+      >
+        <Image src="/providers/google.svg" alt="google" width={22} height={22} priority />
+        <span>{!isGoogleReady ? "加载中..." : text}</span>
+      </button>
+    </div>
   );
 }
