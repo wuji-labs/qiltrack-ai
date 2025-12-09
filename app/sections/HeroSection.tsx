@@ -237,6 +237,14 @@ export function HeroSection({
                       </div>
                       <div className="grid gap-2 text-sm">
                         <Link
+                          href="/account?section=referrals"
+                          onClick={() => setAccountMenuOpen(false)}
+                          className="w-full rounded-xl bg-[var(--accent-emerald)]/15 border border-[var(--accent-emerald)]/30 px-3 py-2 text-left text-[var(--accent-emerald)] hover:bg-[var(--accent-emerald)]/25 hover:border-[var(--accent-emerald)]/50 transition-colors flex items-center gap-2 font-medium"
+                        >
+                          <span>🎁</span>
+                          {t("referral.menu.title")}
+                        </Link>
+                        <Link
                           href="/pricing"
                           onClick={() => setAccountMenuOpen(false)}
                           className="w-full rounded-xl border border-[var(--stroke-soft)] px-3 py-2 text-left text-dim hover:text-[var(--color-foreground)] hover:border-[var(--stroke-glow)]/70 block"
@@ -356,6 +364,14 @@ export function HeroSection({
                       )}
                     </div>
                   </div>
+                  <Link
+                    href="/account?section=referrals"
+                    onClick={() => setMobileDrawerOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm rounded-lg bg-[var(--accent-emerald)]/15 text-[var(--accent-emerald)] hover:bg-[var(--accent-emerald)]/25 transition font-medium"
+                  >
+                    <span>🎁</span>
+                    {t("referral.menu.title")}
+                  </Link>
                   <button
                     type="button"
                     className="w-full text-left px-4 py-2.5 text-sm rounded-lg text-dim hover:text-[var(--color-foreground)] hover:bg-[var(--bg-layer)]/50 transition"
