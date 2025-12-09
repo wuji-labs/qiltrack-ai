@@ -1,17 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "./providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// 使用系统字体替代 Google Fonts 以避免构建时网络依赖
+// 如需使用自定义字体，请下载字体文件并使用 next/font/local
 
 export const metadata: Metadata = {
   title: "Qiltrack AI",
@@ -26,7 +18,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)] antialiased`}
+        className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)] antialiased font-sans"
+        style={{
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
+        }}
       >
         <AppProviders>{children}</AppProviders>
       </body>

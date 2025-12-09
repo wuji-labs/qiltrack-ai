@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
     });
 
     const { searchParams } = new URL(request.url);
-    const range = parseInt(searchParams.get("range") || "30");
-    const limit = Math.min(50, parseInt(searchParams.get("limit") || "20"));
+    const range = parseInt(searchParams.get("range") || "30", 10);
+    const limit = Math.min(50, parseInt(searchParams.get("limit") || "20", 10));
 
     // Call the database function to get popular symbols
     const { data, error } = await supabase.rpc("fn_get_popular_symbols", {

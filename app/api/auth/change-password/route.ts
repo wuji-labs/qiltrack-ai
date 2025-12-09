@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
 import { validatePassword } from "@/lib/auth/password-validator";
+import { checkRateLimit, passwordChangeRateLimit } from "@/lib/api/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,6 +43,25 @@ export async function POST(request: NextRequest) {
         response.headers.append("Set-Cookie", `${name}=${value}`)
       );
       return response;
+    }
+
+    // Rate limit check - only for non-recovery flows
+    if (!isRecovery && session?.user?.id) {
+      const { success, headers } = await checkRateLimit(
+        session.user.id,
+        passwordChangeRateLimit
+      );
+
+      if (!success) {
+        const response = NextResponse.json(
+          { error: "Too many password change attempts. Please try again later.", code: "rate_limit_exceeded" },
+          { status: 429, headers }
+        );
+        responseCookies.forEach(({ name, value }) =>
+          response.headers.append("Set-Cookie", `${name}=${value}`)
+        );
+        return response;
+      }
     }
 
     // If not recovery mode, current password is required
