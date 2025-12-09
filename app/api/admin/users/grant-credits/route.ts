@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { checkRateLimit, adminActionRateLimit } from "@/lib/api/rate-limit";
 
 // Handles POST /api/admin/users/grant-credits for single-user credit adjustments
 
@@ -26,6 +27,19 @@ export async function POST(request: NextRequest) {
     const role = adminProfile?.role;
     if (role !== "super_admin" && role !== "admin") {
       return NextResponse.json({ error: "需要管理员权限" }, { status: 403 });
+    }
+
+    // Rate limit check for admin actions
+    const { success, headers } = await checkRateLimit(
+      user.id,
+      adminActionRateLimit
+    );
+
+    if (!success) {
+      return NextResponse.json(
+        { error: "操作过于频繁，请稍后再试" },
+        { status: 429, headers }
+      );
     }
 
     const body = await request.json();

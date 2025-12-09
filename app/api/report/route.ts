@@ -89,6 +89,11 @@ export async function GET(request: NextRequest) {
       throw new ValidationError("Missing required parameter: symbol");
     }
 
+    // Validate symbol length to prevent abuse
+    if (symbol.length > 10) {
+      throw new ValidationError("Invalid symbol: too long (max 10 characters)");
+    }
+
     const sanitizer = new ContentSanitizer();
     const language = sanitizer.normalizeLanguage(searchParams.get("lang"));
     const tone = (searchParams.get("tone") || "baseline") as ReportTone;

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/server";
+import { requireAdmin, isAuthError } from "@/lib/auth/admin";
 
 /**
  * GET /api/admin/runs
@@ -17,65 +18,25 @@ import { createServerClient } from "@/lib/supabase/server";
  */
 export async function GET(request: NextRequest) {
   try {
-    const responseCookies: Array<{ name: string; value: string; options?: unknown }> = [];
+    // 使用统一的 requireAdmin() 进行管理员权限验证
+    // 这比使用邮箱域名验证更安全，基于数据库的 role 字段
+    const authResult = await requireAdmin();
 
-    const supabase = createServerClient(request.cookies, (cookies) => {
-      responseCookies.push(...cookies);
-    });
-
-    // Get user session
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
-
-    if (sessionError || !session?.user?.id) {
-      const response = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
-      return response;
+    // 检查是否为错误响应
+    if (isAuthError(authResult)) {
+      return authResult;
     }
 
-    const userId = session.user.id;
+    // 已验证为管理员（super_admin/admin/editor）
+    const { userId } = authResult;
 
-    // Check if user is admin
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("plan, email")
-      .eq("id", userId)
-      .single();
-
-    if (profileError || !profile) {
-      const response = NextResponse.json(
-        { error: "Failed to verify admin status" },
-        { status: 500 }
-      );
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
-      return response;
-    }
-
-    const isAdmin =
-      (profile as { plan?: string; email?: string }).plan === "admin" ||
-      (profile as { plan?: string; email?: string }).email?.endsWith("@qiltrack.com");
-
-    if (!isAdmin) {
-      const response = NextResponse.json(
-        { error: "Forbidden: Admin access required" },
-        { status: 403 }
-      );
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
-      return response;
-    }
+    // 使用 service role client 进行数据查询（绕过RLS）
+    const supabase = createServiceRoleClient();
 
     // Parse query params
     const { searchParams } = new URL(request.url);
-    const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
-    const pageSize = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20")));
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+    const pageSize = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
     const offset = (page - 1) * pageSize;
     const olderThanDays = searchParams.get("older_than_days");
     const isFeaturedParam = searchParams.get("is_featured");
@@ -91,7 +52,7 @@ export async function GET(request: NextRequest) {
 
     if (olderThanDays) {
       const cutoffDate = new Date();
-      cutoffDate.setDate(cutoffDate.getDate() - parseInt(olderThanDays));
+      cutoffDate.setDate(cutoffDate.getDate() - parseInt(olderThanDays, 10));
       query = query.lte("created_at", cutoffDate.toISOString());
     }
 
@@ -105,14 +66,10 @@ export async function GET(request: NextRequest) {
 
     if (queryError) {
       console.error("Failed to fetch report runs:", queryError);
-      const response = NextResponse.json({ error: "Failed to fetch report runs" }, { status: 500 });
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
-      return response;
+      return NextResponse.json({ error: "Failed to fetch report runs" }, { status: 500 });
     }
 
-    const response = NextResponse.json({
+    return NextResponse.json({
       runs: runs || [],
       pagination: {
         page,
@@ -121,12 +78,6 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil((count || 0) / pageSize),
       },
     });
-
-    responseCookies.forEach(({ name, value }) => {
-      response.headers.append("Set-Cookie", `${name}=${value}`);
-    });
-
-    return response;
   } catch (err) {
     console.error("Admin runs list error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { requireAdmin, isAuthError } from "@/lib/auth/admin";
+import { handleApiError } from "@/lib/api/error-handler";
 
 function getSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -49,15 +50,14 @@ export async function POST(request: NextRequest) {
     const { error } = await supabaseAdmin.auth.admin.deleteUser(targetUserId);
     if (error) {
       console.error("Delete user error:", error);
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      // Don't expose internal error details to client
+      return NextResponse.json({ error: "删除用户失败" }, { status: 400 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
     console.error("Delete user API error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "删除用户失败" },
-      { status: 500 }
-    );
+    // Use standardized error handler that doesn't leak sensitive info
+    return handleApiError(error);
   }
 }

@@ -9,11 +9,18 @@ export async function GET(request: NextRequest) {
   const tokenHash = requestUrl.searchParams.get("token_hash");
 
   // Log callback invocation for debugging
+  // Sanitize URL to avoid logging sensitive parameters
+  const sanitizedUrl = new URL(requestUrl);
+  sanitizedUrl.searchParams.delete('code');
+  sanitizedUrl.searchParams.delete('token_hash');
+  sanitizedUrl.searchParams.delete('access_token');
+  sanitizedUrl.searchParams.delete('refresh_token');
+
   console.log("[AUTH] Callback invoked:", {
     hasCode: !!code,
     type,
     hasTokenHash: !!tokenHash,
-    url: requestUrl.toString(),
+    url: sanitizedUrl.toString(),
   });
 
   // Detect password recovery: MUST have BOTH type=recovery AND token_hash

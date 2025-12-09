@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
 
     // Get pagination params
     const url = new URL(request.url);
-    const page = Math.max(1, parseInt(url.searchParams.get("page") || "1"));
-    const pageSize = Math.min(50, Math.max(1, parseInt(url.searchParams.get("limit") || "10")));
+    const page = Math.max(1, parseInt(url.searchParams.get("page") || "1", 10));
+    const pageSize = Math.min(50, Math.max(1, parseInt(url.searchParams.get("limit") || "10", 10)));
     const offset = (page - 1) * pageSize;
 
     // 使用 service role 查询报告（绕过 RLS 以确保能查到数据）
