@@ -80,6 +80,7 @@ export function GoogleSignInButton({
     if (!isGoogleReady) return;
 
     const buttonContainer = document.getElementById('google-signin-button');
+    // @ts-ignore - Google Identity Services 全局对象
     if (buttonContainer && window.google) {
       // @ts-ignore
       window.google.accounts.id.renderButton(
