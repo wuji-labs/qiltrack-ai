@@ -615,3 +615,19 @@ select option:hover {
   background: linear-gradient(90deg, rgba(91, 224, 176, 0.15), rgba(91, 224, 176, 0.08)) !important;
   color: #5be0b0 !important;
 }
+
+/* Referral Welcome Banner Animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out;
+}

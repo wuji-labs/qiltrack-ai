@@ -20,8 +20,8 @@ export async function GET(req: NextRequest) {
 
   try {
     // 1. 查询邀请记录
-    const { data: referrals, error: refError } = await supabase
-      .from('referrals')
+    const { data: referrals, error: refError } = (await supabase
+      .from('referrals' as any)
       .select(
         `
         id,
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       `
       )
       .eq('referrer_id', user.id)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })) as any;
 
     if (refError) {
       console.error('[REFERRAL_STATS_ERROR]', refError);
@@ -43,32 +43,32 @@ export async function GET(req: NextRequest) {
     // 2. 统计数据
     const stats = {
       total: referrals?.length || 0,
-      pending: referrals?.filter((r) => r.status === 'pending').length || 0,
-      completed: referrals?.filter((r) => r.status === 'completed').length || 0,
+      pending: referrals?.filter((r: any) => r.status === 'pending').length || 0,
+      completed: referrals?.filter((r: any) => r.status === 'completed').length || 0,
       converted:
-        referrals?.filter((r) => r.status.startsWith('converted')).length || 0,
+        referrals?.filter((r: any) => r.status?.startsWith('converted')).length || 0,
     };
 
     // 3. 查询总获得积分
-    const { data: events, error: eventsError } = await supabase
-      .from('referral_events')
+    const { data: events, error: eventsError } = (await supabase
+      .from('referral_events' as any)
       .select('credits_rewarded')
       .eq('user_id', user.id)
-      .not('credits_rewarded', 'is', null);
+      .not('credits_rewarded', 'is', null)) as any;
 
     if (eventsError) {
       console.error('[REFERRAL_EVENTS_ERROR]', eventsError);
     }
 
     const total_credits_earned =
-      events?.reduce((sum, e) => sum + (e.credits_rewarded || 0), 0) || 0;
+      events?.reduce((sum: number, e: any) => sum + (e.credits_rewarded || 0), 0) || 0;
 
     // 4. 查询里程碑
-    const { data: milestones, error: milestoneError } = await supabase
-      .from('referral_milestones')
+    const { data: milestones, error: milestoneError } = (await supabase
+      .from('referral_milestones' as any)
       .select('*')
       .eq('user_id', user.id)
-      .order('milestone_type');
+      .order('milestone_type')) as any;
 
     if (milestoneError) {
       console.error('[REFERRAL_MILESTONES_ERROR]', milestoneError);

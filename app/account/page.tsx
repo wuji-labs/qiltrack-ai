@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useMembershipTier } from "@/hooks/useMembershipTier";
 import { useLanguage } from "@/lib/i18n";
@@ -13,20 +13,33 @@ import SecuritySection from "./sections/SecuritySection";
 import MembershipSection from "./sections/MembershipSection";
 import PreferencesSection from "./sections/PreferencesSection";
 import DataSection from "./sections/DataSection";
+import ReferralSection from "./sections/ReferralSection";
 
-type Section = "profile" | "security" | "membership" | "preferences" | "data";
+type Section = "profile" | "security" | "membership" | "preferences" | "data" | "referrals";
 
-export default function AccountPage() {
+function AccountPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isAuthenticated, user, loading } = useSupabaseAuth();
   const { t } = useLanguage();
-  const [activeSection, setActiveSection] = useState<Section>("profile");
+
+  // Read section from URL params, default to "profile"
+  const initialSection = (searchParams.get("section") as Section) || "profile";
+  const [activeSection, setActiveSection] = useState<Section>(initialSection);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       router.push("/login");
     }
   }, [loading, isAuthenticated, router]);
+
+  // Update active section when URL param changes
+  useEffect(() => {
+    const section = searchParams.get("section") as Section;
+    if (section && section !== activeSection) {
+      setActiveSection(section);
+    }
+  }, [searchParams, activeSection]);
 
   if (loading) {
     return (
@@ -46,6 +59,7 @@ export default function AccountPage() {
   const sections: { id: Section; label: string; icon: string }[] = [
     { id: "profile", label: t("account.sections.profile"), icon: "👤" },
     { id: "membership", label: t("account.sections.membership"), icon: "💎" },
+    { id: "referrals", label: t("account.sections.referrals"), icon: "🎁" },
     { id: "security", label: t("account.sections.security"), icon: "🔒" },
     { id: "preferences", label: t("account.sections.preferences"), icon: "⚙️" },
     { id: "data", label: t("account.sections.data"), icon: "📊" },
@@ -97,11 +111,27 @@ export default function AccountPage() {
             {activeSection === "profile" && <ProfileSection />}
             {activeSection === "security" && <SecuritySection />}
             {activeSection === "membership" && <MembershipSection />}
+            {activeSection === "referrals" && <ReferralSection />}
             {activeSection === "preferences" && <PreferencesSection />}
             {activeSection === "data" && <DataSection />}
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)] flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[var(--accent-emerald)] border-r-transparent"></div>
+          <p className="mt-4 text-sm text-subtle">加载中...</p>
+        </div>
+      </div>
+    }>
+      <AccountPageContent />
+    </Suspense>
   );
 }

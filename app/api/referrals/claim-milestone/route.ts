@@ -30,10 +30,13 @@ export async function POST(req: NextRequest) {
     }
 
     // 调用数据库函数领取奖励
-    const { data, error } = await supabase.rpc('fn_claim_milestone_reward', {
-      p_user_id: user.id,
-      p_milestone_type: milestone_type,
-    });
+    const { data, error } = await supabase.rpc(
+      'fn_claim_milestone_reward' as any,
+      {
+        p_user_id: user.id,
+        p_milestone_type: milestone_type,
+      }
+    );
 
     if (error) {
       console.error('[CLAIM_MILESTONE_ERROR]', error);

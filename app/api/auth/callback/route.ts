@@ -93,11 +93,19 @@ export async function GET(request: NextRequest) {
 
       if (user && user.email) {
         console.log("[AUTH] Initializing profile for user:", user.id);
+
+        // Read referral code from cookie if present
+        const referralCode = cookieStore.get('referral_code')?.value || null;
+        if (referralCode) {
+          console.log("[AUTH] Found referral code in cookie:", referralCode);
+        }
+
         // Call RPC to initialize profile and credits atomically
         try {
           const { error: rpcError } = await supabase.rpc("fn_initialize_profile", {
             p_user_id: user.id,
             p_email: user.email,
+            p_referral_code: referralCode,
           } as never);
 
           if (rpcError) {
@@ -105,6 +113,14 @@ export async function GET(request: NextRequest) {
             // Don't fail the login, just log the error
           } else {
             console.log("[AUTH] Profile initialized successfully");
+            // Clear the referral code cookie after successful use
+            if (referralCode) {
+              cookiesToSet.push({
+                name: 'referral_code',
+                value: '',
+                options: { maxAge: 0, path: '/' }
+              });
+            }
           }
         } catch (err) {
           console.error("[AUTH] Exception calling fn_initialize_profile:", err);

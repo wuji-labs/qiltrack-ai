@@ -22,17 +22,23 @@ export async function POST(req: NextRequest) {
 
   try {
     // 调用数据库函数生成邀请码
-    const { data: referralCode, error } = await supabase.rpc('fn_generate_referral_code', {
-      p_user_id: user.id,
-    });
+    const { data: referralCode, error } = await supabase.rpc(
+      'fn_generate_referral_code' as any,
+      {
+        p_user_id: user.id,
+      }
+    );
 
     if (error) {
       console.error('[REFERRAL_GENERATE_ERROR]', error);
       throw error;
     }
 
-    // 构造完整的邀请链接
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    // 动态获取当前请求的完整 URL（支持任何端口和域名）
+    const protocol = req.headers.get('x-forwarded-proto') ||
+                     (process.env.NODE_ENV === 'production' ? 'https' : 'http');
+    const host = req.headers.get('host') || 'localhost:3000';
+    const siteUrl = `${protocol}://${host}`;
     const referralLink = `${siteUrl}/ref/${referralCode}`;
 
     console.info('[REFERRAL_GENERATED]', {
