@@ -6100,6 +6100,270 @@ export const STOCK_NAME_MAPPINGS: StockNameMapping[] = [
     description: "Bilibili",
     type: "Common Stock"
   },
+  {
+    symbol: "TCOM",
+    names: {
+      zh: ["携程", "攜程"],
+      ja: ["シートリップ"],
+      ko: ["씨트립"],
+      en: ["Ctrip", "Trip.com"]
+    },
+    description: "Trip.com (Ctrip)",
+    type: "Common Stock"
+  },
+  {
+    symbol: "EDU",
+    names: {
+      zh: ["新东方", "新東方"],
+      ja: ["ニュー・オリエンタル"],
+      ko: ["뉴 오리엔탈"],
+      en: ["New Oriental"]
+    },
+    description: "New Oriental Education",
+    type: "Common Stock"
+  },
+  {
+    symbol: "TAL",
+    names: {
+      zh: ["好未来", "好未來"],
+      ja: ["TAL・エデュケーション"],
+      ko: ["TAL 에듀케이션"],
+      en: ["TAL Education"]
+    },
+    description: "TAL Education",
+    type: "Common Stock"
+  },
+  {
+    symbol: "DIDI",
+    names: {
+      zh: ["滴滴", "滴滴"],
+      ja: ["ディディ"],
+      ko: ["디디"],
+      en: ["Didi"]
+    },
+    description: "Didi Global",
+    type: "Common Stock"
+  },
+  {
+    symbol: "YMM",
+    names: {
+      zh: ["满帮", "滿幫"],
+      ja: ["フル・トラック"],
+      ko: ["풀 트럭"],
+      en: ["Full Truck Alliance"]
+    },
+    description: "Full Truck Alliance (Manbang)",
+    type: "Common Stock"
+  },
+  {
+    symbol: "KC",
+    names: {
+      zh: ["金山云", "金山雲"],
+      ja: ["キングソフト・クラウド"],
+      ko: ["킹소프트 클라우드"],
+      en: ["Kingsoft Cloud"]
+    },
+    description: "Kingsoft Cloud",
+    type: "Common Stock"
+  },
+  {
+    symbol: "HTHT",
+    names: {
+      zh: ["华住", "華住"],
+      ja: ["ホアジュウ"],
+      ko: ["화주"],
+      en: ["Huazhu", "H World"]
+    },
+    description: "H World Group (Huazhu)",
+    type: "Common Stock"
+  },
+  {
+    symbol: "HMC",
+    names: {
+      zh: ["本田", "本田"],
+      ja: ["ホンダ"],
+      ko: ["혼다"],
+      en: ["Honda"]
+    },
+    description: "Honda Motor",
+    type: "Common Stock"
+  },
+  {
+    symbol: "SONY",
+    names: {
+      zh: ["索尼", "索尼"],
+      ja: ["ソニー"],
+      ko: ["소니"],
+      en: ["Sony"]
+    },
+    description: "Sony Group",
+    type: "Common Stock"
+  },
+  {
+    symbol: "NTDOY",
+    names: {
+      zh: ["任天堂", "任天堂"],
+      ja: ["任天堂"],
+      ko: ["닌텐도"],
+      en: ["Nintendo"]
+    },
+    description: "Nintendo",
+    type: "Common Stock"
+  },
+  {
+    symbol: "NSANY",
+    names: {
+      zh: ["日产", "日產"],
+      ja: ["日産"],
+      ko: ["닛산"],
+      en: ["Nissan"]
+    },
+    description: "Nissan Motor",
+    type: "Common Stock"
+  },
+  {
+    symbol: "MZDAY",
+    names: {
+      zh: ["马自达", "馬自達"],
+      ja: ["マツダ"],
+      ko: ["마쓰다"],
+      en: ["Mazda"]
+    },
+    description: "Mazda Motor",
+    type: "Common Stock"
+  },
+  {
+    symbol: "CAJ",
+    names: {
+      zh: ["佳能", "佳能"],
+      ja: ["キヤノン"],
+      ko: ["캐논"],
+      en: ["Canon"]
+    },
+    description: "Canon Inc.",
+    type: "Common Stock"
+  },
+  {
+    symbol: "FUJIY",
+    names: {
+      zh: ["富士通", "富士通"],
+      ja: ["富士通"],
+      ko: ["후지쯔"],
+      en: ["Fujitsu"]
+    },
+    description: "Fujitsu",
+    type: "Common Stock"
+  },
+  {
+    symbol: "NMR",
+    names: {
+      zh: ["野村", "野村"],
+      ja: ["野村"],
+      ko: ["노무라"],
+      en: ["Nomura"]
+    },
+    description: "Nomura Holdings",
+    type: "Common Stock"
+  },
+  {
+    symbol: "CPNG",
+    names: {
+      zh: ["Coupang"],
+      ja: ["クーパン"],
+      ko: ["쿠팡"],
+      en: ["Coupang"]
+    },
+    description: "Coupang",
+    type: "Common Stock"
+  },
+  {
+    symbol: "SKM",
+    names: {
+      zh: ["SK电讯", "SK電訊"],
+      ja: ["SKテレコム"],
+      ko: ["SK텔레콤"],
+      en: ["SK Telecom"]
+    },
+    description: "SK Telecom",
+    type: "Common Stock"
+  },
+  {
+    symbol: "KT",
+    names: {
+      zh: ["KT"],
+      ja: ["KT"],
+      ko: ["KT"],
+      en: ["KT Corporation"]
+    },
+    description: "KT Corporation",
+    type: "Common Stock"
+  },
+  {
+    symbol: "PKX",
+    names: {
+      zh: ["浦项制铁", "浦項製鐵"],
+      ja: ["ポスコ"],
+      ko: ["포스코"],
+      en: ["POSCO"]
+    },
+    description: "POSCO Holdings",
+    type: "Common Stock"
+  },
+  {
+    symbol: "KB",
+    names: {
+      zh: ["KB金融", "KB金融"],
+      ja: ["KB金融"],
+      ko: ["KB금융"],
+      en: ["KB Financial"]
+    },
+    description: "KB Financial Group",
+    type: "Common Stock"
+  },
+  {
+    symbol: "SHG",
+    names: {
+      zh: ["新韩金融", "新韓金融"],
+      ja: ["シンハン金融"],
+      ko: ["신한금융"],
+      en: ["Shinhan Financial"]
+    },
+    description: "Shinhan Financial Group",
+    type: "Common Stock"
+  },
+  {
+    symbol: "UMC",
+    names: {
+      zh: ["联电", "聯電"],
+      ja: ["UMC"],
+      ko: ["UMC"],
+      en: ["UMC"]
+    },
+    description: "United Microelectronics",
+    type: "Common Stock"
+  },
+  {
+    symbol: "ASX",
+    names: {
+      zh: ["日月光", "日月光"],
+      ja: ["ASE"],
+      ko: ["ASE"],
+      en: ["ASE Technology"]
+    },
+    description: "ASE Technology Holding",
+    type: "Common Stock"
+  },
+  {
+    symbol: "CHT",
+    names: {
+      zh: ["中华电信", "中華電信"],
+      ja: ["チュンファ・テレコム"],
+      ko: ["중화전신"],
+      en: ["Chunghwa Telecom"]
+    },
+    description: "Chunghwa Telecom",
+    type: "Common Stock"
+  },
 ];
 
 /**
