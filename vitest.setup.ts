@@ -29,6 +29,50 @@ vi.mock("next/headers", () => {
   };
 });
 
+// Mock Supabase server utilities
+vi.mock("@/lib/supabase/server", () => {
+  const createMockSupabaseClient = () => ({
+    from: vi.fn((table: string) => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          single: vi.fn(() => ({ data: null, error: null })),
+          maybeSingle: vi.fn(() => ({ data: null, error: null })),
+        })),
+        order: vi.fn(() => ({
+          limit: vi.fn(() => ({ data: [], error: null })),
+        })),
+        limit: vi.fn(() => ({ data: [], error: null })),
+      })),
+      insert: vi.fn(() => ({ data: null, error: null })),
+      update: vi.fn(() => ({
+        eq: vi.fn(() => ({ data: null, error: null })),
+      })),
+      delete: vi.fn(() => ({
+        eq: vi.fn(() => ({ data: null, error: null })),
+      })),
+      upsert: vi.fn(() => ({ data: null, error: null })),
+    })),
+    rpc: vi.fn(() => ({ data: null, error: null })),
+    auth: {
+      getUser: vi.fn(() => ({ data: { user: null }, error: null })),
+      getSession: vi.fn(() => ({ data: { session: null }, error: null })),
+    },
+    storage: {
+      from: vi.fn(() => ({
+        upload: vi.fn(() => ({ data: null, error: null })),
+        createSignedUrl: vi.fn(() => ({ data: { signedUrl: "https://example.com/signed" }, error: null })),
+      })),
+    },
+  });
+
+  return {
+    createServerClient: vi.fn(() => createMockSupabaseClient()),
+    createServiceRoleClient: vi.fn(() => createMockSupabaseClient()),
+    getUserIdFromRequest: vi.fn(() => Promise.resolve(null)),
+    uploadToStorage: vi.fn(() => Promise.resolve("https://example.com/file")),
+  };
+});
+
 // Stripe mock
 vi.mock("@/lib/stripe/client", () => {
   const stripeMock = {

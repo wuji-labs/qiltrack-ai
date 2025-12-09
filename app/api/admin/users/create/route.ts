@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { validatePassword } from "@/lib/auth/password-validator";
+import { handleApiError } from "@/lib/api/error-handler";
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,7 +59,8 @@ export async function POST(request: NextRequest) {
 
     if (createError) {
       console.error("Create user error:", createError);
-      return NextResponse.json({ error: createError.message }, { status: 400 });
+      // Don't expose internal error details to client
+      return NextResponse.json({ error: "创建用户失败" }, { status: 400 });
     }
 
     // 3. 更新 profiles 表
@@ -118,9 +120,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: unknown) {
     console.error("Create user API error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "创建用户失败" },
-      { status: 500 }
-    );
+    // Use standardized error handler that doesn't leak sensitive info
+    return handleApiError(error);
   }
 }
