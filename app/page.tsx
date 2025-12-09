@@ -350,15 +350,14 @@ export default function Home() {
                   />
                 </section>
 
-                {/* 每日签到 - 仅登录用户显示 */}
-                {isAuthenticated && (
-                  <DailyRewardButton
-                    onRewardClaimed={(credits) => {
-                      setRemainingQuota(credits);
-                    }}
-                    className="max-w-4xl mx-auto"
-                  />
-                )}
+                {/* 每日签到 - 未登录时显示吸引性CTA，登录后显示签到功能 */}
+                <DailyRewardButton
+                  isLoggedIn={isAuthenticated}
+                  onRewardClaimed={(credits) => {
+                    setRemainingQuota(credits);
+                  }}
+                  className="max-w-4xl mx-auto"
+                />
 
                 <section
                   id="overview"
