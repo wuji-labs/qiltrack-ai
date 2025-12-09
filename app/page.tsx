@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -19,6 +19,7 @@ import { getFeaturedReports } from "@/lib/content/reportHub";
 import { DailyRewardButton } from "@/app/components/DailyRewardButton";
 import { useLanguageDetection } from "@/hooks/useLanguageDetection";
 import { LanguageSwitchPrompt } from "@/app/components/LanguageSwitchPrompt";
+import { ReferralWelcomeBanner } from "@/app/components/ReferralWelcomeBanner";
 
 type TranslationKey = string;
 
@@ -320,6 +321,11 @@ export default function Home() {
           onDismiss={dismissPrompt}
         />
       )}
+
+      {/* Referral welcome banner */}
+      <Suspense fallback={null}>
+        <ReferralWelcomeBanner />
+      </Suspense>
 
       <main
         className={`min-h-screen ${mainBg}`}
