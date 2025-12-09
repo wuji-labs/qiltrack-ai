@@ -72,8 +72,11 @@ curl "http://localhost:3000/api/report?symbol=AAPL&testToken=local-test-token"
 ```bash
 npx supabase start        # 首次启动会根据 supabase/config.toml 初始化
 npx supabase stop         # 停止 Docker 容器
-npx supabase db reset     # 重新应用 migrations + seed（危险操作）
+npx supabase db push      # 应用新迁移（推荐，保留数据）
+npx supabase db reset     # 重建数据库（⚠️ 删除所有数据，慎用！）
 ```
+
+> ⚠️ **重要提示：** 大多数情况下应使用 `db push` 而不是 `db reset`。详见 [数据库管理规范指南](./database-management-guide.md)。
 
 ### 3.2 状态 & 日志
 
@@ -167,4 +170,11 @@ npx supabase gen types typescript --linked --schema public > types/database.ts
 
 ---
 
-若流程仍有疑问，请在 PR/Issue 中引用本指南并描述所卡步骤，方便 Codex 评审与追踪。\*\*\*
+## 9. 相关文档
+
+- **[数据库管理规范指南](./database-management-guide.md)** - ⭐ 必读！详细说明如何安全地管理数据库，避免数据丢失
+- [Supabase Bucket 设置指南](../setup/supabase-bucket-setup-guide.md) - Storage 存储桶配置
+
+---
+
+若流程仍有疑问，请在 PR/Issue 中引用本指南并描述所卡步骤，方便 Codex 评审与追踪。
