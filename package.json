@@ -4,6 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "node scripts/dev.js",
+    "dev:safe": "node scripts/dev-safe.js",
+    "dev:stop": "node scripts/dev-stop.js",
+    "dev:restart": "node scripts/dev-restart.js",
     "dev:start": "bash scripts/dev-start.sh",
     "build": "next build",
     "start": "next start",
