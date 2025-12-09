@@ -1,289 +1,137 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useMembershipTier } from "@/hooks/useMembershipTier";
 import { useLanguage } from "@/lib/i18n";
-import { LANGUAGE_OPTIONS } from "@/lib/i18n-config";
 
-type Preferences = {
-  language: string;
-  timezone: string;
-  emailAlerts: boolean;
-  saveHistory: boolean;
-};
+// Import sections
+import ProfileSection from "./sections/ProfileSection";
+import SecuritySection from "./sections/SecuritySection";
+import MembershipSection from "./sections/MembershipSection";
+import PreferencesSection from "./sections/PreferencesSection";
+import DataSection from "./sections/DataSection";
+import ReferralSection from "./sections/ReferralSection";
 
-export default function AccountPage() {
+type Section = "profile" | "security" | "membership" | "preferences" | "data" | "referrals";
+
+function AccountPageContent() {
   const router = useRouter();
-  const { isAuthenticated, user, authMethod, oauthProviders, getReportCredits, signOut } =
-    useSupabaseAuth();
-  const membership = useMembershipTier();
-  const { language, setLanguage, t } = useLanguage();
-  const [prefs, setPrefs] = useState<Preferences>({
-    language,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    emailAlerts: true,
-    saveHistory: true,
-  });
-  const [loaded, setLoaded] = useState(false);
-  const [reportCredits, setReportCredits] = useState<{
-    credits_available: number;
-    credits_used: number;
-  } | null>(null);
+  const searchParams = useSearchParams();
+  const { isAuthenticated, user, loading } = useSupabaseAuth();
+  const { t } = useLanguage();
 
-  const PREF_KEY = "ia-account-preferences";
+  // Read section from URL params, default to "profile"
+  const initialSection = (searchParams.get("section") as Section) || "profile";
+  const [activeSection, setActiveSection] = useState<Section>(initialSection);
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(PREF_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Preferences;
-        setPrefs((prev) => ({ ...prev, ...parsed }));
-      }
-    } catch {
-      // ignore malformed data
-    } finally {
-      setLoaded(true);
+    if (!loading && !isAuthenticated) {
+      router.push("/login");
     }
-  }, []);
+  }, [loading, isAuthenticated, router]);
 
+  // Update active section when URL param changes
   useEffect(() => {
-    setPrefs((prev) => (prev.language === language ? prev : { ...prev, language }));
-  }, [language]);
+    const section = searchParams.get("section") as Section;
+    if (section && section !== activeSection) {
+      setActiveSection(section);
+    }
+  }, [searchParams, activeSection]);
 
-  useEffect(() => {
-    if (!loaded) return;
-    window.localStorage.setItem(PREF_KEY, JSON.stringify(prefs));
-  }, [prefs, loaded]);
-
-  // Fetch real quota from /api/report/credits on component mount and auto-refresh
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const fetchCredits = async () => {
-      try {
-        const response = await fetch("/api/report/credits");
-        if (response.ok) {
-          const data = await response.json();
-          // Map API response to component state
-          setReportCredits({
-            credits_available: data.credits?.remaining_credits ?? 0,
-            credits_used: 0, // For display; actual tracking is in Supabase
-          });
-        }
-      } catch (err) {
-        console.error("Failed to fetch credits:", err);
-      }
-    };
-
-    // Fetch immediately
-    fetchCredits();
-
-    // Auto-refresh every 30 seconds to keep quota in sync
-    const interval = setInterval(fetchCredits, 30000);
-
-    // Cleanup interval on unmount
-    return () => clearInterval(interval);
-  }, [isAuthenticated]);
-
-  if (!isAuthenticated) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)] flex items-center justify-center px-4">
-        <div className="w-full max-w-md space-y-4 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 p-6 text-center shadow-xl">
-          <h1 className="text-2xl font-semibold">{t("account.page.title")}</h1>
-          <p className="text-sm text-subtle">{t("account.page.loginPrompt")}</p>
-          <button
-            type="button"
-            onClick={() => router.push("/login")}
-            className="w-full rounded-xl bg-[var(--accent-emerald)] py-2.5 text-base font-semibold text-slate-950 shadow-[0_12px_28px_rgba(91,224,176,0.28)] transition hover:brightness-105"
-          >
-            {t("account.page.signIn")}
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push("/")}
-            className="w-full rounded-xl border border-[var(--stroke-soft)] py-2.5 text-base text-dim hover:text-[var(--color-foreground)]"
-          >
-            {t("account.page.returnHome")}
-          </button>
+      <div className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)] flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[var(--accent-emerald)] border-r-transparent"></div>
+          <p className="mt-4 text-sm text-subtle">加载中...</p>
         </div>
       </div>
     );
   }
 
-  const avatarInitial = user?.email ? user.email.charAt(0).toUpperCase() : "A";
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  const sections: { id: Section; label: string; icon: string }[] = [
+    { id: "profile", label: t("account.sections.profile"), icon: "👤" },
+    { id: "membership", label: t("account.sections.membership"), icon: "💎" },
+    { id: "referrals", label: t("account.sections.referrals"), icon: "🎁" },
+    { id: "security", label: t("account.sections.security"), icon: "🔒" },
+    { id: "preferences", label: t("account.sections.preferences"), icon: "⚙️" },
+    { id: "data", label: t("account.sections.data"), icon: "📊" },
+  ];
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)]">
-      <div className="mx-auto w-full max-w-4xl px-4 py-10 space-y-6">
-        <div className="flex items-center gap-3 text-sm text-subtle">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] px-3 py-1.5 hover:text-[var(--color-foreground)]"
-          >
-            <span className="text-base">←</span>
-            {t("account.page.backLabel")}
-          </Link>
-          <span>{t("account.page.title")}</span>
+      {/* Header */}
+      <div className="border-b border-[var(--stroke-soft)] bg-[var(--bg-layer)]/50 backdrop-blur-sm">
+        <div className="mx-auto max-w-7xl px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-subtle hover:bg-[var(--bg-base)] hover:text-[var(--color-foreground)] transition-colors"
+              >
+                <span>←</span>
+                {t("account.page.backLabel")}
+              </Link>
+              <div className="h-6 w-px bg-[var(--stroke-soft)]" />
+              <h1 className="text-lg font-semibold">{t("account.page.title")}</h1>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div className="rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-6 shadow-[0_18px_60px_rgba(0,0,0,0.35)] space-y-6">
-          <div className="flex items-center gap-4">
-            <span className="h-12 w-12 rounded-full bg-[var(--accent-emerald)]/20 border border-[var(--stroke-soft)] overflow-hidden flex items-center justify-center text-base font-semibold text-[var(--accent-emerald)]">
-              {avatarInitial}
-            </span>
-            <div className="flex-1">
-              <p className="text-lg font-semibold">{user?.email ?? t("auth.session.fallback")}</p>
-              <p className="text-sm text-subtle">
-                {t("account.page.planLabel")}:{" "}
-                {membership.loading ? (
-                  "..."
-                ) : membership.tier === "free" ? (
-                  <span className="text-slate-400">Free</span>
-                ) : membership.tier === "pro" ? (
-                  <span className="text-amber-300">Pro</span>
-                ) : (
-                  <span className="text-purple-300">Ultra</span>
-                )}
-                {membership.isActive && membership.expiresAt && (
-                  <span className="text-xs ml-2 text-dim">
-                    到期: {new Date(membership.expiresAt).toLocaleDateString("zh-CN")}
-                  </span>
-                )}
-              </p>
-            </div>
-            {!membership.isFree && (
-              <Link
-                href="/pricing"
-                className="rounded-xl border border-[var(--stroke-soft)] px-4 py-2 text-sm text-subtle hover:text-[var(--color-foreground)] hover:border-[var(--accent-emerald)]/50"
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[240px_1fr]">
+          {/* Sidebar Navigation */}
+          <nav className="space-y-1">
+            {sections.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id)}
+                className={`w-full flex items-center gap-3 rounded-lg px-4 py-2.5 text-left text-sm font-medium transition-colors ${
+                  activeSection === section.id
+                    ? "bg-[var(--accent-emerald)]/10 text-[var(--accent-emerald)]"
+                    : "text-subtle hover:bg-[var(--bg-layer)] hover:text-[var(--color-foreground)]"
+                }`}
               >
-                管理订阅
-              </Link>
-            )}
-            {membership.isFree && (
-              <Link
-                href="/pricing"
-                className="rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(251,146,60,0.3)] hover:scale-105"
-              >
-                升级会员
-              </Link>
-            )}
-          </div>
+                <span className="text-lg">{section.icon}</span>
+                {section.label}
+              </button>
+            ))}
+          </nav>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 space-y-2">
-              <p className="text-sm text-subtle">{t("account.page.remainingTitle")}</p>
-              <p className="text-3xl font-bold text-[var(--accent-emerald)]">
-                {reportCredits === null
-                  ? "..."
-                  : reportCredits.credits_available <= 0
-                    ? 0
-                    : reportCredits.credits_available}
-              </p>
-              <p className="text-sm text-dim">{t("account.page.remainingNote")}</p>
-            </div>
-            <div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 space-y-2">
-              <p className="text-sm text-subtle">{t("account.page.planSectionTitle")}</p>
-              <p className="text-base text-[var(--color-foreground)]">
-                {t("account.page.planStatus", { plan: membership.tier === "free" ? "Free" : membership.tier === "pro" ? "Pro" : "Ultra" })}
-              </p>
-              <p className="text-sm text-dim">{t("account.page.planNote")}</p>
-            </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 space-y-3">
-              <p className="text-sm text-subtle">{t("account.page.languageLabel")}</p>
-              <select
-                value={prefs.language}
-                onChange={(e) => {
-                  setPrefs((prev) => ({ ...prev, language: e.target.value }));
-                  setLanguage(e.target.value as typeof language);
-                }}
-                className="w-full rounded-xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3 py-2 text-base text-[var(--color-foreground)] focus:outline-none focus:border-[var(--stroke-glow)]"
-              >
-                {LANGUAGE_OPTIONS.map((option) => (
-                  <option
-                    key={option.value}
-                    value={option.value}
-                    className="text-[var(--color-foreground)] bg-[var(--bg-base)]"
-                  >
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-subtle">{t("account.page.subtitle")}</p>
-            </div>
-
-            <div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 space-y-3">
-              <p className="text-sm text-subtle">{t("account.page.timezoneLabel")}</p>
-              <input
-                type="text"
-                value={prefs.timezone}
-                onChange={(e) => setPrefs((prev) => ({ ...prev, timezone: e.target.value }))}
-                className="w-full rounded-xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3 py-2 text-base text-[var(--color-foreground)] focus:outline-none focus:border-[var(--stroke-glow)]"
-              />
-              <p className="text-xs text-subtle">{t("account.page.timezoneNote")}</p>
-            </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 space-y-3">
-              <p className="text-sm text-subtle">{t("account.page.notificationsLabel")}</p>
-              <label className="flex items-center gap-3 text-sm text-[var(--color-foreground)]">
-                <input
-                  type="checkbox"
-                  checked={prefs.emailAlerts}
-                  onChange={(e) => setPrefs((prev) => ({ ...prev, emailAlerts: e.target.checked }))}
-                  className="h-4 w-4 accent-[var(--accent-emerald)]"
-                />
-                <span>{t("account.page.emailAlerts")}</span>
-              </label>
-              <label className="flex items-center gap-3 text-sm text-[var(--color-foreground)]">
-                <input
-                  type="checkbox"
-                  checked={prefs.saveHistory}
-                  onChange={(e) => setPrefs((prev) => ({ ...prev, saveHistory: e.target.checked }))}
-                  className="h-4 w-4 accent-[var(--accent-emerald)]"
-                />
-                <span>{t("account.page.saveHistory")}</span>
-              </label>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/70 p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1">
-              <p className="text-sm font-semibold text-[var(--color-foreground)]">Report history</p>
-              <p className="text-sm text-subtle">{t("account.page.saveHistory")}</p>
-            </div>
-            <Link
-              href="/account/history"
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-[var(--accent-emerald)] hover:text-[var(--color-foreground)]"
-            >
-              View history
-            </Link>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)] px-4 py-2 text-sm text-dim hover:text-[var(--color-foreground)]"
-            >
-              {t("account.page.returnHome")}
-            </Link>
-            <button
-              type="button"
-              onClick={() => signOut()}
-              className="inline-flex items-center gap-2 rounded-full bg-[var(--accent-emerald)] px-4 py-2 text-sm font-semibold text-slate-950 shadow-[0_12px_28px_rgba(91,224,176,0.28)] hover:brightness-105"
-            >
-              {t("auth.account.signout")}
-            </button>
+          {/* Main Content */}
+          <div className="min-h-[600px]">
+            {activeSection === "profile" && <ProfileSection />}
+            {activeSection === "security" && <SecuritySection />}
+            {activeSection === "membership" && <MembershipSection />}
+            {activeSection === "referrals" && <ReferralSection />}
+            {activeSection === "preferences" && <PreferencesSection />}
+            {activeSection === "data" && <DataSection />}
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AccountPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)] flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[var(--accent-emerald)] border-r-transparent"></div>
+          <p className="mt-4 text-sm text-subtle">加载中...</p>
+        </div>
+      </div>
+    }>
+      <AccountPageContent />
+    </Suspense>
   );
 }

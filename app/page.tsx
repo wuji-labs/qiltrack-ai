@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -17,6 +17,9 @@ import { fetchCredits } from "@/lib/services/api";
 import type { ReportTone } from "@/types/report";
 import { getFeaturedReports } from "@/lib/content/reportHub";
 import { DailyRewardButton } from "@/app/components/DailyRewardButton";
+import { useLanguageDetection } from "@/hooks/useLanguageDetection";
+import { LanguageSwitchPrompt } from "@/app/components/LanguageSwitchPrompt";
+import { ReferralWelcomeBanner } from "@/app/components/ReferralWelcomeBanner";
 
 type TranslationKey = string;
 
@@ -156,6 +159,15 @@ export default function Home() {
   const [remainingQuota, setRemainingQuota] = useState(0);
   const [quotaLoaded, setQuotaLoaded] = useState(false);
   const [userPlan, setUserPlan] = useState<string>("free");
+  const [userProfile, setUserProfile] = useState<{ avatar_url: string | null; display_name: string | null } | null>(null);
+
+  // Language detection and prompt
+  const {
+    shouldShowPrompt,
+    detectedLanguage,
+    dismissPrompt,
+    acceptSwitch,
+  } = useLanguageDetection(language as Language);
 
   // Fetch remaining credits and user profile on mount and when authenticated
   useEffect(() => {
@@ -175,11 +187,16 @@ export default function Home() {
         setRemainingQuota(creditsData.credits?.remaining_credits ?? 0);
         setQuotaLoaded(true);
         setUserPlan(profile?.plan || "free");
+        setUserProfile({
+          avatar_url: profile?.avatar_url || null,
+          display_name: profile?.display_name || null,
+        });
       } catch (err) {
         console.error("Failed to load user data:", err);
         setRemainingQuota(0);
         setQuotaLoaded(true);
         setUserPlan("free");
+        setUserProfile(null);
       }
     };
 
@@ -292,6 +309,24 @@ export default function Home() {
 
   return (
     <>
+      {/* Language switch prompt */}
+      {shouldShowPrompt && detectedLanguage && (
+        <LanguageSwitchPrompt
+          currentLanguage={language as Language}
+          detectedLanguage={detectedLanguage}
+          onSwitch={() => {
+            setLanguage(detectedLanguage);
+            acceptSwitch();
+          }}
+          onDismiss={dismissPrompt}
+        />
+      )}
+
+      {/* Referral welcome banner */}
+      <Suspense fallback={null}>
+        <ReferralWelcomeBanner />
+      </Suspense>
+
       <main
         className={`min-h-screen ${mainBg}`}
         style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont" }}
@@ -303,7 +338,8 @@ export default function Home() {
             setLanguage={setLanguage}
             planLabel={planLabel}
             userEmail={user?.email ?? null}
-            userImage={user?.user_metadata?.avatar_url}
+            userImage={userProfile?.avatar_url ?? null}
+            userName={userProfile?.display_name ?? null}
             isAuthenticated={isAuthenticated}
             onPrimaryCta={handlePrimaryCta}
             onSmoothScroll={handleSmoothScroll}
@@ -350,15 +386,14 @@ export default function Home() {
                   />
                 </section>
 
-                {/* 每日签到 - 仅登录用户显示 */}
-                {isAuthenticated && (
-                  <DailyRewardButton
-                    onRewardClaimed={(credits) => {
-                      setRemainingQuota(credits);
-                    }}
-                    className="max-w-4xl mx-auto"
-                  />
-                )}
+                {/* 每日签到 - 未登录时显示吸引性CTA，登录后显示签到功能 */}
+                <DailyRewardButton
+                  isLoggedIn={isAuthenticated}
+                  onRewardClaimed={(credits) => {
+                    setRemainingQuota(credits);
+                  }}
+                  className="max-w-4xl mx-auto"
+                />
 
                 <section
                   id="overview"

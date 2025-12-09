@@ -13,6 +13,7 @@ type HeroSectionProps = {
   setLanguage: (lang: Language) => void;
   userEmail: string | null;
   userImage: string | null;
+  userName: string | null;
   planLabel: string;
   isAuthenticated: boolean;
   onPrimaryCta: () => void;
@@ -28,6 +29,7 @@ export function HeroSection({
   setLanguage,
   userEmail,
   userImage,
+  userName,
   planLabel,
   isAuthenticated,
   onPrimaryCta,
@@ -81,7 +83,8 @@ export function HeroSection({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [mobileDrawerOpen]);
 
-  const avatarInitial = userEmail ? userEmail.charAt(0).toUpperCase() : "A";
+  const displayName = userName || userEmail || "Account";
+  const avatarInitial = displayName.charAt(0).toUpperCase();
 
   const handleNavClick = (href: string, e: React.MouseEvent<HTMLAnchorElement>) => {
     if (href.startsWith("#")) {
@@ -223,23 +226,31 @@ export function HeroSection({
                         </span>
                         <div className="flex-1">
                           <p className="text-sm font-semibold text-[var(--color-foreground)] truncate">
-                            {userEmail ?? t("auth.session.fallback")}
+                            {displayName}
                           </p>
-                          <p className="text-xs text-subtle">
-                            {t("quota.status.session", {
-                              email: userEmail ?? t("auth.session.fallback"),
-                              plan: planLabel,
-                            })}
-                          </p>
+                          {userEmail && (
+                            <p className="text-xs text-subtle truncate">
+                              {userEmail}
+                            </p>
+                          )}
                         </div>
                       </div>
                       <div className="grid gap-2 text-sm">
-                        <button
-                          type="button"
-                          className="w-full rounded-xl border border-[var(--stroke-soft)] px-3 py-2 text-left text-dim hover:text-[var(--color-foreground)] hover:border-[var(--stroke-glow)]/70"
+                        <Link
+                          href="/account?section=referrals"
+                          onClick={() => setAccountMenuOpen(false)}
+                          className="w-full rounded-xl bg-[var(--accent-emerald)]/15 border border-[var(--accent-emerald)]/30 px-3 py-2 text-left text-[var(--accent-emerald)] hover:bg-[var(--accent-emerald)]/25 hover:border-[var(--accent-emerald)]/50 transition-colors flex items-center gap-2 font-medium"
+                        >
+                          <span>🎁</span>
+                          {t("referral.menu.title")}
+                        </Link>
+                        <Link
+                          href="/pricing"
+                          onClick={() => setAccountMenuOpen(false)}
+                          className="w-full rounded-xl border border-[var(--stroke-soft)] px-3 py-2 text-left text-dim hover:text-[var(--color-foreground)] hover:border-[var(--stroke-glow)]/70 block"
                         >
                           {t("pricing.title")}
-                        </button>
+                        </Link>
                         <Link
                           href="/account"
                           onClick={() => setAccountMenuOpen(false)}
@@ -344,10 +355,23 @@ export function HeroSection({
                     </span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-[var(--color-foreground)] truncate">
-                        {userEmail ?? t("auth.session.fallback")}
+                        {displayName}
                       </p>
+                      {userEmail && (
+                        <p className="text-xs text-subtle truncate">
+                          {userEmail}
+                        </p>
+                      )}
                     </div>
                   </div>
+                  <Link
+                    href="/account?section=referrals"
+                    onClick={() => setMobileDrawerOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm rounded-lg bg-[var(--accent-emerald)]/15 text-[var(--accent-emerald)] hover:bg-[var(--accent-emerald)]/25 transition font-medium"
+                  >
+                    <span>🎁</span>
+                    {t("referral.menu.title")}
+                  </Link>
                   <button
                     type="button"
                     className="w-full text-left px-4 py-2.5 text-sm rounded-lg text-dim hover:text-[var(--color-foreground)] hover:bg-[var(--bg-layer)]/50 transition"

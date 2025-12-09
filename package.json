@@ -4,6 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "node scripts/dev.js",
+    "dev:safe": "node scripts/dev-safe.js",
+    "dev:stop": "node scripts/dev-stop.js",
+    "dev:restart": "node scripts/dev-restart.js",
     "dev:start": "bash scripts/dev-start.sh",
     "build": "next build",
     "start": "next start",
@@ -57,6 +60,7 @@
     "pino": "^10.1.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "react-easy-crop": "^5.5.6",
     "react-is": "^19.2.0",
     "react-markdown": "^10.1.0",
     "recharts": "^3.5.1",

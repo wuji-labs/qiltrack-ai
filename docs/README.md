@@ -17,6 +17,8 @@
 - `guides/` - 操作指南
   - `BOSS-OPERATION-MANUAL.md` - 运维手册
   - `admin-operations-guide.md` - 管理操作指南
+  - **`database-management-guide.md`** - ⭐ **数据库管理规范（必读）**
+  - `supabase-local-cli.md` - Supabase CLI 本地开发手册
   - `ci-cd-setup.md` - CI/CD 配置
   - `monitoring.md` - 监控指南
   - `email-configuration.md` - 邮件配置
