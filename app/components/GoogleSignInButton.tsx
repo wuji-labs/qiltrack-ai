@@ -75,6 +75,26 @@ export function GoogleSignInButton({
     };
   }, []);
 
+  // 渲染 Google 按钮
+  useEffect(() => {
+    if (!isGoogleReady) return;
+
+    const buttonContainer = document.getElementById('google-signin-button');
+    if (buttonContainer && window.google) {
+      // @ts-ignore
+      window.google.accounts.id.renderButton(
+        buttonContainer,
+        {
+          type: "standard",
+          theme: "outline",
+          size: "large",
+          text: "signin_with",
+          width: buttonContainer.offsetWidth,
+        }
+      );
+    }
+  }, [isGoogleReady]);
+
   const handleCredentialResponse = async (response: any) => {
     if (!supabase) {
       const errorMsg = "Supabase 未初始化";
@@ -107,19 +127,6 @@ export function GoogleSignInButton({
     }
   };
 
-  const handleClick = () => {
-    if (disabled || !isGoogleReady) return;
-
-    // @ts-ignore - 使用 Google One Tap 弹窗
-    if (window.google) {
-      // @ts-ignore
-      window.google.accounts.id.prompt();
-    } else {
-      console.error("Google Identity Services 未加载");
-      onError?.("Google 登录服务加载失败，请刷新页面重试");
-    }
-  };
-
   // 如果没有配置 Client ID，显示降级 UI
   if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
     return (
@@ -134,20 +141,12 @@ export function GoogleSignInButton({
     );
   }
 
-  // 恢复原来好看的按钮样式
-  const isButtonDisabled = disabled || !isGoogleReady;
-
+  // 使用 Google 渲染的按钮（功能性优先）
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      disabled={isButtonDisabled}
-      className={`w-full inline-flex items-center justify-center gap-3 rounded-xl bg-white text-slate-900 px-4 py-3 text-base font-semibold shadow-lg hover:shadow-xl hover:bg-slate-50 transition-all ${
-        isButtonDisabled ? "opacity-70 cursor-not-allowed" : ""
-      }`}
-    >
-      <Image src="/providers/google.svg" alt="google" width={22} height={22} priority />
-      <span>{!isGoogleReady ? "加载中..." : text}</span>
-    </button>
+    <div
+      id="google-signin-button"
+      className="w-full"
+      style={{ minHeight: "44px" }}
+    />
   );
 }
