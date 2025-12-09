@@ -11,6 +11,7 @@ import {
   uploadToStorage,
 } from "@/lib/supabase/server";
 import type { CompanyData, ReportResponse, ReportTone } from "@/types/report";
+import { appendCookies } from "@/lib/utils/cookie-helper";
 
 const styles = StyleSheet.create({
   // Cover page styles
@@ -289,9 +290,7 @@ export async function POST(request: NextRequest) {
 
   const respond = (body: Record<string, unknown>, status: number) => {
     const response = NextResponse.json(body, { status });
-    responseCookies.forEach(({ name, value }) =>
-      response.headers.append("Set-Cookie", `${name}=${value}`)
-    );
+    appendCookies(response, responseCookies);
     return response;
   };
 
@@ -678,8 +677,6 @@ export async function POST(request: NextRequest) {
     storage_path: signedUrl ? pdfPath : null,
   });
 
-  responseCookies.forEach(({ name, value }) =>
-    response.headers.append("Set-Cookie", `${name}=${value}`)
-  );
+  appendCookies(response, responseCookies);
   return response;
 }

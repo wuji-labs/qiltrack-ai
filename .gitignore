@@ -108,6 +108,11 @@ scripts/*admin*.js
 scripts/*direct*.js
 scripts/manual-*.sql
 
+# Database backups (sensitive data)
+backups/
+*.backup.sql
+*.backup.json
+
 # Local Supabase exports (keep untracked across worktrees)
 docs/supabase-api-openapi.json
 docs/supabase-api.md

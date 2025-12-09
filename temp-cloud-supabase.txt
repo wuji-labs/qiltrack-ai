@@ -1,0 +1,6 @@
+# 临时修改.env.local中的Supabase配置
+# 将:
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+
+# 改为:
+NEXT_PUBLIC_SUPABASE_URL=https://inmtounwqcjwsxkfnsfd.supabase.co

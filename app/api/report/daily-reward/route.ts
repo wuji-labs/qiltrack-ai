@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { appendCookies } from "@/lib/utils/cookie-helper";
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,9 +20,7 @@ export async function POST(request: NextRequest) {
         { error: "Unauthorized", code: "unauthorized" },
         { status: 401 }
       );
-      responseCookies.forEach(({ name, value }) =>
-        response.headers.append("Set-Cookie", `${name}=${value}`)
-      );
+      appendCookies(response, responseCookies);
       return response;
     }
 
@@ -41,9 +40,7 @@ export async function POST(request: NextRequest) {
         { error: "Failed to claim daily reward", code: "reward_claim_failed" },
         { status: 500 }
       );
-      responseCookies.forEach(({ name, value }) =>
-        response.headers.append("Set-Cookie", `${name}=${value}`)
-      );
+      appendCookies(response, responseCookies);
       return response;
     }
 
@@ -58,9 +55,7 @@ export async function POST(request: NextRequest) {
       streakCount: (data as any)?.[0]?.streak_count ?? 0,
     });
 
-    responseCookies.forEach(({ name, value }) =>
-      response.headers.append("Set-Cookie", `${name}=${value}`)
-    );
+    appendCookies(response, responseCookies);
     return response;
   } catch (err) {
     console.error("Daily reward API error:", err);

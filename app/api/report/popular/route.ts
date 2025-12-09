@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { appendCookies } from "@/lib/utils/cookie-helper";
 
 /**
  * GET /api/report/popular
@@ -36,9 +37,7 @@ export async function GET(request: NextRequest) {
         { error: "Failed to fetch popular symbols" },
         { status: 500 }
       );
-      responseCookies.forEach(({ name, value }) => {
-        response.headers.append("Set-Cookie", `${name}=${value}`);
-      });
+      appendCookies(response, responseCookies);
       return response;
     }
 
@@ -48,9 +47,7 @@ export async function GET(request: NextRequest) {
       limit,
     });
 
-    responseCookies.forEach(({ name, value }) => {
-      response.headers.append("Set-Cookie", `${name}=${value}`);
-    });
+    appendCookies(response, responseCookies);
 
     return response;
   } catch (err) {
