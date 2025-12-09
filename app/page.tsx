@@ -17,6 +17,8 @@ import { fetchCredits } from "@/lib/services/api";
 import type { ReportTone } from "@/types/report";
 import { getFeaturedReports } from "@/lib/content/reportHub";
 import { DailyRewardButton } from "@/app/components/DailyRewardButton";
+import { useLanguageDetection } from "@/hooks/useLanguageDetection";
+import { LanguageSwitchPrompt } from "@/components/LanguageSwitchPrompt";
 
 type TranslationKey = string;
 
@@ -157,6 +159,14 @@ export default function Home() {
   const [quotaLoaded, setQuotaLoaded] = useState(false);
   const [userPlan, setUserPlan] = useState<string>("free");
 
+  // Language detection and prompt
+  const {
+    shouldShowPrompt,
+    detectedLanguage,
+    dismissPrompt,
+    acceptSwitch,
+  } = useLanguageDetection(language as Language);
+
   // Fetch remaining credits and user profile on mount and when authenticated
   useEffect(() => {
     const loadUserData = async () => {
@@ -292,6 +302,19 @@ export default function Home() {
 
   return (
     <>
+      {/* Language switch prompt */}
+      {shouldShowPrompt && detectedLanguage && (
+        <LanguageSwitchPrompt
+          currentLanguage={language as Language}
+          detectedLanguage={detectedLanguage}
+          onSwitch={() => {
+            setLanguage(detectedLanguage);
+            acceptSwitch();
+          }}
+          onDismiss={dismissPrompt}
+        />
+      )}
+
       <main
         className={`min-h-screen ${mainBg}`}
         style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont" }}
