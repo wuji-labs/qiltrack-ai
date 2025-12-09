@@ -116,8 +116,27 @@ export function GoogleSignInButton({
         return;
       }
 
-      if (data) {
+      if (data?.user) {
         console.log("Google 登录成功");
+
+        // 初始化 profile 和 credits（30 积分）
+        try {
+          const { error: rpcError } = await supabase.rpc("fn_initialize_profile", {
+            p_user_id: data.user.id,
+            p_email: data.user.email || "",
+          } as never);
+
+          if (rpcError) {
+            console.error("初始化 profile 失败:", rpcError);
+            // 不阻断登录流程
+          } else {
+            console.log("Profile 初始化成功");
+          }
+        } catch (err) {
+          console.error("调用 fn_initialize_profile 异常:", err);
+          // 不阻断登录流程
+        }
+
         onSuccess?.();
         router.refresh();
       }
