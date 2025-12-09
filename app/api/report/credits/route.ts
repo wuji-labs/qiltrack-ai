@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
 
-// 默认初始积分
-const DEFAULT_INITIAL_CREDITS = 60;
+// 默认初始积分（与数据库 fn_initialize_profile 保持一致）
+const DEFAULT_INITIAL_CREDITS = 30;
 
 export async function GET(request: NextRequest) {
   try {
