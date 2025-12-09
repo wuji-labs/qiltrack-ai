@@ -1,22 +1,27 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { claimDailyReward, fetchDailyRewardStatus } from "@/lib/services/api";
 import { useLanguage } from "@/lib/i18n";
 
 interface DailyRewardButtonProps {
   onRewardClaimed?: (credits: number) => void;
   className?: string;
+  isLoggedIn?: boolean;
 }
 
-export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewardButtonProps) {
+export function DailyRewardButton({ onRewardClaimed, className = "", isLoggedIn }: DailyRewardButtonProps) {
   const { t } = useLanguage();
+  const router = useRouter();
   const [claiming, setClaiming] = useState(false);
   const [claimed, setClaimed] = useState(false);
   const [streak, setStreak] = useState(0);
   const [dailyRewardAmount, setDailyRewardAmount] = useState(10);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userLoggedIn, setUserLoggedIn] = useState(isLoggedIn);
 
   // Check daily reward status on mount
   useEffect(() => {
@@ -26,9 +31,14 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
         setClaimed(status.hasClaimed);
         setStreak(status.streakCount);
         setDailyRewardAmount(status.dailyRewardAmount);
-      } catch (err) {
+        setUserLoggedIn(true);
+      } catch (err: any) {
         console.error("Failed to check daily reward status:", err);
-        // On error, assume not claimed so user can try
+        // If 401, user is not logged in
+        if (err?.statusCode === 401) {
+          setUserLoggedIn(false);
+          setDailyRewardAmount(60); // Show max possible (Ultra tier)
+        }
       } finally {
         setLoading(false);
       }
@@ -37,11 +47,63 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
     checkStatus();
   }, []);
 
+  const translateErrorMessage = (errorMessage: string): string => {
+    const msgLower = errorMessage.toLowerCase();
+
+    // Check for specific error patterns
+    if (msgLower.includes("unauthorized") || msgLower === "unauthorized") {
+      return t("error.unauthorized" as any);
+    }
+
+    if (msgLower.includes("already claimed")) {
+      return t("dailyReward.alreadyClaimedToday" as any);
+    }
+
+    if (errorMessage.includes("已领取") || errorMessage.includes("已領取")) {
+      return t("dailyReward.alreadyClaimedToday" as any);
+    }
+
+    if (msgLower.includes("failed to claim daily reward")) {
+      return t("error.claimFailed" as any);
+    }
+
+    if (msgLower.includes("internal server error") || msgLower.includes("server error")) {
+      return t("error.internalError" as any);
+    }
+
+    if (msgLower.includes("network")) {
+      return t("error.network" as any);
+    }
+
+    // If no specific pattern matches, return generic error
+    return errorMessage || t("dailyReward.error" as any);
+  };
+
+  const handleSessionExpired = () => {
+    setError(t("dailyReward.sessionExpired" as any));
+    // Wait 1.5 seconds before refreshing to show the message
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
+  };
+
+  const handleSignInClick = () => {
+    // Redirect to login page
+    router.push("/login");
+  };
+
   const handleClaim = async () => {
     if (claimed) return;
 
+    // If not logged in, prompt to sign in
+    if (!userLoggedIn) {
+      handleSignInClick();
+      return;
+    }
+
     setClaiming(true);
     setError(null);
+    setSuccess(null);
 
     try {
       const result = await claimDailyReward();
@@ -49,6 +111,16 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
       if (result.success) {
         setClaimed(true);
         setStreak(result.streakCount || 0);
+
+        // Show success message
+        const successMsg = t("dailyReward.claimSuccess" as any, {
+          credits: String(dailyRewardAmount),
+          streak: String(result.streakCount || 0),
+        });
+        setSuccess(successMsg);
+
+        // Clear success message after 3 seconds
+        setTimeout(() => setSuccess(null), 3000);
 
         // 通知父组件刷新积分
         if (onRewardClaimed) {
@@ -60,24 +132,45 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
           detail: { credits: result.remainingCredits }
         }));
       } else {
-        // Check if already claimed today (case-insensitive)
+        // Handle unsuccessful claim with specific message
         const msg = result.message?.toLowerCase() || "";
-        if (msg.includes("already claimed") || msg.includes("已领取")) {
+
+        if (msg.includes("already claimed") || result.message?.includes("已领取")) {
           setClaimed(true);
           // Don't show error for already claimed
+        } else if (msg.includes("unauthorized")) {
+          handleSessionExpired();
         } else {
-          setError(result.message || t("dailyReward.error" as any));
+          const translatedError = translateErrorMessage(result.message || "");
+          setError(translatedError);
         }
       }
     } catch (err) {
       console.error("Failed to claim daily reward:", err);
-      const errorMessage = err instanceof Error ? err.message : t("error.network" as any);
-      // Check if already claimed (case-insensitive)
-      if (errorMessage.toLowerCase().includes("already claimed") || errorMessage.includes("已领取")) {
-        setClaimed(true);
-        // Don't show error for already claimed
+
+      // Handle network or API errors
+      if (err instanceof Error) {
+        const errorMessage = err.message;
+        const statusCode = (err as any).statusCode;
+
+        // Check if session expired (401 Unauthorized)
+        if (statusCode === 401 || errorMessage.toLowerCase().includes("unauthorized")) {
+          handleSessionExpired();
+          return;
+        }
+
+        // Check if already claimed
+        const msgLower = errorMessage.toLowerCase();
+        if (msgLower.includes("already claimed") || errorMessage.includes("已领取")) {
+          setClaimed(true);
+          return;
+        }
+
+        // Translate and display error
+        const translatedError = translateErrorMessage(errorMessage);
+        setError(translatedError);
       } else {
-        setError(errorMessage);
+        setError(t("error.network" as any));
       }
     } finally {
       setClaiming(false);
@@ -100,6 +193,52 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
     );
   }
 
+  // Not logged in state - attractive CTA
+  if (!userLoggedIn) {
+    return (
+      <div className={`daily-reward-card rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-[var(--bg-layer)]/90 to-[var(--bg-layer)]/85 p-5 relative overflow-hidden ${className}`}>
+        {/* Animated background effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-emerald-500/5 animate-pulse"></div>
+
+        <div className="relative flex items-center gap-4">
+          {/* Eye-catching icon */}
+          <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/30 to-emerald-600/20">
+            <div className="absolute inset-0 rounded-xl bg-emerald-400/20 blur-xl animate-pulse"></div>
+            <span className="relative text-3xl animate-bounce">🎁</span>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1">
+            <h3 className="text-base font-bold text-[var(--color-foreground)] flex items-center gap-2">
+              {t("dailyReward.notLoggedIn.title" as any)}
+              <span className="inline-flex items-center rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-300">
+                {t("dailyReward.notLoggedIn.description" as any, { credits: String(dailyRewardAmount) })}
+              </span>
+            </h3>
+            <p className="text-xs text-subtle mt-1 flex items-center gap-1">
+              <svg className="h-3 w-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              {t("dailyReward.notLoggedIn.features" as any)}
+            </p>
+          </div>
+
+          {/* CTA Button */}
+          <button
+            onClick={handleSignInClick}
+            className="shrink-0 rounded-xl px-5 py-2.5 text-sm font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-[0_8px_20px_rgba(16,185,129,0.4)] hover:shadow-[0_12px_28px_rgba(16,185,129,0.5)] hover:scale-105 transition-all duration-200 flex items-center gap-2"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+            </svg>
+            {t("dailyReward.notLoggedIn.cta" as any)}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Logged in state - normal UI
   return (
     <div className={`daily-reward-card rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85 p-5 ${className}`}>
       <div className="flex items-center gap-4">
@@ -124,6 +263,9 @@ export function DailyRewardButton({ onRewardClaimed, className = "" }: DailyRewa
           </p>
           {error && (
             <p className="text-xs text-red-400 mt-1">{error}</p>
+          )}
+          {success && (
+            <p className="text-xs text-emerald-300 mt-1">{success}</p>
           )}
         </div>
 

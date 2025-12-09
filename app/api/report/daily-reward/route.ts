@@ -16,8 +16,14 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getSession();
 
     if (sessionError || !session?.user?.id) {
+      console.warn(`[DAILY_REWARD_UNAUTHORIZED] sessionError: ${sessionError?.message || 'No session'}`);
       const response = NextResponse.json(
-        { error: "Unauthorized", code: "unauthorized" },
+        {
+          success: false,
+          message: "Unauthorized",
+          remainingCredits: 0,
+          code: "unauthorized"
+        },
         { status: 401 }
       );
       appendCookies(response, responseCookies);
@@ -37,7 +43,12 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.warn(`[DAILY_REWARD_ERROR] user_id: ${userId}, error: ${error.message}`);
       const response = NextResponse.json(
-        { error: "Failed to claim daily reward", code: "reward_claim_failed" },
+        {
+          success: false,
+          message: "Failed to claim daily reward",
+          remainingCredits: 0,
+          code: "reward_claim_failed"
+        },
         { status: 500 }
       );
       appendCookies(response, responseCookies);
