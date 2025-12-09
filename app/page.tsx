@@ -18,7 +18,7 @@ import type { ReportTone } from "@/types/report";
 import { getFeaturedReports } from "@/lib/content/reportHub";
 import { DailyRewardButton } from "@/app/components/DailyRewardButton";
 import { useLanguageDetection } from "@/hooks/useLanguageDetection";
-import { LanguageSwitchPrompt } from "@/components/LanguageSwitchPrompt";
+import { LanguageSwitchPrompt } from "@/app/components/LanguageSwitchPrompt";
 
 type TranslationKey = string;
 
