@@ -537,6 +537,7 @@ function LoginContent() {
 
               <div className="space-y-3">
                 <GoogleSignInButton
+                  text={t("auth.provider.google")}
                   disabled={pendingGoogle}
                   onSuccess={() => {
                     setMessage({ type: "success", text: "登录成功" });

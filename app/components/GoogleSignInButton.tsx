@@ -31,11 +31,10 @@ export function GoogleSignInButton({
 }: GoogleSignInButtonProps) {
   const { supabase } = useSupabaseAuth();
   const router = useRouter();
-  const buttonRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
 
   useEffect(() => {
-    if (initialized.current || !buttonRef.current) {
+    if (initialized.current) {
       return;
     }
 
@@ -55,27 +54,13 @@ export function GoogleSignInButton({
 
     script.onload = () => {
       // @ts-ignore - Google Identity Services 全局对象
-      if (window.google && buttonRef.current) {
+      if (window.google) {
         // @ts-ignore
         window.google.accounts.id.initialize({
           client_id: clientId,
           callback: handleCredentialResponse,
           auto_select: false,
         });
-
-        // @ts-ignore - 渲染 Google 登录按钮
-        window.google.accounts.id.renderButton(
-          buttonRef.current,
-          {
-            type: "standard",
-            shape: "rectangular",
-            theme: "outline",
-            text: "signin_with",
-            size: "large",
-            width: buttonRef.current.offsetWidth,
-            logo_alignment: "left",
-          }
-        );
       }
     };
 
@@ -120,6 +105,16 @@ export function GoogleSignInButton({
     }
   };
 
+  const handleClick = () => {
+    if (disabled) return;
+
+    // @ts-ignore - 使用 Google One Tap 弹窗
+    if (window.google) {
+      // @ts-ignore
+      window.google.accounts.id.prompt();
+    }
+  };
+
   // 如果没有配置 Client ID，显示降级 UI
   if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
     return (
@@ -134,11 +129,18 @@ export function GoogleSignInButton({
     );
   }
 
+  // 恢复原来好看的按钮样式
   return (
-    <div
-      ref={buttonRef}
-      className={`w-full ${disabled ? "opacity-60 pointer-events-none" : ""}`}
-      style={{ minHeight: "44px" }}
-    />
+    <button
+      type="button"
+      onClick={handleClick}
+      disabled={disabled}
+      className={`w-full inline-flex items-center justify-center gap-3 rounded-xl bg-white text-slate-900 px-4 py-3 text-base font-semibold shadow-lg hover:shadow-xl hover:bg-slate-50 transition-all ${
+        disabled ? "opacity-70 cursor-not-allowed" : ""
+      }`}
+    >
+      <Image src="/providers/google.svg" alt="google" width={22} height={22} priority />
+      <span>{text}</span>
+    </button>
   );
 }
