@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { appendCookies } from "@/lib/utils/cookie-helper";
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,9 +20,7 @@ export async function GET(request: NextRequest) {
         { error: "Unauthorized", code: "unauthorized" },
         { status: 401 }
       );
-      responseCookies.forEach(({ name, value }) =>
-        response.headers.append("Set-Cookie", `${name}=${value}`)
-      );
+      appendCookies(response, responseCookies);
       return response;
     }
 
@@ -31,10 +30,10 @@ export async function GET(request: NextRequest) {
     const today = new Date().toISOString().split("T")[0];
 
     const { data: claimData, error: claimError } = await supabase
-      .from("credit_transactions" as any)
-      .select("id, amount, created_at")
+      .from("report_credit_events")
+      .select("id, delta, created_at")
       .eq("user_id", userId)
-      .eq("type", "daily_reward")
+      .eq("event_type", "daily_reward")
       .gte("created_at", `${today}T00:00:00.000Z`)
       .lt("created_at", `${today}T23:59:59.999Z`)
       .limit(1);
@@ -79,9 +78,7 @@ export async function GET(request: NextRequest) {
       tier: plan,
     });
 
-    responseCookies.forEach(({ name, value }) =>
-      response.headers.append("Set-Cookie", `${name}=${value}`)
-    );
+    appendCookies(response, responseCookies);
     return response;
   } catch (err) {
     console.error("Daily reward status API error:", err);

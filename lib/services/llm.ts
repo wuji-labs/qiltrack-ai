@@ -152,7 +152,7 @@ export class LLMService {
           { role: "user", content: userPrompt },
         ],
         temperature: options?.temperature ?? 0.7,
-        max_tokens: options?.maxTokens ?? 4096,
+        max_tokens: options?.maxTokens ?? 16384,
         top_p: options?.topP ?? 1.0,
       }),
     });
@@ -206,7 +206,7 @@ export class LLMService {
           { role: "user", content: userPrompt },
         ],
         temperature: options?.temperature ?? 0.7,
-        max_tokens: options?.maxTokens ?? 4096,
+        max_tokens: options?.maxTokens ?? 16384,
         top_p: options?.topP ?? 1.0,
       }),
     });
