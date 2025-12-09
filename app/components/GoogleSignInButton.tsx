@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import Image from "next/image";
@@ -32,6 +32,7 @@ export function GoogleSignInButton({
   const { supabase } = useSupabaseAuth();
   const router = useRouter();
   const initialized = useRef(false);
+  const [isGoogleReady, setIsGoogleReady] = useState(false);
 
   useEffect(() => {
     if (initialized.current) {
@@ -61,6 +62,7 @@ export function GoogleSignInButton({
           callback: handleCredentialResponse,
           auto_select: false,
         });
+        setIsGoogleReady(true);
       }
     };
 
@@ -106,12 +108,15 @@ export function GoogleSignInButton({
   };
 
   const handleClick = () => {
-    if (disabled) return;
+    if (disabled || !isGoogleReady) return;
 
     // @ts-ignore - 使用 Google One Tap 弹窗
     if (window.google) {
       // @ts-ignore
       window.google.accounts.id.prompt();
+    } else {
+      console.error("Google Identity Services 未加载");
+      onError?.("Google 登录服务加载失败，请刷新页面重试");
     }
   };
 
@@ -130,17 +135,19 @@ export function GoogleSignInButton({
   }
 
   // 恢复原来好看的按钮样式
+  const isButtonDisabled = disabled || !isGoogleReady;
+
   return (
     <button
       type="button"
       onClick={handleClick}
-      disabled={disabled}
+      disabled={isButtonDisabled}
       className={`w-full inline-flex items-center justify-center gap-3 rounded-xl bg-white text-slate-900 px-4 py-3 text-base font-semibold shadow-lg hover:shadow-xl hover:bg-slate-50 transition-all ${
-        disabled ? "opacity-70 cursor-not-allowed" : ""
+        isButtonDisabled ? "opacity-70 cursor-not-allowed" : ""
       }`}
     >
       <Image src="/providers/google.svg" alt="google" width={22} height={22} priority />
-      <span>{text}</span>
+      <span>{!isGoogleReady ? "加载中..." : text}</span>
     </button>
   );
 }
