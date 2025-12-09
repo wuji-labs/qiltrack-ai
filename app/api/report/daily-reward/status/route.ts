@@ -16,8 +16,16 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getSession();
 
     if (sessionError || !session?.user?.id) {
+      console.warn(`[DAILY_REWARD_STATUS_UNAUTHORIZED] sessionError: ${sessionError?.message || 'No session'}`);
       const response = NextResponse.json(
-        { error: "Unauthorized", code: "unauthorized" },
+        {
+          hasClaimed: false,
+          streakCount: 0,
+          dailyRewardAmount: 10,
+          tier: "free",
+          error: "Unauthorized",
+          code: "unauthorized"
+        },
         { status: 401 }
       );
       appendCookies(response, responseCookies);
@@ -83,7 +91,14 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     console.error("Daily reward status API error:", err);
     return NextResponse.json(
-      { error: "Internal server error", code: "internal_error" },
+      {
+        hasClaimed: false,
+        streakCount: 0,
+        dailyRewardAmount: 10,
+        tier: "free",
+        error: "Internal server error",
+        code: "internal_error"
+      },
       { status: 500 }
     );
   }

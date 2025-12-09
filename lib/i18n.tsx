@@ -4245,6 +4245,105 @@ const translations: Record<string, TranslationEntry> = {
       hans: "网络错误，请稍后再试",
     },
   }),
+  "error.unauthorized": withChineseVariants({
+    en: "Please log in to continue",
+    ja: "ログインしてください",
+    ko: "로그인해 주세요",
+    zh: {
+      hant: "請登錄後繼續",
+      hans: "请登录后继续",
+    },
+  }),
+  "error.claimFailed": withChineseVariants({
+    en: "Failed to claim daily reward",
+    ja: "デイリー報酬の取得に失敗しました",
+    ko: "일일 보상 받기 실패",
+    zh: {
+      hant: "領取每日獎勵失敗",
+      hans: "领取每日奖励失败",
+    },
+  }),
+  "error.internalError": withChineseVariants({
+    en: "Server error, please try again",
+    ja: "サーバーエラー、もう一度お試しください",
+    ko: "서버 오류, 다시 시도해 주세요",
+    zh: {
+      hant: "服務器錯誤，請重試",
+      hans: "服务器错误，请重试",
+    },
+  }),
+  "dailyReward.alreadyClaimedToday": withChineseVariants({
+    en: "Already claimed today",
+    ja: "本日は既に取得済みです",
+    ko: "오늘 이미 받았습니다",
+    zh: {
+      hant: "今日已領取",
+      hans: "今日已领取",
+    },
+  }),
+  "dailyReward.claimSuccess": withChineseVariants({
+    en: "Claimed {{credits}} credits! Streak: {{streak}} days",
+    ja: "{{credits}} クレジットを取得！連続 {{streak}} 日",
+    ko: "{{credits}} 크레딧 받음! 연속 {{streak}} 일",
+    zh: {
+      hant: "成功領取 {{credits}} 積分！連續 {{streak}} 天",
+      hans: "成功领取 {{credits}} 积分！连续 {{streak}} 天",
+    },
+  }),
+  "dailyReward.sessionExpired": withChineseVariants({
+    en: "Session expired, refreshing page...",
+    ja: "セッションが期限切れです。ページを更新しています...",
+    ko: "세션이 만료되었습니다. 페이지를 새로고침합니다...",
+    zh: {
+      hant: "登錄已過期，正在刷新頁面...",
+      hans: "登录已过期，正在刷新页面...",
+    },
+  }),
+  "dailyReward.notLoggedIn.title": withChineseVariants({
+    en: "Daily Free Credits",
+    ja: "毎日無料クレジット",
+    ko: "매일 무료 크레딧",
+    zh: {
+      hant: "每日免費積分",
+      hans: "每日免费积分",
+    },
+  }),
+  "dailyReward.notLoggedIn.description": withChineseVariants({
+    en: "Get up to {{credits}} free credits daily!",
+    ja: "毎日最大 {{credits}} クレジット無料！",
+    ko: "매일 최대 {{credits}} 크레딧 무료!",
+    zh: {
+      hant: "每日最高可領 {{credits}} 積分！",
+      hans: "每日最高可领 {{credits}} 积分！",
+    },
+  }),
+  "dailyReward.notLoggedIn.features": withChineseVariants({
+    en: "Build streak · Unlock bonus rewards",
+    ja: "連続記録 · ボーナス報酬",
+    ko: "연속 기록 · 보너스 보상",
+    zh: {
+      hant: "累積連續天數 · 解鎖更多獎勵",
+      hans: "累积连续天数 · 解锁更多奖励",
+    },
+  }),
+  "dailyReward.notLoggedIn.cta": withChineseVariants({
+    en: "Sign in to Claim",
+    ja: "ログインして取得",
+    ko: "로그인하여 받기",
+    zh: {
+      hant: "登錄領取",
+      hans: "登录领取",
+    },
+  }),
+  "dailyReward.notLoggedIn.streak": withChineseVariants({
+    en: "Daily check-in streak bonus",
+    ja: "連続チェックインボーナス",
+    ko: "연속 체크인 보너스",
+    zh: {
+      hant: "連續簽到額外獎勵",
+      hans: "连续签到额外奖励",
+    },
+  }),
   // Pricing page additional translations
   "pricing.perMonth": withChineseVariants({
     en: "/ month",
