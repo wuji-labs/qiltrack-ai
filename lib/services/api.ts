@@ -131,10 +131,10 @@ export async function generateReport(params: FetchReportParams): Promise<ReportR
     search.set("testToken", testToken);
   }
 
-  // Use AbortController with 3 minute timeout for report generation
-  // LLM generation can take 1-2 minutes for detailed reports
+  // Use AbortController with 5 minute timeout for report generation
+  // LLM generation can take 3-4 minutes for detailed reports
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 180000); // 3 minutes
+  const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
 
   try {
     const res = await fetch(`/api/report?${search.toString()}`, {
