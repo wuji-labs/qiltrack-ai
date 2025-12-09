@@ -8,6 +8,7 @@ import { Suspense, useEffect, useMemo, useState, type FormEvent } from "react";
 import { useLanguage } from "@/lib/i18n";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { Turnstile, useTurnstile } from "@/app/components/Turnstile";
+import { GoogleSignInButton } from "@/app/components/GoogleSignInButton";
 
 type EmailStatus = "idle" | "loading" | "sent" | "error" | "cooldown";
 type AuthView = "signin" | "signup" | "magic-link" | "reset-password";
@@ -535,17 +536,16 @@ function LoginContent() {
               </div>
 
               <div className="space-y-3">
-                <button
-                  type="button"
-                  onClick={handleProvider}
+                <GoogleSignInButton
+                  text={t("auth.provider.google")}
                   disabled={pendingGoogle}
-                  className={`w-full inline-flex items-center justify-center gap-3 rounded-xl bg-white text-slate-900 px-4 py-3 text-base font-semibold shadow-lg hover:shadow-xl hover:bg-slate-50 transition-all ${
-                    pendingGoogle ? "opacity-70 cursor-not-allowed" : ""
-                  }`}
-                >
-                  <Image src="/providers/google.svg" alt="google" width={22} height={22} priority />
-                  <span>{t("auth.provider.google")}</span>
-                </button>
+                  onSuccess={() => {
+                    setMessage({ type: "success", text: "登录成功" });
+                  }}
+                  onError={(error) => {
+                    setMessage({ type: "error", text: error || t("auth.error.generic") });
+                  }}
+                />
               </div>
             </>
           )}
