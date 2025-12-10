@@ -126,155 +126,189 @@ export function CookieConsentBanner() {
   if (!showBanner) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 sm:p-6 bg-gradient-to-t from-black/80 to-transparent pointer-events-none">
-      <div className="max-w-7xl mx-auto pointer-events-auto">
-        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-2xl">🍪</span>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Cookie Preferences
-                </h3>
-              </div>
+    <>
+      {/* Backdrop overlay */}
+      <div className="fixed inset-0 bg-black/20 dark:bg-black/40 z-40 backdrop-blur-sm" />
 
-              {!showDetails ? (
-                <div className="space-y-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    We use cookies to enhance your experience, analyze site traffic, and provide
-                    personalized features. By clicking "Accept All", you consent to our use of
-                    cookies.
+      {/* Cookie banner - Modern compact design like GitHub/Stripe */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4 sm:px-6">
+        <div className="bg-white dark:bg-gray-950 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+          {!showDetails ? (
+            // Simple view - GitHub style
+            <div className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
+                    We use cookies
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                    We use essential cookies to make our site work. With your consent, we may also use non-essential cookies to improve user experience and analyze website traffic.{" "}
+                    <a
+                      href="/legal/privacy"
+                      className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                    >
+                      Learn more
+                    </a>
                   </p>
 
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap gap-2 mt-4">
                     <button
                       onClick={handleAcceptAll}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
+                      className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-950"
                     >
-                      Accept All
+                      Accept all
                     </button>
                     <button
                       onClick={handleRejectAll}
-                      className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-md font-medium transition-colors"
+                      className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-950"
                     >
-                      Reject All
+                      Reject all
                     </button>
                     <button
                       onClick={() => setShowDetails(true)}
-                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md font-medium transition-colors"
+                      className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-950"
                     >
                       Customize
                     </button>
                   </div>
-
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Read our{" "}
-                    <a href="/privacy" className="underline hover:text-blue-600">
-                      Privacy Policy
-                    </a>{" "}
-                    and{" "}
-                    <a href="/cookie-policy" className="underline hover:text-blue-600">
-                      Cookie Policy
-                    </a>
-                  </p>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    Choose which cookies you want to accept:
-                  </p>
+              </div>
+            </div>
+          ) : (
+            // Detailed view - Stripe style
+            <div className="max-h-[80vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Cookie preferences
+                </h3>
+                <button
+                  onClick={() => setShowDetails(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  aria-label="Close"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
 
-                  <div className="space-y-3">
-                    {/* Essential Cookies */}
-                    <label className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+              <div className="p-6 space-y-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  We use cookies and similar technologies to provide, improve, and protect our services. Choose which types of cookies to allow:
+                </p>
+
+                <div className="space-y-3">
+                  {/* Essential */}
+                  <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/50">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                            Essential cookies
+                          </h4>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                            Always active
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1.5 leading-relaxed">
+                          Required for authentication, security, and core site functionality. These cannot be disabled.
+                        </p>
+                      </div>
                       <input
                         type="checkbox"
                         checked={true}
                         disabled={true}
-                        className="mt-1 h-4 w-4 text-blue-600 rounded opacity-50"
+                        className="mt-1 h-4 w-4 text-blue-600 rounded border-gray-300 opacity-50 cursor-not-allowed"
                       />
+                    </div>
+                  </div>
+
+                  {/* Analytics */}
+                  <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-4 hover:border-blue-300 dark:hover:border-blue-700 transition-colors cursor-pointer"
+                       onClick={() => setPreferences({ ...preferences, analytics: !preferences.analytics })}>
+                    <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          Essential Cookies
-                          <span className="ml-2 text-xs text-gray-500">(Always Active)</span>
-                        </div>
-                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                          Required for authentication, security, and basic site functionality.
+                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                          Analytics cookies
+                        </h4>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1.5 leading-relaxed">
+                          Help us understand how you use our site. Includes anonymous usage statistics and error tracking (Vercel Analytics, Sentry).
                         </p>
                       </div>
-                    </label>
-
-                    {/* Analytics Cookies */}
-                    <label className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
                       <input
                         type="checkbox"
                         checked={preferences.analytics}
-                        onChange={(e) =>
-                          setPreferences({ ...preferences, analytics: e.target.checked })
-                        }
-                        className="mt-1 h-4 w-4 text-blue-600 rounded"
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setPreferences({ ...preferences, analytics: e.target.checked });
+                        }}
+                        className="mt-1 h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
                       />
+                    </div>
+                  </div>
+
+                  {/* Marketing */}
+                  <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-4 hover:border-blue-300 dark:hover:border-blue-700 transition-colors cursor-pointer"
+                       onClick={() => setPreferences({ ...preferences, marketing: !preferences.marketing })}>
+                    <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          Analytics Cookies
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                            Marketing cookies
+                          </h4>
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                            Coming soon
+                          </span>
                         </div>
-                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                          Help us understand how visitors use our site. Includes Vercel Analytics
-                          and Sentry error tracking.
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1.5 leading-relaxed">
+                          Reserved for future personalized content and advertising features.
                         </p>
                       </div>
-                    </label>
-
-                    {/* Marketing Cookies */}
-                    <label className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-md cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
                       <input
                         type="checkbox"
                         checked={preferences.marketing}
-                        onChange={(e) =>
-                          setPreferences({ ...preferences, marketing: e.target.checked })
-                        }
-                        className="mt-1 h-4 w-4 text-blue-600 rounded"
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setPreferences({ ...preferences, marketing: e.target.checked });
+                        }}
+                        className="mt-1 h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
                       />
-                      <div className="flex-1">
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          Marketing Cookies
-                        </div>
-                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                          Currently not used. Reserved for future personalized advertising features.
-                        </p>
-                      </div>
-                    </label>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3 pt-2">
-                    <button
-                      onClick={handleSavePreferences}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
-                    >
-                      Save Preferences
-                    </button>
-                    <button
-                      onClick={() => setShowDetails(false)}
-                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md font-medium transition-colors"
-                    >
-                      Back
-                    </button>
+                    </div>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
 
-            <button
-              onClick={() => setShowBanner(false)}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-              aria-label="Close banner"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
+              <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between">
+                <a
+                  href="/legal/privacy"
+                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                >
+                  Privacy Policy
+                </a>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowDetails(false)}
+                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSavePreferences}
+                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                  >
+                    Save preferences
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
