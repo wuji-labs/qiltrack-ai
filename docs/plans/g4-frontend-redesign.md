@@ -3,7 +3,7 @@
 > **任务 ID**：WS-REDESIGN
 > **工作组**：G4
 > **Worktree**：`D:\Projects\qiltrack-ai-g4`
-> **分支**：`g4/frontend-redesign`（从 `g4/develop` 创建）
+> **分支**：`g4/develop`（固定工作分支）
 > **负责人**：HQ (Codex 角色)
 > **执行者**：G4-Claude
 > **创建时间**：2025-12-10
@@ -38,7 +38,7 @@
 **目标**：建立 Design Token 体系，集成核心依赖
 
 **子任务清单**：
-- [ ] **P1.1** 创建 feature 分支 `g4/frontend-redesign`（从 `g4/develop` 切出）
+- [ ] **P1.1** 确认当前在 `g4/develop` 分支，同步最新代码
 - [ ] **P1.2** 创建 `tailwind.config.ts`（迁移 PostCSS 配置）
 - [ ] **P1.3** 重构 `app/globals.css`：
   - [ ] 拆分为 `base.css` (CSS 变量 + reset)
@@ -246,7 +246,7 @@
 
 ### 3.2 禁止的操作
 
-❌ **禁止直推 main**：所有提交必须在 `g4/frontend-redesign` 分支
+❌ **禁止切换分支**：固定在 `g4/develop` 工作，不创建子分支
 ❌ **禁止改动其他 worktree**：仅在 `qiltrack-ai-g4` 工作
 ❌ **禁止删除旧组件**：Phase 1-2 先创建新组件，Phase 3-5 逐步替换
 ❌ **禁止破坏性重构**：渐进式迁移，保留降级方案
@@ -255,20 +255,22 @@
 
 **分支策略**：
 ```bash
-# 1. 从 g4/develop 创建 feature 分支
-git checkout g4/develop
+# 1. 确认在 g4/develop 分支
+git status  # 应显示 "On branch g4/develop"
+
+# 2. 每次开始工作前同步最新代码
 git pull origin g4/develop
-git checkout -b g4/frontend-redesign
 
-# 2. 定期同步 g4/develop（避免冲突）
-git fetch origin
-git rebase origin/g4/develop
-
-# 3. 提交 PR 前确认
+# 3. 提交前确认
 git status  # 工作区干净
 npm run lint  # Lint 通过
 npm run type-check  # 类型检查通过
 npm run build  # 构建成功
+
+# 4. 提交到 g4/develop
+git add .
+git commit -m "feat(phase1): 建立 Design Token 体系和 shadcn 集成"
+git push origin g4/develop
 ```
 
 **提交规范**：
@@ -278,6 +280,11 @@ feat(phase2): 迁移按钮和卡片组件到 shadcn
 feat(phase3): 重构主页和定价页
 fix(theme): 修复深色模式下的色彩对比度问题
 ```
+
+**PR 策略**：
+- 每个 Phase 完成后，从 `g4/develop` 向 `main` 提交 PR
+- PR 标题：`[G4] Phase X: 功能描述`
+- PR 描述包含完整 CAVR 报告
 
 ---
 
@@ -426,21 +433,22 @@ Next: 请审查 Phase 2 代码并批准进入 Phase 3
 
 **G4-Claude 立即执行**：
 
-1. **确认分支状态**：
+1. **确认环境**：
    ```bash
-   git status  # 确认在 g4/develop
+   git status  # 确认在 g4/develop 分支
    git pull origin g4/develop  # 同步最新代码
+   pwd  # 确认在 D:\Projects\qiltrack-ai-g4
    ```
 
-2. **创建 feature 分支**：
-   ```bash
-   git checkout -b g4/frontend-redesign
-   ```
-
-3. **开始 Phase 1.1**：
+2. **阅读架构文档**：
    - 阅读 `docs/decisions/2025-12-10-frontend-style-redesign.md`
-   - 理解 Design Token 体系
-   - 准备创建 `tailwind.config.ts`
+   - 理解 Design Token 体系（色彩/字体/间距）
+   - 查看 shadcn/ui 集成步骤
+
+3. **开始 Phase 1.2**：
+   - 创建 `tailwind.config.ts`
+   - 定义 CSS 变量系统
+   - 安装 shadcn/ui
 
 4. **遇到问题时**：
    - 先查阅 Architecture Snapshot

@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "./providers";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { ErrorBoundary } from "@/components/error-boundary";
 
-// 使用系统字体替代 Google Fonts 以避免构建时网络依赖
-// 如需使用自定义字体，请下载字体文件并使用 next/font/local
+// 自托管 Inter 字体 (Google Fonts)
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: "Qiltrack AI",
@@ -18,13 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)] antialiased font-sans"
-        style={{
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
-        }}
-      >
+    <html lang="en" suppressHydrationWarning className={inter.variable}>
+      <body className="min-h-screen antialiased font-sans">
         <ErrorBoundary>
           <AppProviders>{children}</AppProviders>
           <CookieConsentBanner />

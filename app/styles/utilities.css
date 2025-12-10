@@ -1,0 +1,275 @@
+/* ====== Utility Classes ====== */
+/* 工具类 */
+
+/* 文本颜色工具类 */
+.text-dim {
+  color: rgb(var(--fg-secondary));
+}
+
+.text-subtle {
+  color: rgb(var(--fg-tertiary));
+}
+
+.text-muted {
+  color: rgb(var(--fg-muted));
+}
+
+/* 排版样式类 */
+.heading-1 {
+  font-size: var(--text-5xl);
+  font-weight: var(--font-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: rgb(var(--fg-primary));
+}
+
+.heading-2 {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: rgb(var(--fg-primary));
+}
+
+.heading-3 {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-tight);
+  color: rgb(var(--fg-primary));
+}
+
+.heading-4 {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-snug);
+  color: rgb(var(--fg-primary));
+}
+
+.body-large {
+  font-size: var(--text-lg);
+  line-height: var(--leading-relaxed);
+  color: rgb(var(--fg-secondary));
+}
+
+.body-default {
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: rgb(var(--fg-secondary));
+}
+
+.body-small {
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: rgb(--fg-secondary));
+}
+
+.caption {
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: rgb(var(--fg-tertiary));
+}
+
+.label {
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+  font-weight: var(--font-medium);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: rgb(var(--fg-tertiary));
+}
+
+/* 动画工具类 */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin-loading {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes glow-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--accent-primary), 0.4);
+  }
+  50% {
+    box-shadow: 0 0 10px 4px rgba(var(--accent-primary), 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--accent-primary), 0.4);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fade-in-up 0.2s ease-out;
+}
+
+.animate-fadeIn {
+  animation: fade-in 0.3s ease-out;
+}
+
+.animate-slideInLeft {
+  animation: slide-in-left 0.3s ease-out;
+}
+
+.animate-slideInRight {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+.animate-spinner {
+  animation: spin-loading 0.8s linear infinite;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out;
+}
+
+/* 响应式动画控制 */
+.motion-safe\:transition-all {
+  @media (prefers-reduced-motion: no-preference) {
+    transition: all var(--duration-base) var(--ease-smooth);
+  }
+}
+
+.motion-safe\:transition-transform {
+  @media (prefers-reduced-motion: no-preference) {
+    transition: transform var(--duration-base) var(--ease-smooth);
+  }
+}
+
+.motion-safe\:transition-colors {
+  @media (prefers-reduced-motion: no-preference) {
+    transition: color var(--duration-base) var(--ease-smooth),
+                background-color var(--duration-base) var(--ease-smooth),
+                border-color var(--duration-base) var(--ease-smooth);
+  }
+}
+
+.motion-safe\:hover\:-translate-y-0\.5:hover {
+  @media (prefers-reduced-motion: no-preference) {
+    transform: translateY(-0.125rem);
+  }
+}
+
+.motion-safe\:hover\:-translate-y-1:hover {
+  @media (prefers-reduced-motion: no-preference) {
+    transform: translateY(-0.25rem);
+  }
+}
+
+.motion-safe\:hover\:glow-pulse:hover {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: glow-pulse 1.5s ease-in-out infinite;
+  }
+}
+
+/* Select 和 Option 样式 (保留兼容性) */
+select {
+  color-scheme: light dark;
+}
+
+[data-theme="dark"] select option {
+  background-color: rgb(var(--bg-card)) !important;
+  color: rgb(var(--fg-primary)) !important;
+}
+
+[data-theme="light"] select option {
+  background-color: rgb(var(--bg-card)) !important;
+  color: rgb(var(--fg-primary)) !important;
+}
+
+select option:checked,
+select option:hover {
+  background: rgba(var(--accent-primary), 0.15) !important;
+  color: rgb(var(--accent-primary)) !important;
+}
+
+/* Badge pill 样式 */
+.badge-pill {
+  border-radius: var(--radius-full);
+  border: 1px solid rgb(var(--border-default));
+  background: rgb(var(--bg-card));
+  color: rgb(var(--fg-tertiary));
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 10px;
+  padding: 0.25rem 0.75rem;
+}
+
+/* 容器 */
+.container-custom {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 1440px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-custom {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-custom {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
