@@ -71,6 +71,21 @@
   --transition-base: 200ms ease;
   --transition-slow: 300ms ease;
   --transition-cubic: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ====== 向后兼容映射 (Backward Compatibility) ====== */
+  /**
+   * @deprecated 这些变量将在 Phase 4-7 中被逐步移除
+   * 请使用上方对应的新变量名
+   */
+  --accent-blue: var(--accent-primary);
+  --accent-emerald: var(--semantic-success);
+  --accent-emerald-dim: rgba(16, 185, 129, 0.6);
+  --bg-frosted: var(--bg-layer);
+  --bg-surface: var(--bg-subtle);
+  --color-foreground: var(--text-primary);
+  --color-subtle: var(--text-secondary);
+  --stroke-glow: var(--border-default);
+  --stroke-soft: var(--border-subtle);
 }
 
 /* ====== 深色模式 (Dark Mode) - 可选 ====== */
