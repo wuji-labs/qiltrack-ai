@@ -1,48 +1,9 @@
 @import "tailwindcss";
-
-:root {
-  --bg-base: #0a0a0c;
-  --bg-layer: rgba(255, 255, 255, 0.03);
-  --bg-frosted: rgba(255, 255, 255, 0.07);
-  --color-foreground: #f4f4f7;
-  --stroke-soft: rgba(255, 255, 255, 0.08);
-  --stroke-glow: rgba(255, 255, 255, 0.18);
-  --accent-blue: #4dd0a6;
-  --accent-purple: #4dd0a6;
-  --accent-emerald: #5be0b0;
-  --text-dim: rgba(244, 244, 247, 0.82);
-  --text-subtle: rgba(244, 244, 247, 0.68);
-  --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.45);
-  --shadow-focus: 0 0 0 1px rgba(255, 255, 255, 0.18);
-  --shadow-depth: inset 0 0 0.5px rgba(255, 255, 255, 0.3);
-  --blur-sm: 8px;
-  --blur-md: 12px;
-  --nav-offset: 144px;
-}
-
-@theme inline {
-  --color-bg-base: var(--bg-base);
-  --color-bg-layer: var(--bg-layer);
-  --color-bg-frosted: var(--bg-frosted);
-  --color-foreground: var(--color-foreground);
-  --color-accent-blue: var(--accent-blue);
-  --color-accent-purple: var(--accent-purple);
-  --color-accent-emerald: var(--accent-emerald);
-  --font-sans:
-    var(--font-geist-sans), "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
-  --font-mono:
-    var(--font-geist-mono), "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace;
-}
+@import "./styles/tokens.css";
 
 body {
   background-color: var(--bg-base);
-  color: var(--color-foreground);
+  color: var(--text-primary);
   font-family:
     var(--font-geist-sans),
     "Inter",
@@ -63,91 +24,100 @@ body {
   scroll-margin-top: var(--nav-offset);
 }
 
-/* ====== 核心视觉辅助类 ====== */
+/* ====== 兼容性样式类（临时保留,将被逐步移除）====== */
+/**
+ * @deprecated 这些样式类将在后续版本中移除，请使用新的组件替代
+ * .glass-card -> 使用 <Card /> 组件
+ * .frosted-bar -> 使用 <Card variant="elevated" /> 组件
+ * .text-dim -> 使用 text-secondary
+ * .text-subtle -> 使用 text-tertiary
+ */
+
 .glass-card {
   background: var(--bg-layer);
-  border: 1px solid var(--stroke-soft);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-soft);
-  backdrop-filter: blur(var(--blur-sm));
+  box-shadow: var(--shadow-sm);
 }
 
 .frosted-bar {
-  background: var(--bg-frosted);
-  border: 1px solid var(--stroke-soft);
+  background: var(--bg-layer);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
-  backdrop-filter: blur(var(--blur-md));
-  box-shadow: var(--shadow-depth);
+  box-shadow: var(--shadow-sm);
 }
 
 .text-dim {
-  color: var(--text-dim);
+  color: var(--text-secondary);
 }
 
 .text-subtle {
-  color: var(--text-subtle);
+  color: var(--text-tertiary);
 }
 
+/**
+ * @deprecated 请使用 <Button variant="primary" /> 替代
+ */
 .btn-gradient {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 999px;
-  border: 1px solid var(--stroke-soft);
-  background: var(--accent-emerald);
-  color: #04110c;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  box-shadow: 0 14px 42px rgba(91, 224, 176, 0.28);
-  transition: filter 0.2s ease;
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+  background: var(--accent-primary);
+  color: white;
+  font-weight: 600;
+  transition: background var(--transition-fast);
 }
 
 .btn-gradient:hover {
-  filter: brightness(1.05);
+  background: var(--accent-primary-hover);
 }
 
+/**
+ * @deprecated 请使用 <Button variant="ghost" /> 替代
+ */
 .btn-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 999px;
-  border: 1px solid var(--stroke-soft);
+  border-radius: var(--radius-md);
+  border: none;
   background: transparent;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.22em;
+  color: var(--text-secondary);
   transition:
-    border-color 0.2s ease,
-    color 0.2s ease;
+    background var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .btn-ghost:hover {
-  border-color: var(--accent-emerald);
-  color: var(--accent-emerald);
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
+/**
+ * @deprecated 请使用 <Badge /> 组件替代
+ */
 .badge-pill {
-  border-radius: 999px;
-  border: 1px solid var(--stroke-soft);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-default);
   background: var(--bg-layer);
-  color: var(--text-subtle);
-  text-transform: uppercase;
-  letter-spacing: 0.3em;
-  font-size: 10px;
+  color: var(--text-secondary);
+  font-size: 12px;
   padding: 0.25rem 0.75rem;
 }
 
-.hero-mesh {
-  background-image:
-    radial-gradient(120px 120px at 18% 20%, rgba(91, 224, 176, 0.12), transparent 55%),
-    radial-gradient(160px 160px at 82% 12%, rgba(91, 224, 176, 0.16), transparent 60%),
-    radial-gradient(200px 200px at 30% 82%, rgba(91, 224, 176, 0.13), transparent 65%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
-    linear-gradient(0deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+/**
+ * @deprecated 网格背景不符合现代极简风格，将被移除
+ * 请移除 className 中的 .hero-mesh, .feature-mesh, .generator-mesh
+ */
+.hero-mesh,
+.feature-mesh,
+.generator-mesh {
+  /* 暂时禁用网格背景 */
+  opacity: 0;
 }
 
 /* ====== Sonner Toast 样式覆盖 ====== */
@@ -157,137 +127,52 @@ body {
 
 .sonner-toast {
   border-radius: var(--radius-md) !important;
-  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.45) !important;
+  box-shadow: var(--shadow-lg) !important;
 }
 
 [data-sonner-toast][data-styled='true'][data-type='success'] {
-  background: rgba(91, 224, 176, 0.15) !important;
-  border-color: rgba(91, 224, 176, 0.3) !important;
-  color: #5be0b0 !important;
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  color: var(--semantic-success) !important;
 }
 
 [data-sonner-toast][data-styled='true'][data-type='error'] {
-  background: rgba(251, 113, 133, 0.15) !important;
-  border-color: rgba(251, 113, 133, 0.3) !important;
-  color: #fb7185 !important;
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: var(--semantic-error) !important;
 }
 
 [data-sonner-toast][data-styled='true'][data-type='info'] {
-  background: rgba(77, 208, 166, 0.15) !important;
-  border-color: rgba(77, 208, 166, 0.3) !important;
-  color: #4dd0a6 !important;
+  background: rgba(59, 130, 246, 0.15) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+  color: var(--semantic-info) !important;
 }
 
 [data-sonner-toast][data-styled='true'][data-type='warning'] {
-  background: rgba(251, 191, 36, 0.15) !important;
-  border-color: rgba(251, 191, 36, 0.3) !important;
-  color: #fbbf24 !important;
+  background: rgba(245, 158, 11, 0.15) !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+  color: var(--semantic-warning) !important;
 }
 
-.feature-mesh {
-  background-image:
-    radial-gradient(140px 140px at 12% 30%, rgba(91, 224, 176, 0.12), transparent 58%),
-    radial-gradient(140px 140px at 88% 70%, rgba(91, 224, 176, 0.1), transparent 60%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)),
-    linear-gradient(0deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size:
-    auto,
-    auto,
-    100% 100%,
-    36px 36px,
-    36px 36px;
-  background-position:
-    12% 30%,
-    88% 70%,
-    center,
-    0 0,
-    0 0;
-  mix-blend-mode: screen;
-  opacity: 0.75;
-}
-
-.generator-mesh {
-  background-image:
-    radial-gradient(200px 200px at 8% 18%, rgba(91, 224, 176, 0.12), transparent 60%),
-    radial-gradient(220px 220px at 88% 28%, rgba(91, 224, 176, 0.1), transparent 62%),
-    radial-gradient(260px 260px at 18% 82%, rgba(91, 224, 176, 0.1), transparent 65%),
-    radial-gradient(320px 320px at 84% 78%, rgba(63, 157, 255, 0.08), transparent 68%);
-  background-size: auto, auto, auto, auto;
-  background-position:
-    8% 18%,
-    88% 28%,
-    18% 82%,
-    84% 78%;
-  mix-blend-mode: screen;
-  opacity: 0.5;
-}
-
+/* ====== Progress 组件样式 ====== */
 .progress-track {
   position: relative;
   height: 10px;
   width: 100%;
-  border-radius: 999px;
-  background: linear-gradient(120deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+  border-radius: var(--radius-full);
+  background: var(--bg-layer);
   overflow: hidden;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 18px 30px rgba(0, 0, 0, 0.24);
+  box-shadow: var(--shadow-sm);
 }
 
 .progress-fill {
   height: 100%;
   position: relative;
-  border-radius: 999px;
-  background: linear-gradient(120deg, rgba(81, 242, 191, 0.75), rgba(63, 157, 255, 0.65));
+  border-radius: var(--radius-full);
+  background: var(--accent-primary);
   transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  overflow: hidden;
-  isolation: isolate;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 10px 24px rgba(63, 157, 255, 0.18),
-    0 10px 24px rgba(81, 242, 191, 0.16);
-  z-index: 1;
+  box-shadow: var(--shadow-sm);
   will-change: width;
-}
-
-.progress-fill-glow {
-  position: absolute;
-  inset: -40% -10%;
-  background:
-    radial-gradient(circle at 30% 50%, rgba(81, 242, 191, 0.45), transparent 45%),
-    radial-gradient(circle at 70% 50%, rgba(63, 157, 255, 0.35), transparent 50%);
-  filter: blur(22px);
-  opacity: 0.55;
-  animation: gradient-shift 8s ease-in-out infinite;
-  pointer-events: none;
-}
-
-.progress-fill-sheen {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    120deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.35) 45%,
-    transparent 70%
-  );
-  mix-blend-mode: screen;
-  transform: translateX(-120%);
-  animation: sheen-move 2.4s ease-in-out infinite;
-}
-
-.progress-track-backdrop {
-  position: absolute;
-  inset: -40% 0;
-  background:
-    radial-gradient(circle at 10% 50%, rgba(81, 242, 191, 0.18), transparent 35%),
-    radial-gradient(circle at 90% 50%, rgba(63, 157, 255, 0.16), transparent 38%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
-  filter: blur(22px);
-  opacity: 0.55;
-  pointer-events: none;
-  z-index: 0;
 }
 
 .progress-stack {
@@ -307,27 +192,18 @@ body {
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  border-radius: 11px;
-  background: linear-gradient(160deg, rgba(16, 24, 38, 0.82), rgba(18, 28, 44, 0.76));
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.02),
-    0 8px 18px rgba(0, 0, 0, 0.25),
-    0 1px 0 rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  background: var(--bg-layer);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   text-overflow: ellipsis;
   transition:
-    transform 0.45s ease,
-    color 0.5s ease,
-    box-shadow 0.5s ease,
-    border-color 0.5s ease;
+    transform var(--transition-base),
+    box-shadow var(--transition-base),
+    border-color var(--transition-base);
   letter-spacing: 0.01em;
-  isolation: isolate;
-  background-image:
-    radial-gradient(circle at 12% 20%, rgba(81, 242, 191, 0.12), transparent 32%),
-    radial-gradient(circle at 88% 80%, rgba(63, 157, 255, 0.12), transparent 36%);
 }
 
 .progress-chip-index {
@@ -336,13 +212,13 @@ body {
   justify-content: center;
   height: 24px;
   width: 46px;
-  border-radius: 14px;
+  border-radius: var(--radius-sm);
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  background: linear-gradient(135deg, rgba(81, 242, 191, 0.12), rgba(63, 157, 255, 0.1));
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  background: var(--accent-primary-light);
+  border: 1px solid var(--border-default);
+  color: var(--accent-primary);
 }
 
 .progress-chip-label {
@@ -353,218 +229,19 @@ body {
   font-weight: 600;
 }
 
-.progress-chip-ring {
-  position: absolute;
-  inset: -45%;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(81, 242, 191, 0.18), transparent 52%),
-    radial-gradient(circle at 60% 40%, rgba(63, 157, 255, 0.12), transparent 55%);
-  filter: blur(20px);
-  opacity: 0.35;
-  transform: scale(0.86);
-  transition:
-    opacity 0.4s ease,
-    transform 0.4s ease;
-}
-
-.progress-chip-spark {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    120deg,
-    rgba(81, 242, 191, 0) 0%,
-    rgba(81, 242, 191, 0.28) 45%,
-    rgba(63, 157, 255, 0) 100%
-  );
-  mix-blend-mode: screen;
-  transform: translateX(-40%);
-  animation: spark-move 1.9s ease-in-out infinite;
-  opacity: 0.35;
-}
-
-.progress-chip::after {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  pointer-events: none;
-}
-
-.progress-chip::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 11px;
-  background: linear-gradient(120deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-.progress-chip-glow {
-  position: absolute;
-  inset: -30%;
-  background:
-    radial-gradient(circle at 35% 50%, rgba(81, 242, 191, 0.18), transparent 52%),
-    radial-gradient(circle at 70% 50%, rgba(82, 163, 255, 0.18), transparent 58%);
-  filter: blur(32px);
-  opacity: 0;
-  transition: opacity 0.6s ease;
-  pointer-events: none;
-}
-
 .progress-chip.is-active {
-  color: #f1fbff;
-  transform: translateY(-3px);
-  border-color: rgba(81, 242, 191, 0.45);
-  box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.38),
-    0 0 0 1px rgba(81, 242, 191, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  animation: stack-bounce 1.05s ease-in-out infinite;
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
-.progress-chip.is-active .progress-chip-ring {
-  opacity: 0.8;
-  transform: scale(1);
-}
+/* ====== 核心动画（精简版）====== */
 
-.progress-chip.is-active .progress-chip-glow {
-  opacity: 1;
-}
-
-@keyframes marquee-shell-drift {
-  0% {
-    transform: rotateX(0deg) rotateY(0deg) translateY(0);
-  }
-  33% {
-    transform: rotateX(1.6deg) rotateY(-2deg) translateY(-1px);
-  }
-  66% {
-    transform: rotateX(-1.6deg) rotateY(2deg) translateY(1px);
-  }
-  100% {
-    transform: rotateX(0deg) rotateY(0deg) translateY(0);
-  }
-}
-
-@keyframes marquee-float {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-2px);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-
-@keyframes spark-move {
-  0% {
-    transform: translateX(-40%);
-    opacity: 0.45;
-  }
-  50% {
-    transform: translateX(35%);
-    opacity: 0.85;
-  }
-  100% {
-    transform: translateX(-40%);
-    opacity: 0.45;
-  }
-}
-
-@keyframes stack-bounce {
-  0% {
-    transform: translateY(-2px);
-  }
-  45% {
-    transform: translateY(-6px);
-  }
-  100% {
-    transform: translateY(-2px);
-  }
-}
-
-@keyframes gradient-shift {
-  0% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(5%);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .progress-marquee,
-  .progress-marquee::before {
-    animation: none;
-  }
-  .progress-chip.is-active {
-    animation: none;
-  }
-
-  .progress-fill-glow {
-    animation: none;
-  }
-
-  .progress-fill-sheen {
-    animation: none;
-  }
-}
-
-@keyframes sheen-move {
-  0% {
-    transform: translateX(-120%);
-  }
-  50% {
-    transform: translateX(30%);
-  }
-  100% {
-    transform: translateX(120%);
-  }
-}
-
-/* ====== Hero 按钮动效：glow-pulse ====== */
-@keyframes glow-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(91, 224, 176, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 10px 4px rgba(91, 224, 176, 0.3);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(91, 224, 176, 0.4);
-  }
-}
-
-.motion-safe\:hover\:glow-pulse:hover {
-  @media (prefers-reduced-motion: no-preference) {
-    animation: glow-pulse 1.5s ease-in-out infinite;
-  }
-}
-
-.motion-safe\:transition-transform {
-  @media (prefers-reduced-motion: no-preference) {
-    transition: transform 0.2s ease-out;
-  }
-}
-
-.motion-safe\:hover\:-translate-y-0\.5:hover {
-  @media (prefers-reduced-motion: no-preference) {
-    transform: translateY(-0.125rem);
-  }
-}
-
-/* ====== 动效补充：按钮、卡片、FAQ ====== */
+/* 淡入上滑 */
 @keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -572,33 +249,7 @@ body {
   }
 }
 
-@keyframes spin-loading {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* ====== 动效工具类 ====== */
-.animate-fadeInUp {
-  animation: fade-in-up 0.2s ease-out;
-}
-
-.motion-safe\:transition-all {
-  @media (prefers-reduced-motion: no-preference) {
-    transition: all 0.2s ease-out;
-  }
-}
-
-.motion-safe\:hover\:-translate-y-1:hover {
-  @media (prefers-reduced-motion: no-preference) {
-    transform: translateY(-0.25rem);
-  }
-}
-
-/* 加载旋转动画 */
+/* 加载旋转 */
 @keyframes spinner-rotate {
   from {
     transform: rotate(0deg);
@@ -608,39 +259,7 @@ body {
   }
 }
 
-.animate-spinner {
-  animation: spinner-rotate 0.8s linear infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* ====== Select 和 Option 暗色主题样式 ====== */
-select {
-  color-scheme: dark;
-}
-
-select option {
-  background-color: #1a1a1c !important;
-  color: #f4f4f7 !important;
-  font-family: inherit;
-  padding: 8px 12px;
-}
-
-select option:checked,
-select option:hover {
-  background: linear-gradient(90deg, rgba(91, 224, 176, 0.15), rgba(91, 224, 176, 0.08)) !important;
-  color: #5be0b0 !important;
-}
-
-/* Referral Welcome Banner Animation */
+/* 滑下动画 */
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -652,6 +271,68 @@ select option:hover {
   }
 }
 
+/* ====== 动效工具类 ====== */
+.animate-fadeInUp {
+  animation: fade-in-up 0.2s ease-out;
+}
+
+.animate-spinner {
+  animation: spinner-rotate 0.8s linear infinite;
+}
+
 .animate-slide-down {
   animation: slideDown 0.3s ease-out;
+}
+
+.motion-safe\:transition-transform {
+  @media (prefers-reduced-motion: no-preference) {
+    transition: transform var(--transition-fast);
+  }
+}
+
+.motion-safe\:transition-all {
+  @media (prefers-reduced-motion: no-preference) {
+    transition: all var(--transition-base);
+  }
+}
+
+.motion-safe\:hover\:-translate-y-0\.5:hover {
+  @media (prefers-reduced-motion: no-preference) {
+    transform: translateY(-0.125rem);
+  }
+}
+
+.motion-safe\:hover\:-translate-y-1:hover {
+  @media (prefers-reduced-motion: no-preference) {
+    transform: translateY(-0.25rem);
+  }
+}
+
+/* ====== 无障碍：减少动画 ====== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ====== Select 和 Option 样式（待改造）====== */
+select {
+  color-scheme: light dark;
+}
+
+select option {
+  background-color: var(--bg-base) !important;
+  color: var(--text-primary) !important;
+  font-family: inherit;
+  padding: 8px 12px;
+}
+
+select option:checked,
+select option:hover {
+  background: var(--accent-primary-light) !important;
+  color: var(--accent-primary) !important;
 }
