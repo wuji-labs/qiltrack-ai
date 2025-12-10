@@ -1,7 +1,7 @@
 # Investor AI 架构文档
 
-> **最后更新**: 2025-12-01
-> **架构版本**: v2.0 (三层架构重构)
+> **最后更新**: 2025-12-10
+> **架构版本**: v3.0 (G5集成 - 安全/性能/可观测性增强)
 
 ---
 
@@ -10,10 +10,11 @@
 1. [架构概览](#架构概览)
 2. [核心设计原则](#核心设计原则)
 3. [三层架构详解](#三层架构详解)
-4. [核心模块](#核心模块)
-5. [数据流](#数据流)
-6. [API 设计](#api-设计)
-7. [扩展性](#扩展性)
+4. [G5新增功能层](#g5新增功能层)
+5. [核心模块](#核心模块)
+6. [数据流](#数据流)
+7. [API 设计](#api-设计)
+8. [扩展性](#扩展性)
 
 ---
 
@@ -263,6 +264,247 @@ export class MarketDataService {
   }
 }
 ```
+
+---
+
+## G5新增功能层
+
+G5集成引入了三个跨层面的增强系统：**安全层**、**性能优化层** 和 **可观测性层**。
+
+### 🔐 安全层 (Security Layer)
+
+#### 1. MFA双因素认证
+
+**位置**: `lib/security/mfa.ts`, `app/api/mfa/*`
+
+```typescript
+// MFA设备注册
+await mfaManager.registerDevice(userId, {
+  type: 'totp',
+  secret: generateSecret(),
+  deviceName: 'iPhone 15',
+});
+
+// 验证MFA代码
+const isValid = await mfaManager.verifyCode(userId, code);
+```
+
+**数据库表**:
+- `mfa_devices`: 存储用户MFA设备
+- 支持TOTP(Google Authenticator)
+
+#### 2. GDPR合规
+
+**位置**: `app/api/gdpr/*`, `components/cookie-consent-banner.tsx`
+
+**功能**:
+- Cookie同意管理 (Essential, Analytics, Marketing)
+- 数据导出 (JSON格式)
+- 账号删除 (级联清理)
+- 数据访问请求
+
+**Cookie策略**:
+```typescript
+interface CookiePreferences {
+  essential: boolean;  // 始终为true
+  analytics: boolean;  // Vercel Analytics, Sentry
+  marketing: boolean;  // 预留
+}
+```
+
+#### 3. Rate Limiting
+
+**位置**: `lib/api/rate-limit.ts`
+
+**基于Upstash Redis的多层限流**:
+
+```typescript
+// 报告生成限流: 5次/分钟/用户
+const result = await checkRateLimit(
+  userId,
+  reportGenerationRateLimit,
+  { windowMs: 60000, maxRequests: 5 }
+);
+
+// 全局API限流: 20次/秒/IP
+await checkRateLimit(ipAddress, globalRateLimit);
+```
+
+**内存降级**:
+- Redis不可用时自动切换内存限流
+- LRU淘汰策略防止内存耗尽
+
+**限流器列表**:
+- `reportGenerationRateLimit`: 5次/分钟
+- `globalRateLimit`: 20次/秒
+- `passwordChangeRateLimit`: 5次/小时
+- `adminActionRateLimit`: 20次/小时
+- `fileUploadRateLimit`: 10次/小时
+- `searchRateLimit`: 30次/分钟
+- `webhookRateLimit`: 100次/分钟
+
+#### 4. CSP安全策略
+
+**位置**: `lib/security/csp.ts`
+
+```typescript
+Content-Security-Policy:
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' vercel.live;
+  img-src 'self' data: https:;
+  connect-src 'self' *.supabase.co *.helicone.ai;
+```
+
+#### 5. 输入验证
+
+**位置**: `lib/api/validators.ts`
+
+基于Zod的统一验证层:
+
+```typescript
+const reportRequestSchema = z.object({
+  symbol: z.string().min(1).max(10),
+  language: z.enum(['en', 'zh']),
+  tone: z.enum(['baseline', 'conservative', 'aggressive']),
+});
+```
+
+---
+
+### ⚡ 性能优化层 (Performance Layer)
+
+#### 1. LLM缓存系统
+
+**位置**: `lib/llm/cache.ts`
+
+**基于Upstash Redis的提示词缓存**:
+
+```typescript
+// 缓存key生成
+const cacheKey = `llm:${hashPrompt(systemPrompt + userPrompt)}`;
+
+// 缓存命中
+if (cached) {
+  return { content: cached, fromCache: true };
+}
+
+// 缓存miss,调用LLM并缓存
+const result = await llm.generate(...);
+await redis.setex(cacheKey, 3600, result);
+```
+
+**统计面板**: `app/admin/cache-stats`
+- 命中率监控
+- 缓存大小追踪
+- 成本节省估算
+
+#### 2. 数据库分区
+
+**位置**: `supabase/migrations/20251210000004_add_table_partitioning.sql`
+
+**按月分区audit_logs表**:
+
+```sql
+-- 创建分区表
+CREATE TABLE audit_logs_2025_12 PARTITION OF audit_logs
+  FOR VALUES FROM ('2025-12-01') TO ('2026-01-01');
+
+-- 自动创建分区函数
+CREATE OR REPLACE FUNCTION fn_create_monthly_partition()
+RETURNS void AS $$
+BEGIN
+  -- 自动创建下个月分区
+END;
+$$ LANGUAGE plpgsql;
+```
+
+**分区管理**: `app/api/admin/partitions`
+- 自动分区创建
+- 分区健康检查
+- 历史数据清理
+
+#### 3. 骨架屏加载
+
+**位置**: `app/components/SkeletonLoader.tsx`
+
+**流畅的加载体验**:
+- `SkeletonCard`: 卡片骨架
+- `SkeletonTable`: 表格骨架
+- `SkeletonProfile`: 用户资料骨架
+- `SkeletonChart`: 图表骨架
+
+```typescript
+<Suspense fallback={<SkeletonPage />}>
+  <ReportList />
+</Suspense>
+```
+
+---
+
+### 📊 可观测性层 (Observability Layer)
+
+#### 1. Webhook系统
+
+**位置**: `app/api/webhooks/*`, `supabase/migrations/20251210000001_add_webhook_system.sql`
+
+**功能**:
+- 幂等性处理 (基于`idempotency_key`)
+- 事件日志 (`webhook_events`表)
+- 失败重试机制
+- 签名验证
+
+```typescript
+// Stripe webhook处理
+const event = await stripe.webhooks.constructEvent(
+  body,
+  signature,
+  webhookSecret
+);
+
+// 幂等性检查
+const existing = await checkIdempotencyKey(event.id);
+if (existing) return existing;
+
+// 处理事件
+await processWebhookEvent(event);
+```
+
+#### 2. 审计日志
+
+**位置**: `audit_logs`表 (已分区)
+
+**记录所有关键操作**:
+```typescript
+await auditLog({
+  userId,
+  action: 'CREDIT_GRANT',
+  resourceType: 'credit',
+  resourceId: creditId,
+  changes: { before: 10, after: 20 },
+});
+```
+
+**查询界面**: `app/admin/audit-logs`
+
+#### 3. 缓存统计面板
+
+**位置**: `app/admin/cache-stats`, `components/admin/cache-stats-view.tsx`
+
+**实时监控**:
+- 缓存命中率
+- 请求总数
+- 缓存大小
+- 成本节省估算
+
+#### 4. 分区管理工具
+
+**位置**: `app/admin/partitions`, `components/admin/partition-manager.tsx`
+
+**功能**:
+- 分区健康监控
+- 自动创建下个月分区
+- 分区大小统计
+- 历史分区清理
 
 ---
 
