@@ -58,7 +58,10 @@
 
 #### Supabase 访问
 
-- **已授权**：完整凭证位于 `.env.local`（已加载到环境变量）
+- **已授权**：完整凭证根据环境分别存储
+  - **本地开发环境**：`.env.local`
+  - **生产环境（Vercel 部署）**：`.env.vercel`
+  - ⚠️ **重要**：检查/操作生产数据库时必须使用 `.env.vercel` 中的凭证
   - `NEXT_PUBLIC_SUPABASE_URL`: https://inmtounwqcjwsxkfnsfd.supabase.co
   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: sb_publishable_hT6o-oVeTgfmMeWbP7fwaA_ZtBQEeGV
   - `SUPABASE_SERVICE_ROLE_KEY`: sb_secret_icUWGnicz6KtLXUS2sjSXg_onZWKkzP
@@ -93,7 +96,16 @@
 1. **Context Sync**：Codex 汇总上下文 + 发布 Architecture Snapshot；Claude 确认依赖/提疑问。
 2. **Design & Breakdown**：Codex 给组件/数据流/测试矩阵；Claude 输出实施清单。
 3. **Implementation Loop**：Claude 在短分支开发，跑 `npm run lint` / `npm test`，每段产出变更说明；Codex 随时答疑。
-   - 分支策略：Claude 必须用独立 feature 分支，禁止直接改/推 main；通过 PR 合并，lint/test 必过。
+   - 分支策略：
+     - **禁止直接改/推 main**；所有开发必须通过 PR 合并，lint/test 必过。
+     - **5 个工作组固定分支**：每个 worktree 对应唯一的长期分支，严格执行
+       - G1 组：`g1/develop`
+       - G2 组：`g2/develop`
+       - G3 组：`g3/develop`
+       - G4 组：`g4/develop`
+       - G5 组：`g5/develop`
+     - 各组仅在自己的 `gX/develop` 分支上开发，完成后通过 PR 合并到 `main`。
+     - 临时 feature 分支（如 `g1/fix-xxx`）仅在特殊情况使用，任务完成后必须删除。
    - worktree 同步：使用 git worktree 开发时，提 PR 前固定跑 `git fetch origin` -> `git rebase origin/main` -> `git status`，确认工作区干净且基于最新 main，再 push；rebase 冲突由 Claude 解决。
    - 提交 PR 时必须使用 `.github/pull_request_template.md`，确保 CAVR、验证结果与终端三行简讯全部填妥。
 4. **Review & Validation**：Codex 按行为/韧性/风格审查，指出缺陷与风险；Claude 修复并补充验证。
@@ -158,19 +170,79 @@
 
 ## 10. 多工作组 worktree 协作
 
-- 仅在总部 `D:\Projects\qiltrack-ai` 执行 `npm install`，其他 worktree 通过 `npm run <script> --prefix <worktree>` 使用共享依赖。
+- 仅在主 worktree `D:\Projects\qiltrack-ai` 执行 `npm install`，其他 worktree 通过 `npm run <script> --prefix <worktree>` 使用共享依赖。
 - 使用 `scripts/worktree-manager.ps1`（或 `scripts/prep-group.ps1`）创建/清理 worktree（自动 `--no-checkout` + sparse-checkout + `node_modules` 链接），详见 `docs/guides/worktree-multi-team.md`。
-- 每个工作组维护自己的分支 `gX/<topic>` 与 worktree，任务完成后必须 `git worktree remove` 清理。
-- HQ 与各组 Codex 的组织架构、Boot Sequence 参见 `docs/guides/organization-structure.md`。
+- 每个工作组维护自己的固定长期分支 `gX/develop` 与对应 worktree，任务完成后通过 PR 合并到 `main`。
+- 各组架构详见 `docs/guides/organization-structure.md`。
 
-## 11. HQ 通知与汇报模板
+## 11. 老板与各组协作模式
 
-- HQ 发布任务：更新 `docs/plans/workstreams.md` → 在终端向目标 `Gx-Codex` 发送三行模板（Report/Status/Next），示例：
-  ```
-  @G1-Codex
-  Report: docs/plans/workstreams.md
-  Status: 新任务 <topic>，请创建组内 Snapshot
-  Next: 运行 scripts/prep-group.ps1 并反馈计划
-  ```
-- 组内 Claude 只向组内 Codex 汇报；组内 Codex 在关键节点向 HQ 使用同样三行模板，并引用 `docs/plans/gX-*.md`、`docs/reports/<date>-gX-*-cavr.md` 等文件。
-- 所有角色仍遵循 `Report/Status/Next` + 文档引用的规则，老板只需查看引用路径即可掌握全局状态。
+### 组织架构（扁平化）
+```
+老板（用户）
+  ├─ G1-Codex → G1-Claude
+  ├─ G2-Codex → G2-Claude
+  ├─ G3-Codex → G3-Claude
+  ├─ G4-Codex → G4-Claude
+  └─ G5-Codex → G5-Claude
+```
+
+- **老板直接向各组 Codex 分派任务**，无需中间协调层
+- **老板自己协调各组之间的依赖**，各组全力做自己 worktree 的工作
+- **各组 Codex 独立负责**：Architecture Snapshot、代码评审、技术决策
+- **各组 Claude 专注实施**：按 Snapshot 编码、测试、输出 CAVR
+
+### 任务分派流程
+
+1. **老板发布任务**：
+   - 在终端直接向目标组 Codex 发送任务（使用三行模板）
+   - 示例：
+     ```
+     @G1-Codex
+     Report: （需求描述或文档路径）
+     Status: 新任务 <topic>
+     Next: 创建 Architecture Snapshot 并输出实施计划
+     ```
+
+2. **组内 Codex 响应**：
+   - 创建 Architecture Snapshot：`docs/decisions/<date>-<topic>.md`
+   - 更新 `docs/plans/workstreams.md`（添加任务条目）
+   - 向组内 Claude 发布 Snapshot，附可复制指令
+
+3. **组内 Claude 实施**：
+   - 在 `gX/develop` 分支开发
+   - 输出 CAVR 报告：`docs/reports/<date>-gX-<topic>-cavr.md`
+   - 完成后向组内 Codex 汇报（三行模板）
+
+4. **组内 Codex 审查**：
+   - 审查代码、CAVR 报告
+   - 通过后创建 PR 到 `main`
+   - 向老板汇报完成状态（三行模板）
+
+### 汇报模板规范
+
+所有角色（老板、Codex、Claude）统一使用三行模板：
+
+```
+@<接收方>
+Report: <文档路径或简短描述>
+Status: <当前状态或进度>
+Next: <下一步行动>
+```
+
+可选字段（按需添加）：
+```
+Blockers: <阻塞问题>
+Approval: <需要批准的事项>
+```
+
+- 组内 Claude → 组内 Codex：汇报实施进度
+- 组内 Codex → 老板：汇报关键节点（Snapshot 完成、PR 提交）
+- 老板 → 组内 Codex：分派任务、提出需求
+
+### 关键原则
+
+- **去中心化**：无 HQ 总部，各组直接向老板负责
+- **扁平化**：老板 ↔ Codex ↔ Claude，两层结构
+- **专注化**：各组仅关注自己 worktree 的任务，不跨组协调
+- **文档化**：所有决策、进度、结果写入 `docs/`，终端仅引用路径
