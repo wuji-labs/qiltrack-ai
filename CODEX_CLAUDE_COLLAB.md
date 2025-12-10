@@ -58,7 +58,10 @@
 
 #### Supabase 访问
 
-- **已授权**：完整凭证位于 `.env.local`（已加载到环境变量）
+- **已授权**：完整凭证根据环境分别存储
+  - **本地开发环境**：`.env.local`
+  - **生产环境（Vercel 部署）**：`.env.vercel`
+  - ⚠️ **重要**：检查/操作生产数据库时必须使用 `.env.vercel` 中的凭证
   - `NEXT_PUBLIC_SUPABASE_URL`: https://inmtounwqcjwsxkfnsfd.supabase.co
   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: sb_publishable_hT6o-oVeTgfmMeWbP7fwaA_ZtBQEeGV
   - `SUPABASE_SERVICE_ROLE_KEY`: sb_secret_icUWGnicz6KtLXUS2sjSXg_onZWKkzP
