@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
-import type { Database } from "@/types/database";
+import { SUPABASE_AUTH_ERROR_CODES, getAuthErrorMessage } from "@/lib/auth/supabase-error-codes";
 
 /**
  * Authentication method types
@@ -65,6 +65,11 @@ function getAuthRedirectBase(): string {
 
 const AUTH_CALLBACK_PATH = "/api/auth/callback";
 
+/**
+ * 映射 Supabase 错误到 AuthResult
+ * 优先级: error.code > 字符串匹配 (向后兼容)
+ * 使用官方错误代码获取用户友好的错误消息
+ */
 function mapAuthError(error: unknown): AuthResult {
   if (!error) return { success: false };
   if (typeof error === "object" && error !== null && "message" in error) {
@@ -72,28 +77,48 @@ function mapAuthError(error: unknown): AuthResult {
       typeof (error as { status?: number }).status === "number"
         ? (error as { status?: number }).status
         : undefined;
-    const code =
+    const errorCode =
       typeof (error as { code?: string }).code === "string"
         ? (error as { code?: string }).code
         : undefined;
-    const message = String((error as { message?: string }).message ?? "Unknown error");
-    const normalizedMessage = message.toLowerCase();
+    const originalMessage = String((error as { message?: string }).message ?? "Unknown error");
+
+    // 使用官方错误代码映射用户友好消息
+    const friendlyMessage = errorCode ? getAuthErrorMessage(errorCode) : originalMessage;
+
+    // 映射到内部错误代码 (用于 UI 逻辑判断)
+    let internalCode: "cooldown" | "invalid_email" | "invalid_credentials" | "user_already_exists" | "captcha_failed" | undefined;
+
+    // 1. 优先使用 Supabase 官方错误代码
+    if (errorCode === SUPABASE_AUTH_ERROR_CODES.RATE_LIMIT || status === 429) {
+      internalCode = "cooldown";
+    } else if (errorCode === SUPABASE_AUTH_ERROR_CODES.INVALID_EMAIL) {
+      internalCode = "invalid_email";
+    } else if (errorCode === SUPABASE_AUTH_ERROR_CODES.INVALID_CREDENTIALS) {
+      internalCode = "invalid_credentials";
+    } else if (errorCode === SUPABASE_AUTH_ERROR_CODES.EMAIL_EXISTS) {
+      internalCode = "user_already_exists";
+    } else {
+      // 2. 回退到字符串匹配 (向后兼容旧版 Supabase 或自定义错误)
+      const normalizedMessage = originalMessage.toLowerCase();
+      if (normalizedMessage.includes("60 seconds") || normalizedMessage.includes("rate limit")) {
+        internalCode = "cooldown";
+      } else if (normalizedMessage.includes("invalid email") || normalizedMessage.includes("email address") || normalizedMessage.includes("invalid or missing email")) {
+        internalCode = "invalid_email";
+      } else if (normalizedMessage.includes("invalid") || normalizedMessage.includes("credentials")) {
+        internalCode = "invalid_credentials";
+      } else if (normalizedMessage.includes("already") || normalizedMessage.includes("exists")) {
+        internalCode = "user_already_exists";
+      } else if (normalizedMessage.includes("captcha")) {
+        internalCode = "captcha_failed";
+      }
+    }
+
     return {
       success: false,
-      error: message,
+      error: friendlyMessage,
       status,
-      code:
-        status === 429 ||
-        code === "over_request_rate_limit" ||
-        normalizedMessage.includes("60 seconds") ||
-        normalizedMessage.includes("rate limit")
-          ? "cooldown"
-          : code === "email_address_invalid" ||
-              normalizedMessage.includes("invalid email") ||
-              normalizedMessage.includes("email address") ||
-              normalizedMessage.includes("invalid or missing email")
-            ? "invalid_email"
-            : undefined,
+      code: internalCode,
     };
   }
   return { success: false, error: String(error) };
