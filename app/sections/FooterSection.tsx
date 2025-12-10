@@ -29,31 +29,31 @@ export function FooterSection({ disclaimer, dataSource }: FooterSectionProps) {
           <nav className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm">
             <Link
               href="/pricing"
-              className="text-[var(--text-dim)] hover:text-[var(--accent-emerald)] transition-colors"
+              className="text-[var(--text-dim)] hover:text-[var(--accent-primary)] transition-colors"
             >
               {t("nav.pricing")}
             </Link>
             <Link
               href="/legal/terms"
-              className="text-[var(--text-dim)] hover:text-[var(--accent-emerald)] transition-colors"
+              className="text-[var(--text-dim)] hover:text-[var(--accent-primary)] transition-colors"
             >
               {t("footer.terms")}
             </Link>
             <Link
               href="/legal/privacy"
-              className="text-[var(--text-dim)] hover:text-[var(--accent-emerald)] transition-colors"
+              className="text-[var(--text-dim)] hover:text-[var(--accent-primary)] transition-colors"
             >
               {t("footer.privacy")}
             </Link>
             <Link
               href="/legal/refund"
-              className="text-[var(--text-dim)] hover:text-[var(--accent-emerald)] transition-colors"
+              className="text-[var(--text-dim)] hover:text-[var(--accent-primary)] transition-colors"
             >
               退款政策
             </Link>
             <a
               href="mailto:support@qiltrack.com"
-              className="text-[var(--text-dim)] hover:text-[var(--accent-emerald)] transition-colors"
+              className="text-[var(--text-dim)] hover:text-[var(--accent-primary)] transition-colors"
             >
               联系客服
             </a>

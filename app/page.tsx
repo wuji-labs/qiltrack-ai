@@ -422,7 +422,7 @@ export default function Home() {
                 >
                   <div className="pointer-events-none absolute inset-0 opacity-80">
                     <div
-                      className="absolute -left-16 top-10 h-44 w-44 rounded-full bg-emerald-400/15 blur-[120px]"
+                      className="absolute -left-16 top-10 h-44 w-44 rounded-full bg-slate-400/15 blur-[120px]"
                       aria-hidden
                     />
                     <div
@@ -437,13 +437,13 @@ export default function Home() {
 
                   <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-2 max-w-2xl">
-                      <p className="text-sm uppercase tracking-[0.28em] text-emerald-300">
+                      <p className="text-sm uppercase tracking-[0.28em]" style={{ color: 'rgb(var(--accent-primary))' }}>
                         {t("workflow.sectionLabel")}
                       </p>
                       <h2 className="text-2xl sm:text-3xl font-semibold">{t("workflow.title")}</h2>
                       <p className={`text-base ${subtleText}`}>{t("workflow.caption")}</p>
                     </div>
-                    <div className="relative rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 px-4 py-3 text-sm text-right text-emerald-100 shadow-[0_14px_40px_rgba(0,0,0,0.3)]">
+                    <div className="relative rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/80 px-4 py-3 text-sm text-right shadow-[0_14px_40px_rgba(0,0,0,0.3)]" style={{ color: 'rgb(var(--fg-secondary))' }}>
                       <p className="font-semibold tracking-[0.16em] uppercase">
                         {t("workflow.status.step", {
                           step: Math.min(progress.currentStep, workflowList.length)
@@ -457,7 +457,7 @@ export default function Home() {
                         {progress.status === "done" && t("workflow.status.ready")}
                       </p>
                       <div
-                        className="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-emerald-400/10 blur-3xl"
+                        className="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-slate-400/10 blur-3xl"
                         aria-hidden
                       />
                     </div>
@@ -465,7 +465,7 @@ export default function Home() {
 
                   <div className="relative rounded-3xl border border-[var(--stroke-soft)] bg-[var(--bg-layer)]/70 p-4 sm:p-5 shadow-[0_12px_40px_rgba(0,0,0,0.28)]">
                     <div
-                      className="absolute left-4 top-8 bottom-8 hidden lg:block w-px bg-gradient-to-b from-[var(--accent-emerald)] via-[var(--stroke-soft)] to-transparent"
+                      className="absolute left-4 top-8 bottom-8 hidden lg:block w-px bg-gradient-to-b from-[var(--accent-primary)] via-[var(--stroke-soft)] to-transparent"
                       aria-hidden
                     />
                     <div className="grid gap-4">
@@ -481,7 +481,7 @@ export default function Home() {
                           <div key={step.title} className="relative pl-12 lg:pl-16">
                             <div className="absolute left-0 lg:left-1 top-1">
                               <div
-                                className={`relative h-10 w-10 rounded-2xl ${isCompleted || isActive ? "bg-[var(--accent-emerald)]/20 border-[var(--accent-emerald)]/50" : "bg-[var(--accent-emerald)]/10 border-[var(--stroke-soft)]/50"} border flex items-center justify-center text-sm font-semibold ${isCompleted || isActive ? "text-[var(--accent-emerald)]" : "text-subtle"} shadow-[0_10px_30px_rgba(16,185,129,0.25)]`}
+                                className={`relative h-10 w-10 rounded-2xl ${isCompleted || isActive ? "bg-[var(--accent-primary)]/20 border-[var(--accent-primary)]/50" : "bg-[var(--accent-primary)]/10 border-[var(--stroke-soft)]/50"} border flex items-center justify-center text-sm font-semibold ${isCompleted || isActive ? "text-[var(--accent-primary)]" : "text-subtle"} shadow-[0_4px_12px_rgba(100,116,139,0.15)]`}
                               >
                                 {stepNumber.toString().padStart(2, "0")}
                                 <span
@@ -491,24 +491,25 @@ export default function Home() {
                               </div>
                             </div>
                             <div
-                              className={`rounded-2xl border ${isCompleted || isActive ? "border-[var(--accent-emerald)]/50 bg-[var(--bg-layer)]/85" : "border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85"} p-4 space-y-2 transition hover:border-[var(--stroke-glow)]/70 hover:shadow-[0_16px_46px_rgba(0,0,0,0.35)]`}
+                              className={`rounded-2xl border ${isCompleted || isActive ? "border-[var(--accent-primary)]/50 bg-[var(--bg-layer)]/85" : "border-[var(--stroke-soft)] bg-[var(--bg-layer)]/85"} p-4 space-y-2 transition hover:border-[var(--stroke-glow)]/70 hover:shadow-[0_16px_46px_rgba(0,0,0,0.35)]`}
                             >
                               <div className="flex items-center justify-between gap-3">
                                 <span
-                                  className={`text-xs uppercase tracking-[0.22em] ${isCompleted || isActive ? "text-emerald-200" : "text-subtle"}`}
+                                  className={`text-xs uppercase tracking-[0.22em] ${isCompleted || isActive ? "" : "text-subtle"}`}
+                                  style={isCompleted || isActive ? { color: 'rgb(var(--accent-primary))' } : {}}
                                 >
                                   {step.badge}
                                 </span>
                                 <span className="hidden sm:inline-flex items-center gap-2 text-xs text-subtle">
                                   {isCompleted && (
                                     <>
-                                      <span className="h-2 w-2 rounded-full bg-[var(--accent-emerald)]" />
+                                      <span className="h-2 w-2 rounded-full bg-[var(--accent-primary)]" />
                                       {t("workflow.step.status.done")}
                                     </>
                                   )}
                                   {isActive && (
                                     <>
-                                      <span className="h-2 w-2 rounded-full bg-[var(--accent-emerald)] animate-pulse" />
+                                      <span className="h-2 w-2 rounded-full bg-[var(--accent-primary)] animate-pulse" />
                                       {t("workflow.step.status.running")}
                                     </>
                                   )}
@@ -534,7 +535,7 @@ export default function Home() {
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
-                      <p className="text-sm uppercase tracking-[0.28em] text-emerald-300">
+                      <p className="text-sm uppercase tracking-[0.28em]" style={{ color: 'rgb(var(--accent-primary))' }}>
                         {t("nav.templates")}
                       </p>
                       <h2 className="text-2xl sm:text-3xl font-semibold">
@@ -569,7 +570,7 @@ export default function Home() {
                           />
                           <div className="relative flex items-start justify-between p-3 text-white">
                             <div className="space-y-1">
-                              <p className="text-[11px] uppercase tracking-[0.24em] text-emerald-100/90">
+                              <p className="text-[11px] uppercase tracking-[0.24em] text-white/90">
                                 {report.theme}
                               </p>
                               <p className="text-lg font-semibold leading-tight">{report.symbol}</p>
@@ -614,7 +615,7 @@ export default function Home() {
                             </span>
                           ))}
                         </div>
-                        <div className="text-xs text-emerald-300">
+                        <div className="text-xs" style={{ color: 'rgb(var(--accent-primary))' }}>
                           {new Date(report.date).toLocaleDateString(
                             language === "en" ? "en-US" : "zh-CN",
                             {
@@ -632,7 +633,17 @@ export default function Home() {
                     <p className={`text-base ${subtleText}`}>{t("gallery.footer")}</p>
                     <Link
                       href="/reports#archive"
-                      className="self-start rounded-full border border-emerald-400 px-4 py-2 text-base text-emerald-300 hover:bg-emerald-400/10"
+                      className="self-start rounded-full border px-4 py-2 text-base transition-all duration-200 ease-out"
+                      style={{
+                        borderColor: 'rgb(var(--accent-primary))',
+                        color: 'rgb(var(--accent-primary))'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(var(--accent-primary), 0.1)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
                     >
                       {t("gallery.cta")}
                     </Link>
@@ -653,7 +664,7 @@ export default function Home() {
                   className={`rounded-3xl border p-5 sm:p-7 space-y-5 transition-all duration-200 ease-out ${cardSecondary} overflow-hidden`}
                 >
                   <div className="space-y-2">
-                    <p className="text-sm uppercase tracking-[0.28em] text-emerald-300">FAQ</p>
+                    <p className="text-sm uppercase tracking-[0.28em]" style={{ color: 'rgb(var(--accent-primary))' }}>FAQ</p>
                     <h2 className="text-2xl sm:text-3xl font-semibold">{t("faq.title")}</h2>
                     <p className={`text-base ${subtleText}`}>{t("faq.caption")}</p>
                   </div>

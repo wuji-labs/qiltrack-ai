@@ -121,10 +121,10 @@ export function HeroSection({
                 key={item.href}
                 href={item.href}
                 onClick={(e) => handleNavClick(item.href, e)}
-                className="rounded-full px-3 xl:px-3.5 py-2 transition-all duration-200 ease-out relative text-subtle hover:text-[var(--accent-blue)] hover:-translate-y-0.5 hover:bg-[var(--bg-layer)]/70 group"
+                className="rounded-full px-3 xl:px-3.5 py-2 transition-all duration-200 ease-out relative text-muted-foreground hover:text-primary hover:-translate-y-0.5 hover:bg-[var(--bg-layer)]/70 group"
               >
                 {item.label}
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[var(--accent-blue)] to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-out origin-left" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-out origin-left" />
               </a>
             ))}
           </div>
@@ -158,7 +158,7 @@ export function HeroSection({
                 <button
                   type="button"
                   onClick={() => setLanguageMenuOpen((open) => !open)}
-                  className="inline-flex items-center gap-1 sm:gap-1.5 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm text-dim transition hover:border-[var(--stroke-glow)] hover:text-[var(--accent-blue)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40 whitespace-nowrap min-h-[44px] min-w-[112px]"
+                  className="inline-flex items-center gap-1 sm:gap-1.5 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm text-muted-foreground transition hover:border-[var(--stroke-glow)] hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40 whitespace-nowrap min-h-[44px] min-w-[112px]"
                   aria-haspopup="listbox"
                   aria-expanded={languageMenuOpen}
                 >
@@ -178,8 +178,8 @@ export function HeroSection({
                             }}
                             className={`w-full text-left rounded-xl px-4 py-2 text-sm tracking-wide transition ${
                               lang === language
-                                ? "bg-[var(--bg-layer)] text-[var(--accent-blue)]"
-                                : "text-dim hover:text-[var(--accent-blue)]"
+                                ? "bg-[var(--bg-layer)] text-primary"
+                                : "text-muted-foreground hover:text-primary"
                             }`}
                           >
                             {LANGUAGE_LABEL[lang]}
@@ -197,7 +197,7 @@ export function HeroSection({
                     onClick={() => setAccountMenuOpen((open) => !open)}
                     className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-1.5 sm:px-2.5 py-1.5 text-sm text-dim transition hover:border-[var(--stroke-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40 min-h-[44px]"
                   >
-                    <span className="h-7 sm:h-8 w-7 sm:w-8 rounded-full bg-[var(--accent-emerald)]/20 border border-[var(--stroke-soft)] overflow-hidden flex items-center justify-center text-xs font-semibold text-[var(--accent-emerald)] flex-shrink-0">
+                    <span className="h-7 sm:h-8 w-7 sm:w-8 rounded-full bg-primary/20 border border-[var(--stroke-soft)] overflow-hidden flex items-center justify-center text-xs font-semibold text-primary flex-shrink-0">
                       {userImage ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={userImage} alt="avatar" className="h-full w-full object-cover" />
@@ -212,7 +212,7 @@ export function HeroSection({
                   {accountMenuOpen && (
                     <div className="absolute right-0 mt-2 w-60 rounded-2xl border border-[var(--stroke-soft)] bg-[var(--bg-base)]/95 p-3 shadow-[0_20px_80px_rgba(0,0,0,0.65)] backdrop-blur-xl space-y-3 z-50">
                       <div className="flex items-center gap-3">
-                        <span className="h-10 w-10 rounded-full bg-[var(--accent-emerald)]/20 border border-[var(--stroke-soft)] overflow-hidden flex items-center justify-center text-sm font-semibold text-[var(--accent-emerald)]">
+                        <span className="h-10 w-10 rounded-full bg-primary/20 border border-[var(--stroke-soft)] overflow-hidden flex items-center justify-center text-sm font-semibold text-primary">
                           {userImage ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
@@ -239,7 +239,7 @@ export function HeroSection({
                         <Link
                           href="/account?section=referrals"
                           onClick={() => setAccountMenuOpen(false)}
-                          className="w-full rounded-xl bg-[var(--accent-emerald)]/15 border border-[var(--accent-emerald)]/30 px-3 py-2 text-left text-[var(--accent-emerald)] hover:bg-[var(--accent-emerald)]/25 hover:border-[var(--accent-emerald)]/50 transition-colors flex items-center gap-2 font-medium"
+                          className="w-full rounded-xl bg-primary/10 border border-primary/30 px-3 py-2 text-left text-primary hover:bg-primary/20 hover:border-primary/50 transition-colors flex items-center gap-2 font-medium"
                         >
                           <span>🎁</span>
                           {t("referral.menu.title")}
@@ -265,7 +265,7 @@ export function HeroSection({
                           setAccountMenuOpen(false);
                           onSignOut();
                         }}
-                        className="w-full rounded-xl bg-[var(--accent-emerald)] text-slate-950 px-3 py-2 text-sm font-semibold shadow-[0_10px_30px_rgba(16,185,129,0.25)] hover:brightness-105"
+                        className="w-full rounded-xl bg-primary text-primary-foreground px-3 py-2 text-sm font-semibold shadow-md hover:brightness-105"
                       >
                         {t("auth.account.signout")}
                       </button>
@@ -312,7 +312,7 @@ export function HeroSection({
                       handleNavClick(item.href, e);
                       setMobileDrawerOpen(false);
                     }}
-                    className="block px-4 py-2.5 text-sm rounded-lg text-dim hover:text-[var(--accent-blue)] hover:bg-[var(--bg-layer)]/50 transition"
+                    className="block px-4 py-2.5 text-sm rounded-lg text-muted-foreground hover:text-primary hover:bg-[var(--bg-layer)]/50 transition"
                   >
                     {item.label}
                   </a>
@@ -332,8 +332,8 @@ export function HeroSection({
                     }}
                     className={`w-full text-left px-4 py-2.5 text-sm rounded-lg transition ${
                       lang === language
-                        ? "bg-[var(--bg-layer)] text-[var(--accent-emerald)]"
-                        : "text-dim hover:text-[var(--accent-blue)] hover:bg-[var(--bg-layer)]/50"
+                        ? "bg-[var(--bg-layer)] text-primary"
+                        : "text-dim hover:text-primary hover:bg-[var(--bg-layer)]/50"
                     }`}
                   >
                     {LANGUAGE_LABEL[lang]}
@@ -345,7 +345,7 @@ export function HeroSection({
               {isAuthenticated && (
                 <div className="space-y-1 border-b border-[var(--stroke-soft)] pb-4">
                   <div className="flex items-center gap-2 px-3 py-2">
-                    <span className="h-8 w-8 rounded-full bg-[var(--accent-emerald)]/20 border border-[var(--stroke-soft)] overflow-hidden flex items-center justify-center text-xs font-semibold text-[var(--accent-emerald)]">
+                    <span className="h-8 w-8 rounded-full bg-primary/20 border border-[var(--stroke-soft)] overflow-hidden flex items-center justify-center text-xs font-semibold text-primary">
                       {userImage ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={userImage} alt="avatar" className="h-full w-full object-cover" />
@@ -367,7 +367,7 @@ export function HeroSection({
                   <Link
                     href="/account?section=referrals"
                     onClick={() => setMobileDrawerOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2.5 text-sm rounded-lg bg-[var(--accent-emerald)]/15 text-[var(--accent-emerald)] hover:bg-[var(--accent-emerald)]/25 transition font-medium"
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition font-medium"
                   >
                     <span>🎁</span>
                     {t("referral.menu.title")}
@@ -391,7 +391,7 @@ export function HeroSection({
                       setMobileDrawerOpen(false);
                       onSignOut();
                     }}
-                    className="w-full text-left px-4 py-2.5 text-sm rounded-lg bg-[var(--accent-emerald)]/12 text-[var(--accent-emerald)] hover:bg-[var(--accent-emerald)]/20 transition"
+                    className="w-full text-left px-4 py-2.5 text-sm rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition"
                   >
                     {t("auth.account.signout")}
                   </button>
@@ -425,25 +425,25 @@ export function HeroSection({
           <div className="pointer-events-none absolute inset-0 hero-mesh" aria-hidden />
           <div className="relative space-y-4 sm:space-y-7 text-center">
             {tagline ? (
-              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)]/90 bg-[var(--bg-layer)]/90 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm uppercase tracking-[0.24em] text-[var(--accent-emerald)]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-emerald)]" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--stroke-soft)]/90 bg-[var(--bg-layer)]/90 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm uppercase tracking-[0.24em] text-primary">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                 <span>{tagline}</span>
               </div>
             ) : null}
 
             <div className="space-y-3 sm:space-y-4 text-center">
-              <h1 className="text-2xl sm:text-[2.5rem] lg:text-[3rem] leading-[1.2] sm:leading-[1.05] font-semibold text-emerald-200">
+              <h1 className="text-2xl sm:text-[2.5rem] lg:text-[3rem] leading-[1.2] sm:leading-[1.05] font-semibold text-foreground">
                 {t("hero.title")}
               </h1>
-              <p className="mx-auto max-w-3xl text-base sm:text-lg lg:text-xl text-dim leading-relaxed">
+              <p className="mx-auto max-w-3xl text-base sm:text-lg lg:text-xl text-muted-foreground leading-relaxed">
                 {t("hero.description")}
               </p>
               {t("hero.positioning") ? (
-                <p className="text-sm sm:text-base uppercase tracking-[0.24em] text-emerald-200/70">
+                <p className="text-sm sm:text-base uppercase tracking-[0.24em] text-muted-foreground">
                   {t("hero.positioning")}
                 </p>
               ) : null}
-              <p className="text-base sm:text-lg font-medium text-[var(--accent-emerald)]">
+              <p className="text-base sm:text-lg font-medium text-primary">
                 {t("hero.brandline")}
               </p>
             </div>
@@ -452,7 +452,7 @@ export function HeroSection({
               <button
                 type="button"
                 onClick={onPrimaryCta}
-                className="flex-1 sm:flex-none min-w-[136px] rounded-full border border-[var(--accent-emerald)]/70 bg-[var(--accent-emerald)]/12 px-4 sm:px-6 py-2.5 sm:py-2 text-sm sm:text-base font-semibold text-[var(--accent-emerald)] shadow-[0_10px_24px_rgba(91,224,176,0.18)] transition-all duration-200 ease-out hover:bg-[var(--accent-emerald)]/20 hover:-translate-y-1 hover:shadow-[0_14px_32px_rgba(91,224,176,0.28)] active:translate-y-0.5 min-h-[44px] flex items-center justify-center"
+                className="flex-1 sm:flex-none min-w-[136px] rounded-full border border-primary/70 bg-primary/15 px-4 sm:px-6 py-2.5 sm:py-2 text-sm sm:text-base font-semibold text-primary shadow-md transition-all duration-200 ease-out hover:bg-primary/25 hover:-translate-y-1 hover:shadow-lg active:translate-y-0.5 min-h-[44px] flex items-center justify-center"
               >
                 {t("hero.cta.primary")}
               </button>

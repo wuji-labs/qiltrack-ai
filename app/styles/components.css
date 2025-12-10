@@ -28,19 +28,21 @@
   justify-content: center;
   gap: 0.5rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #5be0b0;
-  color: #04110c;
+  border: 1px solid rgb(var(--accent-primary));
+  background: rgba(var(--accent-primary), 0.15);
+  color: rgb(var(--accent-primary));
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  box-shadow: 0 14px 42px rgba(91, 224, 176, 0.28);
-  transition: filter 0.2s ease;
+  box-shadow: 0 8px 24px rgba(var(--accent-primary), 0.2);
+  transition: all 0.2s ease;
 }
 
 .btn-gradient-legacy:hover,
 .btn-gradient:hover {
-  filter: brightness(1.05);
+  background: rgba(var(--accent-primary), 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px rgba(var(--accent-primary), 0.25);
 }
 
 .btn-ghost-legacy,
@@ -62,8 +64,8 @@
 
 .btn-ghost-legacy:hover,
 .btn-ghost:hover {
-  border-color: #5be0b0;
-  color: #5be0b0;
+  border-color: rgb(var(--accent-primary));
+  color: rgb(var(--accent-primary));
 }
 
 /* 进度条系统 - 用于报告生成 */
