@@ -2,6 +2,18 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
 
+/**
+ * 转义 HTML 属性中的特殊字符，防止 XSS
+ */
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
@@ -31,12 +43,23 @@ export async function GET(request: NextRequest) {
 
   if (isRecovery) {
     console.log("[AUTH] Recovery flow detected, preserving hash");
+    // Construct redirect target with search and hash
+    const search = requestUrl.search || "";
+    const hash = requestUrl.hash || "";
+    const target = `/account/reset-password${search}${hash}`;
+    const safeTarget = escapeHtml(target);
+
     const html = `
-      <!doctype html>
+      <!DOCTYPE html>
       <html>
         <head>
-          <meta charset="utf-8" />
-          <title>Password recovery</title>
+          <meta charset="utf-8">
+          <title>Redirecting...</title>
+          <noscript>
+            <meta http-equiv="refresh" content="0; url=${safeTarget}">
+          </noscript>
+        </head>
+        <body style="background:#020617;color:#e2e8f0;font-family:Inter,system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;">
           <script>
             (function() {
               var search = window.location.search || "";
@@ -45,9 +68,12 @@ export async function GET(request: NextRequest) {
               window.location.replace(target);
             })();
           </script>
-        </head>
-        <body style="background:#020617;color:#e2e8f0;font-family:Inter,system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;">
-          <div>Redirecting to reset password...</div>
+          <noscript>
+            <div style="text-align:center;">
+              <p>Redirecting to password reset page...</p>
+              <p>If you are not redirected, <a href="${safeTarget}" style="color:#10b981;text-decoration:underline;">click here</a>.</p>
+            </div>
+          </noscript>
         </body>
       </html>
     `;
