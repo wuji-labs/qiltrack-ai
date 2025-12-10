@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import { useRouter } from "next/navigation";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useLanguage } from "@/lib/i18n";
@@ -410,4 +410,5 @@ export function PricingCards({ className = "" }: { className?: string }) {
   );
 }
 
-export default PricingCards;
+// Memoize to prevent unnecessary re-renders
+export default memo(PricingCards);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, memo } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { ReportResponse } from "@/types/report";
@@ -413,3 +413,6 @@ export function ReportResult({
     </div>
   );
 }
+
+// Memoize to prevent unnecessary re-renders when props haven't changed
+export default memo(ReportResult);
