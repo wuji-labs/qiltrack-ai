@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, memo } from "react";
 import { type SearchResult } from "@/types/report";
 import { type PlaceholderVariant } from "./types";
 import { reportQuerySchema } from "./validation";
@@ -292,3 +292,6 @@ export function ReportForm({
     </form>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+export default memo(ReportForm);
