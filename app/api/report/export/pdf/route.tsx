@@ -1,8 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Document, Image, Page, StyleSheet, Text, View, pdf } from "@react-pdf/renderer";
+import { Document, Font, Image, Page, StyleSheet, Text, View, pdf } from "@react-pdf/renderer";
 
 import { createReportBlueprint } from "@/lib/report/blueprint";
 import { buildPerformanceChart, buildValuationChart, renderChartPng } from "@/lib/report/charts";
+
+// Register Chinese font for PDF rendering
+Font.register({
+  family: "Noto Sans SC",
+  fonts: [
+    {
+      src: "https://fonts.gstatic.com/s/notosanssc/v36/k3kCo84MPvpLmixcA63oeAL7Iqp5IZJF9bmaG9_FnYxNbPzS5HE.ttf",
+      fontWeight: 400,
+    },
+    {
+      src: "https://fonts.gstatic.com/s/notosanssc/v36/k3kCo84MPvpLmixcA63oeAL7Iqp5IZJF9bmaG__EnYxNbPzS5HE.ttf",
+      fontWeight: 700,
+    },
+  ],
+});
 // TODO: Restore quota audit after refactoring
 // import { writeReportAudit } from "@/lib/services/quota";
 import {
@@ -23,6 +38,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
+    fontFamily: "Noto Sans SC",
   },
   coverHero: {
     textAlign: "center",
@@ -88,6 +104,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#0a0a0c",
     color: "#e6f4ff",
     fontSize: 10,
+    fontFamily: "Noto Sans SC",
   },
   header: {
     borderBottom: "2 solid #1c1c22",

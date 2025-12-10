@@ -23,16 +23,23 @@ export async function GET(request: NextRequest) {
     const lang = searchParams.get("lang");
     const search = searchParams.get("q");
     const statusFilter = searchParams.get("status");
+    const accessLevelFilter = searchParams.get("accessLevel");
 
     const { role } = await getAuthContext(context);
     const isAdmin = isAdminOrEditor(role);
 
-    let query = context.supabase
+    // Admin sees additional fields for SEO management
+    // 营销策略：报告列表使用 service role 绕过 RLS，所有人都能看到报告卡片（含 access_level 徽章）
+    // 权限检查在详情页的 React 组件中进行
+    const selectFields = isAdmin
+      ? "id, title, slug, summary, cover, theme, tags, language, status, version, user_id, published_at, created_at, updated_at, access_level, quality_score, organic_visits, conversion_rate, featured, view_count"
+      : "id, title, slug, summary, cover, theme, tags, language, status, version, user_id, published_at, created_at, updated_at, access_level";
+
+    // Use service role client to bypass RLS for public listing
+    const supabaseServiceRole = createServiceRoleClient();
+    let query = supabaseServiceRole
       .from("report_posts")
-      .select(
-        "id, title, slug, summary, cover, theme, tags, language, status, version, user_id, published_at, created_at, updated_at",
-        { count: "exact" }
-      );
+      .select(selectFields, { count: "exact" });
 
     // Apply status filter
     if (statusFilter) {
@@ -60,6 +67,10 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       query = query.ilike("title", `%${search}%`);
+    }
+
+    if (accessLevelFilter) {
+      query = query.eq("access_level" as never, accessLevelFilter);
     }
 
     const { data, error, count } = await query
