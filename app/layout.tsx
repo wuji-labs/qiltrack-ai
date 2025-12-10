@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AppProviders } from "./providers";
+import { CookieConsentBanner } from "@/components/cookie-consent-banner";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 // 使用系统字体替代 Google Fonts 以避免构建时网络依赖
 // 如需使用自定义字体，请下载字体文件并使用 next/font/local
@@ -23,7 +25,10 @@ export default function RootLayout({
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
         }}
       >
-        <AppProviders>{children}</AppProviders>
+        <ErrorBoundary>
+          <AppProviders>{children}</AppProviders>
+          <CookieConsentBanner />
+        </ErrorBoundary>
       </body>
     </html>
   );

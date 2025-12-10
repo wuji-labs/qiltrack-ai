@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { validateUUID, sanitizeString } from "@/lib/utils/validation";
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,11 +27,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "需要管理员权限" }, { status: 403 });
     }
 
-    const { userId, role: newRole, plan, display_name, full_name } = await request.json();
+    const { userId: rawUserId, role: newRole, plan, display_name: rawDisplayName, full_name: rawFullName } = await request.json();
 
-    if (!userId) {
-      return NextResponse.json({ error: "缺少 userId" }, { status: 400 });
+    // Validate userId format
+    let userId: string;
+    try {
+      userId = validateUUID(rawUserId);
+    } catch (error) {
+      return NextResponse.json({ error: "Invalid user ID format" }, { status: 400 });
     }
+
+    // Validate role if provided
+    const validRoles = ["user", "admin", "super_admin"];
+    if (newRole && !validRoles.includes(newRole)) {
+      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+    }
+
+    // Validate plan if provided
+    const validPlans = ["free", "pro", "ultra"];
+    if (plan && !validPlans.includes(plan)) {
+      return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
+    }
+
+    // Sanitize text inputs
+    const display_name = rawDisplayName !== undefined ? sanitizeString(rawDisplayName, 100) : undefined;
+    const full_name = rawFullName !== undefined ? sanitizeString(rawFullName, 100) : undefined;
 
     // 准备更新数据
     const updateData: {
