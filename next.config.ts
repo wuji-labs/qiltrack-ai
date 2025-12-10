@@ -31,6 +31,23 @@ const nextConfig: NextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
           },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://challenges.cloudflare.com https://accounts.google.com https://www.gstatic.com",
+              "style-src 'self' 'unsafe-inline' https://accounts.google.com",
+              "img-src 'self' data: https: blob:",
+              "font-src 'self' data:",
+              "connect-src 'self' https://*.supabase.co https://*.upstash.io https://api.finnhub.io https://openrouter.ai https://api.helicone.ai https://challenges.cloudflare.com",
+              "frame-src 'self' https://challenges.cloudflare.com https://accounts.google.com",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'none'",
+              "upgrade-insecure-requests",
+            ].join("; "),
+          },
         ],
       },
     ];

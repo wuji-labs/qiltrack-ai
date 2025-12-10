@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 
 interface MetricsData {
   reports: {
@@ -273,3 +273,6 @@ function BarItem({
     </div>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+export default memo(MetricsDashboard);

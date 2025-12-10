@@ -43,7 +43,7 @@ BEGIN
     test_user_id,
     '00000000-0000-0000-0000-000000000000',
     'test@qiltrack.com',
-    '$2a$10$vQHOKPXZj0MJOWVLq8X4YOxBZzZz6Oz5Uz9DLQx9JYP5jJfDKvX4e', -- 对应密码 Test123456!
+    '$2b$10$zTcvyI5HQpnMLzzXxKdELeWaQEw.Tql6nqLArpzZAxapkfARN82nq', -- 对应密码 Test123456!
     NOW(),
     '{"provider":"email","providers":["email"]}',
     '{"display_name":"测试用户"}',

@@ -203,6 +203,41 @@ cp .env.local.example .env.local
 # 等
 ```
 
+#### 配置认证回调 URL
+
+如果需要使用 OAuth 登录（Google 等）或 Magic Link 邮箱登录，必须配置 `NEXT_PUBLIC_SITE_URL`：
+
+1. **在 `.env.local` 中设置**：
+
+   ```bash
+   # 开发环境（本地）
+   NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+   # 开发环境（局域网访问，用于多设备测试）
+   NEXT_PUBLIC_SITE_URL=http://192.168.8.40:3000
+
+   # 生产环境（必须使用 HTTPS）
+   NEXT_PUBLIC_SITE_URL=https://your-domain.com
+   ```
+
+2. **运行检查脚本**查看所需的回调 URL：
+
+   ```bash
+   node scripts/check-supabase-redirects.js
+   ```
+
+3. **在 Supabase Dashboard 中添加回调 URL**：
+
+   - 打开 Supabase Dashboard
+   - 导航至：**Authentication → URL Configuration → Redirect URLs**
+   - 将脚本输出的所有 URL 添加到列表中，例如：
+     - `http://localhost:3000/api/auth/callback`
+     - `http://localhost:3000/account/reset-password`
+
+⚠️ **重要提示**：
+- 如果不配置 `NEXT_PUBLIC_SITE_URL`，系统会使用默认的 `http://localhost:3000`，这在非本地环境（如局域网访问、生产环境）下会导致 OAuth/Magic Link 回调失败
+- 每次修改 `NEXT_PUBLIC_SITE_URL` 后，需重新运行检查脚本并更新 Supabase Dashboard 中的回调 URL
+
 ### 第五步：启动开发服务器
 
 ```bash

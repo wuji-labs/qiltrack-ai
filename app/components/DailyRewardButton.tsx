@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { useRouter } from "next/navigation";
 import { claimDailyReward, fetchDailyRewardStatus } from "@/lib/services/api";
 import { useLanguage } from "@/lib/i18n";
@@ -11,7 +11,7 @@ interface DailyRewardButtonProps {
   isLoggedIn?: boolean;
 }
 
-export function DailyRewardButton({ onRewardClaimed, className = "", isLoggedIn }: DailyRewardButtonProps) {
+function DailyRewardButtonComponent({ onRewardClaimed, className = "", isLoggedIn }: DailyRewardButtonProps) {
   const { t } = useLanguage();
   const router = useRouter();
   const [claiming, setClaiming] = useState(false);
@@ -364,3 +364,6 @@ export function DailyRewardCalendar({ streak, className = "" }: DailyRewardCalen
     </div>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+export const DailyRewardButton = memo(DailyRewardButtonComponent);
