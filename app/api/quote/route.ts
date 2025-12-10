@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { validateSymbol } from "@/lib/utils/validation";
 
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const symbol = searchParams.get("symbol");
 
-  if (!symbol) {
-    return NextResponse.json({ error: "Missing symbol query parameter" }, { status: 400 });
+  let symbol: string;
+  try {
+    symbol = validateSymbol(searchParams.get("symbol"));
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Invalid symbol" }, { status: 400 });
   }
 
   const apiKey = process.env.FINNHUB_API_KEY;

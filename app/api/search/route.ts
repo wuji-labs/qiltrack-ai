@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit, searchRateLimit, getIpAddress } from "@/lib/api/rate-limit";
 import { searchStockNameMappings } from "@/lib/data/stock-name-mappings";
+import { sanitizeString } from "@/lib/utils/validation";
 
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
 
@@ -20,17 +21,25 @@ function buildFallbackResponse(query: string, description: string, source: strin
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const q = searchParams.get("q")?.trim();
+  const rawQuery = searchParams.get("q");
+
+  if (!rawQuery) {
+    return NextResponse.json({ error: "Missing q query parameter" }, { status: 400 });
+  }
+
+  // Sanitize and limit search query length
+  const q = sanitizeString(rawQuery, 50);
+
+  if (q.length === 0) {
+    return NextResponse.json({ error: "Invalid search query" }, { status: 400 });
+  }
+
   const testToken = process.env.TEST_REPORT_TOKEN || "local-test-token";
   const tokenFromHeader = request.headers.get("x-test-token");
   const tokenFromQuery = searchParams.get("testToken");
   const isTestBypass = Boolean(
     testToken && (tokenFromHeader === testToken || tokenFromQuery === testToken)
   );
-
-  if (!q) {
-    return NextResponse.json({ error: "Missing q query parameter" }, { status: 400 });
-  }
 
   // Rate limit check by IP address (skip for test bypass)
   if (!isTestBypass) {

@@ -16,6 +16,7 @@ import { DEFAULT_LANGUAGE, type Language } from "@/lib/i18n-config";
 import type { ReportTone } from "@/lib/core/reports/types";
 import { reportGenerationRateLimit, checkRateLimit } from "@/lib/api/rate-limit";
 import { appendCookies } from "@/lib/utils/cookie-helper";
+import { validateSymbol } from "@/lib/utils/validation";
 
 /**
  * Check for test bypass token
@@ -84,16 +85,7 @@ export async function GET(request: NextRequest) {
 
     // 2. Parse and validate parameters
     const { searchParams } = new URL(request.url);
-    const symbol = searchParams.get("symbol")?.toUpperCase().trim();
-
-    if (!symbol) {
-      throw new ValidationError("Missing required parameter: symbol");
-    }
-
-    // Validate symbol length to prevent abuse
-    if (symbol.length > 10) {
-      throw new ValidationError("Invalid symbol: too long (max 10 characters)");
-    }
+    const symbol = validateSymbol(searchParams.get("symbol"));
 
     const sanitizer = new ContentSanitizer();
     const language = sanitizer.normalizeLanguage(searchParams.get("lang"));

@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
 import { validatePassword } from "@/lib/auth/password-validator";
 import { handleApiError } from "@/lib/api/error-handler";
+import { validateEmail, sanitizeString, validateInteger } from "@/lib/utils/validation";
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,18 +33,59 @@ export async function POST(request: NextRequest) {
     const adminUserId = user.id;
 
     const body = await request.json();
-    const { email, password, display_name, full_name, role: newUserRole, plan, initial_credits } =
+    const { email: rawEmail, password, display_name: rawDisplayName, full_name: rawFullName, role: newUserRole, plan, initial_credits } =
       body;
 
+    // Validate and sanitize email
+    let email: string;
+    try {
+      email = validateEmail(rawEmail);
+    } catch (error) {
+      return NextResponse.json({ error: error instanceof Error ? error.message : "Invalid email" }, { status: 400 });
+    }
+
     // Validate required fields
-    if (!email || !password) {
-      return NextResponse.json({ error: "邮箱和密码为必填项" }, { status: 400 });
+    if (!password) {
+      return NextResponse.json({ error: "密码为必填项" }, { status: 400 });
     }
 
     // Validate password strength
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.valid) {
       return NextResponse.json({ error: passwordValidation.errors.join(", ") }, { status: 400 });
+    }
+
+    // Sanitize text inputs
+    const display_name = rawDisplayName ? sanitizeString(rawDisplayName, 100) : null;
+    const full_name = rawFullName ? sanitizeString(rawFullName, 100) : null;
+
+    // Validate role if provided
+    const validRoles = ["user", "admin", "super_admin"];
+    if (newUserRole && !validRoles.includes(newUserRole)) {
+      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+    }
+
+    // Validate plan if provided
+    const validPlans = ["free", "pro", "ultra"];
+    if (plan && !validPlans.includes(plan)) {
+      return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
+    }
+
+    // Validate initial_credits if provided
+    let creditsToGrant: number;
+    if (initial_credits !== undefined) {
+      try {
+        creditsToGrant = validateInteger(initial_credits, 0, 10000);
+      } catch (error) {
+        return NextResponse.json({ error: "Invalid initial credits" }, { status: 400 });
+      }
+    } else {
+      const planCredits: Record<string, number> = {
+        free: 40,
+        pro: 600,
+        ultra: 3000,
+      };
+      creditsToGrant = planCredits[plan || "free"] || 40;
     }
 
     // 2. 创建用户
@@ -81,13 +123,6 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. 初始化积分 (使用 report_credits 表)
-    const planCredits: Record<string, number> = {
-      free: 40,
-      pro: 600,
-      ultra: 3000,
-    };
-    const creditsToGrant = initial_credits || planCredits[plan || "free"] || 40;
-
     const { error: creditsError } = await supabaseAdmin.from("report_credits").insert({
       user_id: userData.user.id,
       credits_available: creditsToGrant,

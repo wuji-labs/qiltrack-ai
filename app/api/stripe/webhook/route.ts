@@ -50,6 +50,47 @@ export async function POST(req: Request) {
   const supabase = createServiceRoleClient();
 
   try {
+    // ============================================================================
+    // IDEMPOTENCY CHECK - Prevent duplicate webhook processing
+    // ============================================================================
+    const eventId = event.id; // Stripe event ID (e.g., evt_xxx)
+
+    // Check if this event was already processed
+    const { data: isProcessed } = await supabase.rpc("fn_is_webhook_processed", {
+      p_provider: "stripe",
+      p_event_id: eventId,
+    });
+
+    if (isProcessed) {
+      console.info(`[Stripe] Event ${eventId} already processed - skipping (idempotent)`);
+      return NextResponse.json({ received: true, message: "Event already processed" });
+    }
+
+    // Record webhook event (idempotent insert)
+    const { data: webhookId } = await supabase.rpc("fn_record_webhook_event", {
+      p_provider: "stripe",
+      p_event_id: eventId,
+      p_event_type: event.type,
+      p_payload: event,
+      p_ip_address: ipAddress || null,
+    });
+
+    // If webhookId is NULL, event was already inserted by another concurrent request
+    if (!webhookId) {
+      console.info(`[Stripe] Event ${eventId} being processed concurrently - skipping`);
+      return NextResponse.json({ received: true, message: "Event being processed" });
+    }
+
+    // Mark as processing
+    await supabase.rpc("fn_mark_webhook_processing", {
+      p_webhook_id: webhookId,
+    });
+
+    console.info(`[Stripe] Processing event ${eventId} (type: ${event.type})`);
+
+    // ============================================================================
+    // EVENT PROCESSING
+    // ============================================================================
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
@@ -194,8 +235,34 @@ export async function POST(req: Request) {
       default:
         console.log(`[Stripe] Unhandled event type: ${event.type}`);
     }
+
+    // Mark webhook as completed
+    await supabase.rpc("fn_mark_webhook_completed", {
+      p_webhook_id: webhookId,
+    });
+
+    console.info(`[Stripe] Successfully processed event ${eventId}`);
   } catch (error) {
     console.error("[Stripe] Webhook handling error", error);
+
+    // Mark webhook as failed if we have webhookId
+    const eventId = event?.id;
+    if (eventId) {
+      const { data: webhook } = await supabase
+        .from("webhook_events")
+        .select("id")
+        .eq("event_id", eventId)
+        .eq("provider", "stripe")
+        .maybeSingle();
+
+      if (webhook?.id) {
+        await supabase.rpc("fn_mark_webhook_failed", {
+          p_webhook_id: webhook.id,
+          p_error_message: error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+    }
+
     return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 });
   }
 
