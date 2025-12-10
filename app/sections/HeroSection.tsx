@@ -136,12 +136,13 @@ export function HeroSection({
               <button
                 type="button"
                 onClick={() => setMobileDrawerOpen((open) => !open)}
-                className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] text-dim transition hover:border-[var(--stroke-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40 min-h-[44px]"
+                className="inline-flex items-center justify-center h-11 w-11 min-h-[44px] min-w-[44px] rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] text-dim transition hover:border-[var(--stroke-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40"
                 aria-haspopup="dialog"
                 aria-expanded={mobileDrawerOpen}
+                aria-label="打开导航菜单"
               >
                 <span className="sr-only">Open navigation menu</span>
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -158,9 +159,10 @@ export function HeroSection({
                 <button
                   type="button"
                   onClick={() => setLanguageMenuOpen((open) => !open)}
-                  className="inline-flex items-center gap-1 sm:gap-1.5 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm text-dim transition hover:border-[var(--stroke-glow)] hover:text-[var(--accent-blue)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40 whitespace-nowrap min-h-[44px] min-w-[112px]"
+                  className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-3 sm:px-4 py-2.5 sm:py-2.5 text-sm sm:text-sm text-dim transition hover:border-[var(--stroke-glow)] hover:text-[var(--accent-blue)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40 whitespace-nowrap min-h-[44px] min-w-[120px]"
                   aria-haspopup="listbox"
                   aria-expanded={languageMenuOpen}
+                  aria-label="选择语言"
                 >
                   <span>{LANGUAGE_LABEL[language]}</span>
                   <span className="text-xs text-subtle">▾</span>
@@ -195,7 +197,9 @@ export function HeroSection({
                   <button
                     type="button"
                     onClick={() => setAccountMenuOpen((open) => !open)}
-                    className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-1.5 sm:px-2.5 py-1.5 text-sm text-dim transition hover:border-[var(--stroke-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40 min-h-[44px]"
+                    className="inline-flex items-center gap-2 sm:gap-2.5 rounded-full border border-[var(--stroke-soft)] bg-[var(--bg-layer)] px-2 sm:px-3 py-2 text-sm text-dim transition hover:border-[var(--stroke-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stroke-glow)]/40 min-h-[44px]"
+                    aria-label="账户菜单"
+                    aria-expanded={accountMenuOpen}
                   >
                     <span className="h-7 sm:h-8 w-7 sm:w-8 rounded-full bg-[var(--accent-emerald)]/20 border border-[var(--stroke-soft)] overflow-hidden flex items-center justify-center text-xs font-semibold text-[var(--accent-emerald)] flex-shrink-0">
                       {userImage ? (
@@ -277,7 +281,8 @@ export function HeroSection({
                 <button
                   type="button"
                   onClick={onPrimaryCta}
-                  className="btn-gradient px-[18px] py-2 text-sm font-semibold shadow-[0_10px_30px_rgba(16,185,129,0.35)] transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_14px_40px_rgba(16,185,129,0.45)] active:translate-y-0.5 min-h-[44px]"
+                  className="btn-gradient px-5 py-2.5 text-sm font-semibold shadow-[0_10px_30px_rgba(16,185,129,0.35)] transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_14px_40px_rgba(16,185,129,0.45)] active:translate-y-0.5 min-h-[44px]"
+                  aria-label={t("cta.preview")}
                 >
                   {t("cta.preview")}
                   {previewNote && (

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { toast } from 'sonner';
 import { Copy, Mail, Share2, Users, Award, ExternalLink, Gift, Trophy, Zap, Star } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
+import { handleClientError, ErrorHandlers } from '@/lib/client/error-handler';
+import { toast } from 'sonner';
 
 interface ReferralStats {
   total: number;
@@ -62,7 +63,11 @@ export default function ReferralPanel() {
         console.log('[REFERRAL_PANEL] Referral link set:', genData.referral_link);
       } else {
         console.error('[REFERRAL_PANEL] Generate link failed:', genData);
-        toast.error(genData.error || t('referral.toast.generateFailed'));
+        handleClientError(genData, {
+          message: genData.error || t('referral.toast.generateFailed'),
+          severity: 'error',
+          log: false,
+        });
       }
 
       // 获取统计
@@ -76,11 +81,14 @@ export default function ReferralPanel() {
         setMilestones(statsData.milestones || []);
       } else {
         console.error('[REFERRAL_PANEL] Stats failed:', statsData);
-        toast.error(statsData.error || t('referral.toast.loadStatsFailed'));
+        handleClientError(statsData, {
+          message: statsData.error || t('referral.toast.loadStatsFailed'),
+          severity: 'error',
+          log: false,
+        });
       }
     } catch (error) {
-      console.error('[REFERRAL_PANEL] Load data error:', error);
-      toast.error(t('referral.toast.loadDataFailed'));
+      ErrorHandlers.network(error, t('referral.toast.loadDataFailed'));
     } finally {
       setLoading(false);
     }
@@ -88,7 +96,11 @@ export default function ReferralPanel() {
 
   const copyLink = async () => {
     if (!referralLink) {
-      toast.error(t('referral.toast.linkNotGenerated'));
+      handleClientError(new Error('Link not generated'), {
+        message: t('referral.toast.linkNotGenerated'),
+        severity: 'warning',
+        log: false,
+      });
       return;
     }
 
@@ -98,13 +110,21 @@ export default function ReferralPanel() {
       toast.success(t('referral.toast.copied'));
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      toast.error(t('referral.toast.copyFailed'));
+      handleClientError(error, {
+        message: t('referral.toast.copyFailed'),
+        severity: 'error',
+        log: false,
+      });
     }
   };
 
   const copyShareText = () => {
     if (!referralLink) {
-      toast.error(t('referral.toast.linkGenerating'));
+      handleClientError(new Error('Link generating'), {
+        message: t('referral.toast.linkGenerating'),
+        severity: 'warning',
+        log: false,
+      });
       return;
     }
     // 随机选择20套话术中的一套
@@ -113,14 +133,22 @@ export default function ReferralPanel() {
 
     navigator.clipboard.writeText(text).then(() => {
       toast.success(t('referral.toast.shareTextCopied'));
-    }).catch(() => {
-      toast.error(t('referral.toast.copyFailed'));
+    }).catch((error) => {
+      handleClientError(error, {
+        message: t('referral.toast.copyFailed'),
+        severity: 'error',
+        log: false,
+      });
     });
   };
 
   const shareOnTwitter = () => {
     if (!referralLink) {
-      toast.error(t('referral.toast.linkGenerating'));
+      handleClientError(new Error('Link generating'), {
+        message: t('referral.toast.linkGenerating'),
+        severity: 'warning',
+        log: false,
+      });
       return;
     }
     // 随机选择20套话术中的一套，避免算法降权
@@ -133,15 +161,23 @@ export default function ReferralPanel() {
 
   const shareOnWeChat = () => {
     if (!referralLink) {
-      toast.error(t('referral.toast.linkGenerating'));
+      handleClientError(new Error('Link generating'), {
+        message: t('referral.toast.linkGenerating'),
+        severity: 'warning',
+        log: false,
+      });
       return;
     }
     const wechatText = t('referral.share.wechat.text', { link: referralLink });
 
     navigator.clipboard.writeText(wechatText).then(() => {
       toast.success(t('referral.toast.wechatCopied'), { duration: 4000 });
-    }).catch(() => {
-      toast.error(t('referral.toast.copyFailed'));
+    }).catch((error) => {
+      handleClientError(error, {
+        message: t('referral.toast.copyFailed'),
+        severity: 'error',
+        log: false,
+      });
     });
   };
 
