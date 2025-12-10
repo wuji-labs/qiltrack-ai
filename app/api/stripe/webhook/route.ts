@@ -86,6 +86,29 @@ export async function POST(req: Request) {
           console.log(`[Stripe] Successfully upgraded user ${userId} to ${plan}`);
         }
 
+        // 调用邀请转化奖励函数
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: rewardGranted, error: rewardError } = await (supabase as any).rpc(
+            "fn_grant_conversion_reward",
+            {
+              p_user_id: userId,
+              p_plan: plan,
+            }
+          );
+
+          if (rewardError) {
+            console.error("[Stripe] Failed to grant referral conversion reward:", rewardError);
+          } else if (rewardGranted) {
+            console.log(`[Stripe] Granted referral conversion reward for ${plan} upgrade`);
+          } else {
+            console.log("[Stripe] No referral reward to grant (user not referred)");
+          }
+        } catch (err) {
+          console.error("[Stripe] Exception calling fn_grant_conversion_reward:", err);
+          // 不阻塞主流程
+        }
+
         break;
       }
 

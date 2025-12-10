@@ -93,7 +93,16 @@
 1. **Context Sync**：Codex 汇总上下文 + 发布 Architecture Snapshot；Claude 确认依赖/提疑问。
 2. **Design & Breakdown**：Codex 给组件/数据流/测试矩阵；Claude 输出实施清单。
 3. **Implementation Loop**：Claude 在短分支开发，跑 `npm run lint` / `npm test`，每段产出变更说明；Codex 随时答疑。
-   - 分支策略：Claude 必须用独立 feature 分支，禁止直接改/推 main；通过 PR 合并，lint/test 必过。
+   - 分支策略：
+     - **禁止直接改/推 main**；所有开发必须通过 PR 合并，lint/test 必过。
+     - **5 个工作组固定分支**：每个 worktree 对应唯一的长期分支，严格执行
+       - G1 组：`g1/develop`
+       - G2 组：`g2/develop`
+       - G3 组：`g3/develop`
+       - G4 组：`g4/develop`
+       - G5 组：`g5/develop`
+     - 各组仅在自己的 `gX/develop` 分支上开发，完成后通过 PR 合并到 `main`。
+     - 临时 feature 分支（如 `g1/fix-xxx`）仅在特殊情况使用，任务完成后必须删除。
    - worktree 同步：使用 git worktree 开发时，提 PR 前固定跑 `git fetch origin` -> `git rebase origin/main` -> `git status`，确认工作区干净且基于最新 main，再 push；rebase 冲突由 Claude 解决。
    - 提交 PR 时必须使用 `.github/pull_request_template.md`，确保 CAVR、验证结果与终端三行简讯全部填妥。
 4. **Review & Validation**：Codex 按行为/韧性/风格审查，指出缺陷与风险；Claude 修复并补充验证。
