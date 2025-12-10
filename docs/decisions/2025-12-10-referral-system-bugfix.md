@@ -1,7 +1,7 @@
 # Architecture Snapshot: 邀请奖励系统 Bug 修复
 
 **日期**：2025-12-10
-**架构师**：HQ-Codex (Claude 顶替)
+**架构师**：G1-Codex (Claude 顶替)
 **优先级**：P0（紧急，核心功能异常）
 
 ---
@@ -535,15 +535,16 @@ HAVING COUNT(*) > 1;
 
 按照 Codex-Claude 协作流程，下一步：
 
-1. **HQ → G1-Codex**：分配任务到 G1 组（邀请系统归属）
-2. **G1-Codex**：审阅本 Snapshot，创建组内计划 `docs/plans/g1-referral-bugfix.md`
+1. **老板 → G1-Codex**：分配任务到 G1 组（邀请系统归属）
+2. **G1-Codex**：审阅本 Snapshot，向G1-Claude发布实施指令
 3. **G1-Claude**：实施修复，按文件清单逐个修复
 4. **G1-Claude**：输出 CAVR 报告到 `docs/reports/2025-12-10-g1-referral-bugfix-cavr.md`
 5. **G1-Codex**：审查 PR，验证修复
-6. **HQ**：最终审查，合并到 main
+6. **G1-Codex**：向老板汇报完成状态
+7. **老板**：审查并合并 PR 到 main
 
 ---
 
-**架构师签名**：HQ-Codex (Claude 顶替 Codex)
+**架构师签名**：G1-Codex (Claude 顶替)
 **待分配组别**：G1
 **预计完成**：1-2 天
