@@ -10,7 +10,7 @@
 
 | ID           | Group | Branch      | Scope                                          | Progress | Owner      | Due        | Notes                                        |
 | ------------ | ----- | ----------- | ---------------------------------------------- | -------- | ---------- | ---------- | -------------------------------------------- |
-| WS-REDESIGN  | G4    | g4/develop  | 前端风格重构：浅色极简风 + shadcn/ui + 双主题 | 0%       | HQ (Codex) | 2025-12-31 | Phase 1-5 渐进式实施，优先级 P1，worktree: qiltrack-ai-g4 |
+| WS-REDESIGN  | G4    | g4/develop  | 前端风格重构：浅色极简风 + shadcn/ui + 双主题 | 15%      | HQ (Codex) | 2025-12-31 | Phase 1 待修复（Tailwind 配置 + 字体依赖），优先级 P1 |
 
 ---
 

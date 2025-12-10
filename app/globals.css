@@ -1,8 +1,10 @@
 /* ====== Qiltrack AI Global Styles ====== */
 /* 全局样式 - 模块化重构 Phase 1 */
 
-/* Tailwind v4 基础导入 */
-@import "tailwindcss";
+/* Tailwind 基础指令 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* 基础样式和 Design Tokens */
 @import "./styles/base.css";

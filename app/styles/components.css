@@ -1,6 +1,23 @@
 /* ====== Component Styles (Legacy) ====== */
 /* 组件样式 - 将在 Phase 2 逐步迁移到 shadcn/ui */
 
+/* ====== 临时别名 (Phase 2 迁移后移除) ====== */
+.btn-gradient {
+  @apply btn-gradient-legacy;
+}
+
+.btn-ghost {
+  @apply btn-ghost-legacy;
+}
+
+.glass-card {
+  @apply glass-card-legacy;
+}
+
+.frosted-bar {
+  @apply frosted-bar-legacy;
+}
+
 /* 旧版玻璃态组件 - 保留用于逐步迁移 */
 .glass-card-legacy {
   background: rgba(255, 255, 255, 0.03);
