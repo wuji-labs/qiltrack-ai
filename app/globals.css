@@ -148,16 +148,40 @@ body {
     linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
     linear-gradient(0deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-  background-size:
-    auto,
-    auto,
-    auto,
-    100% 100%,
-    32px 32px,
-    32px 32px;
-  background-position: center;
-  mix-blend-mode: screen;
-  opacity: 0.9;
+}
+
+/* ====== Sonner Toast 样式覆盖 ====== */
+[data-sonner-toaster] {
+  font-family: var(--font-sans);
+}
+
+.sonner-toast {
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.45) !important;
+}
+
+[data-sonner-toast][data-styled='true'][data-type='success'] {
+  background: rgba(91, 224, 176, 0.15) !important;
+  border-color: rgba(91, 224, 176, 0.3) !important;
+  color: #5be0b0 !important;
+}
+
+[data-sonner-toast][data-styled='true'][data-type='error'] {
+  background: rgba(251, 113, 133, 0.15) !important;
+  border-color: rgba(251, 113, 133, 0.3) !important;
+  color: #fb7185 !important;
+}
+
+[data-sonner-toast][data-styled='true'][data-type='info'] {
+  background: rgba(77, 208, 166, 0.15) !important;
+  border-color: rgba(77, 208, 166, 0.3) !important;
+  color: #4dd0a6 !important;
+}
+
+[data-sonner-toast][data-styled='true'][data-type='warning'] {
+  background: rgba(251, 191, 36, 0.15) !important;
+  border-color: rgba(251, 191, 36, 0.3) !important;
+  color: #fbbf24 !important;
 }
 
 .feature-mesh {

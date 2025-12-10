@@ -9,6 +9,7 @@ import { useLanguage } from "@/lib/i18n";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { Turnstile, useTurnstile } from "@/app/components/Turnstile";
 import { GoogleSignInButton } from "@/app/components/GoogleSignInButton";
+import { PasswordStrengthIndicator } from "@/app/components/PasswordStrengthIndicator";
 
 type EmailStatus = "idle" | "loading" | "sent" | "error" | "cooldown";
 type AuthView = "signin" | "signup" | "magic-link" | "reset-password";
@@ -395,7 +396,7 @@ function LoginContent() {
                   autoComplete="new-password"
                   minLength={8}
                 />
-                <p className="text-xs text-slate-500">{t("auth.signup.passwordHint")}</p>
+                <PasswordStrengthIndicator password={password} minLength={8} />
               </div>
 
               {/* Turnstile Widget */}

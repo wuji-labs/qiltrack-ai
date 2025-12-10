@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import * as docx from "docx";
 import { saveAs } from "file-saver";
+import { toast } from "sonner";
 
 import { ProgressBar } from "@/app/components/ProgressBar";
 import {
@@ -368,14 +369,14 @@ export function ReportGeneratorSection({
 
   const handleCopyRichText = async () => {
     if (!reportData) {
-      alert(t("alert.copy.missing"));
+      toast.error(t("alert.copy.missing"));
       return;
     }
 
     // We need a ref to the rendered content
     const reportContentRef = document.querySelector(".report-markdown-content");
     if (!reportContentRef) {
-      alert(t("alert.copy.missing"));
+      toast.error(t("alert.copy.missing"));
       return;
     }
 
@@ -392,7 +393,10 @@ export function ReportGeneratorSection({
             "text/plain": textBlob,
           }),
         ]);
-        alert(t("alert.copy.success"));
+        toast.success(t("alert.copy.success"), {
+          description: "已复制富文本格式到剪贴板",
+          duration: 3000,
+        });
         return;
       } catch (error) {
         console.warn("使用 ClipboardItem API 复制失败，尝试回退:", error);
@@ -407,19 +411,23 @@ export function ReportGeneratorSection({
       selection?.addRange(range);
       document.execCommand("copy");
       selection?.removeAllRanges();
-      alert(t("alert.copy.fallback"));
+      toast.info(t("alert.copy.fallback"), {
+        description: "已复制为纯文本格式",
+        duration: 3000,
+      });
     } catch (execError) {
       console.error("富文本复制失败:", execError);
-      alert(t("alert.copy.error"));
+      toast.error(t("alert.copy.error"));
     }
   };
 
   const handleExportDocx = async () => {
     if (!reportData) {
-      alert(t("alert.export.missing"));
+      toast.error(t("alert.export.missing"));
       return;
     }
     setExportingDocx(true);
+    toast.loading("正在生成 DOCX 文档...", { id: "export-docx" });
 
     const lines = reportData.report.split("\n");
     let titleLine = lines.find((line) => line.trim().startsWith("# "));
@@ -512,10 +520,14 @@ export function ReportGeneratorSection({
 
       const blob = await docx.Packer.toBlob(docFile);
       saveAs(blob, fileName);
-      alert(t("alert.export.success"));
+      toast.success(t("alert.export.success"), {
+        id: "export-docx",
+        description: `已下载文件: ${fileName}`,
+        duration: 4000,
+      });
     } catch (err) {
       console.error("DOCX 导出失败:", err);
-      alert(t("alert.export.error"));
+      toast.error(t("alert.export.error"), { id: "export-docx" });
     } finally {
       setExportingDocx(false);
     }
@@ -523,7 +535,7 @@ export function ReportGeneratorSection({
 
   const handleExportPdf = async () => {
     if (!reportData) {
-      alert(t("alert.export.missing"));
+      toast.error(t("alert.export.missing"));
       return;
     }
     if (!auth.isAuthenticated && !canBypassAuth) {
@@ -535,6 +547,7 @@ export function ReportGeneratorSection({
     // 权限检查由后端完成，包括 plan 和 subscription_status
 
     setExportingPdf(true);
+    toast.loading("正在生成 PDF 文档...", { id: "export-pdf" });
     try {
       const response = await fetch("/api/report/export/pdf", {
         method: "POST",
@@ -560,18 +573,23 @@ export function ReportGeneratorSection({
 
       if (!response.ok) {
         if (data?.code === "plan_required") {
-          alert(t("report.pdf.error.plan"));
+          toast.error(t("report.pdf.error.plan"), { id: "export-pdf" });
         } else if (data?.code === "not_authenticated") {
           setErrorState({ type: "unauthorized", message: t("generator.alert.unregistered") });
           onRequireLogin();
+          toast.dismiss("export-pdf");
         } else {
-          alert(data?.error || t("alert.export.error"));
+          toast.error(data?.error || t("alert.export.error"), { id: "export-pdf" });
         }
         return;
       }
 
       if (data.downloadUrl) {
         window.open(data.downloadUrl, "_blank", "noopener,noreferrer");
+        toast.success("PDF 已在新标签页打开", {
+          id: "export-pdf",
+          duration: 3000,
+        });
         return;
       }
 
@@ -582,13 +600,18 @@ export function ReportGeneratorSection({
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        toast.success("PDF 导出成功", {
+          id: "export-pdf",
+          description: `已下载文件: Qiltrack-AI_Report_${reportData.symbol}.pdf`,
+          duration: 4000,
+        });
         return;
       }
 
-      alert(t("alert.export.error"));
+      toast.error(t("alert.export.error"), { id: "export-pdf" });
     } catch (err) {
       console.error("PDF export failed:", err);
-      alert(t("alert.export.error"));
+      toast.error(t("alert.export.error"), { id: "export-pdf" });
     } finally {
       setExportingPdf(false);
     }
@@ -613,16 +636,13 @@ export function ReportGeneratorSection({
     window.location.assign("/pricing#quota");
   };
 
-  // Workflow for progress
+  // Workflow for progress (simplified to 5 steps for better UX)
   const workflowList = [
     { step: 1, label: t("generator.progress.stage1") },
     { step: 2, label: t("generator.progress.stage2") },
     { step: 3, label: t("generator.progress.stage3") },
     { step: 4, label: t("generator.progress.stage4") },
     { step: 5, label: t("generator.progress.stage5") },
-    { step: 6, label: t("generator.progress.stage6") },
-    { step: 7, label: t("generator.progress.stage7") },
-    { step: 8, label: t("generator.progress.stage8") },
   ];
 
   const hasDropdown = !dropdownClosed && (searchResults.slice(0, 3).length > 0 || searching);
