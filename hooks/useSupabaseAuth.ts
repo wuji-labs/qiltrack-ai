@@ -32,21 +32,34 @@ type AuthResult =
     };
 
 /**
- * Get the base URL for auth redirects
- * Priority: 1) NEXT_PUBLIC_AUTH_REDIRECT_URL, 2) NEXT_PUBLIC_SITE_URL, 3) NEXT_PUBLIC_VERCEL_URL, 4) runtime origin
- * Supports multi-worktree with different ports and SSR fallback.
+ * 获取认证回调的基础 URL
+ * 优先级: NEXT_PUBLIC_AUTH_REDIRECT_URL > NEXT_PUBLIC_SITE_URL > NEXT_PUBLIC_VERCEL_URL > runtime
+ *
+ * @returns 基础 URL (不含尾部斜杠)
+ * @throws 在开发模式下，如果所有环境变量都未配置，会输出 console.warn
  */
 function getAuthRedirectBase(): string {
   const base =
     process.env.NEXT_PUBLIC_AUTH_REDIRECT_URL ||
     process.env.NEXT_PUBLIC_SITE_URL ||
     process.env.NEXT_PUBLIC_VERCEL_URL;
+
   if (base) {
     return base.replace(/\/$/, "");
   }
-  if (typeof window === "undefined") {
-    return "http://localhost:3000";
+
+  // 开发模式警告
+  if (process.env.NODE_ENV === "development" && typeof window === "undefined") {
+    console.warn(
+      "[Auth] NEXT_PUBLIC_SITE_URL not configured, using localhost:3000. " +
+      "This may cause OAuth/Magic Link callback failures in non-local environments."
+    );
   }
+
+  if (typeof window === "undefined") {
+    return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  }
+
   return window.location.origin;
 }
 
