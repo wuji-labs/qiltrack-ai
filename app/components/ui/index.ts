@@ -6,13 +6,11 @@
  * @updated 2025-12-10
  */
 
-// Phase 2 将添加以下组件:
-// export { Button } from './Button'
-// export { Input } from './Input'
-// export { Card } from './Card'
+// Phase 2 组件导出
+export { Button } from './Button'
+export { Input, Textarea, Label } from './Input'
+export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './Card'
 // export { Badge } from './Badge'
 // export { Select } from './Select'
 // export { Tabs } from './Tabs'
 // export { Avatar } from './Avatar'
-
-export {}
