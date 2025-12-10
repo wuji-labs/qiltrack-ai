@@ -61,7 +61,7 @@
 .body-small {
   font-size: var(--text-sm);
   line-height: var(--leading-normal);
-  color: rgb(--fg-secondary));
+  color: rgb(var(--fg-secondary));
 }
 
 .caption {

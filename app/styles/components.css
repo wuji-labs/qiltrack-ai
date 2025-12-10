@@ -1,25 +1,9 @@
 /* ====== Component Styles (Legacy) ====== */
 /* 组件样式 - 将在 Phase 2 逐步迁移到 shadcn/ui */
 
-/* ====== 临时别名 (Phase 2 迁移后移除) ====== */
-.btn-gradient {
-  @apply btn-gradient-legacy;
-}
-
-.btn-ghost {
-  @apply btn-ghost-legacy;
-}
-
-.glass-card {
-  @apply glass-card-legacy;
-}
-
-.frosted-bar {
-  @apply frosted-bar-legacy;
-}
-
 /* 旧版玻璃态组件 - 保留用于逐步迁移 */
-.glass-card-legacy {
+.glass-card-legacy,
+.glass-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
@@ -27,7 +11,8 @@
   backdrop-filter: blur(8px);
 }
 
-.frosted-bar-legacy {
+.frosted-bar-legacy,
+.frosted-bar {
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
@@ -36,7 +21,8 @@
 }
 
 /* 旧版按钮样式 - 保留用于逐步迁移 */
-.btn-gradient-legacy {
+.btn-gradient-legacy,
+.btn-gradient {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -52,11 +38,13 @@
   transition: filter 0.2s ease;
 }
 
-.btn-gradient-legacy:hover {
+.btn-gradient-legacy:hover,
+.btn-gradient:hover {
   filter: brightness(1.05);
 }
 
-.btn-ghost-legacy {
+.btn-ghost-legacy,
+.btn-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -72,7 +60,8 @@
     color 0.2s ease;
 }
 
-.btn-ghost-legacy:hover {
+.btn-ghost-legacy:hover,
+.btn-ghost:hover {
   border-color: #5be0b0;
   color: #5be0b0;
 }

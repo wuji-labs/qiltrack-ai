@@ -1,10 +1,8 @@
 /* ====== Qiltrack AI Global Styles ====== */
 /* 全局样式 - 模块化重构 Phase 1 */
 
-/* Tailwind 基础指令 */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind v4 CSS-first 导入 */
+@import "tailwindcss";
 
 /* 基础样式和 Design Tokens */
 @import "./styles/base.css";
@@ -15,12 +13,12 @@
 /* 工具类 */
 @import "./styles/utilities.css";
 
-/* ====== Tailwind Layer Directives ====== */
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+/* ====== Base Styles ====== */
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
 }
