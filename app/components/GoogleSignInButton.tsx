@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import Image from "next/image";
@@ -10,6 +10,10 @@ interface GoogleSignInButtonProps {
   onError?: (error: string) => void;
   disabled?: boolean;
   text?: string;
+}
+
+interface GoogleCredentialResponse {
+  credential: string;
 }
 
 /**
@@ -34,69 +38,7 @@ export function GoogleSignInButton({
   const initialized = useRef(false);
   const [isGoogleReady, setIsGoogleReady] = useState(false);
 
-  useEffect(() => {
-    if (initialized.current) {
-      return;
-    }
-
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    if (!clientId) {
-      console.warn("Google Sign In: 未配置 NEXT_PUBLIC_GOOGLE_CLIENT_ID");
-      return;
-    }
-
-    initialized.current = true;
-
-    // 加载 Google Identity Services 脚本
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.defer = true;
-
-    script.onload = () => {
-      // @ts-ignore - Google Identity Services 全局对象
-      if (window.google) {
-        // @ts-ignore
-        window.google.accounts.id.initialize({
-          client_id: clientId,
-          callback: handleCredentialResponse,
-          auto_select: false,
-        });
-        setIsGoogleReady(true);
-      }
-    };
-
-    document.body.appendChild(script);
-
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    };
-  }, []);
-
-  // 渲染 Google 按钮
-  useEffect(() => {
-    if (!isGoogleReady) return;
-
-    const buttonContainer = document.getElementById('google-signin-button');
-    // @ts-ignore - Google Identity Services 全局对象
-    if (buttonContainer && window.google) {
-      // @ts-ignore
-      window.google.accounts.id.renderButton(
-        buttonContainer,
-        {
-          type: "standard",
-          theme: "outline",
-          size: "large",
-          text: "signin_with",
-          width: buttonContainer.offsetWidth,
-        }
-      );
-    }
-  }, [isGoogleReady]);
-
-  const handleCredentialResponse = async (response: any) => {
+  const handleCredentialResponse = useCallback(async (response: GoogleCredentialResponse) => {
     if (!supabase) {
       const errorMsg = "Supabase 未初始化";
       console.error(errorMsg);
@@ -145,19 +87,97 @@ export function GoogleSignInButton({
       console.error("Google 登录异常:", err);
       onError?.(errorMsg);
     }
-  };
+  }, [supabase, onSuccess, onError, router]);
 
-  // 如果没有配置 Client ID，显示降级 UI
+  useEffect(() => {
+    if (initialized.current) {
+      return;
+    }
+
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      console.warn("Google Sign In: 未配置 NEXT_PUBLIC_GOOGLE_CLIENT_ID");
+      return;
+    }
+
+    initialized.current = true;
+
+    // 加载 Google Identity Services 脚本
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+
+    script.onload = () => {
+      // @ts-expect-error - Google Identity Services 全局对象
+      if (window.google) {
+        // @ts-expect-error - Google Identity Services API
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleCredentialResponse,
+          auto_select: false,
+        });
+        setIsGoogleReady(true);
+      }
+    };
+
+    document.body.appendChild(script);
+
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
+  }, [handleCredentialResponse]);
+
+  // 渲染 Google 按钮
+  useEffect(() => {
+    if (!isGoogleReady) return;
+
+    const buttonContainer = document.getElementById('google-signin-button');
+    // @ts-expect-error - Google Identity Services 全局对象
+    if (buttonContainer && window.google) {
+      // @ts-expect-error - Google Identity Services API
+      window.google.accounts.id.renderButton(
+        buttonContainer,
+        {
+          type: "standard",
+          theme: "outline",
+          size: "large",
+          text: "signin_with",
+          width: buttonContainer.offsetWidth,
+        }
+      );
+    }
+  }, [isGoogleReady]);
+
+  // 如果没有配置 Client ID，显示配置指引
   if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
     return (
-      <button
-        type="button"
-        disabled={true}
-        className="w-full inline-flex items-center justify-center gap-3 rounded-xl bg-slate-700 text-slate-400 px-4 py-3 text-base font-semibold cursor-not-allowed"
-      >
-        <Image src="/providers/google.svg" alt="google" width={22} height={22} priority />
-        <span>Google 登录未配置</span>
-      </button>
+      <div className="border border-dashed border-slate-700 rounded-xl p-4 bg-slate-900/50">
+        <p className="text-sm text-slate-400 mb-2 flex items-center gap-2">
+          <Image src="/providers/google.svg" alt="google" width={18} height={18} priority />
+          <span>Google Sign-In is not configured</span>
+        </p>
+        <details className="text-xs text-slate-500">
+          <summary className="cursor-pointer hover:text-slate-400 hover:underline transition-colors">
+            Setup instructions
+          </summary>
+          <ol className="list-decimal list-inside mt-2 space-y-1 text-slate-500">
+            <li>Create a Google OAuth app in Google Cloud Console</li>
+            <li>Add <code className="bg-slate-800 px-1 py-0.5 rounded">NEXT_PUBLIC_GOOGLE_CLIENT_ID</code> to your <code className="bg-slate-800 px-1 py-0.5 rounded">.env.local</code></li>
+            <li>Configure authorized redirect URIs in Google Console</li>
+          </ol>
+          <a
+            href="https://supabase.com/docs/guides/auth/social-login/auth-google"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-emerald-400 hover:text-emerald-300 hover:underline mt-2 inline-block transition-colors"
+          >
+            View documentation →
+          </a>
+        </details>
+      </div>
     );
   }
 

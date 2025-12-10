@@ -2,8 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { Session, User } from "@supabase/supabase-js";
+import type { Session, User, SupabaseClient } from "@supabase/supabase-js";
 import { SUPABASE_AUTH_ERROR_CODES, getAuthErrorMessage } from "@/lib/auth/supabase-error-codes";
+
+/**
+ * RPC function availability cache
+ * Prevents repeated existence checks for fn_user_has_password
+ */
+let rpcFunctionAvailable: boolean | null = null;
 
 /**
  * Authentication method types
@@ -64,6 +70,40 @@ function getAuthRedirectBase(): string {
 }
 
 const AUTH_CALLBACK_PATH = "/api/auth/callback";
+
+/**
+ * Check if RPC function fn_user_has_password exists
+ * Caches result to avoid repeated checks
+ * @returns true if function exists, false otherwise
+ */
+async function checkRpcFunction(supabase: SupabaseClient): Promise<boolean> {
+  if (rpcFunctionAvailable !== null) {
+    return rpcFunctionAvailable;
+  }
+
+  try {
+    // Attempt to call RPC (will fail if function doesn't exist)
+    const { error } = await supabase.rpc('fn_user_has_password');
+
+    // Check if error indicates function does not exist
+    if (error && error.message?.toLowerCase().includes('function') &&
+        (error.message?.toLowerCase().includes('does not exist') ||
+         error.message?.toLowerCase().includes('not found'))) {
+      console.warn(
+        '[Auth] RPC function "fn_user_has_password" not found. ' +
+        'User authentication method detection will fall back to heuristics. ' +
+        'Run: supabase db reset (local) or check migrations (production).'
+      );
+      rpcFunctionAvailable = false;
+    } else {
+      rpcFunctionAvailable = true;
+    }
+  } catch {
+    rpcFunctionAvailable = false;
+  }
+
+  return rpcFunctionAvailable;
+}
 
 /**
  * 映射 Supabase 错误到 AuthResult
@@ -246,14 +286,19 @@ export function useSupabaseAuth() {
    * Returns: "oauth" | "magic_link" | "password" | "unknown"
    *
    * Logic:
-   * 1. Check if user has OAuth identities (Google, GitHub, etc.)
-   * 2. If has identities, check if also has password → "oauth" or "password"
-   * 3. If no identities, check if has password → "magic_link" or "password"
+   * 1. Check RPC function availability
+   * 2. Check if user has OAuth identities (Google, GitHub, etc.)
+   * 3. If has identities, check if also has password → "oauth" or "password"
+   * 4. If no identities, check if has password → "magic_link" or "password"
+   * 5. Fallback to heuristics if RPC function not available
    */
   const getAuthMethod = useCallback(async (): Promise<AuthMethod> => {
     if (!user || !supabase) return "unknown";
 
     try {
+      // Check if RPC function is available
+      const rpcAvailable = await checkRpcFunction(supabase);
+
       // Step 1: Check for OAuth identities
       const { data: identitiesData, error: identitiesError } =
         await supabase.auth.getUserIdentities();
@@ -273,6 +318,12 @@ export function useSupabaseAuth() {
             connected_at: identity.created_at ?? new Date().toISOString(),
           }))
         );
+
+        // If RPC not available, fallback to provider-based heuristic
+        if (!rpcAvailable) {
+          // OAuth users are assumed to not have password unless hybrid auth is explicitly set
+          return "oauth";
+        }
 
         // Check if user also has password (hybrid auth)
         try {
@@ -296,6 +347,11 @@ export function useSupabaseAuth() {
       }
 
       // Step 3: No OAuth identities, check if has password
+      // If RPC not available, assume password-based auth
+      if (!rpcAvailable) {
+        return "password";
+      }
+
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data: hasPassword, error: rpcError } = await (supabase.rpc as any)("fn_user_has_password");
