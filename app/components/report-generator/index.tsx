@@ -264,7 +264,7 @@ export function ReportGeneratorSection({
 
     const focusInput = () => {
       const element = document.querySelector<HTMLInputElement>("#report-query-input");
-      element?.focus();
+      element?.focus({ preventScroll: true });
     };
 
     const handleHash = () => {
