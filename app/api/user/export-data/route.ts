@@ -81,8 +81,8 @@ export async function GET(request: NextRequest) {
 
       // Generated reports
       supabaseAdmin
-        .from("reports")
-        .select("id, symbol, title, language, tone, report_run_id, created_at, updated_at")
+        .from("report_runs")
+        .select("id, symbol, language, tone, status, created_at, updated_at")
         .eq("user_id", userId)
         .order("created_at", { ascending: false }),
 

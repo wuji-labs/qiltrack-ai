@@ -55,15 +55,15 @@ export async function POST(request: NextRequest) {
       console.error("[CLIENT ERROR]", errorLog);
     }
 
-    // 6. Store in database
-    const { error: dbError } = await supabase
-      .from("client_error_logs")
-      .insert(errorLog);
-
-    if (dbError) {
-      console.error("Failed to store error log:", dbError);
-      // Don't throw - we still want to return success to client
-    }
+    // 6. Store in database (TODO: Create client_error_logs table)
+    // const { error: dbError } = await supabase
+    //   .from("client_error_logs")
+    //   .insert(errorLog);
+    //
+    // if (dbError) {
+    //   console.error("Failed to store error log:", dbError);
+    //   // Don't throw - we still want to return success to client
+    // }
 
     // 7. Send to external monitoring service (e.g., Sentry)
     if (process.env.NODE_ENV === "production" && process.env.SENTRY_DSN) {

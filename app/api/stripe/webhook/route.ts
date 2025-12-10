@@ -71,7 +71,7 @@ export async function POST(req: Request) {
       p_provider: "stripe",
       p_event_id: eventId,
       p_event_type: event.type,
-      p_payload: event,
+      p_payload: JSON.parse(JSON.stringify(event)) as any,
       p_ip_address: ipAddress || null,
     });
 

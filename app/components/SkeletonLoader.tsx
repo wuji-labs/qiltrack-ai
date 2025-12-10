@@ -180,13 +180,15 @@ export function SkeletonChart() {
     <div className="space-y-4 p-6 rounded-2xl bg-white/[0.03] border border-white/[0.08]">
       <Skeleton className="h-5 w-40" />
       <div className="flex items-end justify-between gap-2 h-48">
-        {Array.from({ length: 7 }).map((_, i) => (
-          <Skeleton
-            key={i}
-            className="flex-1"
-            style={{ height: `${Math.random() * 80 + 20}%` }}
-          />
-        ))}
+        {Array.from({ length: 7 }).map((_, i) => {
+          const heights = ['h-20', 'h-32', 'h-24', 'h-40', 'h-28', 'h-36', 'h-24'];
+          return (
+            <Skeleton
+              key={i}
+              className={`flex-1 ${heights[i]}`}
+            />
+          );
+        })}
       </div>
       <div className="flex justify-between">
         {Array.from({ length: 7 }).map((_, i) => (
