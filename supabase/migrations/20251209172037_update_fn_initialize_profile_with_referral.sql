@@ -2,6 +2,9 @@
 -- This migration evolves the 3-parameter function to 4-parameter version
 -- Using CREATE OR REPLACE to properly update the function definition
 
+-- Drop the old 3-parameter version to avoid "function is not unique" error
+DROP FUNCTION IF EXISTS public.fn_initialize_profile(uuid, text, text);
+
 CREATE OR REPLACE FUNCTION public.fn_initialize_profile(
   p_user_id uuid,
   p_email text,

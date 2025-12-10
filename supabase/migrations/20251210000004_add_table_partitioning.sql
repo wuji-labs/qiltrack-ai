@@ -87,8 +87,22 @@ CREATE TABLE audit_logs_default PARTITION OF audit_logs DEFAULT;
 DO $$
 BEGIN
   IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'audit_logs_old') THEN
-    INSERT INTO public.audit_logs
-    SELECT * FROM public.audit_logs_old;
+    INSERT INTO public.audit_logs (id, user_id, action, resource_type, resource_id, details, ip_address, user_agent, created_at)
+    SELECT
+      id,
+      user_id,
+      action,
+      resource_type,
+      CASE
+        WHEN resource_id ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+        THEN resource_id::UUID
+        ELSE NULL
+      END as resource_id,
+      details,
+      ip_address,
+      user_agent,
+      created_at
+    FROM public.audit_logs_old;
 
     DROP TABLE public.audit_logs_old;
   END IF;
