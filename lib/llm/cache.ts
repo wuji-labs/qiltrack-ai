@@ -9,11 +9,11 @@
  * Expected cost savings: 60-80% of LLM API costs
  */
 
-import { createClient } from "@upstash/redis";
+import { Redis } from "@upstash/redis";
 import crypto from "crypto";
 
 // Upstash Redis client
-let redisClient: ReturnType<typeof createClient> | null = null;
+let redisClient: Redis | null = null;
 
 function getRedisClient() {
   if (!redisClient) {
@@ -25,7 +25,7 @@ function getRedisClient() {
       return null;
     }
 
-    redisClient = createClient({
+    redisClient = new Redis({
       url,
       token,
     });

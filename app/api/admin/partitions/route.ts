@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       .eq("id", session.user.id)
       .single();
 
-    if (!profile || !["super_admin", "admin"].includes(profile.role)) {
+    if (!profile || !profile.role || !["super_admin", "admin"].includes(profile.role)) {
       throw new ForbiddenError("Only administrators can view partition information");
     }
 
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
       .eq("id", session.user.id)
       .single();
 
-    if (!profile || !["super_admin", "admin"].includes(profile.role)) {
+    if (!profile || !profile.role || !["super_admin", "admin"].includes(profile.role)) {
       throw new ForbiddenError("Only administrators can create partitions");
     }
 
