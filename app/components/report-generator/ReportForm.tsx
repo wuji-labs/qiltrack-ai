@@ -44,6 +44,13 @@ export function ReportForm({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // 页面加载时自动 focus 输入框，但不触发滚动
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus({ preventScroll: true });
+    }
+  }, []);
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!hasDropdown || visibleResults.length === 0) return;
 
@@ -192,7 +199,6 @@ export function ReportForm({
                   id="report-query-input"
                   ref={inputRef}
                   type="text"
-                  autoFocus
                   value={inputValue}
                   onChange={(event) => handleInputChange(event.target.value)}
                   onKeyDown={handleKeyDown}

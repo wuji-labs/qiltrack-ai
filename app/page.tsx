@@ -169,6 +169,19 @@ export default function Home() {
     acceptSwitch,
   } = useLanguageDetection(language as Language);
 
+  // 修复移动端自动跳转到锚点的问题
+  useEffect(() => {
+    // 禁用浏览器的滚动恢复功能
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+
+    // 只在没有 hash 的情况下滚动到顶部
+    if (!window.location.hash) {
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
   // Fetch remaining credits and user profile on mount and when authenticated
   useEffect(() => {
     const loadUserData = async () => {
@@ -296,6 +309,14 @@ export default function Home() {
     const element = document.querySelector(href);
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      // 如果滚动到 generator，在滚动完成后自动 focus input
+      if (href === "#generator") {
+        setTimeout(() => {
+          const input = document.querySelector<HTMLInputElement>("#report-query-input");
+          input?.focus({ preventScroll: true });
+        }, 500); // 等待平滑滚动完成
+      }
     }
   };
 
