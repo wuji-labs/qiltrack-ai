@@ -37,7 +37,7 @@ export type Database = {
       audit_logs: {
         Row: {
           action: string
-          created_at: string | null
+          created_at: string
           details: Json | null
           id: string
           ip_address: unknown
@@ -48,7 +48,7 @@ export type Database = {
         }
         Insert: {
           action: string
-          created_at?: string | null
+          created_at?: string
           details?: Json | null
           id?: string
           ip_address?: unknown
@@ -59,7 +59,7 @@ export type Database = {
         }
         Update: {
           action?: string
-          created_at?: string | null
+          created_at?: string
           details?: Json | null
           id?: string
           ip_address?: unknown
@@ -70,13 +70,553 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "audit_logs_user_id_fkey"
+            foreignKeyName: "audit_logs_user_id_fkey1"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
+      }
+      audit_logs_2024_11: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs_2024_12: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs_2025_01: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs_2025_02: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs_2025_03: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs_2025_04: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs_2025_05: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs_2025_06: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs_2025_07: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs_2025_08: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs_2025_09: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs_2025_10: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs_2025_11: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs_2025_12: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs_default: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: unknown
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: unknown
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       billing_subscriptions: {
         Row: {
@@ -313,6 +853,113 @@ export type Database = {
         }
         Relationships: []
       }
+      mfa_devices: {
+        Row: {
+          backup_codes_encrypted: string[] | null
+          backup_codes_used: number | null
+          created_at: string | null
+          device_name: string
+          device_type: string | null
+          id: string
+          is_active: boolean | null
+          last_used_at: string | null
+          secret_encrypted: string
+          updated_at: string | null
+          use_count: number | null
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          backup_codes_encrypted?: string[] | null
+          backup_codes_used?: number | null
+          created_at?: string | null
+          device_name: string
+          device_type?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_used_at?: string | null
+          secret_encrypted: string
+          updated_at?: string | null
+          use_count?: number | null
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          backup_codes_encrypted?: string[] | null
+          backup_codes_used?: number | null
+          created_at?: string | null
+          device_name?: string
+          device_type?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_used_at?: string | null
+          secret_encrypted?: string
+          updated_at?: string | null
+          use_count?: number | null
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mfa_devices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mfa_login_attempts: {
+        Row: {
+          created_at: string | null
+          device_id: string | null
+          failure_reason: string | null
+          id: string
+          ip_address: unknown
+          method: string | null
+          success: boolean
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          device_id?: string | null
+          failure_reason?: string | null
+          id?: string
+          ip_address?: unknown
+          method?: string | null
+          success: boolean
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          device_id?: string | null
+          failure_reason?: string | null
+          id?: string
+          ip_address?: unknown
+          method?: string | null
+          success?: boolean
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mfa_login_attempts_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "mfa_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mfa_login_attempts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -411,7 +1058,12 @@ export type Database = {
           id: string
           last_login_at: string | null
           last_report_at: string | null
+          mfa_enabled: boolean | null
+          mfa_enforced: boolean | null
           plan: string | null
+          referral_code: string | null
+          referral_completed_at: string | null
+          referred_by: string | null
           role: string | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
@@ -427,7 +1079,12 @@ export type Database = {
           id: string
           last_login_at?: string | null
           last_report_at?: string | null
+          mfa_enabled?: boolean | null
+          mfa_enforced?: boolean | null
           plan?: string | null
+          referral_code?: string | null
+          referral_completed_at?: string | null
+          referred_by?: string | null
           role?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -443,7 +1100,12 @@ export type Database = {
           id?: string
           last_login_at?: string | null
           last_report_at?: string | null
+          mfa_enabled?: boolean | null
+          mfa_enforced?: boolean | null
           plan?: string | null
+          referral_code?: string | null
+          referral_completed_at?: string | null
+          referred_by?: string | null
           role?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -451,7 +1113,15 @@ export type Database = {
           subscription_status?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       publications: {
         Row: {
@@ -485,6 +1155,107 @@ export type Database = {
           url?: string | null
         }
         Relationships: []
+      }
+      referral_events: {
+        Row: {
+          created_at: string | null
+          credits_rewarded: number | null
+          duration_rewarded: number | null
+          event_type: string
+          id: string
+          metadata: Json | null
+          plan_rewarded: string | null
+          referral_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          credits_rewarded?: number | null
+          duration_rewarded?: number | null
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          plan_rewarded?: string | null
+          referral_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          credits_rewarded?: number | null
+          duration_rewarded?: number | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          plan_rewarded?: string | null
+          referral_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_events_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "referrals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_milestones: {
+        Row: {
+          achieved: boolean | null
+          achieved_at: string | null
+          claimed: boolean | null
+          claimed_at: string | null
+          created_at: string | null
+          id: string
+          milestone_type: string
+          reward_credits: number | null
+          reward_duration: number | null
+          reward_plan: string | null
+          user_id: string
+        }
+        Insert: {
+          achieved?: boolean | null
+          achieved_at?: string | null
+          claimed?: boolean | null
+          claimed_at?: string | null
+          created_at?: string | null
+          id?: string
+          milestone_type: string
+          reward_credits?: number | null
+          reward_duration?: number | null
+          reward_plan?: string | null
+          user_id: string
+        }
+        Update: {
+          achieved?: boolean | null
+          achieved_at?: string | null
+          claimed?: boolean | null
+          claimed_at?: string | null
+          created_at?: string | null
+          id?: string
+          milestone_type?: string
+          reward_credits?: number | null
+          reward_duration?: number | null
+          reward_plan?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_milestones_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       referrals: {
         Row: {
@@ -537,7 +1308,7 @@ export type Database = {
       report_credit_events: {
         Row: {
           balance_after: number | null
-          created_at: string | null
+          created_at: string
           delta: number
           event_type: string
           id: string
@@ -547,7 +1318,7 @@ export type Database = {
         }
         Insert: {
           balance_after?: number | null
-          created_at?: string | null
+          created_at?: string
           delta: number
           event_type: string
           id?: string
@@ -557,7 +1328,7 @@ export type Database = {
         }
         Update: {
           balance_after?: number | null
-          created_at?: string | null
+          created_at?: string
           delta?: number
           event_type?: string
           id?: string
@@ -567,13 +1338,508 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "report_credit_events_user_id_fkey"
+            foreignKeyName: "report_credit_events_user_id_fkey1"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
+      }
+      report_credit_events_2024_11: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event_type: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta: number
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_credit_events_2024_12: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event_type: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta: number
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_credit_events_2025_01: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event_type: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta: number
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_credit_events_2025_02: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event_type: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta: number
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_credit_events_2025_03: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event_type: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta: number
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_credit_events_2025_04: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event_type: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta: number
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_credit_events_2025_05: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event_type: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta: number
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_credit_events_2025_06: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event_type: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta: number
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_credit_events_2025_07: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event_type: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta: number
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_credit_events_2025_08: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event_type: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta: number
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_credit_events_2025_09: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event_type: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta: number
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_credit_events_2025_10: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event_type: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta: number
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_credit_events_2025_11: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event_type: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta: number
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_credit_events_2025_12: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event_type: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta: number
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      report_credit_events_default: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          delta: number
+          event_type: string
+          id: string
+          metadata: Json | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          delta: number
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          delta?: number
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       report_credits: {
         Row: {
@@ -1021,23 +2287,116 @@ export type Database = {
           },
         ]
       }
+      webhook_events: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          event_id: string
+          event_type: string
+          id: string
+          ip_address: unknown
+          payload: Json
+          processed_at: string | null
+          provider: string | null
+          retry_count: number | null
+          status: string | null
+          updated_at: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          event_id: string
+          event_type: string
+          id?: string
+          ip_address?: unknown
+          payload: Json
+          processed_at?: string | null
+          provider?: string | null
+          retry_count?: number | null
+          status?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          event_id?: string
+          event_type?: string
+          id?: string
+          ip_address?: unknown
+          payload?: Json
+          processed_at?: string | null
+          provider?: string | null
+          retry_count?: number | null
+          status?: string | null
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      fn_admin_disable_user_mfa: {
+        Args: { p_admin_id: string; p_reason: string; p_target_user_id: string }
+        Returns: boolean
+      }
+      fn_analyze_vector_search_performance: {
+        Args: { p_limit?: number; p_test_embedding: string }
+        Returns: {
+          execution_time_ms: number
+          results_count: number
+          search_method: string
+        }[]
+      }
       fn_cancel_membership: {
         Args: { p_immediate?: boolean; p_user_id: string }
         Returns: Json
       }
+      fn_check_milestones: { Args: { p_user_id: string }; Returns: undefined }
       fn_claim_daily_reward: {
         Args: { p_user_id: string }
         Returns: {
           message: string
           remaining_credits: number
+          streak_count: number
           success: boolean
         }[]
       }
+      fn_claim_milestone_reward: {
+        Args: { p_milestone_type: string; p_user_id: string }
+        Returns: {
+          credits_rewarded: number
+          duration_rewarded: number
+          message: string
+          plan_rewarded: string
+          success: boolean
+        }[]
+      }
+      fn_claim_referral_signup: {
+        Args: { p_referral_code: string; p_referred_user_id: string }
+        Returns: {
+          credits_given: number
+          message: string
+          referrer_id: string
+          success: boolean
+        }[]
+      }
+      fn_cleanup_old_webhook_events: { Args: never; Returns: number }
       fn_compute_report_hash: {
         Args: { p_language: string; p_symbol: string; p_tone: string }
         Returns: string
@@ -1054,6 +2413,14 @@ export type Database = {
           remaining_credits: number
           success: boolean
         }[]
+      }
+      fn_create_next_partition: {
+        Args: { p_months_ahead?: number; p_table_name: string }
+        Returns: string
+      }
+      fn_drop_old_partitions: {
+        Args: { p_retention_months?: number; p_table_name: string }
+        Returns: string
       }
       fn_find_reusable_report: {
         Args: {
@@ -1072,6 +2439,21 @@ export type Database = {
           user_id: string
         }[]
       }
+      fn_generate_referral_code: {
+        Args: { p_user_id: string }
+        Returns: string
+      }
+      fn_get_hnsw_stats: {
+        Args: never
+        Returns: {
+          avg_query_time_ms: number
+          index_name: string
+          index_size: string
+          table_name: string
+          times_used: number
+          total_rows: number
+        }[]
+      }
       fn_get_popular_symbols: {
         Args: { p_days?: number; p_limit?: number }
         Returns: {
@@ -1086,13 +2468,76 @@ export type Database = {
           provider: string
         }[]
       }
+      fn_grant_conversion_reward: {
+        Args: { p_plan: string; p_user_id: string }
+        Returns: boolean
+      }
       fn_grant_credits: {
         Args: { p_amount: number; p_reason?: string; p_target_user_id: string }
         Returns: Json
       }
       fn_initialize_profile: {
-        Args: { p_display_name?: string; p_email: string; p_user_id: string }
+        Args: {
+          p_display_name?: string
+          p_email: string
+          p_referral_code?: string
+          p_user_id: string
+        }
         Returns: undefined
+      }
+      fn_is_webhook_processed: {
+        Args: { p_event_id: string; p_provider: string }
+        Returns: boolean
+      }
+      fn_list_partitions: {
+        Args: { p_table_name: string }
+        Returns: {
+          partition_end: string
+          partition_name: string
+          partition_size: string
+          partition_start: string
+          row_count: number
+        }[]
+      }
+      fn_mark_webhook_completed: {
+        Args: { p_webhook_id: string }
+        Returns: undefined
+      }
+      fn_mark_webhook_failed: {
+        Args: { p_error_message: string; p_webhook_id: string }
+        Returns: undefined
+      }
+      fn_mark_webhook_processing: {
+        Args: { p_webhook_id: string }
+        Returns: boolean
+      }
+      fn_rebuild_hnsw_index: {
+        Args: { p_ef_construction?: number; p_m?: number }
+        Returns: string
+      }
+      fn_record_mfa_attempt: {
+        Args: {
+          p_device_id: string
+          p_failure_reason?: string
+          p_ip_address?: unknown
+          p_method: string
+          p_success: boolean
+          p_user_agent?: string
+          p_user_id: string
+        }
+        Returns: string
+      }
+      fn_record_webhook_event: {
+        Args: {
+          p_event_id: string
+          p_event_type: string
+          p_ip_address?: unknown
+          p_payload: Json
+          p_provider: string
+          p_user_agent?: string
+          p_user_id?: string
+        }
+        Returns: string
       }
       fn_upgrade_membership: {
         Args: {
@@ -1103,7 +2548,9 @@ export type Database = {
         }
         Returns: Json
       }
+      fn_user_has_active_mfa: { Args: { p_user_id: string }; Returns: boolean }
       fn_user_has_password: { Args: never; Returns: boolean }
+      get_active_users_count: { Args: { days?: number }; Returns: number }
       is_admin: { Args: { check_user_id?: string }; Returns: boolean }
       match_reports_embeddings: {
         Args: {
