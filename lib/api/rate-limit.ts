@@ -42,7 +42,9 @@ class InMemoryRateLimiter {
     // LRU eviction: if too many keys, remove oldest entries
     if (this.requests.size > this.maxKeys) {
       const firstKey = this.requests.keys().next().value;
-      this.requests.delete(firstKey);
+      if (firstKey !== undefined) {
+        this.requests.delete(firstKey);
+      }
     }
 
     return {

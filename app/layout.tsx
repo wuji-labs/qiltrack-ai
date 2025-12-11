@@ -17,6 +17,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500;700&family=Anton&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
         className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)] antialiased font-sans"
         style={{

@@ -450,12 +450,22 @@ export function useSupabaseAuth() {
       }
 
       try {
+        // 读取邀请码 Cookie
+        const referralCode = document.cookie
+          .split('; ')
+          .find(row => row.startsWith('referral_code='))
+          ?.split('=')[1];
+
         const { error } = await supabase.auth.signUp({
           email: trimmedEmail,
           password,
           options: {
             emailRedirectTo: `${getAuthRedirectBase()}${AUTH_CALLBACK_PATH}`,
             ...(captchaToken ? { captchaToken } : {}),
+            // 传递邀请码到 metadata
+            data: {
+              ...(referralCode ? { referral_code: referralCode } : {}),
+            },
           },
         });
 
