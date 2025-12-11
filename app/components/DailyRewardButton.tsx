@@ -4,6 +4,7 @@ import { useState, useEffect, memo } from "react";
 import { useRouter } from "next/navigation";
 import { claimDailyReward, fetchDailyRewardStatus } from "@/lib/services/api";
 import { useLanguage } from "@/lib/i18n";
+import confetti from "canvas-confetti";
 
 interface DailyRewardButtonProps {
   onRewardClaimed?: (credits: number) => void;
@@ -111,6 +112,14 @@ function DailyRewardButtonComponent({ onRewardClaimed, className = "", isLoggedI
       if (result.success) {
         setClaimed(true);
         setStreak(result.streakCount || 0);
+
+        // 🎊 触发彩带庆祝效果
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#F49D6E', '#FFD275', '#000000']
+        });
 
         // Show success message
         const successMsg = t("dailyReward.claimSuccess" as any, {
