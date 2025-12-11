@@ -4,6 +4,9 @@
 /* Tailwind v4 CSS-first 导入 */
 @import "tailwindcss";
 
+/* Design Token 系统 */
+@import "./styles/design-tokens.css";
+
 /* 基础样式和 Design Tokens */
 @import "./styles/base.css";
 
