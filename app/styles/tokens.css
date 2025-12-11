@@ -1,0 +1,156 @@
+/**
+ * Design Tokens - Modern Minimal Style
+ * 现代极简风格设计变量系统
+ *
+ * @version 1.0.0
+ * @updated 2025-12-10
+ */
+
+:root {
+  /* ====== 背景层级 (Background Layers) ====== */
+  --bg-base: #ffffff;              /* 主背景 - 纯白 */
+  --bg-subtle: #fafafa;            /* 次级背景 - 极浅灰 */
+  --bg-layer: #f5f5f5;             /* 浮层背景 */
+  --bg-hover: #f0f0f0;             /* 悬停背景 */
+
+  /* ====== 文本颜色 (Text Colors) ====== */
+  --text-primary: #0a0a0a;         /* 主文本 - 近黑 */
+  --text-secondary: #525252;       /* 次要文本 */
+  --text-tertiary: #a3a3a3;        /* 三级文本 */
+  --text-placeholder: #d4d4d4;     /* 占位文本 */
+
+  /* ====== 主色系 (Accent Colors) ====== */
+  --accent-primary: #0070f3;       /* 主强调色 - Vercel 蓝 */
+  --accent-primary-hover: #0761d1; /* 悬停态 */
+  --accent-primary-light: #eef5ff; /* 浅色背景 */
+
+  /* ====== 语义色 (Semantic Colors) ====== */
+  --semantic-success: #10b981;     /* 成功 - 翠绿 */
+  --semantic-warning: #f59e0b;     /* 警告 - 琥珀 */
+  --semantic-error: #ef4444;       /* 错误 - 红色 */
+  --semantic-info: #3b82f6;        /* 信息 - 蓝色 */
+
+  /* ====== 边框与分割线 (Borders) ====== */
+  --border-subtle: #e5e5e5;        /* 轻微边框 */
+  --border-default: #d4d4d4;       /* 默认边框 */
+  --border-strong: #a3a3a3;        /* 强调边框 */
+
+  /* ====== 阴影系统 (Shadows) ====== */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+
+  /* ====== 圆角系统 (Border Radius) ====== */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ====== 间距系统 (Spacing) - 8px 基准 ====== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* ====== 导航偏移 (Navigation Offset) ====== */
+  --nav-offset: 80px;              /* 减少导航栏高度 */
+
+  /* ====== 过渡动画 (Transitions) ====== */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+  --transition-cubic: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ====== 向后兼容映射 (Backward Compatibility) ====== */
+  /**
+   * @deprecated 这些变量将在 Phase 4-7 中被逐步移除
+   * 请使用上方对应的新变量名
+   */
+  --accent-blue: var(--accent-primary);
+  --accent-emerald: var(--semantic-success);
+  --accent-emerald-dim: rgba(16, 185, 129, 0.6);
+  --bg-frosted: var(--bg-layer);
+  --bg-surface: var(--bg-subtle);
+  --color-foreground: var(--text-primary);
+  --color-subtle: var(--text-secondary);
+  --stroke-glow: var(--border-default);
+  --stroke-soft: var(--border-subtle);
+}
+
+/* ====== 深色模式 (Dark Mode) - 可选 ====== */
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="dark"] {
+    /* 背景层级 */
+    --bg-base: #0a0a0a;            /* 主背景 - 近黑 */
+    --bg-subtle: #171717;          /* 次级背景 */
+    --bg-layer: #262626;           /* 浮层背景 */
+    --bg-hover: #404040;           /* 悬停背景 */
+
+    /* 文本颜色 */
+    --text-primary: #fafafa;       /* 主文本 */
+    --text-secondary: #a3a3a3;     /* 次要文本 */
+    --text-tertiary: #737373;      /* 三级文本 */
+    --text-placeholder: #525252;   /* 占位文本 */
+
+    /* 主色系 - 稍微提亮 */
+    --accent-primary: #3b99fc;
+    --accent-primary-hover: #60a5fa;
+    --accent-primary-light: #1e3a5f;
+
+    /* 边框 - 深色模式下更微妙 */
+    --border-subtle: #262626;
+    --border-default: #404040;
+    --border-strong: #525252;
+
+    /* 阴影 - 深色下更重 */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* ====== Tailwind v4 Theme Integration ====== */
+@theme inline {
+  /* 背景色 */
+  --color-bg-base: var(--bg-base);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-bg-layer: var(--bg-layer);
+  --color-bg-hover: var(--bg-hover);
+
+  /* 文本色 */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-placeholder: var(--text-placeholder);
+
+  /* 主色系 */
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-primary-hover: var(--accent-primary-hover);
+  --color-accent-primary-light: var(--accent-primary-light);
+
+  /* 语义色 */
+  --color-semantic-success: var(--semantic-success);
+  --color-semantic-warning: var(--semantic-warning);
+  --color-semantic-error: var(--semantic-error);
+  --color-semantic-info: var(--semantic-info);
+
+  /* 字体 */
+  --font-sans:
+    var(--font-geist-sans), "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-mono:
+    var(--font-geist-mono), "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+}

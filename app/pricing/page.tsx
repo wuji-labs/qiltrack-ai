@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useTranslatedPlans, BillingToggle, type PlanKey, type BillingCycle, type Plan } from "@/app/components/PricingCards";
 import { useLanguage } from "@/lib/i18n";
+import { handleClientError } from "@/lib/client/error-handler";
 
 // Feature comparison data - using translation keys
 const getComparisonFeatures = (t: (key: string, vars?: Record<string, string>) => string) => [
@@ -92,8 +93,12 @@ export default function PricingPage() {
 
       window.location.href = data.url;
     } catch (error) {
-      console.error("[Pricing] checkout error", error);
-      alert("创建订阅失败，请稍后重试。");
+      handleClientError(error, {
+        message: "创建订阅失败，请稍后重试",
+        description: "如问题持续，请联系客服",
+        severity: "error",
+        log: true,
+      });
     } finally {
       setLoadingPlan(null);
     }

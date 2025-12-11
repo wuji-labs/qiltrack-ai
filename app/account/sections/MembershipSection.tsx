@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useMembershipTier } from "@/hooks/useMembershipTier";
 import { useLanguage } from "@/lib/i18n";
+import { SkeletonMembership } from "@/app/components/SkeletonLoader";
 
 export default function MembershipSection() {
   const { user, isAuthenticated } = useSupabaseAuth();
@@ -99,6 +100,19 @@ export default function MembershipSection() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold">{t("account.membership.title")}</h2>
+          <p className="mt-1 text-sm text-subtle">{t("account.membership.description")}</p>
+        </div>
+        <SkeletonMembership />
+        <SkeletonMembership />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -171,7 +185,7 @@ export default function MembershipSection() {
           <div className="rounded-lg border border-[var(--stroke-soft)] bg-[var(--bg-base)] p-4">
             <p className="text-sm text-subtle">{t("account.membership.availableCredits")}</p>
             <p className="mt-2 text-3xl font-bold text-[var(--accent-emerald)]">
-              {loading ? "..." : reportCredits?.credits_available ?? 0}
+              {reportCredits?.credits_available ?? 0}
             </p>
           </div>
           <div className="rounded-lg border border-[var(--stroke-soft)] bg-[var(--bg-base)] p-4">
