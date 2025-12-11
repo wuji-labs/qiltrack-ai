@@ -81,6 +81,7 @@ export async function GET(request: NextRequest) {
 
       // Generated reports
       supabaseAdmin
+        // @ts-ignore - reports table not in generated types yet
         .from("reports")
         .select("id, symbol, title, language, tone, report_run_id, created_at, updated_at")
         .eq("user_id", userId)

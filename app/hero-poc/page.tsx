@@ -38,7 +38,7 @@ export default function HeroPOCPage() {
       </div>
 
       {/* New Hero Design */}
-      <HeroNew onPrimaryCta={handleCta} t={t} />
+      <HeroNew onPrimaryCta={handleCta} isAuthenticated={false} t={t} />
 
       {/* Design Notes */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

@@ -129,6 +129,7 @@ export default function NewHomePage() {
         setLanguage={setLanguage}
         userEmail={null}
         userName={null}
+        userImage={null}
         planLabel="Free Plan"
         isAuthenticated={false}
         onSignOut={() => {}}
@@ -139,7 +140,7 @@ export default function NewHomePage() {
       {/* Main Content */}
       <main>
         {/* Hero */}
-        <HeroNew onPrimaryCta={handlePrimaryCta} t={t} />
+        <HeroNew onPrimaryCta={handlePrimaryCta} isAuthenticated={false} t={t} />
 
         {/* Features */}
         <FeaturesNew t={t} />

@@ -35,12 +35,14 @@ export async function GET(request: NextRequest) {
     // 2. Get profile MFA status
     const { data: profile } = await supabaseAdmin
       .from("profiles")
+      // @ts-ignore - mfa_enabled and mfa_enforced not in generated types yet
       .select("mfa_enabled, mfa_enforced")
       .eq("id", userId)
       .single();
 
     // 3. Get MFA devices
     const { data: devices } = await supabaseAdmin
+      // @ts-ignore - mfa_devices not in generated types yet
       .from("mfa_devices")
       .select("id, device_name, device_type, is_active, verified_at, last_used_at, use_count, created_at")
       .eq("user_id", userId)
@@ -49,8 +51,8 @@ export async function GET(request: NextRequest) {
     // 4. Return status
     const response = NextResponse.json(
       {
-        mfaEnabled: profile?.mfa_enabled || false,
-        mfaEnforced: profile?.mfa_enforced || false,
+        mfaEnabled: (profile as any)?.mfa_enabled || false,
+        mfaEnforced: (profile as any)?.mfa_enforced || false,
         devices: devices || [],
         deviceCount: devices?.length || 0,
       },

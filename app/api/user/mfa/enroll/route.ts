@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
     // 3. Check if user already has 5+ devices (rate limit)
     const supabaseAdmin = createServiceRoleClient();
     const { count } = await supabaseAdmin
+      // @ts-ignore - mfa_devices not in generated types yet
       .from("mfa_devices")
       .select("*", { count: "exact", head: true })
       .eq("user_id", userId)
@@ -89,6 +90,7 @@ export async function POST(request: NextRequest) {
 
     // 7. Insert MFA device (unverified)
     const { data: device, error: insertError } = await supabaseAdmin
+      // @ts-ignore - mfa_devices not in generated types yet
       .from("mfa_devices")
       .insert({
         user_id: userId,

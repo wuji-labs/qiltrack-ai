@@ -56,6 +56,7 @@ export async function POST(req: Request) {
     const eventId = event.id; // Stripe event ID (e.g., evt_xxx)
 
     // Check if this event was already processed
+    // @ts-ignore - fn_is_webhook_processed not in generated types yet
     const { data: isProcessed } = await supabase.rpc("fn_is_webhook_processed", {
       p_provider: "stripe",
       p_event_id: eventId,
@@ -67,6 +68,7 @@ export async function POST(req: Request) {
     }
 
     // Record webhook event (idempotent insert)
+    // @ts-ignore - fn_record_webhook_event not in generated types yet
     const { data: webhookId } = await supabase.rpc("fn_record_webhook_event", {
       p_provider: "stripe",
       p_event_id: eventId,
@@ -82,6 +84,7 @@ export async function POST(req: Request) {
     }
 
     // Mark as processing
+    // @ts-ignore - fn_mark_webhook_processing not in generated types yet
     await supabase.rpc("fn_mark_webhook_processing", {
       p_webhook_id: webhookId,
     });
@@ -237,6 +240,7 @@ export async function POST(req: Request) {
     }
 
     // Mark webhook as completed
+    // @ts-ignore - fn_mark_webhook_completed not in generated types yet
     await supabase.rpc("fn_mark_webhook_completed", {
       p_webhook_id: webhookId,
     });
@@ -249,6 +253,7 @@ export async function POST(req: Request) {
     const eventId = event?.id;
     if (eventId) {
       const { data: webhook } = await supabase
+        // @ts-ignore - webhook_events not in generated types yet
         .from("webhook_events")
         .select("id")
         .eq("event_id", eventId)
@@ -256,6 +261,7 @@ export async function POST(req: Request) {
         .maybeSingle();
 
       if (webhook?.id) {
+        // @ts-ignore - fn_mark_webhook_failed not in generated types yet
         await supabase.rpc("fn_mark_webhook_failed", {
           p_webhook_id: webhook.id,
           p_error_message: error instanceof Error ? error.message : "Unknown error",

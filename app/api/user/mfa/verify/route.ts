@@ -71,6 +71,7 @@ export async function POST(request: NextRequest) {
     // 3. Get device from database
     const supabaseAdmin = createServiceRoleClient();
     const { data: device, error: deviceError } = await supabaseAdmin
+      // @ts-ignore - mfa_devices not in generated types yet
       .from("mfa_devices")
       .select("*")
       .eq("id", deviceId)
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
 
     let secret: string;
     try {
-      secret = decrypt(device.secret_encrypted, encryptionKey);
+      secret = decrypt((device as any).secret_encrypted, encryptionKey);
     } catch (error) {
       console.error("[MFA_DECRYPT_ERROR]", error);
       return NextResponse.json(
@@ -106,6 +107,7 @@ export async function POST(request: NextRequest) {
 
     if (!isValid) {
       // Record failed attempt
+      // @ts-ignore - fn_record_mfa_attempt not in generated types yet
       await supabaseAdmin.rpc("fn_record_mfa_attempt", {
         p_user_id: userId,
         p_device_id: deviceId,
@@ -127,6 +129,7 @@ export async function POST(request: NextRequest) {
 
     // 6. Activate device and enable MFA
     const { error: updateError } = await supabaseAdmin
+      // @ts-ignore - mfa_devices not in generated types yet
       .from("mfa_devices")
       .update({
         is_active: true,
@@ -156,6 +159,7 @@ export async function POST(request: NextRequest) {
       .eq("id", userId);
 
     // 8. Record successful attempt
+    // @ts-ignore - fn_record_mfa_attempt not in generated types yet
     await supabaseAdmin.rpc("fn_record_mfa_attempt", {
       p_user_id: userId,
       p_device_id: deviceId,
@@ -170,7 +174,7 @@ export async function POST(request: NextRequest) {
       resource_type: "mfa_devices",
       resource_id: deviceId,
       details: {
-        device_name: device.device_name,
+        device_name: (device as any).device_name,
       },
     });
 

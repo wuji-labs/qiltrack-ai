@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       .eq("id", session.user.id)
       .single();
 
-    if (!profile || !["super_admin", "admin"].includes(profile.role)) {
+    if (!profile || !profile.role || !["super_admin", "admin"].includes(profile.role)) {
       throw new ForbiddenError("Only administrators can view partition information");
     }
 
@@ -45,6 +45,7 @@ export async function GET(request: NextRequest) {
     const tableName = searchParams.get("table") || "audit_logs";
 
     // 4. Call partition listing function
+    // @ts-ignore - fn_list_partitions not in generated types yet
     const { data, error } = await supabase.rpc("fn_list_partitions", {
       p_table_name: tableName,
     });
@@ -96,7 +97,7 @@ export async function POST(request: NextRequest) {
       .eq("id", session.user.id)
       .single();
 
-    if (!profile || !["super_admin", "admin"].includes(profile.role)) {
+    if (!profile || !profile.role || !["super_admin", "admin"].includes(profile.role)) {
       throw new ForbiddenError("Only administrators can create partitions");
     }
 
@@ -109,6 +110,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Call partition creation function
+    // @ts-ignore - fn_create_next_partition not in generated types yet
     const { data, error } = await supabase.rpc("fn_create_next_partition", {
       p_table_name: table,
       p_months_ahead: monthsAhead,
@@ -175,6 +177,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // 4. Call partition drop function
+    // @ts-ignore - fn_drop_old_partitions not in generated types yet
     const { data, error } = await supabase.rpc("fn_drop_old_partitions", {
       p_table_name: table,
       p_retention_months: retentionMonths,

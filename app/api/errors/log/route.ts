@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
 
     // 6. Store in database
     const { error: dbError } = await supabase
+      // @ts-ignore - client_error_logs not in generated types yet
       .from("client_error_logs")
       .insert(errorLog);
 
