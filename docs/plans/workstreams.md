@@ -8,17 +8,22 @@
 
 ## 🚧 进行中
 
-| ID            | Group | Branch      | Scope                  | Progress | Owner     | Due        | Notes                                               |
-| ------------- | ----- | ----------- | ---------------------- | -------- | --------- | ---------- | --------------------------------------------------- |
-| WS-2025-12-10 | G1    | g1/develop  | 邀请奖励系统 Bug 修复  | 5%       | G1-Claude | 2025-12-11 | P0 紧急，Cookie 传递 + Stripe webhook 奖励缺失问题 |
+| ID            | Group | Branch     | Scope                 | Progress | Owner     | Due        | Notes                                              |
+| ------------- | ----- | ---------- | --------------------- | -------- | --------- | ---------- | -------------------------------------------------- |
+| WS-2025-12-10 | G1    | g1/develop | 邀请奖励系统 Bug 修复 | 5%       | G1-Claude | 2025-12-11 | P0 紧急，Cookie 传递 + Stripe webhook 奖励缺失问题 |
 
 ---
 
 ## ✅ 已完成
 
-| ID                 | Group | Completed  | PR                                                      | Summary                      | Notes                  |
-| ------------------ | ----- | ---------- | ------------------------------------------------------- | ---------------------------- | ---------------------- |
-| （示例）WS-EXAMPLE | G0    | 2025-11-26 | [#36](https://github.com/explore0012/ai-report/pull/36) | 修复 PowerShell Git 参数冲突 | 稳定 worktree 创建流程 |
+| ID                 | Group | Completed  | PR                                                         | Summary                            | Notes                          |
+| ------------------ | ----- | ---------- | ---------------------------------------------------------- | ---------------------------------- | ------------------------------ |
+| WS-AUTH-01         | G2    | 2025-12-10 | [#186](https://github.com/explore0012/qiltrack-ai/pull/186), [#187](https://github.com/explore0012/qiltrack-ai/pull/187) | 登录系统 Bug 修复（seed.sql）      | 修复 bcrypt hash 长度          |
+| WS-AUTH-02         | G2    | 2025-12-10 | [#186](https://github.com/explore0012/qiltrack-ai/pull/186), [#187](https://github.com/explore0012/qiltrack-ai/pull/187) | Redirect URL 配置修复              | OAuth/Magic Link 回调配置优化  |
+| WS-AUTH-03         | G2    | 2025-12-10 | [#186](https://github.com/explore0012/qiltrack-ai/pull/186), [#187](https://github.com/explore0012/qiltrack-ai/pull/187) | 密码恢复 noscript fallback         | XSS 防护 + 无 JS 环境支持      |
+| WS-AUTH-04         | G2    | 2025-12-10 | [#186](https://github.com/explore0012/qiltrack-ai/pull/186), [#187](https://github.com/explore0012/qiltrack-ai/pull/187) | 错误处理重构 + 密码校验统一        | 官方错误码 + 12字符密码        |
+| WS-AUTH-05         | G2    | 2025-12-10 | [#186](https://github.com/explore0012/qiltrack-ai/pull/186), [#187](https://github.com/explore0012/qiltrack-ai/pull/187) | Cookie 监控 + OAuth 提示 + RPC防御 | 版本兼容性监控 + 开发者体验优化 |
+| （示例）WS-EXAMPLE | G0    | 2025-11-26 | [#36](https://github.com/explore0012/ai-report/pull/36)    | 修复 PowerShell Git 参数冲突       | 稳定 worktree 创建流程         |
 
 ---
 
@@ -64,16 +69,17 @@
 
 ## 📊 统计信息
 
-**本周概况**（2025-12-08 ~ 2025-12-14）：
+**本周概况**（2025-12-09 ~ 2025-12-15）：
 
-- 进行中：1 个任务
-- 已完成：1 个任务
-- 平均完成时间：1.5 天 / 任务
+- 进行中：1 个任务 (G1 邀请奖励系统 Bug)
+- 已完成：6 个任务 (G2 认证系统改进 Stage 1-5)
+- 平均完成时间：1 天 / 任务
 
 **各组工作量**：
 
 - G1：1 个任务（进行中，P0 紧急）
-- G2-G5：空闲
+- G2：已完成 5 个认证系统改进任务
+- G3-G5：空闲，等待任务分配
 
 ---
 

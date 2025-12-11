@@ -8,6 +8,20 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 
 /**
+ * Known @supabase/ssr version that getAllCookies() logic is based on
+ * MANUAL CHECK REQUIRED: When upgrading @supabase/ssr, verify cookie names haven't changed
+ * Check: https://github.com/supabase/ssr/releases
+ * Current package.json: "@supabase/ssr": "^0.7.0"
+ */
+const KNOWN_SUPABASE_SSR_VERSION = '0.7.0';
+const COMMON_COOKIE_NAMES = [
+  'sb-auth-token',
+  'sb-session',
+  'sb_auth_token',
+  'sb_session',
+];
+
+/**
  * Create a Supabase server client with user session (RLS-enabled)
  * Use this in API route handlers to respect row-level security
  * Handles cookies transparently via @supabase/ssr
@@ -47,6 +61,17 @@ export function createServerClient(
   const getAllCookies = () => {
     if (cookieStore) {
       const allCookies = cookieStore.getAll().map(({ name, value }) => ({ name, value }));
+
+      // Cookie monitoring: warn on anomalous cookie count
+      const supabaseCookies = allCookies.filter(c => c.name.startsWith('sb-') || c.name.startsWith('sb_'));
+      if (supabaseCookies.length > 10) {
+        console.warn(
+          `[Supabase] Anomalous cookie count detected: ${supabaseCookies.length} cookies starting with 'sb-' or 'sb_'. ` +
+          `This may indicate a cookie leak or @supabase/ssr version change (current known version: ${KNOWN_SUPABASE_SSR_VERSION}). ` +
+          `Check: https://github.com/supabase/ssr/releases`
+        );
+      }
+
       console.log(
         "[DEBUG createServerClient] getAllCookies returned:",
         allCookies.length,
@@ -55,14 +80,15 @@ export function createServerClient(
       return allCookies;
     }
 
-    const commonNames = ["sb-auth-token", "sb-session", "sb_auth_token", "sb_session"];
+    // Fallback: manually query known cookie names
     const cookieList: Array<{ name: string; value: string }> = [];
-    for (const name of commonNames) {
+    for (const name of COMMON_COOKIE_NAMES) {
       const cookie = cookieGetter?.(name);
       if (cookie?.value) {
         cookieList.push({ name, value: cookie.value });
       }
     }
+
     console.log(
       "[DEBUG createServerClient] getAllCookies (fallback) returned:",
       cookieList.length,

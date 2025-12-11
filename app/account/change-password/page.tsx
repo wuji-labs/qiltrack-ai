@@ -48,8 +48,8 @@ function ChangePasswordContent() {
         return;
       }
 
-      if (newPassword.length < 8) {
-        setError(t("password.error.tooShort") || "New password must be at least 8 characters");
+      if (newPassword.length < 12) {
+        setError(t("password.error.tooShort") || "New password must be at least 12 characters");
         return;
       }
 
@@ -101,8 +101,8 @@ function ChangePasswordContent() {
       return;
     }
 
-    if (newPassword.length < 8) {
-      setError(t("password.error.tooShort") || "New password must be at least 8 characters");
+    if (newPassword.length < 12) {
+      setError(t("password.error.tooShort") || "New password must be at least 12 characters");
       return;
     }
 
@@ -263,7 +263,7 @@ function ChangePasswordContent() {
                   autoComplete="new-password"
                 />
                 <p className="text-xs text-slate-500">
-                  {t("password.hint") || "At least 8 characters"}
+                  {t("password.hint") || "At least 12 characters"}
                 </p>
               </div>
 

@@ -90,9 +90,12 @@ export async function GET(request: NextRequest) {
       throw new ValidationError("Missing required parameter: symbol");
     }
 
-    // Validate symbol length to prevent abuse
-    if (symbol.length > 10) {
-      throw new ValidationError("Invalid symbol: too long (max 10 characters)");
+    // Validate symbol format: alphanumeric only, 1-10 characters
+    // Prevents injection attacks and ensures valid stock symbols
+    if (!/^[A-Z0-9]{1,10}$/.test(symbol)) {
+      throw new ValidationError(
+        "Invalid symbol format: must be 1-10 alphanumeric characters (A-Z, 0-9)"
+      );
     }
 
     const sanitizer = new ContentSanitizer();

@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useReducer, useRef } from "react";
 import * as docx from "docx";
 import { saveAs } from "file-saver";
 
@@ -35,6 +35,128 @@ const getPlaceholderVariant = (width: number): PlaceholderVariant => {
   return "xs";
 };
 
+// State type definition
+type GeneratorState = {
+  inputValue: string;
+  searchResults: SearchResult[];
+  searching: boolean;
+  selectedSymbol: string | null;
+  dropdownClosed: boolean;
+  loading: boolean;
+  errorState: ErrorState | null;
+  reportData: ReportResponse | null;
+  exportingDocx: boolean;
+  exportingPdf: boolean;
+  lastReportTone: string;
+  placeholderVariant: PlaceholderVariant;
+  showReuseDialog: boolean;
+  reuseRunId: string | null;
+  pendingSymbol: string | null;
+};
+
+// Action types
+type GeneratorAction =
+  | { type: "SET_INPUT_VALUE"; payload: string }
+  | { type: "SET_SEARCH_RESULTS"; payload: SearchResult[] }
+  | { type: "SET_SEARCHING"; payload: boolean }
+  | { type: "SET_SELECTED_SYMBOL"; payload: string | null }
+  | { type: "SET_DROPDOWN_CLOSED"; payload: boolean }
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_ERROR_STATE"; payload: ErrorState | null }
+  | { type: "SET_REPORT_DATA"; payload: ReportResponse | null }
+  | { type: "SET_EXPORTING_DOCX"; payload: boolean }
+  | { type: "SET_EXPORTING_PDF"; payload: boolean }
+  | { type: "SET_LAST_REPORT_TONE"; payload: string }
+  | { type: "SET_PLACEHOLDER_VARIANT"; payload: PlaceholderVariant }
+  | { type: "SET_SHOW_REUSE_DIALOG"; payload: boolean }
+  | { type: "SET_REUSE_RUN_ID"; payload: string | null }
+  | { type: "SET_PENDING_SYMBOL"; payload: string | null }
+  | { type: "SELECT_RESULT"; payload: { symbol: string } }
+  | { type: "CLEAR_SEARCH" }
+  | { type: "START_GENERATION"; payload: { tone: string } }
+  | { type: "GENERATION_SUCCESS"; payload: ReportResponse }
+  | { type: "GENERATION_ERROR"; payload: ErrorState }
+  | { type: "RESET_GENERATION" };
+
+// Reducer function
+function generatorReducer(state: GeneratorState, action: GeneratorAction): GeneratorState {
+  switch (action.type) {
+    case "SET_INPUT_VALUE":
+      return { ...state, inputValue: action.payload };
+    case "SET_SEARCH_RESULTS":
+      return { ...state, searchResults: action.payload };
+    case "SET_SEARCHING":
+      return { ...state, searching: action.payload };
+    case "SET_SELECTED_SYMBOL":
+      return { ...state, selectedSymbol: action.payload };
+    case "SET_DROPDOWN_CLOSED":
+      return { ...state, dropdownClosed: action.payload };
+    case "SET_LOADING":
+      return { ...state, loading: action.payload };
+    case "SET_ERROR_STATE":
+      return { ...state, errorState: action.payload };
+    case "SET_REPORT_DATA":
+      return { ...state, reportData: action.payload };
+    case "SET_EXPORTING_DOCX":
+      return { ...state, exportingDocx: action.payload };
+    case "SET_EXPORTING_PDF":
+      return { ...state, exportingPdf: action.payload };
+    case "SET_LAST_REPORT_TONE":
+      return { ...state, lastReportTone: action.payload };
+    case "SET_PLACEHOLDER_VARIANT":
+      return { ...state, placeholderVariant: action.payload };
+    case "SET_SHOW_REUSE_DIALOG":
+      return { ...state, showReuseDialog: action.payload };
+    case "SET_REUSE_RUN_ID":
+      return { ...state, reuseRunId: action.payload };
+    case "SET_PENDING_SYMBOL":
+      return { ...state, pendingSymbol: action.payload };
+    case "SELECT_RESULT":
+      return {
+        ...state,
+        inputValue: action.payload.symbol,
+        selectedSymbol: action.payload.symbol,
+        searchResults: [],
+        dropdownClosed: true,
+        errorState: null,
+      };
+    case "CLEAR_SEARCH":
+      return {
+        ...state,
+        searchResults: [],
+        errorState: null,
+      };
+    case "START_GENERATION":
+      return {
+        ...state,
+        lastReportTone: action.payload.tone,
+        loading: true,
+        errorState: null,
+        reportData: null,
+      };
+    case "GENERATION_SUCCESS":
+      return {
+        ...state,
+        reportData: action.payload,
+        loading: false,
+      };
+    case "GENERATION_ERROR":
+      return {
+        ...state,
+        errorState: action.payload,
+        loading: false,
+      };
+    case "RESET_GENERATION":
+      return {
+        ...state,
+        loading: false,
+        errorState: null,
+      };
+    default:
+      return state;
+  }
+}
+
 export function ReportGeneratorSection({
   selectedTone,
   toneOptions,
@@ -47,23 +169,26 @@ export function ReportGeneratorSection({
   onRequireLogin,
   t,
 }: ReportGeneratorProps) {
-  // State management
-  const [inputValue, setInputValue] = useState("");
-  const [searchResults, setSearchResults] = useState<SearchResult[]>(initialSearchResults ?? []);
-  const [searching, setSearching] = useState(false);
-  const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
+  // State management with useReducer
+  const [state, dispatch] = useReducer(generatorReducer, {
+    inputValue: "",
+    searchResults: initialSearchResults ?? [],
+    searching: false,
+    selectedSymbol: null,
+    dropdownClosed: false,
+    loading: false,
+    errorState: null,
+    reportData: null,
+    exportingDocx: false,
+    exportingPdf: false,
+    lastReportTone: "baseline",
+    placeholderVariant: "xs",
+    showReuseDialog: false,
+    reuseRunId: null,
+    pendingSymbol: null,
+  });
+
   const suppressNextSearchRef = useRef(false);
-  const [dropdownClosed, setDropdownClosed] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [errorState, setErrorState] = useState<ErrorState | null>(null);
-  const [reportData, setReportData] = useState<ReportResponse | null>(null);
-  const [exportingDocx, setExportingDocx] = useState(false);
-  const [exportingPdf, setExportingPdf] = useState(false);
-  const [lastReportTone, setLastReportTone] = useState<typeof selectedTone>("baseline");
-  const [placeholderVariant, setPlaceholderVariant] = useState<PlaceholderVariant>("xs");
-  const [showReuseDialog, setShowReuseDialog] = useState(false);
-  const [reuseRunId, setReuseRunId] = useState<string | null>(null);
-  const [pendingSymbol, setPendingSymbol] = useState<string | null>(null);
 
   // Test bypass should only work in development and requires explicit token in URL
   const testToken = process.env.NEXT_PUBLIC_TEST_REPORT_TOKEN;
@@ -78,7 +203,7 @@ export function ReportGeneratorSection({
 
   const selectedToneInfo =
     toneOptions.find((option) => option.id === selectedTone) || toneOptions[0];
-  const lastToneInfo = toneOptions.find((option) => option.id === lastReportTone) || toneOptions[0];
+  const lastToneInfo = toneOptions.find((option) => option.id === state.lastReportTone) || toneOptions[0];
   const selectedToneTitle = selectedToneInfo.title;
 
   const highlightCards = useMemo(
@@ -93,8 +218,8 @@ export function ReportGeneratorSection({
   );
 
   const placeholderText = useMemo(
-    () => t(placeholderKeyByVariant[placeholderVariant]),
-    [placeholderVariant, t]
+    () => t(placeholderKeyByVariant[state.placeholderVariant]),
+    [state.placeholderVariant, t]
   );
 
   // Search effect
@@ -104,34 +229,34 @@ export function ReportGeneratorSection({
       return;
     }
 
-    const q = inputValue.trim();
-    setSelectedSymbol(null);
+    const q = state.inputValue.trim();
+    dispatch({ type: "SET_SELECTED_SYMBOL", payload: null });
     if (!q || q.length < 2) {
-      setSearchResults([]);
-      setSearching(false);
+      dispatch({ type: "SET_SEARCH_RESULTS", payload: [] });
+      dispatch({ type: "SET_SEARCHING", payload: false });
       return;
     }
 
     let canceled = false;
     const timer = setTimeout(async () => {
-      setSearching(true);
+      dispatch({ type: "SET_SEARCHING", payload: true });
       try {
         const results = await searchSymbols(q);
-        if (!canceled) setSearchResults(results);
+        if (!canceled) dispatch({ type: "SET_SEARCH_RESULTS", payload: results });
       } catch (err) {
         console.error("search exception:", err);
-        if (!canceled) setSearchResults([]);
+        if (!canceled) dispatch({ type: "SET_SEARCH_RESULTS", payload: [] });
       } finally {
-        if (!canceled) setSearching(false);
+        if (!canceled) dispatch({ type: "SET_SEARCHING", payload: false });
       }
     }, 400);
 
     return () => {
       canceled = true;
       clearTimeout(timer);
-      setSearching(false);
+      dispatch({ type: "SET_SEARCHING", payload: false });
     };
-  }, [inputValue]);
+  }, [state.inputValue]);
 
   // Hash focus effect
   useEffect(() => {
@@ -158,7 +283,7 @@ export function ReportGeneratorSection({
 
     const updatePlaceholder = () => {
       const next = getPlaceholderVariant(window.innerWidth);
-      setPlaceholderVariant((current) => (current === next ? current : next));
+      dispatch({ type: "SET_PLACEHOLDER_VARIANT", payload: next });
     };
 
     updatePlaceholder();
@@ -168,45 +293,40 @@ export function ReportGeneratorSection({
 
   // Handlers
   const handleInputChange = (value: string) => {
-    setInputValue(value);
-    setDropdownClosed(false);
+    dispatch({ type: "SET_INPUT_VALUE", payload: value });
+    dispatch({ type: "SET_DROPDOWN_CLOSED", payload: false });
   };
 
   const handleSelectResult = (symbol: string) => {
-    setInputValue(symbol);
-    setSelectedSymbol(symbol);
-    setSearchResults([]);
     suppressNextSearchRef.current = true;
-    setDropdownClosed(true);
-    // 清除之前的错误状态
-    setErrorState(null);
+    dispatch({ type: "SELECT_RESULT", payload: { symbol } });
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>, forceRegenerate: boolean = false) => {
     e.preventDefault();
-    const raw = inputValue.trim();
+    const raw = state.inputValue.trim();
     if (!raw) {
-      setErrorState({ type: "generic", message: t("error.submit.empty") });
+      dispatch({ type: "SET_ERROR_STATE", payload: { type: "generic", message: t("error.submit.empty") } });
       return;
     }
     // 允许字母、数字、点号、连字符以及中文/日文/韩文（如BRK.A, 苹果, アップル, 애플）
     const rawUpper = raw.toUpperCase();
     if (!/^[A-Z0-9.\-\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\s]+$/.test(rawUpper)) {
-      setErrorState({ type: "generic", message: t("error.submit.format") });
+      dispatch({ type: "SET_ERROR_STATE", payload: { type: "generic", message: t("error.submit.format") } });
       return;
     }
 
     // 如果正在搜索，等待搜索完成
-    if (searching) {
+    if (state.searching) {
       // 等待最多2秒让搜索完成
       await new Promise(resolve => setTimeout(resolve, 2000));
     }
 
     // 确定要使用的symbol：优先使用selectedSymbol，否则从搜索结果中查找匹配项
-    let symbolToUse = selectedSymbol;
+    let symbolToUse = state.selectedSymbol;
 
     if (!symbolToUse) {
-      const validResults = searchResults.filter(
+      const validResults = state.searchResults.filter(
         (item) => item.type !== "test" && item.type !== "fallback"
       );
 
@@ -222,16 +342,14 @@ export function ReportGeneratorSection({
 
     // 如果仍然没有找到有效的symbol，显示错误
     if (!symbolToUse) {
-      setErrorState({ type: "generic", message: t("error.submit.notFound") });
+      dispatch({ type: "SET_ERROR_STATE", payload: { type: "generic", message: t("error.submit.notFound") } });
       return;
     }
 
-    setSearchResults([]);
-    // 清除错误状态
-    setErrorState(null);
+    dispatch({ type: "CLEAR_SEARCH" });
 
     if (!auth.isAuthenticated && !canBypassAuth) {
-      setErrorState({ type: "unauthorized", message: t("generator.alert.unregistered") });
+      dispatch({ type: "SET_ERROR_STATE", payload: { type: "unauthorized", message: t("generator.alert.unregistered") } });
       onRequireLogin();
       return;
     }
@@ -239,13 +357,13 @@ export function ReportGeneratorSection({
     // 检查积分是否足够（生成报告需要30积分）
     const REPORT_CREDIT_COST = 30;
     if (isQuotaExhausted || auth.remainingQuota < REPORT_CREDIT_COST) {
-      setErrorState({
+      dispatch({ type: "SET_ERROR_STATE", payload: {
         type: "quota",
         message: t("generator.alert.insufficientCredits", {
           required: String(REPORT_CREDIT_COST),
           available: String(auth.remainingQuota)
         }) || `积分不足，需要 ${REPORT_CREDIT_COST} 积分，当前余额 ${auth.remainingQuota} 积分`
-      });
+      } });
       return;
     }
 
@@ -258,9 +376,9 @@ export function ReportGeneratorSection({
           mode: "production",
         });
         if (availability.reusable && availability.reusable_run_id) {
-          setPendingSymbol(symbolToUse);
-          setReuseRunId(availability.reusable_run_id);
-          setShowReuseDialog(true);
+          dispatch({ type: "SET_PENDING_SYMBOL", payload: symbolToUse });
+          dispatch({ type: "SET_REUSE_RUN_ID", payload: availability.reusable_run_id });
+          dispatch({ type: "SET_SHOW_REUSE_DIALOG", payload: true });
           return;
         }
       } catch (err) {
@@ -269,16 +387,13 @@ export function ReportGeneratorSection({
     }
 
     // Generate report
-    setLastReportTone(selectedTone);
-    setLoading(true);
-    setErrorState(null);
-    setReportData(null);
+    dispatch({ type: "START_GENERATION", payload: { tone: selectedTone } });
     progress.start(t("generator.progress.init"));
 
     try {
       const data = await generateReport({ symbol: symbolToUse, lang: language, tone: selectedTone });
       await progress.complete(t("generator.progress.done"));
-      setReportData(data);
+      dispatch({ type: "GENERATION_SUCCESS", payload: data });
       await auth.refreshSession();
       if (auth.refreshQuota) {
         await auth.refreshQuota();
@@ -291,41 +406,39 @@ export function ReportGeneratorSection({
       const statusCode = (error as { code?: string; statusCode?: number }).statusCode;
 
       if (errorCode === "unauthorized" || errorCode === "UNAUTHORIZED" || statusCode === 401) {
-        setErrorState({ type: "unauthorized", message: t("quota.status.mismatch") });
+        dispatch({ type: "GENERATION_ERROR", payload: { type: "unauthorized", message: t("quota.status.mismatch") } });
         onRequireLogin();
       } else if (errorCode === "INSUFFICIENT_CREDITS" || statusCode === 403) {
         // 积分不足错误 - 显示API返回的中文错误信息
-        setErrorState({ type: "quota", message: message || t("generator.alert.quota") });
+        dispatch({ type: "GENERATION_ERROR", payload: { type: "quota", message: message || t("generator.alert.quota") } });
       } else if (errorCode === "quota_exceeded" || statusCode === 429) {
-        setErrorState({ type: "quota", message: t("generator.alert.quota") });
+        dispatch({ type: "GENERATION_ERROR", payload: { type: "quota", message: t("generator.alert.quota") } });
       } else if (errorCode === "quota_fetch_failed") {
-        setErrorState({ type: "generic", message: t("quota.error.generic") });
+        dispatch({ type: "GENERATION_ERROR", payload: { type: "generic", message: t("quota.error.generic") } });
       } else {
         const normalized = (message || "").toLowerCase();
         if (normalized.includes("unauthorized")) {
-          setErrorState({ type: "unauthorized", message: t("quota.status.mismatch") });
+          dispatch({ type: "GENERATION_ERROR", payload: { type: "unauthorized", message: t("quota.status.mismatch") } });
           onRequireLogin();
         } else if (normalized.includes("积分不足") || normalized.includes("insufficient credits")) {
-          setErrorState({ type: "quota", message });
+          dispatch({ type: "GENERATION_ERROR", payload: { type: "quota", message } });
         } else if (normalized.includes("quota exceeded") || normalized.includes("429")) {
-          setErrorState({ type: "quota", message: t("generator.alert.quota") });
+          dispatch({ type: "GENERATION_ERROR", payload: { type: "quota", message: t("generator.alert.quota") } });
         } else {
-          setErrorState({ type: "generic", message });
+          dispatch({ type: "GENERATION_ERROR", payload: { type: "generic", message } });
         }
       }
       progress.fail(message);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleViewHistory = () => {
-    setShowReuseDialog(false);
+    dispatch({ type: "SET_SHOW_REUSE_DIALOG", payload: false });
     window.location.assign("/reports#my-reports");
   };
 
   const handleRegenerate = () => {
-    setShowReuseDialog(false);
+    dispatch({ type: "SET_SHOW_REUSE_DIALOG", payload: false });
     // Create a synthetic form event
     const syntheticEvent = new Event("submit", { bubbles: true, cancelable: true });
     const form = document.querySelector("form");
@@ -335,20 +448,17 @@ export function ReportGeneratorSection({
   };
 
   const handleUseReused = async () => {
-    setShowReuseDialog(false);
-    if (!pendingSymbol) return;
+    dispatch({ type: "SET_SHOW_REUSE_DIALOG", payload: false });
+    if (!state.pendingSymbol) return;
 
     // 直接调用API获取复用的报告（API会返回复用的报告内容）
-    setLastReportTone(selectedTone);
-    setLoading(true);
-    setErrorState(null);
-    setReportData(null);
+    dispatch({ type: "START_GENERATION", payload: { tone: selectedTone } });
     progress.start(t("generator.progress.loading"));
 
     try {
-      const data = await generateReport({ symbol: pendingSymbol, lang: language, tone: selectedTone });
+      const data = await generateReport({ symbol: state.pendingSymbol, lang: language, tone: selectedTone });
       await progress.complete(t("generator.progress.done"));
-      setReportData(data);
+      dispatch({ type: "GENERATION_SUCCESS", payload: data });
 
       // 显示复用提示
       if (data.reused) {
@@ -357,17 +467,16 @@ export function ReportGeneratorSection({
     } catch (err) {
       console.error("加载复用报告异常:", err);
       const error = err instanceof Error ? err : { message: "" };
-      setErrorState({ type: "generic", message: error.message || t("error.submit.generic") });
+      dispatch({ type: "GENERATION_ERROR", payload: { type: "generic", message: error.message || t("error.submit.generic") } });
       progress.fail(error.message || "Failed to load report");
     } finally {
-      setLoading(false);
-      setPendingSymbol(null);
-      setReuseRunId(null);
+      dispatch({ type: "SET_PENDING_SYMBOL", payload: null });
+      dispatch({ type: "SET_REUSE_RUN_ID", payload: null });
     }
   };
 
   const handleCopyRichText = async () => {
-    if (!reportData) {
+    if (!state.reportData) {
       alert(t("alert.copy.missing"));
       return;
     }
@@ -380,7 +489,7 @@ export function ReportGeneratorSection({
     }
 
     const contentHtml = reportContentRef.innerHTML;
-    const textPlain = reportData.report;
+    const textPlain = state.reportData.report;
 
     if (typeof ClipboardItem !== "undefined" && navigator.clipboard.write) {
       try {
@@ -415,24 +524,24 @@ export function ReportGeneratorSection({
   };
 
   const handleExportDocx = async () => {
-    if (!reportData) {
+    if (!state.reportData) {
       alert(t("alert.export.missing"));
       return;
     }
-    setExportingDocx(true);
+    dispatch({ type: "SET_EXPORTING_DOCX", payload: true });
 
-    const lines = reportData.report.split("\n");
+    const lines = state.reportData.report.split("\n");
     let titleLine = lines.find((line) => line.trim().startsWith("# "));
     if (!titleLine) {
-      const companyName = reportData.companyData.profile?.name || reportData.symbol;
-      const symbol = reportData.symbol || "UNKNOWN";
+      const companyName = state.reportData.companyData.profile?.name || state.reportData.symbol;
+      const symbol = state.reportData.symbol || "UNKNOWN";
       titleLine = t("report.docx.fallbackTitle", { company: companyName, symbol });
     }
 
-    const fileName = `Qiltrack-AI_Report_${reportData.symbol}_${new Date().toLocaleDateString("en-CA")}.docx`;
+    const fileName = `Qiltrack-AI_Report_${state.reportData.symbol}_${new Date().toLocaleDateString("en-CA")}.docx`;
 
     try {
-      const markdownLines = reportData.report.split("\n");
+      const markdownLines = state.reportData.report.split("\n");
       const docxChildren: docx.Paragraph[] = [];
       markdownLines.forEach((line) => {
         const trimmedLine = line.trim();
@@ -517,35 +626,35 @@ export function ReportGeneratorSection({
       console.error("DOCX 导出失败:", err);
       alert(t("alert.export.error"));
     } finally {
-      setExportingDocx(false);
+      dispatch({ type: "SET_EXPORTING_DOCX", payload: false });
     }
   };
 
   const handleExportPdf = async () => {
-    if (!reportData) {
+    if (!state.reportData) {
       alert(t("alert.export.missing"));
       return;
     }
     if (!auth.isAuthenticated && !canBypassAuth) {
-      setErrorState({ type: "unauthorized", message: t("generator.alert.unregistered") });
+      dispatch({ type: "SET_ERROR_STATE", payload: { type: "unauthorized", message: t("generator.alert.unregistered") } });
       onRequireLogin();
       return;
     }
 
     // 权限检查由后端完成，包括 plan 和 subscription_status
 
-    setExportingPdf(true);
+    dispatch({ type: "SET_EXPORTING_PDF", payload: true });
     try {
       const response = await fetch("/api/report/export/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // Ensure cookies are sent
         body: JSON.stringify({
-          reportRunId: reportData.reportRunId,
-          report: reportData.report,
-          companyData: reportData.companyData,
-          symbol: reportData.symbol,
-          tone: lastReportTone,
+          reportRunId: state.reportData.reportRunId,
+          report: state.reportData.report,
+          companyData: state.reportData.companyData,
+          symbol: state.reportData.symbol,
+          tone: state.lastReportTone,
           planLabel: auth.planLabel,
           lang: language, // 传递当前语言给 PDF 生成
         }),
@@ -562,7 +671,7 @@ export function ReportGeneratorSection({
         if (data?.code === "plan_required") {
           alert(t("report.pdf.error.plan"));
         } else if (data?.code === "not_authenticated") {
-          setErrorState({ type: "unauthorized", message: t("generator.alert.unregistered") });
+          dispatch({ type: "SET_ERROR_STATE", payload: { type: "unauthorized", message: t("generator.alert.unregistered") } });
           onRequireLogin();
         } else {
           alert(data?.error || t("alert.export.error"));
@@ -578,7 +687,7 @@ export function ReportGeneratorSection({
       if (data.pdfBase64) {
         const link = document.createElement("a");
         link.href = `data:application/pdf;base64,${data.pdfBase64}`;
-        link.download = `Qiltrack-AI_Report_${reportData.symbol}.pdf`;
+        link.download = `Qiltrack-AI_Report_${state.reportData.symbol}.pdf`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -590,7 +699,7 @@ export function ReportGeneratorSection({
       console.error("PDF export failed:", err);
       alert(t("alert.export.error"));
     } finally {
-      setExportingPdf(false);
+      dispatch({ type: "SET_EXPORTING_PDF", payload: false });
     }
   };
 
@@ -601,10 +710,10 @@ export function ReportGeneratorSection({
       } else {
         await auth.refreshSession();
       }
-      setErrorState(null);
+      dispatch({ type: "SET_ERROR_STATE", payload: null });
     } catch (refreshError) {
       console.error("刷新额度失败:", refreshError);
-      setErrorState({ type: "generic", message: t("quota.error.generic") });
+      dispatch({ type: "SET_ERROR_STATE", payload: { type: "generic", message: t("quota.error.generic") } });
     }
   };
 
@@ -625,7 +734,7 @@ export function ReportGeneratorSection({
     { step: 8, label: t("generator.progress.stage8") },
   ];
 
-  const hasDropdown = !dropdownClosed && (searchResults.slice(0, 3).length > 0 || searching);
+  const hasDropdown = !state.dropdownClosed && (state.searchResults.slice(0, 3).length > 0 || state.searching);
   const currentStageIndex = Math.min(
     workflowList.length - 1,
     Math.max(0, progress.currentStep - 1)
@@ -636,7 +745,7 @@ export function ReportGeneratorSection({
   return (
     <div className="space-y-6 md:space-y-8 min-w-0" id="generator">
       <section className="space-y-5 md:space-y-6 min-w-0">
-        {(progress.progress > 0 || loading) && (
+        {(progress.progress > 0 || state.loading) && (
           <ProgressBar
             percent={progress.progress}
             label={progress.text ?? t("generator.progress.preparing")}
@@ -646,12 +755,12 @@ export function ReportGeneratorSection({
         )}
 
         <ReportForm
-          inputValue={inputValue}
-          searchResults={searchResults}
-          searching={searching}
+          inputValue={state.inputValue}
+          searchResults={state.searchResults}
+          searching={state.searching}
           hasDropdown={hasDropdown}
           placeholderText={placeholderText}
-          loading={loading}
+          loading={state.loading}
           onInputChange={handleInputChange}
           onSubmit={handleSubmit}
           onSelectResult={handleSelectResult}
@@ -664,33 +773,33 @@ export function ReportGeneratorSection({
         />
 
         <ReuseDialog
-          showReuseDialog={showReuseDialog}
+          showReuseDialog={state.showReuseDialog}
           onViewHistory={handleViewHistory}
           onRegenerate={handleRegenerate}
           onUseReused={handleUseReused}
-          onClose={() => setShowReuseDialog(false)}
+          onClose={() => dispatch({ type: "SET_SHOW_REUSE_DIALOG", payload: false })}
           t={t}
         />
 
         <ErrorAlert
-          errorState={errorState}
+          errorState={state.errorState}
           auth={auth}
           isQuotaExhausted={isQuotaExhausted}
-          onDismiss={() => setErrorState(null)}
+          onDismiss={() => dispatch({ type: "SET_ERROR_STATE", payload: null })}
           onRequireLogin={onRequireLogin}
           onRefreshQuota={handleRefreshQuota}
           onViewPricing={handleViewPricing}
           t={t}
         />
 
-        {loading && <ReportSkeleton />}
+        {state.loading && <ReportSkeleton />}
 
         <ReportResult
-          reportData={reportData}
+          reportData={state.reportData}
           lastToneInfo={lastToneInfo}
           highlightFallback={highlightFallback}
-          exportingDocx={exportingDocx}
-          exportingPdf={exportingPdf}
+          exportingDocx={state.exportingDocx}
+          exportingPdf={state.exportingPdf}
           onCopyRichText={handleCopyRichText}
           onExportDocx={handleExportDocx}
           onExportPdf={handleExportPdf}
