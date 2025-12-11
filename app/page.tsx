@@ -4,11 +4,12 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { HeroSection } from "@/app/sections/HeroSection";
+import { Navigation } from "@/components/layout/Navigation";
+import { HeroNew } from "@/app/sections/HeroNew";
+import { Footer } from "@/components/layout/Footer";
 import { ModesSection } from "@/app/sections/ModesSection";
 import { ReportGeneratorSection } from "@/app/sections/ReportGeneratorSection";
 import { WhySection } from "@/app/sections/WhySection";
-import { FooterSection } from "@/app/sections/FooterSection";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useProgress } from "@/hooks/useProgress";
 import { useLanguage } from "@/lib/i18n";
@@ -352,21 +353,33 @@ export default function Home() {
         className={`min-h-screen ${mainBg}`}
         style={{ fontFamily: "system-ui, -apple-system, BlinkMacSystemFont" }}
       >
+        <Navigation
+          navItems={navLinks}
+          language={language as Language}
+          setLanguage={setLanguage}
+          userEmail={user?.email ?? null}
+          userName={userProfile?.display_name ?? null}
+          userImage={userProfile?.avatar_url ?? null}
+          planLabel={planLabel}
+          remainingQuota={remainingQuota}
+          quotaLoaded={quotaLoaded}
+          isAuthenticated={isAuthenticated}
+          onSignOut={() => signOut()}
+          onPrimaryCta={handlePrimaryCta}
+          t={t}
+          onNavClick={(href, e) => {
+            if (href.startsWith("#")) {
+              e.preventDefault();
+              handleSmoothScroll(href);
+            }
+          }}
+        />
+        <HeroNew
+          onPrimaryCta={handlePrimaryCta}
+          isAuthenticated={isAuthenticated}
+          t={t}
+        />
         <div className="grid min-h-screen grid-rows-[auto,1fr] min-w-0">
-          <HeroSection
-            navItems={navLinks}
-            language={language as Language}
-            setLanguage={setLanguage}
-            planLabel={planLabel}
-            userEmail={user?.email ?? null}
-            userImage={userProfile?.avatar_url ?? null}
-            userName={userProfile?.display_name ?? null}
-            isAuthenticated={isAuthenticated}
-            onPrimaryCta={handlePrimaryCta}
-            onSmoothScroll={handleSmoothScroll}
-            onSignOut={() => signOut()}
-            t={t}
-          />
           <div className="flex flex-col flex-1 min-w-0">
             <div className="flex-1 flex justify-center py-10 sm:py-12 min-w-0">
               <div className="w-full max-w-6xl px-4 sm:px-6 lg:px-10 space-y-6 md:space-y-10 min-w-0">
@@ -691,7 +704,7 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <FooterSection disclaimer={t("footer.disclaimer")} dataSource={t("footer.dataSource")} />
+      <Footer t={t} />
     </>
   );
 }

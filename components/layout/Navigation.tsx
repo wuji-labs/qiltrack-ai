@@ -22,10 +22,14 @@ type NavigationProps = {
   setLanguage: (lang: Language) => void;
   userEmail: string | null;
   userName: string | null;
+  userImage: string | null;
   planLabel: string;
+  remainingQuota?: number;
+  quotaLoaded?: boolean;
   isAuthenticated: boolean;
   onSignOut: () => void;
-  t: (key: string) => string;
+  onPrimaryCta?: () => void;
+  t: (key: string, vars?: Record<string, string>) => string;
   onNavClick?: (href: string, e: React.MouseEvent<HTMLAnchorElement>) => void;
 };
 
@@ -35,9 +39,13 @@ export function Navigation({
   setLanguage,
   userEmail,
   userName,
+  userImage,
   planLabel,
+  remainingQuota,
+  quotaLoaded,
   isAuthenticated,
   onSignOut,
+  onPrimaryCta,
   t,
   onNavClick,
 }: NavigationProps) {
@@ -122,8 +130,13 @@ export function Navigation({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-2">
-                    <span className="h-6 w-6 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-semibold">
-                      {avatarInitial}
+                    <span className="h-6 w-6 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-semibold overflow-hidden">
+                      {userImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={userImage} alt="avatar" className="h-full w-full object-cover" />
+                      ) : (
+                        avatarInitial
+                      )}
                     </span>
                     <span className="hidden sm:inline">{displayName}</span>
                   </Button>
@@ -135,29 +148,34 @@ export function Navigation({
                       <p className="text-xs text-gray-500">{userEmail}</p>
                     )}
                     <p className="text-xs text-gray-500 mt-1">{planLabel}</p>
+                    {quotaLoaded && typeof remainingQuota === "number" && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        {t("quota.remaining")?.replace("{credits}", remainingQuota.toString()) || `${remainingQuota} credits`}
+                      </p>
+                    )}
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/account?section=referrals">
+                    <Link href="/account?section=referrals" className="cursor-pointer">
                       <span>🎁</span>
                       <span className="ml-2">{t("referral.menu.title")}</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/pricing">{t("pricing.title")}</Link>
+                    <Link href="/pricing" className="cursor-pointer">{t("pricing.title")}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/account">{t("account.menu.settings")}</Link>
+                    <Link href="/account" className="cursor-pointer">{t("account.menu.settings")}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={onSignOut} className="text-red-600">
+                  <DropdownMenuItem onClick={onSignOut} className="text-red-600 cursor-pointer">
                     {t("auth.account.signout")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/login">Login</Link>
+              <Button variant="default" size="sm" onClick={onPrimaryCta || (() => {})}>
+                {t("cta.preview") || "Sign In"}
               </Button>
             )}
 
@@ -201,7 +219,7 @@ export function Navigation({
               ))}
 
               {/* Mobile Language Selector */}
-              <div className="sm:hidden pt-3 border-t border-gray-200">
+              <div className="pt-3 border-t border-gray-200">
                 <p className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase">
                   Language
                 </p>
@@ -223,6 +241,75 @@ export function Navigation({
                   </button>
                 ))}
               </div>
+
+              {/* Mobile Account Section */}
+              {isAuthenticated ? (
+                <div className="pt-3 border-t border-gray-200">
+                  <div className="flex items-center gap-2 px-3 py-2 mb-2">
+                    <span className="h-8 w-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-semibold overflow-hidden">
+                      {userImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={userImage} alt="avatar" className="h-full w-full object-cover" />
+                      ) : (
+                        avatarInitial
+                      )}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 truncate">
+                        {displayName}
+                      </p>
+                      {userEmail && (
+                        <p className="text-xs text-gray-500 truncate">{userEmail}</p>
+                      )}
+                    </div>
+                  </div>
+                  <Link
+                    href="/account?section=referrals"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+                  >
+                    <span>🎁</span>
+                    <span className="ml-2">{t("referral.menu.title")}</span>
+                  </Link>
+                  <Link
+                    href="/pricing"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+                  >
+                    {t("pricing.title")}
+                  </Link>
+                  <Link
+                    href="/account"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+                  >
+                    {t("account.menu.settings")}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onSignOut();
+                    }}
+                    className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                  >
+                    {t("auth.account.signout")}
+                  </button>
+                </div>
+              ) : (
+                <div className="pt-3 border-t border-gray-200">
+                  <Button
+                    variant="default"
+                    className="w-full"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      if (onPrimaryCta) onPrimaryCta();
+                    }}
+                  >
+                    {t("cta.preview") || "Sign In"}
+                  </Button>
+                </div>
+              )}
             </div>
           </Container>
         </div>
