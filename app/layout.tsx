@@ -1,9 +1,27 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AppProviders } from "./providers";
+import { Anton, Inter, JetBrains_Mono } from "next/font/google";
 
-// 使用系统字体替代 Google Fonts 以避免构建时网络依赖
-// 如需使用自定义字体，请下载字体文件并使用 next/font/local
+// 🎨 复古波普字体配置
+const anton = Anton({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-anton",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Qiltrack AI",
@@ -16,11 +34,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${anton.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
       <body
-        className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)] antialiased font-sans"
+        className="min-h-screen bg-[var(--bg-base)] text-[var(--color-foreground)] antialiased"
         style={{
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
+          fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
         }}
       >
         <AppProviders>{children}</AppProviders>
