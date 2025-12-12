@@ -6,7 +6,7 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
    * Card variant style
    * @default "default"
    */
-  variant?: "default" | "elevated" | "interactive";
+  variant?: "default" | "elevated" | "interactive" | "orange" | "yellow" | "blue";
 }
 
 export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
@@ -20,24 +20,26 @@ export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = "default", children, ...props }, ref) => {
     const cardStyles = clsx(
-      // Base styles
-      "rounded-[var(--radius-lg)]",
-      "border",
-      "transition-all duration-200 ease-out",
+      // Base styles - Neo-Brutalism
+      "border-2 border-black",
+      "transition-all duration-200",
 
       // Variant styles
       {
-        // Default - simple flat card
-        "bg-white border-[var(--border-subtle)] shadow-[var(--shadow-xs)]":
-          variant === "default",
+        // Default - White card with retro shadow
+        "bg-white shadow-[var(--shadow-retro)]": variant === "default",
 
-        // Elevated - more prominent shadow
-        "bg-white border-[var(--border-default)] shadow-[var(--shadow-md)]":
-          variant === "elevated",
+        // Elevated - Larger shadow
+        "bg-white shadow-[var(--shadow-retro-lg)]": variant === "elevated",
 
-        // Interactive - hover effects
-        "bg-white border-[var(--border-subtle)] shadow-[var(--shadow-sm)] hover:border-[var(--border-default)] hover:shadow-[var(--shadow-md)] cursor-pointer":
+        // Interactive - Hover effects (shadow shrink + translate)
+        "bg-white shadow-[var(--shadow-retro)] hover:shadow-[var(--shadow-retro-hover)] hover:translate-x-[2px] hover:translate-y-[2px] cursor-pointer":
           variant === "interactive",
+
+        // Colored backgrounds - Neo-Brutalism style
+        "bg-[var(--accent-primary)] shadow-[var(--shadow-retro)]": variant === "orange",
+        "bg-[var(--accent-secondary)] shadow-[var(--shadow-retro)]": variant === "yellow",
+        "bg-[var(--accent-tertiary)] shadow-[var(--shadow-retro)]": variant === "blue",
       },
 
       className
@@ -58,7 +60,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
     const headerStyles = clsx(
       "flex flex-col gap-1.5",
       "p-6",
-      "border-b border-[var(--border-subtle)]",
+      "border-b-2 border-black",
       className
     );
 
@@ -71,7 +73,7 @@ CardHeader.displayName = "CardHeader";
 const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
   ({ className, ...props }, ref) => {
     const titleStyles = clsx(
-      "text-xl font-semibold",
+      "text-xl font-bold",
       "text-[var(--text-primary)]",
       "leading-tight tracking-tight",
       className
@@ -114,7 +116,7 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
     const footerStyles = clsx(
       "flex items-center gap-3",
       "p-6",
-      "border-t border-[var(--border-subtle)]",
+      "border-t-2 border-black",
       className
     );
 

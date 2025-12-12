@@ -39,15 +39,16 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
     const showFallback = !src || imageError || !imageLoaded;
 
     const avatarStyles = clsx(
-      // Base styles
+      // Base styles - Neo-Brutalism
       "relative inline-flex items-center justify-center",
-      "rounded-full",
+      "border-2 border-black",
       "overflow-hidden",
-      "bg-[var(--accent-primary-light)]",
-      "text-[var(--accent-primary)]",
-      "font-semibold",
+      "bg-[var(--accent-secondary)]",
+      "text-black",
+      "font-bold uppercase",
       "select-none",
       "flex-shrink-0",
+      "shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
 
       // Size styles
       {

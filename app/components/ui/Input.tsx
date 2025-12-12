@@ -55,18 +55,17 @@ export interface LabelProps
 }
 
 const baseInputStyles = clsx(
-  // Base styles
-  "px-3 py-2",
-  "border border-[var(--border-default)]",
-  "rounded-[var(--radius-md)]",
+  // Base styles - Neo-Brutalism
+  "px-4 py-3",
+  "border-2 border-black",
   "bg-white",
   "text-[var(--text-primary)]",
-  "placeholder:text-[var(--text-placeholder)]",
-  "font-medium text-sm",
-  "transition-all duration-150 ease-out",
+  "placeholder:text-gray-400",
+  "font-bold text-sm",
+  "transition-all",
 
-  // Focus styles
-  "focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)]",
+  // Focus styles - Orange glow
+  "focus:outline-none focus:ring-4 focus:ring-[var(--accent-primary)]/20 focus:border-black",
 
   // Disabled styles
   "disabled:bg-[var(--bg-subtle)] disabled:text-[var(--text-tertiary)] disabled:cursor-not-allowed disabled:opacity-50"
@@ -110,7 +109,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const inputStyles = clsx(
       baseInputStyles,
       {
-        "border-[var(--semantic-error)] focus:ring-[var(--semantic-error)]":
+        "border-[var(--semantic-error)] focus:ring-[var(--semantic-error)]/20":
           error,
         "pl-10": prefixIcon,
         "pr-10": suffixIcon,
@@ -152,14 +151,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
         {/* Error message */}
         {error && (
-          <span className="text-xs text-[var(--semantic-error)] font-medium">
+          <span className="text-xs text-[var(--semantic-error)] font-bold">
             {error}
           </span>
         )}
 
         {/* Character count */}
         {showCount && maxLength && (
-          <span className="text-xs text-[var(--text-tertiary)] text-right">
+          <span className="text-xs text-[var(--text-tertiary)] text-right font-bold">
             {currentLength} / {maxLength}
           </span>
         )}
@@ -201,7 +200,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       baseInputStyles,
       "resize-vertical min-h-[80px]",
       {
-        "border-[var(--semantic-error)] focus:ring-[var(--semantic-error)]":
+        "border-[var(--semantic-error)] focus:ring-[var(--semantic-error)]/20":
           error,
         "w-full": fullWidth,
       },
@@ -227,14 +226,14 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 
         {/* Error message */}
         {error && (
-          <span className="text-xs text-[var(--semantic-error)] font-medium">
+          <span className="text-xs text-[var(--semantic-error)] font-bold">
             {error}
           </span>
         )}
 
         {/* Character count */}
         {showCount && maxLength && (
-          <span className="text-xs text-[var(--text-tertiary)] text-right">
+          <span className="text-xs text-[var(--text-tertiary)] text-right font-bold">
             {currentLength} / {maxLength}
           </span>
         )}
@@ -249,7 +248,7 @@ const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
   ({ className, required = false, children, ...props }, ref) => {
     const labelStyles = clsx(
       "inline-flex items-center gap-1",
-      "text-sm font-semibold",
+      "text-sm font-bold",
       "text-[var(--text-primary)]",
       "mb-1",
       className

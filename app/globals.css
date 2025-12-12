@@ -1,18 +1,66 @@
 @import "tailwindcss";
 @import "./styles/tokens.css";
 
+/* ====== 全局基础样式 ====== */
 body {
-  background-color: var(--bg-base);
-  color: var(--text-primary);
-  font-family:
-    var(--font-geist-sans),
-    "Inter",
-    "SF Pro Display",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  background-color: #FDF8F3;       /* 奶油色背景 */
+  color: #18181b;                  /* 近黑文字 */
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
   letter-spacing: 0.01em;
+}
+
+/* ====== 点阵网格背景 (Dot Grid Pattern) ====== */
+.bg-grid-dots {
+  background-size: 40px 40px;
+  background-image: radial-gradient(circle, #000000 1.5px, transparent 1.5px);
+  opacity: 0.1;
+}
+
+/* ====== 3D 文字效果 (3D Text Effects) ====== */
+.text-3d {
+  -webkit-text-stroke: 2px black;
+  text-shadow:
+    1px 1px 0 #000,
+    2px 2px 0 #000,
+    3px 3px 0 #000,
+    4px 4px 0 #000;
+}
+
+.text-3d-sm {
+  -webkit-text-stroke: 1px black;
+  text-shadow:
+    1px 1px 0 #000,
+    2px 2px 0 #000;
+}
+
+.text-stroke {
+  -webkit-text-stroke: 2px black;
+  color: transparent;  /* 空心文字 */
+}
+
+.text-stroke-sm {
+  -webkit-text-stroke: 1px black;
+}
+
+/* ====== Retro 滚动条 (Retro Scrollbar) ====== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FDF8F3;
+  border-left: 2px solid black;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #F49D6E;
+  border: 2px solid black;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FFD275;
 }
 
 /* ====== 锚点滚动补偿 ====== */
@@ -24,218 +72,41 @@ body {
   scroll-margin-top: var(--nav-offset);
 }
 
-/* ====== 兼容性样式类（临时保留,将被逐步移除）====== */
-/**
- * @deprecated 这些样式类将在后续版本中移除，请使用新的组件替代
- * .glass-card -> 使用 <Card /> 组件
- * .frosted-bar -> 使用 <Card variant="elevated" /> 组件
- * .text-dim -> 使用 text-secondary
- * .text-subtle -> 使用 text-tertiary
- */
+/* ====== Retro 动画 (Retro Animations) ====== */
 
-.glass-card {
-  background: var(--bg-layer);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+/* 浮动动画 */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
-.frosted-bar {
-  background: var(--bg-layer);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+/* 滑入动画 */
+@keyframes slideIn {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
-.text-dim {
-  color: var(--text-secondary);
+/* 淡入动画 */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
-
-.text-subtle {
-  color: var(--text-tertiary);
-}
-
-/**
- * @deprecated 请使用 <Button variant="primary" /> 替代
- */
-.btn-gradient {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border-radius: var(--radius-full);
-  border: 1px solid transparent;
-  background: var(--accent-primary);
-  color: white;
-  font-weight: 600;
-  transition: background var(--transition-fast);
-}
-
-.btn-gradient:hover {
-  background: var(--accent-primary-hover);
-}
-
-/**
- * @deprecated 请使用 <Button variant="ghost" /> 替代
- */
-.btn-ghost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border-radius: var(--radius-md);
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  transition:
-    background var(--transition-fast),
-    color var(--transition-fast);
-}
-
-.btn-ghost:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-}
-
-/**
- * @deprecated 请使用 <Badge /> 组件替代
- */
-.badge-pill {
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border-default);
-  background: var(--bg-layer);
-  color: var(--text-secondary);
-  font-size: 12px;
-  padding: 0.25rem 0.75rem;
-}
-
-/**
- * @deprecated 网格背景不符合现代极简风格，将被移除
- * 请移除 className 中的 .hero-mesh, .feature-mesh, .generator-mesh
- */
-.hero-mesh,
-.feature-mesh,
-.generator-mesh {
-  /* 暂时禁用网格背景 */
-  opacity: 0;
-}
-
-/* ====== Sonner Toast 样式覆盖 ====== */
-[data-sonner-toaster] {
-  font-family: var(--font-sans);
-}
-
-.sonner-toast {
-  border-radius: var(--radius-md) !important;
-  box-shadow: var(--shadow-lg) !important;
-}
-
-[data-sonner-toast][data-styled='true'][data-type='success'] {
-  background: rgba(16, 185, 129, 0.15) !important;
-  border-color: rgba(16, 185, 129, 0.3) !important;
-  color: var(--semantic-success) !important;
-}
-
-[data-sonner-toast][data-styled='true'][data-type='error'] {
-  background: rgba(239, 68, 68, 0.15) !important;
-  border-color: rgba(239, 68, 68, 0.3) !important;
-  color: var(--semantic-error) !important;
-}
-
-[data-sonner-toast][data-styled='true'][data-type='info'] {
-  background: rgba(59, 130, 246, 0.15) !important;
-  border-color: rgba(59, 130, 246, 0.3) !important;
-  color: var(--semantic-info) !important;
-}
-
-[data-sonner-toast][data-styled='true'][data-type='warning'] {
-  background: rgba(245, 158, 11, 0.15) !important;
-  border-color: rgba(245, 158, 11, 0.3) !important;
-  color: var(--semantic-warning) !important;
-}
-
-/* ====== Progress 组件样式 ====== */
-.progress-track {
-  position: relative;
-  height: 10px;
-  width: 100%;
-  border-radius: var(--radius-full);
-  background: var(--bg-layer);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-}
-
-.progress-fill {
-  height: 100%;
-  position: relative;
-  border-radius: var(--radius-full);
-  background: var(--accent-primary);
-  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  box-shadow: var(--shadow-sm);
-  will-change: width;
-}
-
-.progress-stack {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-  justify-content: center;
-  margin-top: 6px;
-}
-
-.progress-chip {
-  position: relative;
-  min-width: 168px;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
-  background: var(--bg-layer);
-  border: 1px solid var(--border-default);
-  color: var(--text-primary);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition:
-    transform var(--transition-base),
-    box-shadow var(--transition-base),
-    border-color var(--transition-base);
-  letter-spacing: 0.01em;
-}
-
-.progress-chip-index {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 24px;
-  width: 46px;
-  border-radius: var(--radius-sm);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  background: var(--accent-primary-light);
-  border: 1px solid var(--border-default);
-  color: var(--accent-primary);
-}
-
-.progress-chip-label {
-  font-size: 13px;
-  line-height: 1.4;
-  flex: 1;
-  text-align: left;
-  font-weight: 600;
-}
-
-.progress-chip.is-active {
-  border-color: var(--accent-primary);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
-
-/* ====== 核心动画（精简版）====== */
 
 /* 淡入上滑 */
 @keyframes fade-in-up {
@@ -271,7 +142,27 @@ body {
   }
 }
 
-/* ====== 动效工具类 ====== */
+/* ====== 动画工具类 ====== */
+.animate-float-slow {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-medium {
+  animation: float 5s ease-in-out infinite;
+}
+
+.animate-float-fast {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
 .animate-fadeInUp {
   animation: fade-in-up 0.2s ease-out;
 }
@@ -284,15 +175,147 @@ body {
   animation: slideDown 0.3s ease-out;
 }
 
+/* ====== Sonner Toast 样式覆盖 ====== */
+[data-sonner-toaster] {
+  font-family: var(--font-sans);
+}
+
+.sonner-toast {
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-retro) !important;
+  border: 2px solid black !important;
+}
+
+[data-sonner-toast][data-styled='true'][data-type='success'] {
+  background: rgba(81, 207, 102, 0.2) !important;
+  border-color: rgba(81, 207, 102, 0.8) !important;
+  color: var(--semantic-success) !important;
+}
+
+[data-sonner-toast][data-styled='true'][data-type='error'] {
+  background: rgba(255, 107, 107, 0.2) !important;
+  border-color: rgba(255, 107, 107, 0.8) !important;
+  color: var(--semantic-error) !important;
+}
+
+[data-sonner-toast][data-styled='true'][data-type='info'] {
+  background: rgba(174, 203, 235, 0.2) !important;
+  border-color: rgba(174, 203, 235, 0.8) !important;
+  color: var(--semantic-info) !important;
+}
+
+[data-sonner-toast][data-styled='true'][data-type='warning'] {
+  background: rgba(255, 210, 117, 0.2) !important;
+  border-color: rgba(255, 210, 117, 0.8) !important;
+  color: var(--semantic-warning) !important;
+}
+
+/* ====== Progress 组件样式 (Retro 风格) ====== */
+.progress-track {
+  position: relative;
+  height: 10px;
+  width: 100%;
+  background: var(--bg-subtle);
+  border: 2px solid black;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  position: relative;
+  background: var(--accent-primary);
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: width;
+}
+
+.progress-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.progress-chip {
+  position: relative;
+  min-width: 168px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-subtle);
+  border: 2px solid black;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-retro);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition:
+    transform var(--transition-retro),
+    box-shadow var(--transition-retro);
+  letter-spacing: 0.01em;
+}
+
+.progress-chip-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  width: 46px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--accent-primary);
+  border: 1px solid black;
+  color: white;
+  font-weight: bold;
+}
+
+.progress-chip-label {
+  font-size: 13px;
+  line-height: 1.4;
+  flex: 1;
+  text-align: left;
+  font-weight: 600;
+}
+
+.progress-chip.is-active {
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-retro-hover);
+  transform: translate(2px, 2px);
+}
+
+/* ====== Select 和 Option 样式 ====== */
+select {
+  color-scheme: light;
+}
+
+select option {
+  background-color: var(--bg-base) !important;
+  color: var(--text-primary) !important;
+  font-family: inherit;
+  padding: 8px 12px;
+  border: 2px solid black;
+}
+
+select option:checked,
+select option:hover {
+  background: var(--accent-primary) !important;
+  color: white !important;
+  font-weight: bold;
+}
+
+/* ====== 过渡效果工具类 ====== */
 .motion-safe\:transition-transform {
   @media (prefers-reduced-motion: no-preference) {
-    transition: transform var(--transition-fast);
+    transition: transform var(--transition-retro);
   }
 }
 
 .motion-safe\:transition-all {
   @media (prefers-reduced-motion: no-preference) {
-    transition: all var(--transition-base);
+    transition: all var(--transition-retro);
   }
 }
 
@@ -319,20 +342,82 @@ body {
   }
 }
 
-/* ====== Select 和 Option 样式（待改造）====== */
-select {
-  color-scheme: light dark;
+/* ====== 向后兼容样式（已废弃，将被移除）====== */
+/**
+ * @deprecated 这些样式类已废弃，请使用新的 Retro 风格组件
+ * 保留仅为向后兼容，下一版本将移除
+ */
+
+.glass-card {
+  background: var(--bg-subtle);
+  border: 2px solid var(--border-color);
+  box-shadow: var(--shadow-retro);
 }
 
-select option {
-  background-color: var(--bg-base) !important;
-  color: var(--text-primary) !important;
-  font-family: inherit;
-  padding: 8px 12px;
+.frosted-bar {
+  background: var(--bg-subtle);
+  border: 2px solid var(--border-color);
+  box-shadow: var(--shadow-retro);
 }
 
-select option:checked,
-select option:hover {
-  background: var(--accent-primary-light) !important;
-  color: var(--accent-primary) !important;
+.text-dim {
+  color: var(--text-secondary);
+}
+
+.text-subtle {
+  color: var(--text-tertiary);
+}
+
+.btn-gradient {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid black;
+  background: var(--accent-primary);
+  color: black;
+  font-weight: 700;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-retro);
+  transition: all var(--transition-retro);
+}
+
+.btn-gradient:hover {
+  box-shadow: var(--shadow-retro-hover);
+  transform: translate(2px, 2px);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  transition: all var(--transition-retro);
+}
+
+.btn-ghost:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.badge-pill {
+  border: 2px solid black;
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding: 0.25rem 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 1);
+}
+
+/* 移除网格背景（不符合 Retro 风格） */
+.hero-mesh,
+.feature-mesh,
+.generator-mesh {
+  opacity: 0;
+  display: none;
 }

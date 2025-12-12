@@ -22,26 +22,25 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     );
 
     const selectStyles = clsx(
-      // Base styles
+      // Base styles - Neo-Brutalism (same as Input)
       "appearance-none",
-      "px-3 py-2 pr-10",
-      "border border-[var(--border-default)]",
-      "rounded-[var(--radius-md)]",
+      "px-4 py-3 pr-10",
+      "border-2 border-black",
       "bg-white",
       "text-[var(--text-primary)]",
-      "font-medium text-sm",
-      "transition-all duration-150 ease-out",
+      "font-bold text-sm",
+      "transition-all",
       "cursor-pointer",
 
-      // Focus styles
-      "focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-[var(--accent-primary)]",
+      // Focus styles - Orange glow (same as Input)
+      "focus:outline-none focus:ring-4 focus:ring-[var(--accent-primary)]/20 focus:border-black",
 
       // Disabled styles
       "disabled:bg-[var(--bg-subtle)] disabled:text-[var(--text-tertiary)] disabled:cursor-not-allowed disabled:opacity-50",
 
       // Error styles
       error &&
-        "border-[var(--semantic-error)] focus:ring-[var(--semantic-error)]",
+        "border-[var(--semantic-error)] focus:ring-[var(--semantic-error)]/20",
 
       // Width
       fullWidth && "w-full",

@@ -7,7 +7,7 @@ export interface ButtonProps
    * Button variant style
    * @default "primary"
    */
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "danger";
   /**
    * Button size
    * @default "md"
@@ -45,33 +45,36 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
 
     const baseStyles = clsx(
-      // Base styles
-      "inline-flex items-center justify-center gap-2",
-      "font-medium",
-      "transition-all duration-150 ease-out",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-      "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
+      // Base styles - Neo-Brutalism
+      "relative inline-flex items-center justify-center gap-2",
+      "border-2 border-black font-bold uppercase tracking-wider",
+      "transition-all duration-200 focus:outline-none",
+      "disabled:opacity-50 disabled:cursor-not-allowed",
 
       // Variant styles
       {
-        // Primary - blue filled
-        "bg-[var(--accent-primary)] text-white border border-transparent hover:bg-[var(--accent-primary-hover)] focus-visible:ring-[var(--accent-primary)]":
+        // Primary - Orange filled with retro shadow
+        "bg-[var(--accent-primary)] text-black shadow-[var(--shadow-retro)] hover:shadow-[var(--shadow-retro-hover)] hover:translate-x-[2px] hover:translate-y-[2px]":
           variant === "primary",
 
-        // Secondary - white with border
-        "bg-white text-[var(--text-primary)] border border-[var(--border-default)] hover:border-[var(--border-strong)] hover:shadow-[var(--shadow-sm)] focus-visible:ring-[var(--accent-primary)]":
+        // Secondary - White with retro shadow
+        "bg-white text-black shadow-[var(--shadow-retro)] hover:shadow-[var(--shadow-retro-hover)] hover:translate-x-[2px] hover:translate-y-[2px]":
           variant === "secondary",
 
-        // Ghost - transparent
-        "bg-transparent text-[var(--text-secondary)] border-none hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] focus-visible:ring-[var(--accent-primary)]":
+        // Ghost - Transparent
+        "bg-transparent border-transparent hover:bg-black/5":
           variant === "ghost",
+
+        // Danger - Red with retro shadow
+        "bg-[var(--semantic-error)] text-black shadow-[var(--shadow-retro)] hover:shadow-[var(--shadow-retro-hover)] hover:translate-x-[2px] hover:translate-y-[2px]":
+          variant === "danger",
       },
 
-      // Size styles
+      // Size styles (no border-radius)
       {
-        "h-8 px-3 text-sm rounded-[var(--radius-sm)]": size === "sm",
-        "h-10 px-4 text-base rounded-[var(--radius-md)]": size === "md",
-        "h-12 px-6 text-lg rounded-[var(--radius-md)]": size === "lg",
+        "h-8 px-4 py-2 text-xs": size === "sm",
+        "h-10 px-6 py-3 text-sm": size === "md",
+        "h-12 px-8 py-4 text-base": size === "lg",
       },
 
       className

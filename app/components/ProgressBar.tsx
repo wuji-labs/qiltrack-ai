@@ -20,17 +20,17 @@ export function ProgressBar({ percent, label, steps, activeStep, extra }: Progre
   const currentStepLabel = activeStepItem?.label ?? label ?? "";
 
   return (
-    <div className="space-y-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-layer)]/80 p-4">
+    <div className="space-y-3 border-2 border-black bg-white shadow-[var(--shadow-retro)] p-4">
       {/* Desktop: Show label and percentage */}
-      <div className="hidden md:flex items-center justify-between text-sm uppercase tracking-[0.24em] text-[var(--accent-primary)]">
+      <div className="hidden md:flex items-center justify-between text-sm font-bold uppercase tracking-[0.24em] text-[var(--text-primary)]">
         <span>{label ?? ""}</span>
         <span>{Math.round(percent)}%</span>
       </div>
 
       {/* Mobile: Show current step and percentage */}
-      <div className="flex md:hidden items-center justify-between text-sm text-[var(--accent-primary)]">
-        <span className="text-xs font-medium truncate flex-1 mr-2">{currentStepLabel}</span>
-        <span className="text-sm font-semibold tracking-wider">{Math.round(percent)}%</span>
+      <div className="flex md:hidden items-center justify-between text-sm font-bold text-[var(--text-primary)]">
+        <span className="text-xs font-bold uppercase truncate flex-1 mr-2">{currentStepLabel}</span>
+        <span className="text-sm font-bold tracking-wider">{Math.round(percent)}%</span>
       </div>
 
       <div className="progress-track">
@@ -60,12 +60,12 @@ export function ProgressBar({ percent, label, steps, activeStep, extra }: Progre
           return (
             <div
               key={item.step}
-              className={`h-2 rounded-full transition-all duration-300 ${
+              className={`h-2 border border-black transition-all duration-300 ${
                 active
                   ? "w-8 bg-[var(--accent-primary)]"
                   : completed
                   ? "w-2 bg-[var(--accent-primary)]/60"
-                  : "w-2 bg-[var(--bg-hover)]"
+                  : "w-2 bg-gray-200"
               }`}
               aria-label={`${item.label} ${active ? "(current)" : completed ? "(completed)" : ""}`}
             />

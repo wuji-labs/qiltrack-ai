@@ -85,11 +85,11 @@ Tabs.displayName = "Tabs";
 const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
   ({ className, children, ...props }, ref) => {
     const listStyles = clsx(
-      "inline-flex items-center gap-1",
+      "inline-flex items-center gap-2",
       "p-1",
-      "rounded-[var(--radius-md)]",
-      "bg-[var(--bg-subtle)]",
-      "border border-[var(--border-subtle)]",
+      "bg-white",
+      "border-2 border-black",
+      "shadow-[var(--shadow-retro)]",
       className
     );
 
@@ -109,19 +109,19 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
     const isActive = selectedValue === value;
 
     const triggerStyles = clsx(
-      // Base styles
+      // Base styles - Neo-Brutalism
       "relative inline-flex items-center justify-center",
       "px-4 py-2",
-      "text-sm font-medium",
-      "rounded-[var(--radius-sm)]",
+      "text-sm font-bold uppercase",
+      "border-2 border-black",
       "transition-all duration-150 ease-out",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-2",
+      "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--accent-primary)]/20",
 
       // State styles
       {
-        "bg-white text-[var(--text-primary)] shadow-[var(--shadow-xs)]":
+        "bg-[var(--accent-primary)] text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]":
           isActive,
-        "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]":
+        "bg-white text-[var(--text-secondary)] hover:text-black hover:bg-gray-100":
           !isActive,
       },
 
@@ -154,8 +154,7 @@ const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
     if (!isActive) return null;
 
     const contentStyles = clsx(
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-2",
-      "rounded-[var(--radius-md)]",
+      "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--accent-primary)]/20",
       className
     );
 

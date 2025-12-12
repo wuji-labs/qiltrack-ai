@@ -6,7 +6,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
    * Badge variant style
    * @default "default"
    */
-  variant?: "default" | "success" | "warning" | "error" | "info";
+  variant?: "default" | "success" | "warning" | "error" | "info" | "orange" | "blue" | "purple";
   /**
    * Badge size
    * @default "md"
@@ -17,40 +17,41 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
   ({ className, variant = "default", size = "md", children, ...props }, ref) => {
     const badgeStyles = clsx(
-      // Base styles
+      // Base styles - Neo-Brutalism
       "inline-flex items-center justify-center",
-      "font-medium",
-      "border",
-      "rounded-[var(--radius-full)]",
+      "font-bold uppercase",
+      "border-2 border-black",
+      "shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
       "transition-colors duration-150 ease-out",
 
       // Variant styles
       {
         // Default - gray
-        "bg-[var(--bg-layer)] text-[var(--text-secondary)] border-[var(--border-default)]":
-          variant === "default",
+        "bg-gray-200 text-black": variant === "default",
 
         // Success - green
-        "bg-[rgba(16,185,129,0.1)] text-[var(--semantic-success)] border-[rgba(16,185,129,0.3)]":
-          variant === "success",
+        "bg-[var(--semantic-success)] text-black": variant === "success",
 
-        // Warning - amber
-        "bg-[rgba(245,158,11,0.1)] text-[var(--semantic-warning)] border-[rgba(245,158,11,0.3)]":
-          variant === "warning",
+        // Warning - yellow
+        "bg-[var(--accent-secondary)] text-black": variant === "warning",
 
         // Error - red
-        "bg-[rgba(239,68,68,0.1)] text-[var(--semantic-error)] border-[rgba(239,68,68,0.3)]":
-          variant === "error",
+        "bg-[var(--semantic-error)] text-black": variant === "error",
 
-        // Info - blue
-        "bg-[rgba(59,130,246,0.1)] text-[var(--semantic-info)] border-[rgba(59,130,246,0.3)]":
-          variant === "info",
+        // Info / Blue - blue
+        "bg-[var(--accent-tertiary)] text-black": variant === "info" || variant === "blue",
+
+        // Orange
+        "bg-[var(--accent-primary)] text-black": variant === "orange",
+
+        // Purple
+        "bg-[var(--retro-purple)] text-black": variant === "purple",
       },
 
       // Size styles
       {
-        "px-2 py-0.5 text-xs": size === "sm",
-        "px-2.5 py-1 text-sm": size === "md",
+        "px-2 py-0.5 text-[10px]": size === "sm",
+        "px-3 py-1 text-xs": size === "md",
       },
 
       className
