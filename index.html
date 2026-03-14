@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qiltrack AI — AI-Powered Stock Research</title>
+<meta name="description" content="Transform complex financial data into clear, actionable research reports in 30 seconds. 13 languages, global market coverage.">
+<link rel="icon" href="https://qiltrack.com/favicon.ico">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--surface:#111;--border:#222;--text:#e5e5e5;--muted:#888;--accent:#00ff88;--accent2:#ff6600;--font:'SF Mono',SFMono-Regular,ui-monospace,'DejaVu Sans Mono',Menlo,Consolas,monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.container{max-width:960px;margin:0 auto;padding:0 24px}
+
+/* Hero */
+.hero{text-align:center;padding:80px 24px 60px;border-bottom:1px solid var(--border)}
+.hero img{width:64px;height:64px;margin-bottom:16px}
+.hero h1{font-size:2.5rem;font-weight:700;letter-spacing:-1px;margin-bottom:8px}
+.hero h1 span{color:var(--accent)}
+.hero .tagline{font-size:1rem;color:var(--muted);max-width:520px;margin:0 auto 24px}
+.hero .cta{display:inline-block;background:var(--accent);color:#000;font-weight:700;padding:12px 32px;font-size:.85rem;text-transform:uppercase;letter-spacing:1px;transition:all .2s}
+.hero .cta:hover{background:#fff;text-decoration:none}
+
+/* Lang selector */
+.lang-bar{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;padding:16px 24px;border-bottom:1px solid var(--border);background:var(--surface)}
+.lang-bar button{background:transparent;border:1px solid var(--border);color:var(--muted);padding:4px 10px;font-size:.7rem;font-family:var(--font);cursor:pointer;transition:all .15s}
+.lang-bar button:hover,.lang-bar button.active{border-color:var(--accent);color:var(--accent)}
+
+/* Features */
+.features{padding:60px 24px;border-bottom:1px solid var(--border)}
+.features h2{text-align:center;font-size:1.2rem;text-transform:uppercase;letter-spacing:3px;color:var(--accent2);margin-bottom:40px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:960px;margin:0 auto}
+.card{border:1px solid var(--border);padding:24px;background:var(--surface);transition:border-color .2s}
+.card:hover{border-color:var(--accent)}
+.card h3{font-size:.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;color:var(--accent)}
+.card p{font-size:.8rem;color:var(--muted);line-height:1.5}
+
+/* Workflow */
+.workflow{padding:60px 24px;border-bottom:1px solid var(--border)}
+.workflow h2{text-align:center;font-size:1.2rem;text-transform:uppercase;letter-spacing:3px;color:var(--accent2);margin-bottom:40px}
+.steps{display:flex;gap:0;max-width:960px;margin:0 auto;flex-wrap:wrap}
+.step{flex:1;min-width:200px;padding:24px;border:1px solid var(--border);position:relative}
+.step .num{font-size:2rem;font-weight:700;color:var(--accent);opacity:.3;position:absolute;top:12px;right:16px}
+.step h3{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.step p{font-size:.75rem;color:var(--muted)}
+
+/* Screenshots */
+.screenshots{padding:60px 24px;border-bottom:1px solid var(--border);text-align:center}
+.screenshots h2{font-size:1.2rem;text-transform:uppercase;letter-spacing:3px;color:var(--accent2);margin-bottom:40px}
+.screenshots img{max-width:100%;border:1px solid var(--border);margin-bottom:12px}
+.screenshots .caption{font-size:.7rem;color:var(--muted);margin-bottom:32px}
+
+/* Footer */
+footer{padding:40px 24px;text-align:center;font-size:.7rem;color:var(--muted)}
+footer .links{margin-bottom:16px}
+footer .links a{margin:0 12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-size:.65rem}
+footer .links a:hover{color:var(--accent)}
+footer .copy{opacity:.5}
+
+@media(max-width:600px){
+  .hero h1{font-size:1.8rem}
+  .steps{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- Language Bar -->
+<div class="lang-bar" id="langBar"></div>
+
+<!-- Hero -->
+<section class="hero">
+  <img src="https://qiltrack.com/logo.png" alt="Qiltrack AI">
+  <h1>QILTRACK <span>AI</span></h1>
+  <p class="tagline" data-i18n="tagline"></p>
+  <a href="https://qiltrack.com" class="cta" data-i18n="cta"></a>
+</section>
+
+<!-- Features -->
+<section class="features">
+  <div class="container">
+    <h2 data-i18n="featuresTitle"></h2>
+    <div class="grid" id="featuresGrid"></div>
+  </div>
+</section>
+
+<!-- Workflow -->
+<section class="workflow">
+  <div class="container">
+    <h2 data-i18n="workflowTitle"></h2>
+    <div class="steps" id="stepsContainer"></div>
+  </div>
+</section>
+
+<!-- Screenshots -->
+<section class="screenshots">
+  <div class="container">
+    <h2 data-i18n="screenshotsTitle"></h2>
+    <img src="docs/screenshots/homepage.png" alt="Homepage">
+    <p class="caption" data-i18n="screenshotHomepage"></p>
+    <img src="docs/screenshots/report.png" alt="Report">
+    <p class="caption" data-i18n="screenshotReport"></p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="links">
+    <a href="https://qiltrack.com">Website</a>
+    <a href="https://x.com/wuji_labs">X / Twitter</a>
+    <a href="https://github.com/wuji-labs">GitHub</a>
+    <a href="mailto:support@qiltrack.com">Contact</a>
+  </div>
+  <p class="copy">&copy; 2025 Qiltrack AI Inc. All rights reserved. Not financial advice.</p>
+</footer>
+
+<script>
+const i18n = {
+  en: {
+    tagline: "Transform complex financial data into clear, actionable research reports in 30 seconds.",
+    cta: "Try It Free",
+    featuresTitle: "Features",
+    workflowTitle: "How It Works",
+    screenshotsTitle: "Screenshots",
+    screenshotHomepage: "Homepage — Clean, intuitive interface",
+    screenshotReport: "AI-Generated Research Report",
+    features: [
+      ["13 Global Languages", "Seamless support for English, Chinese, Japanese, Korean, Arabic, German, Spanish, French, Italian, Malay, Dutch, and Russian."],
+      ["30-Second Reports", "AI-generated comprehensive stock analysis with bull, bear, balanced, and technical perspectives."],
+      ["Evidence Tracing", "Every claim is linked back to original SEC filings or news sources."],
+      ["Pro Export Suite", "Download reports in high-fidelity PDF, Word, or copy to clipboard."],
+      ["Real-Time Data", "Live market data integration from Finnhub and SEC EDGAR."],
+      ["Daily Alpha Inbox", "Top 10 market-moving insights delivered to your email every morning."]
+    ],
+    steps: [
+      ["Enter Ticker", "Type any stock symbol — US, HK, CN, TW markets supported."],
+      ["Choose Style", "Pick your analysis persona: bull, bear, balanced, or technical."],
+      ["AI Analysis", "NLP extracts moat, risk, KPIs from real-time data."],
+      ["Export Report", "Review and export to PDF, DOCX, or share directly."]
+    ]
+  },
+  "zh-Hans": {
+    tagline: "将复杂的金融数据转化为清晰、可操作的研究报告，仅需 30 秒。",
+    cta: "免费试用",
+    featuresTitle: "功能特点",
+    workflowTitle: "使用流程",
+    screenshotsTitle: "产品截图",
+    screenshotHomepage: "首页 — 简洁直观的界面",
+    screenshotReport: "AI 生成的研究报告",
+    features: [
+      ["13 种语言", "无缝支持英语、中文、日语、韩语、阿拉伯语、德语、西班牙语、法语、意大利语、马来语、荷兰语和俄语。"],
+      ["30 秒出报告", "AI 生成的综合股票分析，涵盖多头、空头、平衡和技术分析视角。"],
+      ["证据溯源", "每个结论都关联原始 SEC 文件或新闻来源。"],
+      ["专业导出", "支持高保真 PDF、Word 导出或复制到剪贴板。"],
+      ["实时数据", "集成 Finnhub 和 SEC EDGAR 的实时市场数据。"],
+      ["每日 Alpha 邮件", "每天早上推送 10 大市场洞察至您的邮箱。"]
+    ],
+    steps: [
+      ["输入代码", "输入任意股票代码 — 支持美股、港股、A股、台股。"],
+      ["选择风格", "选择分析角色：多头、空头、平衡或技术分析。"],
+      ["AI 分析", "NLP 从实时数据中提取护城河、风险和关键指标。"],
+      ["导出报告", "查看并导出为 PDF、DOCX 或直接分享。"]
+    ]
+  },
+  "zh-Hant": {
+    tagline: "將複雜的金融數據轉化為清晰、可操作的研究報告，僅需 30 秒。",
+    cta: "免費試用",
+    featuresTitle: "功能特點",
+    workflowTitle: "使用流程",
+    screenshotsTitle: "產品截圖",
+    screenshotHomepage: "首頁 — 簡潔直觀的介面",
+    screenshotReport: "AI 生成的研究報告",
+    features: [
+      ["13 種語言", "無縫支援英語、中文、日語、韓語、阿拉伯語、德語、西班牙語、法語、義大利語、馬來語、荷蘭語和俄語。"],
+      ["30 秒出報告", "AI 生成的綜合股票分析，涵蓋多頭、空頭、平衡和技術分析視角。"],
+      ["證據溯源", "每個結論都關聯原始 SEC 文件或新聞來源。"],
+      ["專業匯出", "支援高保真 PDF、Word 匯出或複製到剪貼簿。"],
+      ["即時數據", "整合 Finnhub 和 SEC EDGAR 的即時市場數據。"],
+      ["每日 Alpha 郵件", "每天早上推送 10 大市場洞察至您的信箱。"]
+    ],
+    steps: [
+      ["輸入代碼", "輸入任意股票代碼 — 支援美股、港股、A股、台股。"],
+      ["選擇風格", "選擇分析角色：多頭、空頭、平衡或技術分析。"],
+      ["AI 分析", "NLP 從即時數據中提取護城河、風險和關鍵指標。"],
+      ["匯出報告", "查看並匯出為 PDF、DOCX 或直接分享。"]
+    ]
+  },
+  ja: {
+    tagline: "複雑な金融データを30秒で明確で実用的なリサーチレポートに変換します。",
+    cta: "無料で試す",
+    featuresTitle: "機能",
+    workflowTitle: "使い方",
+    screenshotsTitle: "スクリーンショット",
+    screenshotHomepage: "ホームページ — シンプルで直感的なインターフェース",
+    screenshotReport: "AI生成リサーチレポート",
+    features: [
+      ["13言語対応", "英語、中国語、日本語、韓国語、アラビア語、ドイツ語、スペイン語、フランス語、イタリア語、マレー語、オランダ語、ロシア語をシームレスにサポート。"],
+      ["30秒レポート", "強気・弱気・バランス・テクニカルの視点からAI生成の包括的な株式分析。"],
+      ["エビデンス追跡", "すべての主張はSEC提出書類やニュースソースにリンク。"],
+      ["プロ仕様エクスポート", "高品質PDF、Word形式でダウンロードまたはクリップボードにコピー。"],
+      ["リアルタイムデータ", "FinnhubとSEC EDGARからのライブ市場データ統合。"],
+      ["デイリーAlphaメール", "毎朝トップ10の市場インサイトをメールでお届け。"]
+    ],
+    steps: [
+      ["ティッカー入力", "任意の銘柄コードを入力 — 米国、香港、中国、台湾市場対応。"],
+      ["スタイル選択", "分析ペルソナを選択：強気、弱気、バランス、テクニカル。"],
+      ["AI分析", "NLPがリアルタイムデータから堀、リスク、KPIを抽出。"],
+      ["レポート出力", "確認してPDF、DOCXにエクスポートまたは直接共有。"]
+    ]
+  },
+  ko: {
+    tagline: "복잡한 금융 데이터를 30초 만에 명확하고 실행 가능한 리서치 리포트로 변환합니다.",
+    cta: "무료 체험",
+    featuresTitle: "기능",
+    workflowTitle: "사용 방법",
+    screenshotsTitle: "스크린샷",
+    screenshotHomepage: "홈페이지 — 깔끔하고 직관적인 인터페이스",
+    screenshotReport: "AI 생성 리서치 리포트",
+    features: [
+      ["13개 언어", "영어, 중국어, 일본어, 한국어, 아랍어, 독일어, 스페인어, 프랑스어, 이탈리아어, 말레이어, 네덜란드어, 러시아어를 완벽 지원합니다."],
+      ["30초 리포트", "강세, 약세, 균형, 기술적 관점의 AI 종합 주식 분석."],
+      ["증거 추적", "모든 주장은 원본 SEC 제출 문서 또는 뉴스 소스와 연결됩니다."],
+      ["프로 내보내기", "고품질 PDF, Word로 다운로드하거나 클립보드에 복사."],
+      ["실시간 데이터", "Finnhub 및 SEC EDGAR의 실시간 시장 데이터 통합."],
+      ["일일 Alpha 메일", "매일 아침 시장을 움직이는 Top 10 인사이트를 이메일로 전달."]
+    ],
+    steps: [
+      ["종목 입력", "주식 코드를 입력하세요 — 미국, 홍콩, 중국, 대만 시장 지원."],
+      ["스타일 선택", "분석 페르소나 선택: 강세, 약세, 균형, 기술적 분석."],
+      ["AI 분석", "NLP가 실시간 데이터에서 해자, 리스크, KPI를 추출."],
+      ["리포트 내보내기", "검토 후 PDF, DOCX로 내보내기 또는 직접 공유."]
+    ]
+  },
+  ar: {
+    tagline: "حوّل البيانات المالية المعقدة إلى تقارير بحثية واضحة وقابلة للتنفيذ في 30 ثانية.",
+    cta: "جرّب مجاناً",
+    featuresTitle: "المميزات",
+    workflowTitle: "كيف يعمل",
+    screenshotsTitle: "لقطات الشاشة",
+    screenshotHomepage: "الصفحة الرئيسية — واجهة نظيفة وبديهية",
+    screenshotReport: "تقرير بحثي مُنشأ بالذكاء الاصطناعي",
+    features: [
+      ["13 لغة", "دعم سلس للإنجليزية والصينية واليابانية والكورية والعربية والألمانية والإسبانية والفرنسية والإيطالية والملايو والهولندية والروسية."],
+      ["تقارير في 30 ثانية", "تحليل شامل للأسهم بالذكاء الاصطناعي من منظور صعودي وهبوطي ومتوازن وتقني."],
+      ["تتبع الأدلة", "كل ادعاء مرتبط بملفات SEC الأصلية أو مصادر الأخبار."],
+      ["تصدير احترافي", "تحميل التقارير بصيغة PDF أو Word عالية الجودة أو نسخها."],
+      ["بيانات فورية", "تكامل مباشر مع بيانات السوق من Finnhub و SEC EDGAR."],
+      ["بريد Alpha اليومي", "أهم 10 رؤى سوقية تصل إلى بريدك كل صباح."]
+    ],
+    steps: [
+      ["أدخل الرمز", "اكتب أي رمز سهم — أسواق أمريكا وهونغ كونغ والصين وتايوان."],
+      ["اختر النمط", "اختر شخصية التحليل: صعودي، هبوطي، متوازن، أو تقني."],
+      ["تحليل AI", "يستخرج NLP الخنادق والمخاطر ومؤشرات الأداء من البيانات الفورية."],
+      ["تصدير التقرير", "راجع وصدّر إلى PDF أو DOCX أو شارك مباشرة."]
+    ]
+  },
+  de: {
+    tagline: "Verwandeln Sie komplexe Finanzdaten in klare, umsetzbare Research-Berichte in 30 Sekunden.",
+    cta: "Kostenlos testen",
+    featuresTitle: "Funktionen",
+    workflowTitle: "So funktioniert's",
+    screenshotsTitle: "Screenshots",
+    screenshotHomepage: "Startseite — Klare, intuitive Oberfläche",
+    screenshotReport: "KI-generierter Research-Bericht",
+    features: [
+      ["13 Sprachen", "Nahtlose Unterstützung für Englisch, Chinesisch, Japanisch, Koreanisch, Arabisch, Deutsch, Spanisch, Französisch, Italienisch, Malaiisch, Niederländisch und Russisch."],
+      ["30-Sekunden-Berichte", "KI-generierte umfassende Aktienanalyse mit bullischen, bärischen, ausgewogenen und technischen Perspektiven."],
+      ["Evidenz-Rückverfolgung", "Jede Aussage ist mit originalen SEC-Einreichungen oder Nachrichtenquellen verknüpft."],
+      ["Profi-Export", "Berichte als hochwertige PDF- oder Word-Dateien herunterladen oder in die Zwischenablage kopieren."],
+      ["Echtzeit-Daten", "Live-Marktdaten-Integration von Finnhub und SEC EDGAR."],
+      ["Tägliche Alpha-Mail", "Top 10 marktbewegende Insights jeden Morgen per E-Mail."]
+    ],
+    steps: [
+      ["Ticker eingeben", "Beliebiges Aktiensymbol eingeben — US-, HK-, CN-, TW-Märkte unterstützt."],
+      ["Stil wählen", "Analyse-Persona wählen: Bullisch, Bärisch, Ausgewogen oder Technisch."],
+      ["KI-Analyse", "NLP extrahiert Burggräben, Risiken und KPIs aus Echtzeit-Daten."],
+      ["Bericht exportieren", "Prüfen und als PDF, DOCX exportieren oder direkt teilen."]
+    ]
+  },
+  es: {
+    tagline: "Transforma datos financieros complejos en informes de investigación claros y accionables en 30 segundos.",
+    cta: "Prueba gratis",
+    featuresTitle: "Características",
+    workflowTitle: "Cómo funciona",
+    screenshotsTitle: "Capturas de pantalla",
+    screenshotHomepage: "Página principal — Interfaz limpia e intuitiva",
+    screenshotReport: "Informe de investigación generado por IA",
+    features: [
+      ["13 idiomas", "Soporte fluido para inglés, chino, japonés, coreano, árabe, alemán, español, francés, italiano, malayo, neerlandés y ruso."],
+      ["Informes en 30 segundos", "Análisis bursátil integral generado por IA con perspectivas alcista, bajista, equilibrada y técnica."],
+      ["Rastreo de evidencia", "Cada afirmación está vinculada a documentos SEC originales o fuentes de noticias."],
+      ["Exportación profesional", "Descarga informes en PDF, Word de alta calidad o copia al portapapeles."],
+      ["Datos en tiempo real", "Integración de datos de mercado en vivo de Finnhub y SEC EDGAR."],
+      ["Email Alpha diario", "Los 10 principales insights del mercado entregados a tu email cada mañana."]
+    ],
+    steps: [
+      ["Ingresa el ticker", "Escribe cualquier símbolo bursátil — mercados de EE.UU., HK, CN, TW soportados."],
+      ["Elige el estilo", "Selecciona tu persona de análisis: alcista, bajista, equilibrado o técnico."],
+      ["Análisis IA", "NLP extrae fosos, riesgos y KPIs de datos en tiempo real."],
+      ["Exporta el informe", "Revisa y exporta a PDF, DOCX o comparte directamente."]
+    ]
+  },
+  fr: {
+    tagline: "Transformez des données financières complexes en rapports de recherche clairs et exploitables en 30 secondes.",
+    cta: "Essai gratuit",
+    featuresTitle: "Fonctionnalités",
+    workflowTitle: "Comment ça marche",
+    screenshotsTitle: "Captures d'écran",
+    screenshotHomepage: "Page d'accueil — Interface claire et intuitive",
+    screenshotReport: "Rapport de recherche généré par IA",
+    features: [
+      ["13 langues", "Support fluide pour l'anglais, le chinois, le japonais, le coréen, l'arabe, l'allemand, l'espagnol, le français, l'italien, le malais, le néerlandais et le russe."],
+      ["Rapports en 30 secondes", "Analyse boursière complète générée par IA avec perspectives haussière, baissière, équilibrée et technique."],
+      ["Traçabilité des preuves", "Chaque affirmation est liée aux documents SEC originaux ou aux sources d'information."],
+      ["Export professionnel", "Téléchargez les rapports en PDF, Word haute fidélité ou copiez dans le presse-papiers."],
+      ["Données en temps réel", "Intégration de données de marché en direct de Finnhub et SEC EDGAR."],
+      ["Email Alpha quotidien", "Les 10 principales analyses du marché livrées chaque matin par email."]
+    ],
+    steps: [
+      ["Entrez le ticker", "Tapez n'importe quel symbole boursier — marchés US, HK, CN, TW supportés."],
+      ["Choisissez le style", "Sélectionnez votre persona d'analyse : haussier, baissier, équilibré ou technique."],
+      ["Analyse IA", "Le NLP extrait les avantages concurrentiels, risques et KPIs des données en temps réel."],
+      ["Exportez le rapport", "Consultez et exportez en PDF, DOCX ou partagez directement."]
+    ]
+  },
+  it: {
+    tagline: "Trasforma dati finanziari complessi in report di ricerca chiari e utilizzabili in 30 secondi.",
+    cta: "Prova gratis",
+    featuresTitle: "Funzionalità",
+    workflowTitle: "Come funziona",
+    screenshotsTitle: "Screenshot",
+    screenshotHomepage: "Homepage — Interfaccia pulita e intuitiva",
+    screenshotReport: "Report di ricerca generato dall'IA",
+    features: [
+      ["13 lingue", "Supporto fluido per inglese, cinese, giapponese, coreano, arabo, tedesco, spagnolo, francese, italiano, malese, olandese e russo."],
+      ["Report in 30 secondi", "Analisi azionaria completa generata dall'IA con prospettive rialzista, ribassista, bilanciata e tecnica."],
+      ["Tracciamento evidenze", "Ogni affermazione è collegata ai documenti SEC originali o alle fonti di notizie."],
+      ["Export professionale", "Scarica report in PDF, Word ad alta fedeltà o copia negli appunti."],
+      ["Dati in tempo reale", "Integrazione dati di mercato live da Finnhub e SEC EDGAR."],
+      ["Email Alpha giornaliera", "I 10 principali insight di mercato consegnati nella tua email ogni mattina."]
+    ],
+    steps: [
+      ["Inserisci il ticker", "Digita qualsiasi simbolo azionario — mercati US, HK, CN, TW supportati."],
+      ["Scegli lo stile", "Seleziona la tua persona di analisi: rialzista, ribassista, bilanciata o tecnica."],
+      ["Analisi IA", "L'NLP estrae vantaggi competitivi, rischi e KPI dai dati in tempo reale."],
+      ["Esporta il report", "Rivedi ed esporta in PDF, DOCX o condividi direttamente."]
+    ]
+  },
+  ms: {
+    tagline: "Ubah data kewangan yang kompleks menjadi laporan penyelidikan yang jelas dan boleh diambil tindakan dalam 30 saat.",
+    cta: "Cuba percuma",
+    featuresTitle: "Ciri-ciri",
+    workflowTitle: "Cara ia berfungsi",
+    screenshotsTitle: "Tangkapan skrin",
+    screenshotHomepage: "Laman utama — Antara muka bersih dan intuitif",
+    screenshotReport: "Laporan penyelidikan dijana AI",
+    features: [
+      ["13 bahasa", "Sokongan lancar untuk Bahasa Inggeris, Cina, Jepun, Korea, Arab, Jerman, Sepanyol, Perancis, Itali, Melayu, Belanda dan Rusia."],
+      ["Laporan 30 saat", "Analisis saham komprehensif dijana AI dengan perspektif kenaikan, penurunan, seimbang dan teknikal."],
+      ["Penjejakan bukti", "Setiap dakwaan dikaitkan dengan pemfailan SEC asal atau sumber berita."],
+      ["Eksport profesional", "Muat turun laporan dalam PDF, Word berkualiti tinggi atau salin ke papan keratan."],
+      ["Data masa nyata", "Integrasi data pasaran langsung dari Finnhub dan SEC EDGAR."],
+      ["E-mel Alpha harian", "10 pandangan pasaran teratas dihantar ke e-mel anda setiap pagi."]
+    ],
+    steps: [
+      ["Masukkan ticker", "Taip mana-mana simbol saham — pasaran AS, HK, CN, TW disokong."],
+      ["Pilih gaya", "Pilih persona analisis anda: kenaikan, penurunan, seimbang atau teknikal."],
+      ["Analisis AI", "NLP mengekstrak parit, risiko dan KPI daripada data masa nyata."],
+      ["Eksport laporan", "Semak dan eksport ke PDF, DOCX atau kongsi terus."]
+    ]
+  },
+  nl: {
+    tagline: "Transformeer complexe financiële data in duidelijke, bruikbare onderzoeksrapporten in 30 seconden.",
+    cta: "Gratis proberen",
+    featuresTitle: "Functies",
+    workflowTitle: "Hoe het werkt",
+    screenshotsTitle: "Screenshots",
+    screenshotHomepage: "Startpagina — Schone, intuïtieve interface",
+    screenshotReport: "AI-gegenereerd onderzoeksrapport",
+    features: [
+      ["13 talen", "Naadloze ondersteuning voor Engels, Chinees, Japans, Koreaans, Arabisch, Duits, Spaans, Frans, Italiaans, Maleis, Nederlands en Russisch."],
+      ["30-seconden rapporten", "AI-gegenereerde uitgebreide aandelenanalyse met bullish, bearish, evenwichtige en technische perspectieven."],
+      ["Bewijsvoering", "Elke bewering is gekoppeld aan originele SEC-documenten of nieuwsbronnen."],
+      ["Professionele export", "Download rapporten in hoogwaardige PDF, Word of kopieer naar klembord."],
+      ["Realtime data", "Live marktdata-integratie van Finnhub en SEC EDGAR."],
+      ["Dagelijkse Alpha-mail", "Top 10 marktbewegend inzichten elke ochtend in uw inbox."]
+    ],
+    steps: [
+      ["Voer ticker in", "Typ een willekeurig aandelensymbool — US, HK, CN, TW markten ondersteund."],
+      ["Kies stijl", "Selecteer uw analyse-persona: bullish, bearish, evenwichtig of technisch."],
+      ["AI-analyse", "NLP extraheert concurrentievoordelen, risico's en KPI's uit realtime data."],
+      ["Exporteer rapport", "Bekijk en exporteer naar PDF, DOCX of deel direct."]
+    ]
+  },
+  ru: {
+    tagline: "Превращайте сложные финансовые данные в понятные аналитические отчёты за 30 секунд.",
+    cta: "Попробовать бесплатно",
+    featuresTitle: "Возможности",
+    workflowTitle: "Как это работает",
+    screenshotsTitle: "Скриншоты",
+    screenshotHomepage: "Главная страница — Чистый, интуитивный интерфейс",
+    screenshotReport: "Аналитический отчёт, созданный ИИ",
+    features: [
+      ["13 языков", "Бесшовная поддержка английского, китайского, японского, корейского, арабского, немецкого, испанского, французского, итальянского, малайского, нидерландского и русского языков."],
+      ["Отчёт за 30 секунд", "Комплексный анализ акций с бычьей, медвежьей, сбалансированной и технической перспективами."],
+      ["Отслеживание источников", "Каждое утверждение связано с оригинальными документами SEC или новостными источниками."],
+      ["Профессиональный экспорт", "Скачивайте отчёты в высококачественном PDF, Word или копируйте в буфер обмена."],
+      ["Данные в реальном времени", "Интеграция рыночных данных в реальном времени от Finnhub и SEC EDGAR."],
+      ["Ежедневная Alpha-рассылка", "Топ-10 рыночных инсайтов доставляются на вашу почту каждое утро."]
+    ],
+    steps: [
+      ["Введите тикер", "Введите любой символ акции — рынки США, Гонконга, Китая, Тайваня."],
+      ["Выберите стиль", "Выберите аналитическую персону: бычья, медвежья, сбалансированная или техническая."],
+      ["Анализ ИИ", "NLP извлекает конкурентные преимущества, риски и KPI из данных в реальном времени."],
+      ["Экспорт отчёта", "Просмотрите и экспортируйте в PDF, DOCX или поделитесь напрямую."]
+    ]
+  }
+};
+
+const langLabels = {
+  en:"English","zh-Hans":"简体中文","zh-Hant":"繁體中文",ja:"日本語",ko:"한국어",
+  ar:"العربية",de:"Deutsch",es:"Español",fr:"Français",it:"Italiano",
+  ms:"Melayu",nl:"Nederlands",ru:"Русский"
+};
+
+let currentLang = localStorage.getItem('ql-lang') || navigator.language.split('-')[0] || 'en';
+if (!i18n[currentLang]) {
+  if (navigator.language === 'zh-TW' || navigator.language === 'zh-Hant') currentLang = 'zh-Hant';
+  else if (navigator.language.startsWith('zh')) currentLang = 'zh-Hans';
+  else currentLang = 'en';
+}
+
+function render(lang) {
+  currentLang = lang;
+  localStorage.setItem('ql-lang', lang);
+  const t = i18n[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key]) el.textContent = t[key];
+  });
+
+  // Features
+  const grid = document.getElementById('featuresGrid');
+  grid.innerHTML = t.features.map(([title, desc]) =>
+    `<div class="card"><h3>${title}</h3><p>${desc}</p></div>`
+  ).join('');
+
+  // Steps
+  const steps = document.getElementById('stepsContainer');
+  steps.innerHTML = t.steps.map(([title, desc], i) =>
+    `<div class="step"><span class="num">0${i+1}</span><h3>${title}</h3><p>${desc}</p></div>`
+  ).join('');
+
+  // Lang bar active state
+  document.querySelectorAll('.lang-bar button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+}
+
+// Build lang bar
+const bar = document.getElementById('langBar');
+Object.entries(langLabels).forEach(([code, label]) => {
+  const btn = document.createElement('button');
+  btn.textContent = label;
+  btn.dataset.lang = code;
+  btn.onclick = () => render(code);
+  bar.appendChild(btn);
+});
+
+render(currentLang);
+</script>
+</body>
+</html>
