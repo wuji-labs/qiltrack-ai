@@ -1,54 +1,90 @@
 <div align="center">
   <img src="https://qiltrack.com/logo.png" alt="Qiltrack AI" width="80" />
   <h1>Qiltrack AI</h1>
-  <p><strong>AI 驱动的股票研究工具</strong></p>
+  <p><strong>AI 驱动的个人投资者股票研究工具</strong></p>
+  <p>三分钟搞懂一家公司 — 机构级分析，零门槛。</p>
 
-  <a href="https://qiltrack.com">官网</a> •
-  <a href="https://qiltrack.com/blog">博客</a> •
-  <a href="https://x.com/wuji_labs">Twitter</a>
+  <a href="https://qiltrack.com">🌐 官网</a> •
+  <a href="https://qiltrack.com/zh-Hans/hub">📊 报告中心</a> •
+  <a href="https://qiltrack.com/blog">📝 博客</a> •
+  <a href="https://x.com/wuji_labs">𝕏 Twitter</a>
+
+  <br /><br />
+
+  <img src="https://img.shields.io/badge/报告-100+-blue" alt="Reports" />
+  <img src="https://img.shields.io/badge/语言-13种-green" alt="Languages" />
+  <img src="https://img.shields.io/badge/市场-美股%20%7C%20港股%20%7C%20A股%20%7C%20台股-orange" alt="Markets" />
+  <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="License" />
 </div>
 
 ---
 
-## Qiltrack AI 是什么？
+> 📖 [English version](README.md)
 
-Qiltrack AI 将复杂的金融数据转化为清晰、可操作的研究报告，仅需 30 秒。我们通过人工智能让个人投资者也能获得机构级的股票研究能力。
+## 什么是 Qiltrack AI？
 
-## 功能特点
+Qiltrack AI 将复杂的金融数据转化为清晰、可执行的研究报告，**只需 30 秒**。我们通过多视角 AI 分析，让个人投资者也能获得机构级的股票研究 — 无需华尔街的价格。
 
-- **5 种研究风格** — 多头、空头、平衡、技术分析、深度分析视角
-- **30 秒出报告** — AI 生成的综合分析报告
-- **13 种语言** — English, 简体中文, 繁體中文, 日本語, 한국어, العربية, Deutsch, Español, Français, Italiano, Bahasa Melayu, Nederlands, Русский
-- **全球覆盖** — 美股、港股、A股、台股
-- **证据溯源** — 每个结论都关联原始 SEC 文件或新闻来源
-- **专业导出** — 支持 PDF、Word 和剪贴板导出
-- **每日 Alpha 邮件** — 每日精选市场洞察推送至邮箱
+<div align="center">
+  <img src="docs/screenshots/homepage.png" alt="Qiltrack AI 首页" width="800" />
+  <p><em>终端风格界面，实时市场数据流</em></p>
+</div>
 
-## 使用方法
+## ✨ 核心功能
 
-1. 输入股票代码（如 AAPL、TSLA、0700.HK）
-2. 选择研究风格和分析角色
-3. 30 秒内获得 AI 生成的报告
-4. 导出为 PDF/DOCX 或分享
+| 功能 | 说明 |
+|------|------|
+| **5 种研究视角** | 标准、马斯克（增长）、巴菲特（价值）、浑水（做空）、深度研究 |
+| **30 秒报告** | AI 生成全面分析报告，附证据溯源 |
+| **13 种语言** | 中英日韩阿拉伯语等 13 种语言支持 |
+| **全球市场** | 美股（NASDAQ/NYSE）、港股、A 股、台股 |
+| **证据溯源** | 每个观点都链接到 SEC 原始文件或新闻来源 |
+| **专业导出** | PDF、Word（DOCX）、剪贴板导出 |
+| **每日精选** | Top 10 市场动态邮件推送 |
+| **报告中心** | 浏览 100+ 社区生成的免费报告 |
 
-## 技术栈
+## 📊 报告中心
 
-- **前端**: Next.js, React, TypeScript, Tailwind CSS
-- **AI**: 多个大语言模型提供综合分析
-- **数据**: 来自 Finnhub 和 SEC EDGAR 的实时市场数据
+浏览社区生成的 AI 投研报告 — 按股票代码、语言、风格和权限筛选。
 
-## 链接
+<div align="center">
+  <img src="docs/screenshots/hub.png" alt="报告中心" width="800" />
+  <p><em>浏览、筛选、发现投资洞察</em></p>
+</div>
+
+## 📄 AI 生成报告
+
+每份报告包含执行摘要、财务分析、竞争定位、风险评估和可操作建议 — 全部附有来源引用。
+
+<div align="center">
+  <img src="docs/screenshots/report.png" alt="AI 投研报告" width="800" />
+  <p><em>机构级股票研究报告，附证据溯源</em></p>
+</div>
+
+## 🛠 技术栈
+
+- **前端**: Next.js 14, React, TypeScript, Tailwind CSS
+- **AI 引擎**: 多模型 LLM 编排，全面分析
+- **数据源**: Finnhub 实时市场数据 + SEC EDGAR 文件
+- **基础设施**: Vercel (Edge + Serverless), Supabase (Auth + DB)
+
+## 🔗 链接
 
 - **官网**: [qiltrack.com](https://qiltrack.com)
-- **联系**: support@qiltrack.com
+- **报告中心**: [qiltrack.com/hub](https://qiltrack.com/zh-Hans/hub)
 - **Twitter**: [@wuji_labs](https://x.com/wuji_labs)
+- **联系我们**: [support@qiltrack.com](mailto:support@qiltrack.com)
 
-## 免责声明
+## ⚖️ 免责声明
 
-Qiltrack AI 是一个教育工具，不是金融顾问。我们不提供投资建议或推荐。做出金融决策前请咨询专业人士。
+Qiltrack AI 是教育和信息工具，**不是投资顾问**。我们不提供投资建议或买卖推荐。数据来源于公开渠道，不保证准确性。投资决策前请自行研究并咨询专业人士。
+
+## 📄 许可证
+
+[MIT](LICENSE)
 
 ---
 
 <div align="center">
-  <sub>由 Qiltrack 团队用 ❤️ 构建</sub>
+  <sub>Built with ❤️ by <a href="https://github.com/wuji-labs">Qiltrack Team</a></sub>
 </div>
