@@ -607,8 +607,8 @@ export function mapApiPostToCard(post: ReportPost): ReportCard {
     language: post.language ?? null,
     status: post.status ?? null,
     version: post.version ?? null,
-    // Default to "ultra" for new reports - premium content
-    accessLevel: (post as any)?.accessLevel || "ultra",
+    // Read access_level from database (snake_case) or accessLevel (camelCase)
+    accessLevel: (post as any)?.access_level || (post as any)?.accessLevel || "timed-free",
   };
 }
 

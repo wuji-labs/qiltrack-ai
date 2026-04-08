@@ -16,10 +16,13 @@ export async function GET(
     const { role } = await getAuthContext(context);
     const isAdmin = isAdminOrEditor(role);
 
-    let query = context.supabase
+    // 营销策略：使用 service role 绕过 RLS，让所有人都能访问报告详情页
+    // 权限检查在 ClientReportContent 组件中进行（登录/会员等级检查）
+    const supabaseServiceRole = createServiceRoleClient();
+    let query = supabaseServiceRole
       .from("report_posts")
       .select(
-        "id, title, slug, summary, body, cover, theme, tags, language, status, version, user_id, published_at, created_at, updated_at"
+        "id, title, slug, summary, body, cover, theme, tags, language, status, version, user_id, published_at, created_at, updated_at, company_data, symbol, tone, access_level"
       )
       .eq("slug" as never, slug)
       .limit(1);

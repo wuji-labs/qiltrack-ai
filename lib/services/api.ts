@@ -27,11 +27,16 @@ type HistoryResponse = {
     symbol: string;
     created_at: string;
     status: string;
+    slug: string | null;
+    report_run_id: string | null;
+    tone: string | null;
+    language: string | null;
+    mode: string | null;
     markdown_path?: string | null;
     docx_path?: string | null;
     markdown_signed_url?: string | null;
     docx_signed_url?: string | null;
-    mode?: string | null;
+    pdf_signed_url?: string | null;
   }>;
   pagination: {
     page: number;
@@ -126,10 +131,10 @@ export async function generateReport(params: FetchReportParams): Promise<ReportR
     search.set("testToken", testToken);
   }
 
-  // Use AbortController with 3 minute timeout for report generation
-  // LLM generation can take 1-2 minutes for detailed reports
+  // Use AbortController with 5 minute timeout for report generation
+  // LLM generation can take 3-4 minutes for detailed reports
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 180000); // 3 minutes
+  const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
 
   try {
     const res = await fetch(`/api/report?${search.toString()}`, {
@@ -220,6 +225,7 @@ type ReportPostsQuery = {
   lang?: string;
   query?: string;
   status?: string;
+  accessLevel?: string;
 };
 
 /**
@@ -236,6 +242,7 @@ export async function fetchReportPosts(
   if (params.lang) search.set("lang", params.lang);
   if (params.query) search.set("q", params.query);
   if (params.status) search.set("status", params.status);
+  if (params.accessLevel) search.set("accessLevel", params.accessLevel);
 
   const res = await fetch(`/api/report/posts?${search.toString()}`);
   return handleJson<ReportPostsResponse>(res, "Failed to fetch report posts");
