@@ -21,6 +21,11 @@
 
 > 📖 [English version](README.md)
 
+<p align="center">
+  <img src="assets/wechat-personal.jpg" alt="Add WUJI on WeChat" width="200">
+</p>
+<p align="center">扫码添加作者微信</p>
+
 ## 什么是 Qiltrack AI？
 
 Qiltrack AI 将复杂的金融数据转化为清晰、可执行的研究报告，**只需 30 秒**。我们通过多视角 AI 分析，让个人投资者也能获得机构级的股票研究 — 无需华尔街的价格。

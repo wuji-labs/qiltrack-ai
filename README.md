@@ -19,6 +19,11 @@
 
 ---
 
+<p align="center">
+  <img src="assets/wechat-personal.jpg" alt="Add WUJI on WeChat" width="200">
+</p>
+<p align="center">扫码添加作者微信 · Scan to add the author on WeChat</p>
+
 ## What is Qiltrack AI?
 
 Qiltrack AI transforms complex financial data into clear, actionable research reports in **30 seconds**. We bring institutional-grade equity analysis to individual investors through multi-perspective AI — so you can make informed decisions without the Wall Street price tag.
@@ -115,7 +120,3 @@ Qiltrack AI is an educational and informational tool — **not a financial advis
 <div align="center">
   <sub>Built with ❤️ by the <a href="https://github.com/wuji-labs">Qiltrack Team</a></sub>
 </div>
-
-## 联系 · Contact
-扫码添加无极微信，交流合作 · Scan to add WUJI on WeChat
-<img src="assets/wechat-qr.png" width="200" alt="WUJI WeChat QR">
